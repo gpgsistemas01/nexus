@@ -11,7 +11,7 @@ Antes de confirmar un cambio se verifica:
    modificada?
 5. ¿La escritura compuesta conserva transacción, autorización, auditoría y errores?
 6. ¿Las pruebas están en la ubicación declarada y verifican el CRUD o regla afectada?
-7. ¿Las vistas reutilizan componentes y preservan la última línea EJS?
+7. ¿Los componentes Vue reutilizan los contratos y controles compartidos?
 8. ¿La documentación curada y generada quedó sincronizada y los diagramas modificados
    se renderizaron y revisaron en una exportación?
 9. ¿Los cambios persistentes incluyen migración incremental, conservación de datos

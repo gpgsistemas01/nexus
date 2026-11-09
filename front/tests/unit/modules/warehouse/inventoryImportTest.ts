@@ -19,6 +19,93 @@ afterEach(() => {
 });
 
 describe('contrato de importación y recuperación', () => {
+  it.each(['DRAFT', 'COMPLETED'])(
+    'rechaza respuestas %s con una operación fuera de las tres admitidas',
+    async (status) => {
+      const batch = draft();
+      apiClient.http.defaults.adapter = mockHttpAdapter(() => ({
+        data: {
+          batch: {
+            ...batch,
+            mode: 'mixed',
+            status,
+            ...(status === 'COMPLETED' ? { preview: null, result: batch.preview } : {}),
+          },
+        },
+      }));
+      await expect(
+        inventoryImportService.get(batch.id, new AbortController().signal),
+      ).rejects.toThrow('leer la importación');
+    },
+  );
+  it('vincula todo el archivo a una operación y retira el archivo al cambiarla antes de validar', async () => {
+    const batch = { ...draft(), mode: 'update' as const };
+    const preview = vi.spyOn(inventoryImportService, 'preview').mockResolvedValue(batch);
+    vi.spyOn(inventoryImportService, 'cancel').mockResolvedValue({ ...batch, status: 'CANCELED' });
+    const mounted = mountComposable(() =>
+      useInventoryImport({
+        resource: 'materials',
+        userId: ids.user,
+        onSaved: vi.fn(),
+        onUnauthorized: vi.fn(),
+      }),
+    );
+    const file = new File(['xlsx'], 'materiales.xlsx');
+    mounted.value.selectFile(file);
+    mounted.value.selectMode('update');
+    expect(mounted.value.file.value).toBeNull();
+    await mounted.value.prepare();
+    expect(preview).not.toHaveBeenCalled();
+    mounted.value.selectFile(file);
+    await mounted.value.prepare();
+    expect(preview).toHaveBeenCalledWith('materials', 'update', file, expect.any(AbortSignal));
+    mounted.value.selectMode('adjust');
+    expect(mounted.value.mode.value).toBe('update');
+    await mounted.value.discard();
+    expect(mounted.value.mode.value).toBe('create');
+    mounted.wrapper.unmount();
+  });
+  it('un operador de conteo inicia en Ajustar y no puede seleccionar altas ni ediciones', () => {
+    const mounted = mountComposable(() =>
+      useInventoryImport({
+        resource: 'materials',
+        userId: ids.user,
+        availableModes: () => ['adjust'],
+        onSaved: vi.fn(),
+        onUnauthorized: vi.fn(),
+      }),
+    );
+    expect(mounted.value.mode.value).toBe('adjust');
+    mounted.value.selectMode('create');
+    expect(mounted.value.mode.value).toBe('adjust');
+    mounted.wrapper.unmount();
+  });
+  it('conserva la operación mientras se descarga su plantilla y no valida otro archivo en esa espera', async () => {
+    let finish!: (value: Blob) => void;
+    vi.spyOn(inventoryImportService, 'template').mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+    );
+    const preview = vi.spyOn(inventoryImportService, 'preview');
+    const mounted = mountComposable(() =>
+      useInventoryImport({
+        resource: 'materials',
+        userId: ids.user,
+        onSaved: vi.fn(),
+        onUnauthorized: vi.fn(),
+      }),
+    );
+    mounted.value.selectFile(new File(['xlsx'], 'materiales.xlsx'));
+    const download = mounted.value.template.exportReport({ supplierId: '', search: '', page: 1 });
+    mounted.value.selectMode('adjust');
+    await mounted.value.prepare();
+    expect(mounted.value.mode.value).toBe('create');
+    expect(preview).not.toHaveBeenCalled();
+    mounted.wrapper.unmount();
+    finish(new Blob(['xlsx']));
+    await download;
+  });
   it('envía un solo multipart para la vista previa y confirma con JSON y clave estable', async () => {
     const batch = draft();
     const transport = vi.fn((config) =>

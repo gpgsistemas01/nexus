@@ -85,7 +85,7 @@ que el cliente determine un discriminador persistido y reutiliza el núcleo com�
 
 - `src/shared` contiene exclusivamente contratos y funciones puras utilizables por
   Node.js y el navegador. No importa módulos de front/back, DOM, Prisma ni transporte.
-  Además de `src/public`, Express publica ese directorio en `/shared`; el resto de
+  Vite incorpora esos módulos al cliente; el resto de
   `src` no se sirve mediante esos montajes estáticos. Todo su contenido es público.
 - Compartir exige que el contenido pueda publicarse según los requisitos de
   confidencialidad del proyecto. Una función pura puede contener una fórmula

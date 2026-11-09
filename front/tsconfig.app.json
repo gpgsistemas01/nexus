@@ -4,15 +4,16 @@
         "env.d.ts",
         "src/**/*.ts",
         "src/**/*.vue",
-        "../back/src/public/js/utils/validations/loginValidation.js",
-        "../back/src/public/js/utils/validations/baseValidations.js",
-        "../back/src/public/js/constants/apiMessages.js",
+        "../back/src/shared/validation/loginValidation.js",
+        "../back/src/shared/validation/baseValidations.js",
+        "../back/src/shared/messages/apiMessages.js",
         "../back/src/shared/constants/auth.js",
         "../back/src/shared/constants/inputValidation.js",
         "../back/src/shared/constants/inventoryImport.js",
+        "../back/src/shared/constants/historicalDelivery.js",
         "../back/src/shared/messages/goodsReceiptMessages.js",
-        "../back/src/public/js/utils/validations/validators.js",
-        "../back/src/public/js/utils/validations/fieldValidations.js",
+        "../back/src/shared/validation/validators.js",
+        "../back/src/shared/validation/fieldValidations.js",
         "../back/src/shared/constants/inventory.js",
         "../back/src/shared/constants/permissions.js",
         "../back/src/shared/inventory/wasteMeasurements.js",
@@ -20,11 +21,12 @@
         "../back/src/shared/utils/numberUtils.js",
         "../back/src/shared/constants/catalogs.js",
         "../back/src/shared/inventory/goodsReceiptCalculations.js",
-        "../back/src/public/js/utils/timeZone.js",
+        "../back/src/shared/utils/timeZone.js",
         "../back/src/shared/constants/apiSuccessCodes.js",
-        "../back/src/public/js/application/warehouse/issues/issueHeaderRules.js",
-        "../back/src/public/js/constants/fulfillmentStatuses.js",
-        "../back/src/public/js/utils/formatters.js"
+        "../back/src/shared/inventory/issueHeaderRules.js",
+        "../back/src/shared/constants/fulfillmentStatuses.js",
+        "../back/src/shared/constants/goodsReceiptStatuses.js",
+        "../back/src/shared/utils/formatters.js"
     ],
     "compilerOptions": {
         "composite": true,
@@ -33,26 +35,24 @@
         "allowJs": true,
         "checkJs": false,
         "paths": {
+            "@nexus/purchase-statuses": ["../back/src/shared/constants/goodsReceiptStatuses.js"],
+            "@nexus/historical-deliveries": ["../back/src/shared/constants/historicalDelivery.js"],
             "@nexus/inventory-imports": ["../back/src/shared/constants/inventoryImport.js"],
             "@nexus/piece-quantity": ["../back/src/shared/inventory/pieceQuantity.js"],
             "@nexus/input-validation": ["../back/src/shared/constants/inputValidation.js"],
-            "@nexus/login-validation": [
-                "../back/src/public/js/utils/validations/loginValidation.js"
-            ],
-            "@nexus/api-messages": ["../back/src/public/js/constants/apiMessages.js"],
+            "@nexus/login-validation": ["../back/src/shared/validation/loginValidation.js"],
+            "@nexus/api-messages": ["../back/src/shared/messages/apiMessages.js"],
             "@nexus/waste-measurements": ["../back/src/shared/inventory/wasteMeasurements.js"],
             "@nexus/permissions": ["../back/src/shared/constants/permissions.js"],
             "@nexus/catalogs": ["../back/src/shared/constants/catalogs.js"],
-            "@nexus/form-validation": ["../back/src/public/js/utils/validations/validators.js"],
+            "@nexus/form-validation": ["../back/src/shared/validation/validators.js"],
             "@nexus/purchase-calculations": [
                 "../back/src/shared/inventory/goodsReceiptCalculations.js"
             ],
-            "@nexus/date-time": ["../back/src/public/js/utils/timeZone.js"],
+            "@nexus/date-time": ["../back/src/shared/utils/timeZone.js"],
             "@nexus/api-success-codes": ["../back/src/shared/constants/apiSuccessCodes.js"],
-            "@nexus/issue-header-rules": [
-                "../back/src/public/js/application/warehouse/issues/issueHeaderRules.js"
-            ],
-            "@nexus/issue-statuses": ["../back/src/public/js/constants/fulfillmentStatuses.js"],
+            "@nexus/issue-header-rules": ["../back/src/shared/inventory/issueHeaderRules.js"],
+            "@nexus/issue-statuses": ["../back/src/shared/constants/fulfillmentStatuses.js"],
             "@nexus/numbers": ["../back/src/shared/utils/numberUtils.js"]
         },
         "noUnusedLocals": true,

@@ -1,4 +1,4 @@
-import { FULFILLMENT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import {
     WasteIssueDetailNotFound,

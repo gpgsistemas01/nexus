@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.7 | 1.0.0 | En revisión | 2026-11-07 | Equipo Nexus |
+| 1.9 | 1.0.0 | En revisión | 2026-11-09 | Equipo Nexus |
 
 ## Propósito y destinatarios
 
@@ -27,9 +27,9 @@ Empiece por [Primera jornada: recorrido de inducción](00-induction.md).
 | --- | --- |
 | [1. Acceso y sesión](01-access.md) | Ingresar, recordar usuario, recuperar acceso y salir. |
 | [2. Navegación y controles](02-navigation-and-controls.md) | Menú, filtros, tablas, selectores y formularios. |
-| [3. Materiales](03-materials.md) | Registrar, consultar, editar y ajustar materiales. |
-| [4. Consumibles](04-consumables.md) | Administrar existencias de consumibles. |
-| [5. Mermas](05-wastes.md) | Capturar medidas y pesos, agregar existencias y ajustar. |
+| [3. Materiales](03-materials.md) | Consultar, registrar, editar, ajustar e importar materiales desde Excel. |
+| [4. Consumibles](04-consumables.md) | Consultar, editar e importar consumibles por operación. |
+| [5. Mermas](05-wastes.md) | Capturar medidas y pesos, editar, importar, agregar existencias y ajustar. |
 | [6. Catálogos](06-catalogs.md) | Áreas, roles, presentaciones, unidades, motivos y estados. |
 | [7. Personas](07-persons.md) | Personas y sus responsabilidades por área. |
 | [8. Usuarios](08-users.md) | Cuentas, asignaciones y contraseñas. |
@@ -38,7 +38,7 @@ Empiece por [Primera jornada: recorrido de inducción](00-induction.md).
 | [11. Compras](11-purchases.md) | Recepciones, detalles, correcciones y cancelaciones. |
 | [12. Salidas](12-issues.md) | Solicitudes, surtido y devoluciones. |
 | [13. Movimientos](13-movements.md) | Historial de entradas y salidas de existencias. |
-| [14. Reportes](14-reports.md) | Descargar información según filtros o periodo. |
+| [14. Reportes](14-reports.md) | Descargar por filtros/periodo y distinguir reportes, plantillas e informes de errores. |
 | [15. Errores y recuperación](15-errors-and-recovery.md) | Capturas inválidas, conflictos y fallos de conexión. |
 | [16. Glosario para trabajar en Nexus](16-glossary.md) | Significado de campos, cantidades, estados y operaciones. |
 

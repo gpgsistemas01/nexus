@@ -7,6 +7,7 @@ import { FORM_FIELD_LIMITS } from '@nexus/input-validation';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import IssueDetailsTable from './IssueDetailsTable.vue';
+import type { HistoricalDeliveryEvidence } from '../historicalDelivery.js';
 import type {
     IssueValues,
     IssueField,
@@ -17,6 +18,7 @@ import type {
 } from '../issue.js';
 
 defineProps<{
+    historicalDelivery?: HistoricalDeliveryEvidence;
     title: string;
     values: IssueValues;
     errors: Partial<Record<IssueField, string>>;
@@ -61,6 +63,27 @@ const emit = defineEmits<{
         @close="emit('close')"
         @reload="emit('reload')"
     >
+        <VAlert
+            v-if="historicalDelivery"
+            type="info"
+            variant="tonal"
+            class="mb-4"
+        >
+            <strong>Regularizada por entrega histórica</strong>
+            . Recibo: {{ historicalDelivery.id }}. Motivo: {{ historicalDelivery.reason }}.
+            Registró: {{ historicalDelivery.user?.name ?? 'Usuario no disponible' }}. Corte:
+            {{
+                new Date(historicalDelivery.cutoffDate).toLocaleString('es-MX', {
+                    timeZone: 'America/Mexico_City',
+                })
+            }}. Registro:
+            {{
+                new Date(historicalDelivery.createdAt).toLocaleString('es-MX', {
+                    timeZone: 'America/Mexico_City',
+                })
+            }}. Costos y cantidades de proyecto históricos sin verificar. Las devoluciones deben
+            representar entradas físicas actuales.
+        </VAlert>
         <h3>Datos de la salida</h3>
         <VRow>
             <VCol

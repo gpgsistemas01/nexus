@@ -23,6 +23,7 @@ el límite multipart real. Las respuestas simuladas no demuestran persistencia.
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
 | `DP-VUE-TABLE-001` | Orden incorrecto al compartir tablas | Unitario; particiones por mapa y transición de recurso | `tableQueryTest.ts`: conserva índices discontinuos de inventario, traduce página/tamaño/sentido, descarta una columna exclusiva de proveedor al cambiar a cliente y conserva Fecha descendente del historial. | [tableQueryTest.ts](../../../tests/unit/shared/composables/tableQueryTest.ts) |
+| `DP-VUE-TABLE-003` | Acciones inaccesibles al desplazar el listado o controles táctiles demasiado pequeños. | Navegador; fronteras de 390/960 px y desplazamiento inicial/intermedio/final. | `tableActions.spec.ts` abre y cierra la edición mediante clic en coordenadas visibles después de cada desplazamiento; en móvil el control mide al menos 44 px por lado. | `tests/e2e/tableActions.spec.ts`. |
 | `DP-VUE-LIST-002` | Limpieza compartida pierde filtros, tamaño u orden | Unitario; transición aplicada → borrador → limpio | `listInteractionTest.ts`: limpia texto aplicado y borrador, reinicia filtros y página, conserva tamaño y sentido. | [listInteractionTest.ts](../../../tests/unit/shared/composables/listInteractionTest.ts) |
 
 Las pruebas de navegador cubren `RecordListPanel`, `ListFilters`, `TableFrame`, `TableAction` y
@@ -96,6 +97,17 @@ describe la colaboración que comprueban estas pruebas.
 
 ## Altas contextuales desde selectores
 
+Los filtros y la importación sólo seleccionan proveedores existentes. El alta se
+conserva en Nuevo material, Nuevo consumible y Nueva compra para cuentas autorizadas;
+Mermas requiere un origen existente y Salidas no registra proveedores. El recorrido
+`operationalAccess.spec.ts` contrasta un Coordinador de Impresión y un Instalador:
+sólo Almacén/Salidas, tablas sin acciones ni costos, búsqueda de registros inexistentes
+sin alta comercial y selección de un cliente existente sin escrituras. La variante de
+gestión conserva Detalles de peso. Salidas pendientes y surtidas no ofrecen surtido
+ni devolución, tampoco dentro de la consulta de una entrega. La matriz del servidor cubre las seis áreas y la
+integración `operationalAccessDbTest.js` verifica 403 y ausencia de registros de clientes
+y proveedores para Operador y Coordinador.
+
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
 | `DP-VUE-SEL-001` | RF-VUE-012; selección contextual | `CU-CAT-02/06`, `CU-ALM-02/18`, soporte de `CU-ENT-02/08` y Salidas; navegador y unitario. Particiones por consumidor/permiso, coincidencia/ausencia y transiciones abrir → cancelar/error/reintentar/guardar. | `selectCreation.spec.ts` representa proveedor en Materiales/Consumibles y Compras, artículo en ambas Compras y cliente en las tres Salidas. Comprueba precarga, retorno, captura conservada, contratos de compra, teclado y exclusión de alta en filtros/catálogos/merma o sin permiso. `inventoryFormTest.ts` añade proveedor inactivo, selección fuera de la página remota y respuesta tras desmontaje. Fichas `CP-VUE-SEL-001-01/02/03`. | [CP-VUE-SEL-001-01](../cases/cp-vue-sel-001-01.md); [CP-VUE-SEL-001-02](../cases/cp-vue-sel-001-02.md); [CP-VUE-SEL-001-03](../cases/cp-vue-sel-001-03.md) |
@@ -129,6 +141,7 @@ modificadas. La disponibilidad de un PNG en otro perfil no completa el seleccion
 | `DP-VUE-MAN-001` | Omitir registros posteriores o capturar una fila anterior; particiones por estado y fronteras de paginación. | Una página corta avanza por filas recibidas. Compras canceladas y salidas parciales/con devolución se encuentran después de veinte registros; la búsqueda diferida abre el ID del folio elegido. | `manualPreparationTest.ts` y `manualCapture.spec.ts`. |
 | `DP-VUE-MAN-002` | Bloquearse con el primer detalle surtido o sin saldo; transiciones consulta → página posterior → selección. | Surtido y devolución recorren documentos y detalles hasta encontrar una opción disponible. La cantidad de muestra respeta un pendiente menor que uno; no se envían escrituras. Cada imagen tiene límite propio y conserva el estado de recuperación. | `manualCapture.spec.ts`, `profileManuals.spec.ts` y `manualProfilesTest.ts`. |
 | `DP-VUE-MAN-003` | Exigir operaciones históricas para ilustrar acciones o publicar referencias rotas; particiones acción/ejemplo y dev/demo. | Corregir funciona con una partida activa sin historial de cancelaciones. Ningún perfil solicita capturas de compra mixta; la tabla conserva su explicación. El surtido conserva la referencia existente o usa el total convertido del detalle como borrador. La devolución por documento admite un renglón cancelado y otro con saldo. Los ejemplos sin datos no omiten capturas de acciones; sus referencias se retiran y la tabla permanece. | `manualCapture.spec.ts` y `manualProfilesTest.ts`. |
+| `DP-VUE-MAN-004` | Publicar importación o modos no autorizados; tabla de decisión de lectura, escritura, costos y ajuste. | Lectura/escritura/costos o lectura/ajuste habilitan el procedimiento; lectura sola, escritura sin costos, costos sin escritura o falta de lectura lo excluyen en Materiales, Consumibles y Mermas. | `manualProfilesTest.ts`; variante documental de `CP-VUE-MAN-001-01`. |
 | `DP-VUE-MAN-004` | Continuar con consultas huérfanas tras un límite o saturar la preparación; transiciones consulta → cancelación → captura siguiente. | La página se cierra y la tarea termina antes de continuar en la misma cuenta. Las consultas se limitan a cuatro simultáneas y sus lotes terminan antes de devolver un resultado o error; un fallo del servicio no se presenta como falta de datos. | `manualCaptureRunTest.ts`, `manualPreparationTest.ts` y `manualCapture.spec.ts`. |
 | `DP-VUE-MAN-005` | Publicar una selección parcial o atribuir escritura a consulta; particiones por permiso y conjunto completo/omitido/repetido. | Los capítulos y capturas coinciden con la selección de la sesión. Retirar un capítulo, captura o referencia requerida bloquea la publicación; los ejemplos sin datos conservan su excepción. Consulta no recibe instrucciones, imágenes ni alcance de escritura. | `manualProfilesTest.ts`; `CP-VUE-MAN-001-01`. |
 
@@ -152,3 +165,9 @@ el formulario principal. La persistencia se verifica por separado en el backend.
 | Riesgo | Nivel y técnica | Condición y fuente ejecutable |
 | --- | --- | --- |
 | Omitir firmas, expandir estructuras inferidas como contratos independientes o conservar declaraciones obsoletas. | Unitario; particiones TS/SFC, tipos locales/externos, aliases, genéricos, objetos anónimos, imports renombrados y cambios/retirada de fuentes. | `typeDocumentationTest.ts`: conserva campos, parámetros propiedad, props/eventos/slots y referencias locales en tablas; mantiene aliases y objetos anónimos dentro de su declaración, sin crear diagramas por contrato. Comprueba generación determinista, fuentes cambiadas y eliminación de salidas obsoletas. No valida reglas del negocio. |
+
+La selección documental de `DP-VUE-MAN-004` incluye la importación de Materiales,
+Consumibles y Mermas. `manualProfilesTest.ts` contrasta la tabla de decisión:
+lectura/escritura/costos y lectura/ajuste permiten el procedimiento; lectura sola,
+escritura sin costos, falta de lectura o costos sin escritura lo excluyen. Son
+particiones de autorización del manual; no prueban la persistencia de una importación.

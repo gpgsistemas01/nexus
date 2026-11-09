@@ -18,3 +18,12 @@ comprueba controles, recarga, permisos y ausencia de desbordamiento a 320 px.
 La API simulada no prueba stock; la
 [integración HTTP/Prisma](../../../../back/tests/integration/controllers/inventoryImportControllerDbTest.js)
 comprueba recibos, movimientos, versiones y rollback reales.
+
+La variante de conteo selecciona Ajustar existencias para todo el archivo y muestra
+stock 2→0. Cambiar de Alta a Ajustar retira el archivo previo y exige cargarlo otra
+vez. Se confirma una sola solicitud. Las plantillas de edición/alta conservan su
+operación en los parámetros y nombre de descarga. Un archivo incompatible muestra
+el rechazo sin confirmación. Un operador de ajuste sin lectura de costos sólo ve
+Ajustar existencias; sin escritura/costos ni ajuste, el botón permanece oculto.
+La integración contrasta columnas del reporte, IDs/versiones, conservación del destino,
+conteo real y recuperación de la misma confirmación.

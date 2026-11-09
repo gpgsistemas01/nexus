@@ -3,7 +3,7 @@
   "info": {
     "title": "Nexus API",
     "version": "1.0.0",
-    "description": "API HTTP de Nexus. Autenticaci\u00f3n por cookies, recursos operativos y reportes XLSX.",
+    "description": "API HTTP de Nexus. Autenticación por cookies, recursos operativos y reportes XLSX.",
     "license": {
       "name": "ISC",
       "identifier": "ISC"
@@ -245,6 +245,12 @@
     },
     "/api/warehouse/inventory-imports/{id}/errors/excel": {
       "$ref": "./paths/inventory-imports.json#/~1api~1warehouse~1inventory-imports~1{id}~1errors~1excel"
+    },
+    "/api/warehouse/historical-deliveries/{resource}/preview": {
+      "$ref": "./paths/historical-deliveries.json#/~1api~1warehouse~1historical-deliveries~1{resource}~1preview"
+    },
+    "/api/warehouse/historical-deliveries/{resource}/confirm": {
+      "$ref": "./paths/historical-deliveries.json#/~1api~1warehouse~1historical-deliveries~1{resource}~1confirm"
     }
   },
   "components": {
@@ -253,13 +259,13 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "accessToken",
-        "description": "Cookie accessToken HttpOnly emitida al iniciar o renovar sesi\u00f3n; se usa en operaciones protegidas."
+        "description": "Cookie accessToken HttpOnly emitida al iniciar o renovar sesión; se usa en operaciones protegidas."
       },
       "refreshCookieAuth": {
         "type": "apiKey",
         "in": "cookie",
         "name": "refreshToken",
-        "description": "Cookie refreshToken HttpOnly; se usa s\u00f3lo para renovar el acceso."
+        "description": "Cookie refreshToken HttpOnly; se usa sólo para renovar el acceso."
       }
     },
     "responses": {
@@ -279,7 +285,7 @@
         "$ref": "./components/responses.json#/WriteConflict"
       },
       "ValidationError": {
-        "description": "Datos de captura inv\u00e1lidos (VALIDATION_ERROR con errors por campo) o rechazo global de la solicitud (code y message), incluido RECORD_ID_INVALID.",
+        "description": "Datos de captura inválidos (VALIDATION_ERROR con errors por campo) o rechazo global de la solicitud (code y message), incluido RECORD_ID_INVALID.",
         "content": {
           "application/json": {
             "schema": {
@@ -527,6 +533,21 @@
       },
       "InventoryImportConfirmRequest": {
         "$ref": "./components/inventory-import-schemas.json#/InventoryImportConfirmRequest"
+      },
+      "HistoricalDeliveryEvidence": {
+        "$ref": "./components/historical-delivery-schemas.json#/HistoricalDeliveryEvidence"
+      },
+      "HistoricalDeliveryCommand": {
+        "$ref": "./components/historical-delivery-schemas.json#/HistoricalDeliveryCommand"
+      },
+      "HistoricalDeliveryCandidate": {
+        "$ref": "./components/historical-delivery-schemas.json#/HistoricalDeliveryCandidate"
+      },
+      "HistoricalDeliveryPreviewResponse": {
+        "$ref": "./components/historical-delivery-schemas.json#/HistoricalDeliveryPreviewResponse"
+      },
+      "HistoricalDeliveryResponse": {
+        "$ref": "./components/historical-delivery-schemas.json#/HistoricalDeliveryResponse"
       }
     },
     "parameters": {
@@ -621,8 +642,8 @@
   },
   "tags": [
     {
-      "name": "Sesi\u00f3n",
-      "description": "Operaciones de sesi\u00f3n."
+      "name": "Sesión",
+      "description": "Operaciones de sesión."
     },
     {
       "name": "Clientes",
@@ -661,8 +682,8 @@
       "description": "Operaciones de inventario."
     },
     {
-      "name": "Cat\u00e1logos",
-      "description": "Operaciones de cat\u00e1logos."
+      "name": "Catálogos",
+      "description": "Operaciones de catálogos."
     },
     {
       "name": "Compras de materiales",
@@ -686,7 +707,11 @@
     },
     {
       "name": "Importaciones de inventario",
-      "description": "Plantillas, validaci\u00f3n, confirmaci\u00f3n at\u00f3mica y recuperaci\u00f3n de lotes XLSX de Almac\u00e9n."
+      "description": "Plantillas, validación, confirmación atómica y recuperación de lotes XLSX de Almacén."
+    },
+    {
+      "name": "Conciliación histórica",
+      "description": "Reconocimiento de entregas físicas anteriores sin otro descuento de stock."
     }
   ]
 }

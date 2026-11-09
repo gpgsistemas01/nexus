@@ -69,6 +69,10 @@ const dateText = (value: string) =>
             <br />
             <small>{{ dateText(item.requestDate) }}</small>
         </template>
+        <template #[`item.fulfillmentStatus`]="{ item }">
+            {{ item.fulfillmentStatus }}
+            <p v-if="item.historicalDelivery"><small>Regularizada por entrega histórica</small></p>
+        </template>
         <template #[`item.actions`]="{ item }">
             <TableAction
                 v-if="canManage && canEditIssue(item)"

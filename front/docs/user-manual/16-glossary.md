@@ -141,3 +141,13 @@ Consulte [Salidas](12-issues.md) para los pasos y las restricciones de cada oper
 
 Los pasos de consulta están en [Movimientos](13-movements.md).
 <!-- manual:end -->
+
+## Archivos de trabajo
+
+| Término | Significado |
+| --- | --- |
+| Reporte de consulta | Archivo descargado para revisar información y totales del alcance seleccionado. No guarda cambios en Nexus. |
+| Plantilla operativa | Excel preparado para una operación de inventario, con sus hojas, columnas de captura y referencias. |
+| Informe de errores | Relación de filas y columnas que debe revisar en la copia de captura; no sustituye esa copia. |
+| ID y versión en una plantilla | Referencias del registro y de la lectura descargada. Se conservan para identificar el destino y detectar si cambió. |
+| Stock contado | Saldo físico final comprobado. Un cero expresa ausencia de existencias; una celda vacía no es un conteo. |

@@ -3,7 +3,21 @@
 <!-- manual:all suppliers:manage suppliers:read -->
 ## Registrar un proveedor desde el selector
 
-Si falta un proveedor, regístrelo desde el selector del artículo o la compra.
+Si falta un proveedor, regístrelo al crear un material, consumible o compra. La acción
+requiere permiso para registrar y consultar proveedores; no aparece en todos los selectores.
+
+| Selector o formulario | Alta de proveedor |
+| --- | --- |
+| Nuevo material o consumible en Almacén | Disponible para una cuenta autorizada. |
+| Nueva compra | Disponible para una cuenta autorizada. |
+| Edición de un artículo o compra | No cambia ni crea proveedores; conserva el proveedor original. |
+| Nueva merma | Utiliza el proveedor y material de origen existentes. |
+| Filtros de Almacén, Compras o Movimientos | Sólo consulta y selecciona proveedores existentes. |
+| Importar Excel | Sólo filtra proveedores existentes; no registra un proveedor desde el selector. |
+| Salidas | Selecciona artículos con proveedor existente; no ofrece alta de proveedores. |
+
+En Mermas, el proveedor debe tener un material de origen válido. Si falta, prepare
+primero ese material y su proveedor; después registre la merma.
 
 1. Abra **Proveedor** y busque su nombre comercial. Si ya existe, selecciónelo.
 2. Si falta y aparece **Registrar proveedor**, pulse esa acción sin cerrar la captura principal.
@@ -41,8 +55,11 @@ campos y guarde. Compruebe el proveedor en el listado.
 ## Editar y desactivar
 
 1. Localice el proveedor y pulse **Editar registro**.
-2. Compruebe la identidad de la empresa, corrija los campos o desmarque **Activo**.
+2. Cambie **Razón social**, **Nombre comercial** o **Activo**, según corresponda.
 3. Pulse **Actualizar** y revise el resultado.
+
+El código del proveedor se conserva; no se captura desde esta edición. Los cambios
+no modifican existencias, costos ni partidas de compras o salidas.
 
 Desactivar conserva el historial. Edite los datos de la misma empresa; no los
 sustituya por los de otro proveedor. Ante un conflicto, siga

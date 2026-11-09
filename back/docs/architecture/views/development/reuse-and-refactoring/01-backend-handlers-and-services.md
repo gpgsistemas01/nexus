@@ -43,7 +43,7 @@ flowchart TB
     goods["goodsIssueService<br/>salida de materiales / consumibles"] --> header["issueHeaderService<br/>resolveIssueHeaderData"]
     waste["wasteIssueService<br/>salida de merma"] --> header
     header --> lookups["personService · clientService · departmentService<br/>consultas con tx recibido"]
-    header --> policy["personRules + constants/issueHeaderRules<br/>asesor interno y número de proyecto"]
+    header --> policy["personRules + shared/inventory/issueHeaderRules<br/>asesor interno y número de proyecto"]
     goods --> common["issues/issueFulfillmentRules<br/>resolveIssueFulfillmentStatus"]
     waste --> common
     returns["goodsIssueReturnService<br/>devolución de material"] --> common

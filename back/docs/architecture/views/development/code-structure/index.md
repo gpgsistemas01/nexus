@@ -7,7 +7,7 @@ su ubicación; su alcance es el conjunto del software.
 
 Los archivos, imports y particularidades de cada recurso pertenecen a las referencias
 técnicas de [backend](../backend-technical-documentation/index.md#módulos) y
-[frontend](../frontend-technical-documentation/index.md#módulos). Las decisiones
+[frontend](../../../../../../front/docs/architecture/views/development/code-structure.md). Las decisiones
 que se repiten entre recursos se justifican en [patrones](../design-and-construction-patterns/index.md),
 y los contratos de sus núcleos se detallan en [reutilización](../reuse-and-refactoring/index.md).
 Los mapas generales se amplían mediante enlaces, sin reproducir aquí cada módulo.

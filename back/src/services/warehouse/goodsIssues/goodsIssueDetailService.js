@@ -9,7 +9,7 @@ import { GoodsIssueMissingMaxUnitCost } from '../../../errors/inventory/stockErr
 import { lockGoodsIssue } from '../../../repository/warehouse/documentLockRepository.js';
 import { updateGoodsIssueDetails as persistGoodsIssueDetails } from '../../../repository/warehouse/issueDetailRepository.js';
 import { createServiceLogger } from '../../../utils/logger.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';

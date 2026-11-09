@@ -1,9 +1,8 @@
 import 'dotenv/config';
 import { getRequestLogContext, logger, pinoLogger } from './utils/logger.js';
-import { hasPermission } from './shared/constants/permissions.js';
 
 import { registerApiRoutes } from './routes/api/index.js';
-import { registerWebRoutes } from './routes/web/index.js';
+import { registerSystemRoutes } from './routes/system/index.js';
 
 import {
     checkTypeContentJson,
@@ -13,41 +12,22 @@ import {
 import cookieParser from 'cookie-parser';
 
 import express from 'express';
-import expressEjsLayouts from 'express-ejs-layouts';
-import { publicDir, sharedDir, viewsDir } from './utils/pathsUtils.js';
 import { errorMap } from './messages/codeMessages.js';
 import { isAppError } from './errors/AppError.js';
 import { normalizeDatabaseError } from './errors/databaseError.js';
-import { appConfig } from './config/appConfig.js';
-import { getAuthTokenInfo } from './middleware/authMiddleware.js';
 import { auditWrites } from './middleware/auditMiddleware.js';
-import { serializeScriptData } from './utils/scriptDataUtils.js';
 
 export const createApp = ({ isReady = () => true } = {}) => {
     const app = express();
     app.locals.isReady = isReady;
 
-    const rootRoute = '/';
     const apiRoute = '/api';
     const textRoute = '/text';
     const uploadRoute = '/upload';
 
-    app.set('views', viewsDir);
-    app.set('view engine', 'ejs');
-    app.locals.serializeScriptData = serializeScriptData;
-
-    app.use(expressEjsLayouts);
-    app.set('layout', 'layout/base');
-    app.set('layout extractStyles', true);
-    app.set('layout extractScripts', true);
-
-    app.use(rootRoute, express.static(publicDir));
-    app.use('/shared', express.static(sharedDir));
-
     app.use(apiRoute, express.json());
     app.use(textRoute, express.text({ type: 'text/plain' }));
     app.use(cookieParser());
-    // app.use(express.urlencoded({ extended: true }));
 
     app.use(pinoLogger);
     app.use(auditWrites);
@@ -57,32 +37,10 @@ export const createApp = ({ isReady = () => true } = {}) => {
     app.use(uploadRoute, checkTypeContentFile);
     app.use(textRoute, checkContentTypePlainText);
 
-    app.use((req, res, next) => {
-        res.locals.appName = appConfig.name;
-        res.locals.flash = req.cookies.flash || null;
-        res.locals.hasPermission = hasPermission;
-        res.clearCookie('flash');
-        next();
-    });
-
-    registerWebRoutes(app);
-    app.get('/error/404', (req, res) => {
-        const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
-
-        return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
-    });
-
+    registerSystemRoutes(app);
     registerApiRoutes(app, { apiPrefix: apiRoute });
 
-    app.use((req, res, next) => {
-        if (req.path.startsWith(apiRoute) || !req.accepts('html')) {
-            return res.status(404).json({ message: 'Ruta no encontrada.' });
-        }
-
-        const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
-
-        return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
-    });
+    app.use((_req, res) => res.status(404).json({ message: 'Ruta no encontrada.' }));
 
     app.use((err, req, res, next) => {
 

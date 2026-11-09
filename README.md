@@ -1,6 +1,6 @@
 # Nexus
 
-La aplicación actual de Express, Prisma y vistas EJS vive en `back/`.
+La API Express con persistencia Prisma vive en `back/`.
 El frontend Vue 3 con TypeScript, Router y Vite está en `front/`, con login conectado
 a Express usando Vuetify y VeeValidate.
 Almacén, Compras, Salidas, Movimientos, Catálogos, Personas, Usuarios, Clientes y
@@ -12,7 +12,7 @@ Proveedores tienen interfaz Vue con acceso según los permisos de la cuenta.
 y [diagnóstico de rutas y login](front/docs/development/03-build-and-deployment.md#diagnóstico-del-despliegue).
 
 ```text
-back/                 # Express, EJS, Prisma, pruebas y documentación
+back/                 # API Express, Prisma, pruebas y documentación
 front/                # Vue 3 + Vite, login, Almacén, Movimientos, Identidad y Directorio
 .github/workflows/    # CI del repositorio
 Dockerfile            # Construye el backend usando el contexto raíz

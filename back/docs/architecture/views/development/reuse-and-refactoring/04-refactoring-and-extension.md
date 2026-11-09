@@ -10,35 +10,15 @@ histórica ni presenta una propuesta como implementación actual.
 
 ## Resultado vigente de extracción y configuración
 
-**Identificador:** `DIA-PAT-REF-001`. **Pregunta:** ¿cómo se concentran los mecanismos
-comunes sin absorber las variantes del dominio? **Fuente:** `createCrudApplication.js`,
-`warehouse/issues/createIssueApplication.js` y sus configuradores en `src/public/js/application`.
-Las flechas apuntan desde el consumidor a su dependencia.
+Los handlers compartidos de compras y salidas reciben las funciones del contexto
+desde controllers específicos. Las fachadas fijan el tipo y los servicios concentran
+las reglas y transacciones. La [reutilización backend](01-backend-handlers-and-services.md)
+conserva su diagrama propietario.
 
-```mermaid
-flowchart TB
-    subgraph domain["Variación propietaria del recurso"]
-        material["materials.js<br/>requests · dataKeys<br/>alta desde compra"]
-        consumable["consumables.js<br/>requests del consumible"]
-        issue["materialGoodsIssues.js<br/>requests · clave de devolución"]
-    end
-    material --> crud["Núcleo CRUD<br/>createCrudApplication<br/>closures de consulta y mutación"]
-    consumable --> crud
-    issue --> issueFactory["Composición de salidas<br/>createIssueApplication<br/>mutaciones especializadas"]
-    issueFactory --> crud
-    crud --> response["createSuccessResponseFromRequest<br/>adaptación común de respuesta"]
-```
-
-La extracción observable es la concentración de adaptación y construcción en las
-factories; la configuración permanece con el recurso. La instancia es privada y las
-operaciones se exportan con nombres de dominio. Así una modificación del mecanismo
-puede afectar varios recursos aunque ninguno cambie de endpoint.
-
-En backend, el mismo criterio se materializa con handlers compartidos de compras y
-salidas, configurados por controllers específicos. Sus consumidores y fronteras se
-muestran en [`DIA-COD-REU-002`](01-backend-handlers-and-services.md#reutilización-del-transporte-backend).
-La [decisión de propiedad visual](../design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md#decisión-de-propiedad)
-conserva un componente junto al recurso cuando su contrato todavía depende de él.
+En Vue, componentes, composables y servicios mantienen sus propias responsabilidades.
+La [estructura del cliente](../../../../../../front/docs/architecture/views/development/code-structure.md)
+y su [composición visual](../../../../../../front/docs/architecture/views/development/design-and-construction-patterns/05-slots-and-visual-composition.md)
+son las fuentes del ciclo de formulario y de los configuradores compartidos.
 
 ## Procedimiento para revisar una extracción
 
@@ -79,8 +59,8 @@ resolver y se mantiene junto al mecanismo propietario.
 | Pieza revisada | Representación vigente | Criterio de cobertura |
 | --- | --- | --- |
 | Factories CRUD y salidas; handlers y listado backend | [Factories y handlers](index.md) y `DIA-PAT-REF-001`. | Cubiertos: núcleo, configuradores y contrato de cada frontera. |
-| Factories de requests de compras/salidas | [`DIA-COD-REU-003`](02-browser-applications-and-requests.md#factories-de-requests-por-contexto). | Se añade la frontera de transporte y las variantes de URLs/operaciones. |
-| Tabla de detalle, builders y núcleo responsivo | [`DIA-COD-REU-004`](03-interface-and-table-lifecycle.md#construcción-y-ciclo-de-vida-de-tablas-de-detalle). | Se añade configuración, ownership, reinicialización y consumidores reales. |
+| Factories de requests de compras/salidas | [`DIA-COD-REU-003`](02-browser-applications-and-requests.md). | Se añade la frontera de transporte y las variantes de URLs/operaciones. |
+| Tabla de detalle, builders y núcleo responsivo | [`DIA-COD-REU-004`](03-interface-and-table-lifecycle.md). | Se añade configuración, ownership, reinicialización y consumidores reales. |
 | Encabezado y cumplimiento compartido de salidas | [`DIA-COD-REU-005`](01-backend-handlers-and-services.md#servicios-y-reglas-compartidos-por-salidas). | Se añade la colaboración backend y el límite de reglas específicas del detalle. |
 | DTO/adaptadores, colecciones, UI, permisos, eventos, auditoría y `tx` | [Catálogo visual y capítulos propietarios](../design-and-construction-patterns/index.md#cobertura-visual). | Ya tienen una colaboración o flujo de datos; se actualiza su fuente canónica. |
 | Arreglos compartidos de middleware de compras/salidas | [Pipeline](../design-and-construction-patterns/05-middleware-pipeline.md) y routers de cada contexto. | Basta explicar sus consumidores: comparten el orden declarado y permisos por operación; no necesitan otra secuencia equivalente. |

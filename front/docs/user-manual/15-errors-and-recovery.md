@@ -17,6 +17,7 @@ Los errores junto a un campo se corrigen directamente en ese campo.
 | Aparece Acceso no permitido. | Solicite revisión de permisos para esa función. | La persona autorizada puede entrar con su propia cuenta. |
 | La sesión sigue sin poder comprobarse tras los reintentos automáticos. | Restablezca conexión y use **Volver a comprobar el acceso**; ingrese de nuevo si se solicita. | Se abre una página autorizada. |
 | El registro cambió durante la edición. | Siga **Conflictos de edición**, abajo. | Puede revisar y guardar la corrección vigente. |
+| El archivo no se puede abrir o no conserva su formato. | Conserve el original y obtenga una descarga nueva; renombrar la extensión no convierte el contenido. | Puede revisar un archivo válido sin perder la copia anterior. |
 | Se perdió la respuesta al guardar. | Siga **Resultado incierto al guardar**, abajo. | Comprueba si el envío anterior se registró. |
 
 <!-- manual:any materials:write materials:adjust-stock wastes:write wastes:add-stock wastes:adjust-stock goods:receipts-manage goods:issue-details-manage waste:issues-supply -->
@@ -48,7 +49,9 @@ El ajuste no cierra la salida pendiente.
 
 ## Conflictos de edición
 
-El formulario conserva su captura y bloquea el envío. Use **Cerrar y actualizar
+El formulario conserva su captura y bloquea el envío. Un campo de consulta, un
+selector pendiente de otra selección y un registro en conflicto tienen causas
+distintas: compruebe el [estado de los campos](02-navigation-and-controls.md#campos-de-captura-y-de-consulta). Use **Cerrar y actualizar
 listado**, o cierre y vuelva a abrir el registro. Compare los datos actuales antes
 de preparar otra corrección.
 

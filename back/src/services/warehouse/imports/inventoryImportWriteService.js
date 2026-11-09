@@ -1,10 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { prepareMaterialData } from '../materials/materialHelpers.js';
-import { createInitialMaterialStockBatch } from '../adjustmentService.js';
+import { createInitialMaterialStockBatch, createMaterialStockAdjustmentsBatch } from '../adjustmentService.js';
+import { registerWasteStockAdjustmentsBatch } from '../wastes/wasteStockAdjustmentService.js';
 import { registerWasteStockEntriesBatch } from '../wastes/wasteStockEntryService.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { materialImportIdentity } from './inventoryImportContext.js';
-import { lockInventoryImportReferences, updateImportedMaterials, updateImportedWastes } from '../../../repository/warehouse/inventoryImportWriteRepository.js';
+import { lockInventoryImportReferences, lockInventoryStockCount, updateImportedMaterials, updateImportedWastes } from '../../../repository/warehouse/inventoryImportWriteRepository.js';
+import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 
 const createMaterials = async ({ tx, config, rows, context, userId }) => {
     const identities = new Map(context.identities);
@@ -58,9 +60,21 @@ const createWastes = async ({ tx, rows, context, userId }) => {
 
 // Las reglas y conversiones son las de los formularios; el lote agrupa las escrituras dentro de su única tx.
 export const writeInventoryImport = async ({ tx, config, rows, context, userId }) => {
-    const changed = rows.filter(row => row.action !== 'unchanged');
+    const changed = rows.filter(row => row.action !== actions.UNCHANGED);
+    if (config.mode === modes.ADJUST) {
+        await lockInventoryStockCount({ tx, context });
+        const references = config.type
+            ? await createMaterialStockAdjustmentsBatch({ tx, userId, entries: changed.map(row => ({
+                ...row.dto, materialId: row.id, supplierMaterial: context.offers.get(`${row.id}:${row.dto.supplierId}`)
+            })) })
+            : await registerWasteStockAdjustmentsBatch({ tx, userId, entries: changed.map(row => ({
+                ...row.dto, waste: context.wastes.get(row.id)
+            })) });
+        changed.forEach((row, index) => { row.details.adjustmentReference = references[index]; });
+        return new Map(changed.map(row => [row.row, row.id]));
+    }
     if (!changed.length) return new Map();
-    if (config.mode === 'create') {
+    if (config.mode === modes.CREATE) {
         await lockInventoryImportReferences({ tx, context });
         return config.resource === 'wastes'
             ? createWastes({ tx, rows: changed, context, userId })

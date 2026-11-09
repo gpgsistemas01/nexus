@@ -26,6 +26,33 @@ import { APP_NAVIGATION_GROUPS } from '../../../src/app/navigation.js';
 
 const temporary: string[] = [];
 
+it.each([
+  ['03-materials.md', 'materials'],
+  ['04-consumables.md', 'materials'],
+  ['05-wastes.md', 'wastes'],
+])(
+  'la importación de %s se documenta sólo para lectura y la operación autorizada',
+  async (file, resource) => {
+    const source = await readFile(path.resolve('docs/user-manual', file), 'utf8');
+    const read = `${resource}:read`;
+    const write = `${resource}:write`;
+    const adjust = `${resource}:adjust-stock`;
+    const costs = 'inventory:costs-read';
+    const decisions: [string[], boolean][] = [
+      [[read, write, costs], true],
+      [[read, adjust], true],
+      [[read], false],
+      [[read, write], false],
+      [[write, costs], false],
+      [[read, costs], false],
+    ];
+    for (const [permissions, available] of decisions) {
+      const content = filterManualContent(source, permissions);
+      expect(/^## Importar/m.test(content), permissions.join(', ')).toBe(available);
+    }
+  },
+);
+
 it('conserva capturas posteriores completas aunque otra pendiente falle de nuevo', () => {
   const previous = {
     revision: 'cuenta-a-vigente',
@@ -337,9 +364,17 @@ it.each(
       links.some(({ permission }) => session.permissions.includes(permission)),
     ).map(({ id }) => id);
     expect(groups).toEqual(['warehouse', 'issues']);
-    expect(selectedChapters(session.permissions).map(({ file }) => file)).not.toContain(
-      '14-reports.md',
+    expect(
+      selectedChapters(session.permissions)
+        .filter(({ section }) => section === 'tasks')
+        .map(({ file }) => file),
+    ).toEqual(['03-materials.md', '04-consumables.md', '05-wastes.md', '12-issues.md']);
+    const navigation = filterManualContent(
+      await readFile(path.resolve('docs/user-manual/02-navigation-and-controls.md'), 'utf8'),
+      session.permissions,
     );
+    expect(navigation).toContain('### Áreas operativas: Almacén y Salidas');
+    expect(navigation).toContain('no registran clientes ni proveedores');
     expect(selectedChapters(session.permissions).map(({ file }) => file)).toContain(
       '16-glossary.md',
     );
@@ -369,6 +404,7 @@ it.each(
       expect(content).not.toContain('25-issue-return.png');
       expect(content).not.toContain('utilice la devolución');
       expect(content).not.toContain('**Registrar cliente «nombre»**');
+      expect(content).not.toContain('**Detalles de peso**');
     }
   },
 );
@@ -378,6 +414,17 @@ it('Almacén conserva surtido y devolución, mientras sólo administración reci
   const admin = demoSession(DEMO_PROFILES[0]!);
   const issues = await readFile(path.resolve('docs/user-manual/12-issues.md'), 'utf8');
   expect(filterManualContent(issues, warehouse.permissions)).toContain('## Devolver una entrega');
+  expect(filterManualContent(issues, warehouse.permissions)).toContain(
+    '**Registrar cliente «nombre»**',
+  );
+  for (const permission of ['clients:create', 'clients:read']) {
+    expect(
+      filterManualContent(
+        issues,
+        warehouse.permissions.filter((value) => value !== permission),
+      ),
+    ).not.toContain('**Registrar cliente «nombre»**');
+  }
   const glossary = await readFile(path.resolve('docs/user-manual/16-glossary.md'), 'utf8');
   expect(filterManualContent(glossary, warehouse.permissions)).toContain(
     '### Referencias para surtir o devolver',

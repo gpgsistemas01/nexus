@@ -20,14 +20,33 @@ Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida 
 Materiales y consumibles requieren al menos una unidad; merma admite cantidades positivas menores.
 Solicitar no descuenta inventario.
 
-<!-- manual:any clients:create -->
+Seleccione un cliente y artículos con proveedor ya registrado. Si su cuenta pertenece
+a un área operativa y falta un registro, solicite el alta al responsable de Almacén.
+Salidas no ofrece alta de proveedores.
+
+<!-- manual:all clients:create clients:read -->
 Si falta un cliente, use **Registrar cliente «nombre»** en el selector y continúe después del alta.
 <!-- manual:end -->
 
 ## Editar
 
-Pulse **Editar salida**, cambie los campos habilitados y confirme **Actualizar**.
-Los detalles se editan mientras no haya surtidos; después puede quedar habilitado sólo el encabezado.
+Pulse **Editar salida**, revise el estado y confirme los cambios con **Actualizar**.
+
+| Situación | Campos habilitados | Datos que se conservan |
+| --- | --- | --- |
+| Pendiente, sin entregas | Cliente, Asesor, Área, Solicitante, Número de proyecto, Fecha y hora de solicitud y Observaciones; puede agregar o retirar partidas. | Folio; presentación, unidad y medidas de cada artículo. Los totales se calculan. |
+| Surtido parcial o Surtido, sin cancelación | Cliente, Asesor, Área, Solicitante, Número de proyecto, Fecha y hora de solicitud y Observaciones, con las condiciones de selección indicadas abajo. | Partidas, cantidades solicitadas, surtidas y devueltas; esta edición no entrega ni devuelve inventario. |
+| Cancelada | Ninguno: sólo consulta. | Encabezado y detalles históricos. |
+
+Para corregir una cantidad mientras la salida sigue pendiente, retire la partida
+y agréguela con la cantidad correcta. Revise las sumas si repite artículo y proveedor.
+Después de una entrega no se modifican las partidas desde la edición.
+
+Si la cuenta sólo tiene un área disponible, se conserva seleccionada. Para **GPG
+INTERNO**, el sistema propone el proyecto del área; conserve ese valor, ya que
+la validación exige que corresponda al área elegida. Cliente, área
+y permisos delimitan los selectores de asesor y solicitante; revise esas selecciones
+si cambia un dato del encabezado.
 <!-- manual:end -->
 
 ## Consultar y distinguir estados
@@ -48,6 +67,9 @@ Las partidas canceladas se conservan sin botones de acción.
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ## Surtir
 
+En esta operación el encabezado y la solicitud original son de consulta. Se habilitan
+la selección de partidas, **Cantidad a surtir** y **Cantidad de proyecto**.
+
 1. Pulse **Surtir detalle** y marque las partidas que entregará.
 2. Capture **Cantidad a surtir** sin superar el saldo pendiente.
 3. Capture **Cantidad de proyecto**, que expresa el total del detalle para el proyecto.
@@ -60,6 +82,9 @@ La cantidad de proyecto se expresa en la unidad de conversión y sirve para comp
 lo previsto con la cantidad convertida. El descuento de stock usa **Cantidad a surtir**.
 
 ## Devolver una entrega
+
+La devolución sólo captura la cantidad a devolver y sus observaciones para la partida
+seleccionada. No modifica cliente, proyecto, artículo ni la cantidad solicitada.
 
 1. En una salida **Surtida**, pulse **Devolver material surtido**.
 2. Elija **Devolver detalle de salida** y compruebe el saldo retornable.
@@ -97,6 +122,28 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 ![Merma con devolución registrada y saldo entregado.](images/25c-issue-partial-return.png)
 
 ![Salida de merma cancelada por devolución total.](images/25f-issue-canceled.png)
+<!-- manual:end -->
+
+<!-- manual:any issues:reconcile -->
+## Registrar entregas históricas ya realizadas
+
+1. Conciliar primero el inventario mediante un conteo físico actual en Almacén.
+2. Pulsar **Registrar entregas históricas** en el inventario de salidas correspondiente.
+3. Capturar fecha/hora de corte (Ciudad de México) y buscar folio o proyecto.
+4. Revisar cantidades ya registradas/devueltas y pendientes por registrar. Seleccionar
+   sólo documentos entregados completamente; hasta 100 por página y lote.
+5. Capturar motivo/evidencia y, sólo si se conoce, fecha real de entrega.
+6. Declarar que todas las partidas pendientes seleccionadas se entregaron antes del corte.
+7. Pulsar **Registrar entregas seleccionadas** y conservar el recibo.
+
+Completa sólo lo que faltaba registrar. Conserva devoluciones y no vuelve a descontar
+stock ni genera movimientos. Consulta y Excel identifican la procedencia histórica;
+costos y datos de proyecto históricos quedan sin verificar.
+Si cambia un documento, volver a buscar/revisar. Si se pierde la respuesta, reabrir
+y pulsar **Revisar y reintentar registro**; conserva captura y clave originales.
+
+Una devolución posterior exige confirmar que el material está entrando físicamente
+al almacén ahora. No registrar como devolución material que ya se incluyó en el conteo.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->

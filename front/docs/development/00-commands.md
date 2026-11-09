@@ -126,8 +126,7 @@ necesario agregarlo. `--fresh` rehace el conjunto seleccionado.
 `docs:manual` es alias de `docs:manuals`.
 
 Desde `front/`, omite `--prefix front`. Los archivos de cuentas y credenciales se
-resuelven desde `front/` en ambos casos. Los comandos de `back/` corresponden al
-manual EJS. El manual general `:reference` reúne funciones de referencia; para
+resuelven desde `front/` en ambos casos. Los comandos de `back/` exportan documentación técnica de la API. El manual general `:reference` reúne funciones de referencia; para
 entregar un manual a un usuario, selecciona su cuenta con los comandos anteriores.
 
 Manuales y capturas usan los permisos de `/api/auth/me`. Un cambio de usuario o

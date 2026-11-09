@@ -279,6 +279,7 @@ erDiagram
     direction LR
     GoodsIssue {
         String id PK
+        String historicalDeliveryBatchId FK
         String referenceNumber UK
         String statusId FK
         String departmentId FK
@@ -289,6 +290,9 @@ erDiagram
         String clientId FK
         String advisorId FK
         String fulfillmentStatusId FK
+    }
+    HistoricalDeliveryBatch {
+        String id PK
     }
     Department {
         String id PK
@@ -308,6 +312,7 @@ erDiagram
     FulfillmentStatus {
         String id PK
     }
+    HistoricalDeliveryBatch o|..o{ GoodsIssue : "historicalDeliveryBatchId = HistoricalDeliveryBatch.id"
     Department ||..o{ GoodsIssue : "departmentId = Department.id"
     Person o|..o{ GoodsIssue : "approverId = Person.id"
     Person ||..o{ GoodsIssue : "requesterId = Person.id"
@@ -523,6 +528,7 @@ erDiagram
     direction LR
     WasteIssue {
         String id PK
+        String historicalDeliveryBatchId FK
         String referenceNumber UK
         String createdById FK
         String departmentId FK
@@ -531,6 +537,9 @@ erDiagram
         String advisorId FK
         String fulfillmentStatusId FK
         String statusId FK
+    }
+    HistoricalDeliveryBatch {
+        String id PK
     }
     User {
         String id PK
@@ -550,6 +559,7 @@ erDiagram
     Status {
         String id PK
     }
+    HistoricalDeliveryBatch o|..o{ WasteIssue : "historicalDeliveryBatchId = HistoricalDeliveryBatch.id"
     User ||..o{ WasteIssue : "createdById = User.id"
     Department ||..o{ WasteIssue : "departmentId = Department.id"
     Person ||..o{ WasteIssue : "requesterId = Person.id"
@@ -724,9 +734,9 @@ erDiagram
     Waste ||..o{ WasteStockAdjustmentDetail : "wasteId = Waste.id"
 ```
 
-## Importaciones de inventario
+## Importaciones y conciliación de inventario
 
-### InventoryImport
+### InventoryImport · HistoricalDeliveryBatch
 
 ```mermaid
 erDiagram
@@ -735,9 +745,14 @@ erDiagram
         String id PK
         String userId FK
     }
+    HistoricalDeliveryBatch {
+        String id PK
+        String userId FK
+    }
     User {
         String id PK
     }
+    User o|..o{ HistoricalDeliveryBatch : "userId = User.id"
     User o|..o{ InventoryImport : "userId = User.id"
 ```
 
@@ -751,6 +766,7 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | Campos FK del dependiente | Clave referenciada | Referenciados por dependiente | Dependientes por referenciado |
 | --- | --- | --- | --- |
 | `User.personId` | `Person.id` | 0..1 | 0..N |
+| `HistoricalDeliveryBatch.userId` | `User.id` | 0..1 | 0..N |
 | `InventoryImport.userId` | `User.id` | 0..1 | 0..N |
 | `CriticalWriteAudit.actorId` | `User.id` | 0..1 | 0..N |
 | `UserRoleDepartment.userId` | `User.id` | 1 | 0..N |
@@ -782,6 +798,7 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `WasteMovementDetail.wasteStockAdjustmentDetailId` | `WasteStockAdjustmentDetail.id` | 0..1 | 0..N |
 | `WasteMovementDetail.movementId` | `WasteMovement.id` | 1 | 0..N |
 | `WasteMovementDetail.wasteIssueDetailId` | `WasteIssueDetail.id` | 0..1 | 0..N |
+| `WasteIssue.historicalDeliveryBatchId` | `HistoricalDeliveryBatch.id` | 0..1 | 0..N |
 | `WasteIssue.createdById` | `User.id` | 1 | 0..N |
 | `WasteIssue.departmentId` | `Department.id` | 1 | 0..N |
 | `WasteIssue.requesterId` | `Person.id` | 1 | 0..N |
@@ -803,6 +820,7 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `GoodsReceipt.statusId` | `Status.id` | 1 | 0..N |
 | `GoodsReceiptDetail.goodsReceiptId` | `GoodsReceipt.id` | 1 | 0..N |
 | `GoodsReceiptDetail.materialId` | `Material.id` | 1 | 0..N |
+| `GoodsIssue.historicalDeliveryBatchId` | `HistoricalDeliveryBatch.id` | 0..1 | 0..N |
 | `GoodsIssue.departmentId` | `Department.id` | 1 | 0..N |
 | `GoodsIssue.approverId` | `Person.id` | 0..1 | 0..N |
 | `GoodsIssue.requesterId` | `Person.id` | 1 | 0..N |

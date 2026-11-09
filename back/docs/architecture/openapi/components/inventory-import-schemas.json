@@ -194,8 +194,10 @@
       "mode": {
         "enum": [
           "create",
-          "update"
-        ]
+          "update",
+          "adjust"
+        ],
+        "description": "Operación de todo el archivo: Alta, Editar datos o Ajustar existencias."
       },
       "status": {
         "enum": [

@@ -2,9 +2,12 @@ import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { Prisma } from '../../../../generated/prisma/client.ts';
 import { getDb } from '../../../repository/baseRepository.js';
+import { lockInventoryImport, tryLockInventoryImportConfirmation } from '../../../repository/warehouse/inventoryImportWriteRepository.js';
 import { OperationKeyConflictError, RecordVersionConflictError } from '../../../errors/concurrencyError.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
-import { INVENTORY_IMPORT_LIMITS as limits } from '../../../shared/constants/inventoryImport.js';
+import { isDatabaseContentionError } from '../../../errors/databaseError.js';
+import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
+import { INVENTORY_IMPORT_LIMITS as limits, INVENTORY_IMPORT_STATUSES as statuses } from '../../../shared/constants/inventoryImport.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { writeInventoryImport } from './inventoryImportWriteService.js';
 import { authorizeInventoryImport } from './inventoryImportConfig.js';
@@ -26,9 +29,9 @@ const owned = async ({ id, user, db = getDb() }) => {
 };
 
 const view = batch => {
-    const expired = batch.status === 'DRAFT' && batch.expiresAt <= new Date();
+    const expired = batch.status === statuses.DRAFT && batch.expiresAt <= new Date();
     return { id: batch.id, version: batch.version, resource: batch.resource, mode: batch.mode,
-        status: expired ? 'EXPIRED' : batch.status, filename: batch.filename,
+        status: expired ? statuses.EXPIRED : batch.status, filename: batch.filename,
         createdAt: batch.createdAt, expiresAt: batch.expiresAt, completedAt: batch.completedAt,
         preview: expired ? null : batch.preview, result: batch.result };
 };
@@ -39,7 +42,7 @@ export const previewInventoryImport = async ({ user, resource, mode, filename, b
     const fileHash = hash(buffer);
     const rows = await processInventoryWorkbook({ action: 'read', config, bytes: buffer }, signal);
     signal?.throwIfAborted();
-    const validated = await validateInventoryImportRows({ db: getDb(), config, rows });
+    const validated = await validateInventoryImportRows({ db: getDb(), config, rows, user });
     signal?.throwIfAborted();
     const preview = { summary: validated.summary, rows: validated.rows.map(publicRow) };
     const payload = validated.summary.errors ? undefined : json(validated.rows.map(row => ({
@@ -59,9 +62,9 @@ export const getInventoryImport = async ({ id, user }) => view(await owned({ id,
 
 export const cancelInventoryImport = async ({ id, user }) => {
     const batch = await owned({ id, user });
-    if (batch.status !== 'DRAFT') throw new InventoryImportError('STATE');
-    const result = await getDb().inventoryImport.updateMany({ where: { id, userId: user.id, status: 'DRAFT' },
-        data: { status: 'CANCELED', payload: Prisma.DbNull, preview: Prisma.DbNull } });
+    if (batch.status !== statuses.DRAFT) throw new InventoryImportError('STATE');
+    const result = await getDb().inventoryImport.updateMany({ where: { id, userId: user.id, status: statuses.DRAFT },
+        data: { status: statuses.CANCELED, payload: Prisma.DbNull, preview: Prisma.DbNull } });
     if (!result.count) throw new InventoryImportError('STATE');
     return view(await owned({ id, user }));
 };
@@ -73,22 +76,21 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
     try {
         const completed = await getDb().$transaction(async tx => {
             await tx.$executeRaw`SET LOCAL lock_timeout = '1500ms'`;
-            await tx.$queryRaw`SELECT "id" FROM "InventoryImport" WHERE "id" = ${id}::uuid AND "userId" = ${user.id}::uuid FOR UPDATE`;
+            await lockInventoryImport({ tx, id, userId: user.id });
             const batch = await owned({ id, user, db: tx });
             const commandHash = hash(JSON.stringify({ id, expectedVersion, fileHash: batch.fileHash }));
-            if (batch.status === 'COMPLETED') {
+            if (batch.status === statuses.COMPLETED) {
                 if (batch.operationId !== operationId || batch.commandHash !== commandHash) throw new OperationKeyConflictError();
                 return { batch: view(batch), replayed: true };
             }
-            if (batch.status !== 'DRAFT') throw new InventoryImportError('STATE');
+            if (batch.status !== statuses.DRAFT) throw new InventoryImportError('STATE');
             if (batch.expiresAt <= new Date()) throw new InventoryImportError('EXPIRED');
             if (batch.version !== expectedVersion) throw new RecordVersionConflictError();
             if (!Array.isArray(batch.payload) || batch.preview?.summary?.errors) throw new InventoryImportError('VALIDATION');
-            const [gate] = await tx.$queryRaw`SELECT pg_try_advisory_xact_lock(733040, 1) AS allowed`;
-            if (!gate.allowed) throw new InventoryImportError('BUSY');
+            if (!await tryLockInventoryImportConfirmation({ tx })) throw new InventoryImportError('BUSY');
             const config = authorizeInventoryImport(user, batch.resource, batch.mode);
             const rows = batch.payload.map(row => ({ row: row.row, values: { ...row.dto, ...(row.id && { id: row.id }) } }));
-            const validated = await validateInventoryImportRows({ db: tx, config, rows });
+            const validated = await validateInventoryImportRows({ db: tx, config, rows, user });
             if (validated.summary.errors) throw new InventoryImportError('CONFLICT', { rows: validated.rows.filter(row => row.errors.length).map(publicRow) });
             for (let index = 0; index < validated.rows.length; index++) {
                 const current = validated.rows[index];
@@ -99,10 +101,10 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
             }
             const saved = await writeInventoryImport({ tx, config, rows: validated.rows, context: validated.context, userId: user.id });
             const changes = validated.rows.map(row => ({ ...publicRow(row), id: saved.get(row.row) ?? row.id,
-                supplierId: row.dto.supplierId ?? validated.context.wastes.get(row.id)?.supplierId ?? null }));
+                supplierId: row.dto.supplierId ?? validated.context.wastes?.get(row.id)?.supplierId ?? null }));
             const result = json({ summary: validated.summary, rows: changes });
             const persisted = await tx.inventoryImport.update({ where: { id, version: expectedVersion }, data: {
-                status: 'COMPLETED', operationId, commandHash, completedAt: new Date(), result,
+                status: statuses.COMPLETED, operationId, commandHash, completedAt: new Date(), result,
                 payload: Prisma.DbNull, preview: Prisma.DbNull
             } });
             return { batch: view(persisted), replayed: false };
@@ -111,15 +113,15 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
             replayed: completed.replayed, durationMs: Math.round(performance.now() - started) }, 'Importación confirmada');
         return completed;
     } catch (error) {
-        if (error.code === 'P2002' || error.meta?.code === '23505') throw new InventoryImportError('CONFLICT');
-        if (error.code === 'P2028' || ['55P03', '57014', '40P01'].includes(error.meta?.code)) throw new InventoryImportError('BUSY');
+        if (error.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE || error.meta?.code === '23505') throw new InventoryImportError('CONFLICT');
+        if (isDatabaseContentionError(error)) throw new InventoryImportError('BUSY');
         throw error;
     }
 };
 
 export const getInventoryImportErrors = async ({ id, user, signal }) => {
     const batch = await owned({ id, user });
-    if (batch.status !== 'DRAFT' || batch.expiresAt <= new Date()) throw new InventoryImportError('EXPIRED');
+    if (batch.status !== statuses.DRAFT || batch.expiresAt <= new Date()) throw new InventoryImportError('EXPIRED');
     const rows = (batch.preview?.rows ?? []).flatMap(row => row.errors.map(error => ({
         row: row.row, name: row.name, column: error.column, message: error.message
     })));

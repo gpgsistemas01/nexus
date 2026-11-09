@@ -9,6 +9,7 @@ import { createInventoryImportFixture, inventoryWorkbook, writeInventoryWorkbook
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { getImportConfig } from '../../../src/services/warehouse/imports/inventoryImportConfig.js';
+import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
 
 let prisma, app, fixture, cookie, deniedCookie, previousSecret;
 const preview = async (rows, resource = 'materials', mode = 'create') => {
@@ -53,6 +54,10 @@ const inventorySnapshot = async () => {
 };
 
 describe('importación XLSX: permisos, estados y persistencia atómica', () => {
+    const countRow = async (offer, newStock, extra = {}) => ({ id: offer.materialId, supplierId: offer.supplierId,
+        expectedVersion: offer.version, expectedMaterialVersion: offer.material.version, newStock,
+        reasonId: (await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } })).id,
+        observations: 'Conteo físico actual verificado', ...extra });
     beforeAll(async () => {
         previousSecret = process.env.JWT_SECRET_ACCESS;
         process.env.JWT_SECRET_ACCESS = randomUUID();
@@ -67,6 +72,150 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         await fixture?.cleanup();
         if (previousSecret === undefined) delete process.env.JWT_SECRET_ACCESS;
         else process.env.JWT_SECRET_ACCESS = previousSecret;
+    });
+
+    it('reemplaza el saldo por conteo cero o positivo, conserva datos, omite iguales y devuelve folios sin duplicar', async () => {
+        const offers = await Promise.all(['Conteo cero', 'Conteo mayor', 'Conteo igual'].map(seedOffer));
+        const batch = await preview(await Promise.all(offers.map((offer, index) => countRow(offer, [0, 5, 2][index]))), 'materials', 'adjust');
+        expect(batch.preview.summary).toMatchObject({ updates: 2, unchanged: 1, errors: 0 });
+        expect(batch.preview.rows[0]).toMatchObject({ before: { currentStock: 2 }, after: { currentStock: 0 }, details: { difference: -2 } });
+        const operationId = randomUUID();
+        const applied = await confirm(batch, operationId).expect(200);
+        expect(applied.body.batch.result.rows.slice(0, 2).every(row => /^AJU-/.test(row.details.adjustmentReference))).toBe(true);
+        const snapshot = await inventorySnapshot();
+        await confirm(batch, operationId).expect(200);
+        expect(await inventorySnapshot()).toEqual(snapshot);
+        for (const [index, offer] of offers.entries()) {
+            const saved = await prisma.supplierMaterial.findUnique({ where: { id: offer.id }, include: { material: true } });
+            expect(Number(saved.currentStock)).toBe([0, 5, 2][index]);
+            expect(Number(saved.convertedQuantity)).toBe([0, 30, 12][index]);
+            expect(Number(saved.maxUnitCost)).toBe(10);
+            expect(saved.material).toEqual(offer.material);
+        }
+        const adjustment = await prisma.stockAdjustment.findFirst({ where: { details: { some: { materialId: offers[0].materialId } } } });
+        expect(adjustment.type).toBe('DECREASE');
+    });
+
+    it.each(['materials', 'consumables', 'wastes'])('rechaza una operación no admitida para %s antes de analizar el archivo', async resource => {
+        const before = await inventorySnapshot();
+        const drafts = await prisma.inventoryImport.count({ where: { userId: fixture.user.id } });
+        await request(app).get(`/${resource}/template`).query({ mode: 'mixed' }).set('Cookie', cookie)
+            .expect(400).expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_FILE'));
+        await request(app).post(`/${resource}/preview`).query({ mode: 'mixed' }).set('Cookie', cookie)
+            .send('ni siquiera es XLSX').expect(400).expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_FILE'));
+        expect(await inventorySnapshot()).toEqual(before);
+        expect(await prisma.inventoryImport.count({ where: { userId: fixture.user.id } })).toBe(drafts);
+    });
+
+    it('la operación del archivo debe coincidir con la selección; ninguna combinación cruzada crea borradores ni escrituras', async () => {
+        const before = await inventorySnapshot();
+        const drafts = await prisma.inventoryImport.count({ where: { userId: fixture.user.id } });
+        for (const source of ['create', 'update', 'adjust']) {
+            const buffer = await inventoryWorkbook({ mode: source, rows: [fixture.row('Operación cruzada')] });
+            for (const selected of ['create', 'update', 'adjust'].filter(mode => mode !== source)) {
+                await request(app).post('/materials/preview').query({ mode: selected }).set('Cookie', cookie)
+                    .attach('file', buffer, 'inventario.xlsx').expect(400)
+                    .expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_FILE'));
+            }
+        }
+        expect(await inventorySnapshot()).toEqual(before);
+        expect(await prisma.inventoryImport.count({ where: { userId: fixture.user.id } })).toBe(drafts);
+    });
+
+    it('usa la misma estructura de consulta al editar y contar merma en archivos separados con IDs originales', async () => {
+        const row = await newRow('wastes', 'Plantilla de merma');
+        const created = await confirm(await preview([row], 'wastes')).expect(200);
+        const id = created.body.batch.result.rows[0].id;
+        const original = await prisma.waste.findUnique({ where: { id } });
+        const reason = await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } });
+        for (const mode of ['update', 'adjust']) {
+            const response = await request(app).get('/wastes/template').query({ mode, supplierId: fixture.suppliers[0].id, search: row.name }).set('Cookie', cookie)
+                .buffer(true).parse((res, done) => { const chunks = []; res.on('data', chunk => chunks.push(chunk)); res.on('end', () => done(null, Buffer.concat(chunks))); }).expect(200);
+            const workbook = new ExcelJS.Workbook(); await workbook.xlsx.load(response.body);
+            const sheet = workbook.getWorksheet('Datos'); const headers = sheet.getRow(1).values.slice(1);
+            expect(headers.slice(0, 5)).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual']);
+            expect(sheet.getCell(2, headers.indexOf('ID merma') + 1).value).toBe(id);
+            const changes = mode === 'update' ? { Material: `${row.name} corregida`, 'Costo unitario': 19 }
+                : { 'Stock contado': 2, Motivo: `${reason.id} | ${reason.name}`, Observaciones: 'Conteo físico comprobado' };
+            for (const [header, value] of Object.entries(changes)) sheet.getCell(2, headers.indexOf(header) + 1).value = value;
+            const uploaded = await request(app).post('/wastes/preview').query({ mode }).set('Cookie', cookie)
+                .attach('file', await writeInventoryWorkbook(workbook), `merma-${mode}.xlsx`).expect(200);
+            expect(uploaded.body.batch.preview.summary.errors).toBe(0);
+            await confirm(uploaded.body.batch).expect(200);
+            const saved = await prisma.waste.findUnique({ where: { id } });
+            expect(saved.name).toBe(`${row.name} corregida`); expect(Number(saved.maxUnitCost)).toBe(19);
+            expect(Number(saved.currentStock)).toBe(mode === 'update' ? 3 : 2);
+            expect(saved.base).toEqual(original.base); expect(saved.height).toEqual(original.height);
+        }
+    });
+
+    it('rechaza vacío, negativo, motivo ausente, duplicado y recurso cruzado sin aplicar el conteo válido', async () => {
+        const offer = await seedOffer('Conteo inválido');
+        const valid = await countRow(offer, 4);
+        for (const rows of [[{ ...valid, newStock: '' }], [{ ...valid, newStock: -1 }], [{ ...valid, reasonId: '' }], [valid, valid]]) {
+            const batch = await preview(rows, 'materials', 'adjust');
+            expect(batch.preview.summary.errors).toBeGreaterThan(0);
+            await confirm(batch).expect(400);
+        }
+        const crossed = await preview([valid], 'consumables', 'adjust');
+        expect(crossed.preview.summary.errors).toBe(1);
+        expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).currentStock)).toBe(2);
+        expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: offer.materialId } })).toBe(0);
+    });
+
+    it('conserva las versiones del archivo y revierte el lote si un movimiento cambia un saldo después de la vista previa', async () => {
+        const offers = await Promise.all(['Conteo concurrente 1', 'Conteo concurrente 2'].map(seedOffer));
+        const rows = await Promise.all(offers.map(offer => countRow(offer, 6)));
+        const batch = await preview(rows, 'materials', 'adjust');
+        await prisma.supplierMaterial.update({ where: { id: offers[1].id }, data: { currentStock: 3, convertedQuantity: 18 } });
+        const before = await inventorySnapshot();
+        await confirm(batch).expect(409);
+        expect(await inventorySnapshot()).toEqual(before);
+        const stale = await preview(rows, 'materials', 'adjust');
+        expect(stale.preview.summary.errors).toBe(1);
+    });
+
+    it('ajusta merma con AME y sus conversiones sin registrarlo como entrada inicial', async () => {
+        const row = await newRow('wastes', 'Merma contada');
+        await confirm(await preview([row], 'wastes')).expect(200);
+        const waste = await prisma.waste.findFirst({ where: { name: row.name } });
+        const reason = await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } });
+        const batch = await preview([{ id: waste.id, expectedVersion: waste.version, newStock: 1,
+            reasonId: `${reason.id} | ${reason.name}`, observations: 'Conteo físico de merma' }], 'wastes', 'adjust');
+        expect(batch.preview.summary.errors).toBe(0);
+        const result = await confirm(batch).expect(200);
+        expect(result.body.batch.result.rows[0].details.adjustmentReference).toMatch(/^AME-/);
+        const saved = await prisma.waste.findUnique({ where: { id: waste.id } });
+        expect(Number(saved.currentStock)).toBe(1);
+        expect(Number(saved.convertedQuantity)).toBe(3);
+        expect(await prisma.wasteStockEntry.count({ where: { wasteId: waste.id } })).toBe(1);
+        expect(await prisma.wasteStockAdjustmentDetail.findFirst({ where: { wasteId: waste.id } })).toMatchObject({
+            previousStock: expect.anything(), newStock: expect.anything(), difference: expect.anything()
+        });
+    });
+
+    it('descarga el conteo en blanco con datos actuales, sin columnas de costo ni edición de identidad', async () => {
+        const offer = await seedOffer('Plantilla conteo');
+        const response = await request(app).get('/materials/template').query({ mode: 'adjust', search: offer.material.name }).set('Cookie', cookie)
+            .buffer(true).parse((res, done) => { const chunks = []; res.on('data', chunk => chunks.push(chunk)); res.on('end', () => done(null, Buffer.concat(chunks))); }).expect(200);
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(response.body);
+        const sheet = workbook.getWorksheet('Datos');
+        const headers = sheet.getRow(1).values.slice(1);
+        expect(headers).toContain('Stock contado');
+        expect(headers).not.toContain('Costo unitario');
+        expect(sheet.getCell(2, headers.indexOf('Stock contado') + 1).value ?? '').toBe('');
+        expect(sheet.getCell(2, headers.indexOf('Stock actual') + 1).value).toBe(2);
+    });
+
+    it('al perder lectura de costos, protege las ediciones sin bloquear los conteos', async () => {
+        const offer = await seedOffer('Permisos recuperables');
+        const editing = await preview([{ ...updateRow(offer), maxUnitCost: 17 }], 'materials', 'update');
+        const counting = await preview([await countRow(offer, 3)], 'materials', 'adjust');
+        const user = { ...fixture.user, permissions: [PERMISSIONS.MATERIALS_READ, PERMISSIONS.MATERIALS_ADJUST_STOCK] };
+        const { getInventoryImport } = await import('../../../src/services/warehouse/imports/inventoryImportService.js');
+        await expect(getInventoryImport({ id: editing.id, user })).rejects.toMatchObject({ statusCode: 403 });
+        expect((await getInventoryImport({ id: counting.id, user })).preview.rows[0].after).toMatchObject({ currentStock: 3 });
     });
 
     it('autoriza antes de analizar el archivo y mantiene el lote privado', async () => {
@@ -172,7 +321,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         let waste = await prisma.waste.findUnique({ where: { id } });
         expect(Number(waste.currentStock)).toBe(4);
         expect(Number(waste.convertedQuantity)).toBe(8);
-        expect(await prisma.wasteStockEntry.count({ where: { createdById: fixture.user.id } })).toBe(1);
+        expect(await prisma.wasteStockEntry.count({ where: { wasteId: id } })).toBe(1);
         const update = await preview([{ id, expectedVersion: waste.version, name: `${row.name} editada`, minStock: 1, maxUnitCost: 12, isActive: 'NO' }], 'wastes', 'update');
         await confirm(update).expect(200);
         waste = await prisma.waste.findUnique({ where: { id } });
@@ -197,16 +346,18 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(await prisma.inventoryImport.findUnique({ where: { id: completed.id } })).toMatchObject({ status: 'COMPLETED', result: expect.any(Object) });
     });
 
-    it('revierte artículos, saldos, historia y folios si falla la escritura final del recibo', async () => {
-        const batch = await preview([fixture.row('Rollback A'), fixture.row('Rollback B')]);
-        const counters = () => prisma.referenceNumberCounter.findMany({ orderBy: [{ prefix: 'asc' }, { year: 'asc' }] });
-        const before = await counters();
+    it.each(['create', 'adjust'])('revierte filas, saldos, historia y folios si falla el recibo de %s', async mode => {
+        const offer = await seedOffer(`Rollback ${mode}`);
+        const batch = mode === 'create' ? await preview([fixture.row('Rollback A'), fixture.row('Rollback B')])
+            : await preview([await countRow(offer, 0)], 'materials', 'adjust');
+        expect(batch.preview.summary.errors).toBe(0);
+        const inventoryBefore = await inventorySnapshot();
         await prisma.$executeRawUnsafe(`CREATE FUNCTION test_import_failure() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.id = '${batch.id}'::uuid AND NEW.status = 'COMPLETED' THEN RAISE EXCEPTION 'test receipt failure'; END IF; RETURN NEW; END $$`);
         await prisma.$executeRawUnsafe('CREATE TRIGGER test_import_failure BEFORE UPDATE ON "InventoryImport" FOR EACH ROW EXECUTE FUNCTION test_import_failure()');
         try {
             await confirm(batch).expect(500);
             expect(await savedOffer(fixture.row('Rollback A').name)).toBeNull();
-            expect(await counters()).toEqual(before);
+            expect(await inventorySnapshot()).toEqual(inventoryBefore);
             expect(await prisma.inventoryImport.findUnique({ where: { id: batch.id } })).toMatchObject({ status: 'DRAFT', version: batch.version });
         } finally {
             await prisma.$executeRawUnsafe('DROP TRIGGER test_import_failure ON "InventoryImport"');
@@ -272,9 +423,12 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(Buffer.from(bytes));
         const sheet = workbook.getWorksheet('Datos');
-        expect(sheet.getRow(2).values.slice(1, 5)).toEqual([offer.materialId, offer.supplierId, offer.version, offer.material.version]);
+        const headers = sheet.getRow(1).values.slice(1);
+        expect(headers.slice(0, 10)).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual', 'Stock mínimo', 'Presentación', 'Conversión', 'Unidad', 'Costo unitario']);
+        expect(['ID material', 'ID proveedor', 'Versión proveedor', 'Versión material'].map(header => sheet.getCell(2, headers.indexOf(header) + 1).value))
+            .toEqual([offer.materialId, offer.supplierId, offer.version, offer.material.version]);
         const name = fixture.row('Plantilla editada').name;
-        sheet.getCell('E2').value = name;
+        sheet.getCell(2, headers.indexOf('Material') + 1).value = name;
         const response = await request(app).post('/materials/preview?mode=update').set('Cookie', cookie)
             .attach('file', await writeInventoryWorkbook(workbook), 'actualizar.xlsx').expect(200);
         const batch = response.body.batch;
@@ -291,7 +445,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const offer = await seedOffer('Proveedor inválido');
         const batch = await preview([{ ...updateRow(offer), supplierId: 'no-es-uuid' }], 'materials', 'update');
         expect(batch.preview.summary.errors).toBe(1);
-        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'id_proveedor' }));
+        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'ID proveedor' }));
         expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).maxUnitCost)).toBe(10);
     });
 
@@ -301,7 +455,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const before = await inventorySnapshot();
         const batch = await preview([valid, row, { ...row, name: `  ${row.name}  `, newStock: 9, initialQuantity: 9 }], resource);
         expect(batch.preview.summary).toMatchObject({ total: 3, creates: 2, errors: 1 });
-        expect(batch.preview.rows[2].errors).toContainEqual(expect.objectContaining({ column: 'nombre', message: expect.stringContaining('fila 3') }));
+        expect(batch.preview.rows[2].errors).toContainEqual(expect.objectContaining({ column: 'Material', message: expect.stringContaining('fila 3') }));
         await confirm(batch).expect(400);
         expect(await inventorySnapshot()).toEqual(before);
     });
@@ -315,7 +469,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const before = await inventorySnapshot();
         const batch = await preview([valid, { ...row, newStock: 8, initialQuantity: 8 }], resource);
         expect(batch.preview.summary).toMatchObject({ creates: 1, errors: 1 });
-        expect(batch.preview.rows[1].errors).toContainEqual(expect.objectContaining({ column: 'nombre', message: expect.stringMatching(/ya existe|ya está registrada/) }));
+        expect(batch.preview.rows[1].errors).toContainEqual(expect.objectContaining({ column: 'Material', message: expect.stringMatching(/ya existe|ya está registrada/) }));
         await confirm(batch).expect(400);
         expect(await inventorySnapshot()).toEqual(before);
     });
@@ -338,7 +492,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const batch = await preview([{ name: fixture.row('Actualización sin ID').name, supplierId: fixture.suppliers[0].id,
             expectedVersion: 0, expectedMaterialVersion: 0, minStock: 1, maxUnitCost: 10, isActive: 'SI' }], 'materials', 'update');
         expect(batch.preview.summary).toMatchObject({ creates: 0, updates: 0, errors: 1 });
-        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'id_material' }));
+        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'ID material' }));
         await confirm(batch).expect(400);
         expect(await inventorySnapshot()).toEqual(before);
     });
@@ -351,10 +505,10 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         await workbook.xlsx.load(Buffer.from(bytes));
         const reference = workbook.getWorksheet('Catalogos').getCell('E2').value;
         expect(reference).toContain(`${source.materialId} | ${source.material.name}`);
-        const data = { name: fixture.row('Merma desde catálogo').name, supplierCode: fixture.suppliers[0].code,
+        const data = { name: fixture.row('Merma desde catálogo').name, supplierCode: workbook.getWorksheet('Catalogos').getCell('A2').value,
             materialId: reference, base: 1.5, height: 2, minStock: 0, maxUnitCost: 10, isActive: 'SI', initialQuantity: 3 };
         const columns = getImportConfig('wastes', 'create').columns;
-        expect(columns.map(([header]) => header)).not.toContain('id_merma');
+        expect(columns.map(([header]) => header)).not.toContain('ID merma');
         workbook.getWorksheet('Datos').getRow(2).values = columns.map(([, key]) => data[key] ?? '');
         const response = await request(app).post('/wastes/preview').set('Cookie', cookie)
             .attach('file', await writeInventoryWorkbook(workbook), 'mermas.xlsx').expect(200);

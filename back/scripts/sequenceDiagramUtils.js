@@ -66,7 +66,7 @@ export const getSequenceParticipantSources = (body, sequence) => {
     const normalizedBody = normalizeLineEndings(body);
     const normalizedSequence = normalizeLineEndings(sequence);
     const sources = new Map();
-    const sourcePattern = /src\/[\w./-]+\.(?:js|ejs)/g;
+    const sourcePattern = /src\/[\w./-]+\.(?:js|ts|vue)/g;
     for (const match of normalizedSequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)) {
         sources.set(match[1], [...new Set([
             ...(sources.get(match[1]) ?? []),
@@ -113,7 +113,7 @@ export const getDiagramFileCoverageErrors = (body, blocks, sourceContents) => {
     const rows = [...table.matchAll(/^\| `([^`]+)` \|[^|]+\|([^\n]+)\|$/gm)];
     const files = new Map();
     for (const [, alias, text] of rows) {
-        const paths = [...new Set(text.match(/src\/[\w./-]+\.(?:js|ejs)/g) ?? [])];
+        const paths = [...new Set(text.match(/src\/[\w./-]+\.(?:js|ts|vue)/g) ?? [])];
         if (paths.length !== 1) errors.push(`componente ${alias} debe identificar un único archivo`);
         else files.set(alias, paths[0]);
     }

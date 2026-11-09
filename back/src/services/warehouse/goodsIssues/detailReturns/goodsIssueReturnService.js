@@ -1,11 +1,12 @@
 import { lockGoodsIssue } from '../../../../repository/warehouse/documentLockRepository.js';
+import { assertHistoricalPhysicalReturn } from '../../issues/historicalReturnRules.js';
 import {
     GoodsIssueDetailNotFound,
     GoodsIssueReturnDatabaseError,
     GoodsIssueReturnQuantityConflict,
     GoodsIssueReturnStatusConflict
 } from '../../../../errors/warehouse/goodsIssueError.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../shared/constants/fulfillmentStatuses.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
 import { MATERIAL_TYPES } from '../../../../shared/constants/inventory.js';
 import { getDb } from '../../../../repository/baseRepository.js';
@@ -39,6 +40,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
             });
 
             if (!detail) throw new GoodsIssueDetailNotFound();
+            assertHistoricalPhysicalReturn({ issue: detail.goodsIssue, returnDto });
             if (detail.goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.COMPLETE) {
                 throw new GoodsIssueReturnStatusConflict();
             }

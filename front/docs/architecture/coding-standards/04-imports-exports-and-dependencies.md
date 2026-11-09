@@ -49,6 +49,24 @@ mensajes y vistas previas. No leen archivos del servidor en ejecución. Excluir 
 secretos, middleware, fórmulas privadas y políticas internas. Al cambiar un alias, revisar
 Vite, TypeScript, pruebas y contexto de build.
 
+### Constantes por responsabilidad
+
+Las constantes exclusivas del navegador permanecen en el cliente: navegación e
+iconos en `app`, descriptores de pantallas en su módulo y configuración transversal
+en `shared`. No se trasladan a Express para centralizarlas.
+
+Los valores de un contrato usado por ambas aplicaciones tienen una sola fuente
+en `back/src/shared/constants`: permisos recibidos de la API, estados, modos y
+límites de captura. Su ubicación bajo `back` no implica ejecución exclusiva allí;
+los alias los compilan en Vue. Los estados de Compras se consumen mediante
+`@nexus/purchase-statuses`, también utilizado en tipos y decodificación de respuestas.
+
+La configuración de Prisma, autorización, consultas y procesamiento XLSX pertenece
+al servidor y no se importa en el cliente. En Excel se comparten los límites que
+necesita la captura, mientras descompresión, entradas ZIP y timeout del worker
+permanecen en el módulo privado. El plazo mostrado del borrador utiliza el mismo
+valor público que aplica el servidor.
+
 ## Carga diferida y ciclos
 
 Las páginas de rutas y el proveedor visual se cargan dinámicamente. Esa elección

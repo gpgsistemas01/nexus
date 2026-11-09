@@ -14,6 +14,7 @@ import { createServiceLogger, getModelLogContext, logServiceInfo } from "../../.
 
 import { getDb } from "../../../repository/baseRepository.js";
 import { lockGoodsIssue } from "../../../repository/warehouse/documentLockRepository.js";
+import { HISTORICAL_DELIVERY_SELECT } from '../issues/historicalDeliverySelect.js';
 import {
     generateYearlyReferenceNumber,
     throwIfReferenceNumberAlreadyExists
@@ -23,7 +24,7 @@ import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssu
 import { handleServiceError } from "../../serviceErrorHandler.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { assertIssueDepartmentAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../shared/constants/fulfillmentStatuses.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
@@ -110,6 +111,7 @@ export const findAllGoodsIssues = async ({
             where,
             orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             include: {
+                historicalDeliveryBatch: { select: HISTORICAL_DELIVERY_SELECT },
                 status: true,
                 fulfillmentStatus: true,
                 details: includeDetails && {

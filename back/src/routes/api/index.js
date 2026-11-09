@@ -7,6 +7,7 @@ import clientApiRoutes from './sales/clientApiRoute.js';
 import salesReportApiRoutes from './sales/reportApiRoute.js';
 import materialApiRoutes from './warehouse/materialApiRoute.js';
 import inventoryImportApiRoutes from './warehouse/inventoryImportApiRoute.js';
+import historicalDeliveryApiRoutes from './warehouse/historicalDeliveryApiRoute.js';
 import consumableApiRoutes from './warehouse/consumableApiRoute.js';
 import wasteApiRoutes from './warehouse/wasteApiRoute.js';
 import wasteIssueApiRoutes from './warehouse/wasteIssueApiRoute.js';
@@ -30,6 +31,7 @@ import catalogApiRoutes from './admin/catalogApiRoute.js';
 
 const API_ROUTES = [
     ['/warehouse/inventory-imports', inventoryImportApiRoutes],
+    ['/warehouse/historical-deliveries', historicalDeliveryApiRoutes],
     ['/auth', authApiRoutes],
     ['/sales/clients', clientApiRoutes],
     ['/sales/reports', salesReportApiRoutes],

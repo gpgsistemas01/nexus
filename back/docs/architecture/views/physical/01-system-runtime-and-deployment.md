@@ -46,13 +46,13 @@ implementado. ERP, CRM y transportistas tampoco son integraciones vigentes.
 
 «Contenedor» identifica aquí una unidad que ejecuta o almacena información. Sólo la
 aplicación se empaqueta como imagen Docker; el navegador y PostgreSQL son unidades
-externas a esa imagen. Express, EJS, Socket.IO y Prisma colaboran en la misma
+externas a esa imagen. Express, Socket.IO y Prisma colaboran en la misma
 aplicación y no son servicios desplegados por separado.
 
 ```mermaid
 flowchart TB
     browser["Navegador<br/>HTML y JavaScript"]
-    application["Aplicación Node.js<br/>Express · EJS · Socket.IO · Prisma"]
+    application["Aplicación Node.js<br/>Express · Socket.IO · Prisma"]
     database[("PostgreSQL<br/>Datos operativos")]
     browser -->|"Páginas y API<br/>HTTP(S)"| application
     application -->|"HTML, JSON y archivos"| browser
@@ -62,8 +62,8 @@ flowchart TB
 
 | Unidad | Responsabilidad y límite |
 | --- | --- |
-| Navegador | Presenta el HTML recibido, ejecuta JavaScript, envía solicitudes y recibe avisos de actualización. No ejecuta EJS ni se conecta directamente a PostgreSQL. |
-| Aplicación | Renderiza las plantillas EJS, autentica y autoriza las peticiones y ejecuta las reglas y transacciones mediante Prisma. Los controladores notifican cambios por Socket.IO después de completar la operación correspondiente. |
+| Navegador | Presenta el HTML recibido, ejecuta JavaScript, envía solicitudes y recibe avisos de actualización. Ejecuta Vue y se comunica con la API. |
+| Aplicación | Autentica y autoriza las peticiones HTTP y ejecuta las reglas y transacciones mediante Prisma. Los controladores notifican cambios por Socket.IO después de completar la operación correspondiente. |
 | Base de datos | Conserva documentos, detalles, existencias e historia. Las cuentas PostgreSQL son identidades de infraestructura, distintas de los usuarios y roles funcionales de Nexus. |
 
 Socket.IO usa el mismo servidor que Express. Los avisos permiten actualizar los

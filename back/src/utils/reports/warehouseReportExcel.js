@@ -1,4 +1,5 @@
 import { createFormulaCell } from '../reportExcelUtils.js';
+import { INVENTORY_SPREADSHEET_COLUMNS } from '../../constants/inventorySpreadsheet.js';
 import { VAT_RATE, VAT_MULTIPLIER } from '../../shared/inventory/goodsReceiptCalculations.js';
 import { createWasteReportSummary } from '../../services/warehouse/wastes/wasteReportSummary.js';
 import { createMonthlyGoodsReceiptSummary } from '../../services/warehouse/goodsReceipts/goodsReceiptReportSummary.js';
@@ -26,7 +27,11 @@ const ISSUE_REPORT_HEADERS = [
     'Unidad de conversión',
     'Cantidad de proyecto',
     'Diferencia',
-    'Estado del detalle'
+    'Estado del detalle',
+    'Regularización histórica',
+    'Motivo de regularización',
+    'Fecha de registro histórico',
+    'Verificación histórica'
 ];
 
 export const buildIssueReportData = async function* (rows, { baseHeader = 'Base', heightHeader = 'Altura' } = {}) {
@@ -51,39 +56,21 @@ export const buildIssueReportData = async function* (rows, { baseHeader = 'Base'
             row.convertedQuantity,
             row.convertedUnitMeasureName,
             row.projectConvertedQuantity,
-            createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
-            row.detailFulfillmentStatusName
+            row.historicalDeliveryReference && row.convertedQuantityDifference == null
+                ? '' : createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
+            row.detailFulfillmentStatusName,
+            row.historicalDeliveryReference ?? '',
+            row.historicalDeliveryReason ?? '',
+            row.historicalDeliveryRegisteredAt ?? '',
+            row.historicalDeliveryNote ?? ''
         ];
         index++;
     }
 };
 
 export const buildInventoryReportData = async function* (rows) {
-    yield [
-        'Proveedor',
-        'Material',
-        'Base',
-        'Altura',
-        'Stock actual',
-        'Stock mínimo',
-        'Presentación',
-        'Conversión',
-        'Unidad',
-        'Costo unitario'
-    ];
-
-    for await (const row of rows) yield [
-        row.supplier,
-        row.name,
-        row.base,
-        row.height,
-        row.currentStock,
-        row.minStock,
-        row.presentation,
-        row.convertedQuantity,
-        row.unitMeasure,
-        row.maxUnitCost
-    ];
+    yield INVENTORY_SPREADSHEET_COLUMNS.map(([header]) => header);
+    for await (const row of rows) yield INVENTORY_SPREADSHEET_COLUMNS.map(([, key]) => row[key]);
 };
 
 export const buildGoodsReceiptReportData = async function* (rows, { isConsumableReport = false, monthlyReport = false } = {}) {

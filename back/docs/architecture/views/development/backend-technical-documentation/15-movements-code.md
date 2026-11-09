@@ -48,7 +48,7 @@ Los reportes y la infraestructura transversal se localizan en el
 ## Materiales, consumibles y reportes en un módulo
 
 Las tres páginas pertenecen a Movimientos. Materiales y consumibles comparten
-`InventoryMovement`/`MovementDetail`, la vista EJS y `findInventoryMovements`;
+`InventoryMovement`/`MovementDetail`, la pantalla Vue y `findInventoryMovements`;
 sus fachadas fijan `Material.type` a `MATERIAL` o `CONSUMABLE` antes de ejecutar
 consulta y conteos. `recordsTotal` cuenta sólo el contexto, incluso sin filtros.
 Merma conserva `WasteMovement`/`WasteMovementDetail`. La consulta es de sólo lectura.

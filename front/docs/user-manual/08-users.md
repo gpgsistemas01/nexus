@@ -26,10 +26,12 @@ Compruebe la identidad y la asignación autorizada.
 2. Revise **Usuario**, **Área** y **Rol**.
 3. Consulte **Persona vinculada**. Este campo conserva la vinculación existente;
    no permite reasignarla desde esta edición.
-4. Cambie únicamente los campos autorizados y pulse **Actualizar**.
+4. Modifique **Usuario**, **Área** o **Rol**, según la asignación autorizada, y pulse **Actualizar**.
 5. Compruebe los datos en el listado.
 
-Esta edición conserva la contraseña actual.
+En esta operación **Persona vinculada** es de consulta y no aparece un campo para
+cambiar la contraseña. La contraseña actual se conserva; para sustituirla use la
+acción independiente **Cambiar contraseña**.
 
 ## Cambiar una contraseña
 
@@ -41,6 +43,9 @@ Compruebe a quién debe entregarla y utilice el medio autorizado.
 3. En **Editar contraseña**, compruebe el **Usuario** de consulta.
 4. Escriba la nueva **Contraseña**.
 5. Pulse **Actualizar contraseña** y espere la confirmación.
+
+En este formulario sólo se captura **Contraseña**. **Usuario** es de consulta;
+no se modifican área, rol ni persona vinculada.
 
 ![Operación independiente para actualizar la contraseña de una cuenta.](images/15-user-password.png)
 

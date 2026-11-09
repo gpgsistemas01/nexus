@@ -1,3 +1,4 @@
+import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
 import { onBeforeUnmount, ref, shallowRef } from 'vue';
 import { useListEditor } from '../../../shared/composables/useListEditor.js';
 import { confirmAction, showSuccess } from '../../../shared/ui/feedback.js';
@@ -88,7 +89,7 @@ export const usePurchaseActions = (options: {
             target?.action !== 'view' ||
             !canEditPurchase(target.document) ||
             line.isNew ||
-            line.status !== 'ACTIVE' ||
+            line.status !== GOODS_RECEIPT_DETAIL_STATUSES.ACTIVE ||
             needsReload.value ||
             isChanging.value ||
             reader.isReading.value ||

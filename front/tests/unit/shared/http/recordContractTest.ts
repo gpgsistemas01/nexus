@@ -2,7 +2,7 @@ import { expect, it } from 'vitest';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { confirmMutation } from '../../../../src/shared/http/recordContract.js';
 
-it('una confirmación utiliza el código recibido y el texto compartido con EJS', () => {
+it('una confirmación utiliza el código recibido y el texto público compartido', () => {
   const response = { code: 'CREATED_GOODS_RECEIPT', message: '<b>Texto ajeno</b>' };
   expect(confirmMutation(response, successCodeMessages.CREATED_GOODS_RECEIPT)).toEqual({
     code: 'CREATED_GOODS_RECEIPT',

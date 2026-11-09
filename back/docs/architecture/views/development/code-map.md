@@ -13,57 +13,57 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    constants["constants (11 módulos)"] --> shared["shared (14 módulos)"]
-    controllers["controllers (46 módulos)"] --> dtos["dtos (12 módulos)"]
-    controllers["controllers (46 módulos)"] --> errors["errors (23 módulos)"]
-    controllers["controllers (46 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (46 módulos)"] --> middleware["middleware (5 módulos)"]
-    controllers["controllers (46 módulos)"] --> services["services (79 módulos)"]
-    controllers["controllers (46 módulos)"] --> shared["shared (14 módulos)"]
-    controllers["controllers (46 módulos)"] --> utils["utils (17 módulos)"]
-    dtos["dtos (12 módulos)"] --> shared["shared (14 módulos)"]
-    errors["errors (23 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (23 módulos)"] --> public["public (211 módulos)"]
-    errors["errors (23 módulos)"] --> shared["shared (14 módulos)"]
-    middleware["middleware (5 módulos)"] --> errors["errors (23 módulos)"]
-    middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (79 módulos)"]
-    middleware["middleware (5 módulos)"] --> shared["shared (14 módulos)"]
-    middleware["middleware (5 módulos)"] --> utils["utils (17 módulos)"]
-    public["public (211 módulos)"] --> shared["shared (14 módulos)"]
-    repository["repository (9 módulos)"] --> constants["constants (11 módulos)"]
-    repository["repository (9 módulos)"] --> errors["errors (23 módulos)"]
-    repository["repository (9 módulos)"] --> lib["lib (3 módulos)"]
-    repository["repository (9 módulos)"] --> shared["shared (14 módulos)"]
-    routes["routes (51 módulos)"] --> controllers["controllers (46 módulos)"]
-    routes["routes (51 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (51 módulos)"] --> services["services (79 módulos)"]
-    routes["routes (51 módulos)"] --> shared["shared (14 módulos)"]
-    routes["routes (51 módulos)"] --> utils["utils (17 módulos)"]
-    routes["routes (51 módulos)"] --> validators["validators (17 módulos)"]
-    services["services (79 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (79 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (79 módulos)"] --> errors["errors (23 módulos)"]
-    services["services (79 módulos)"] --> lib["lib (3 módulos)"]
-    services["services (79 módulos)"] --> repository["repository (9 módulos)"]
-    services["services (79 módulos)"] --> shared["shared (14 módulos)"]
-    services["services (79 módulos)"] --> utils["utils (17 módulos)"]
-    services["services (79 módulos)"] --> validators["validators (17 módulos)"]
-    utils["utils (17 módulos)"] --> constants["constants (11 módulos)"]
-    utils["utils (17 módulos)"] --> errors["errors (23 módulos)"]
-    utils["utils (17 módulos)"] --> services["services (79 módulos)"]
-    utils["utils (17 módulos)"] --> shared["shared (14 módulos)"]
-    validators["validators (17 módulos)"] --> constants["constants (11 módulos)"]
-    validators["validators (17 módulos)"] --> messages["messages (2 módulos)"]
-    validators["validators (17 módulos)"] --> public["public (211 módulos)"]
-    validators["validators (17 módulos)"] --> shared["shared (14 módulos)"]
+    constants["constants (11 módulos)"] --> shared["shared (24 módulos)"]
+    controllers["controllers (34 módulos)"] --> dtos["dtos (12 módulos)"]
+    controllers["controllers (34 módulos)"] --> errors["errors (24 módulos)"]
+    controllers["controllers (34 módulos)"] --> messages["messages (1 módulos)"]
+    controllers["controllers (34 módulos)"] --> middleware["middleware (5 módulos)"]
+    controllers["controllers (34 módulos)"] --> services["services (83 módulos)"]
+    controllers["controllers (34 módulos)"] --> shared["shared (24 módulos)"]
+    controllers["controllers (34 módulos)"] --> utils["utils (15 módulos)"]
+    dtos["dtos (12 módulos)"] --> shared["shared (24 módulos)"]
+    errors["errors (24 módulos)"] --> constants["constants (11 módulos)"]
+    errors["errors (24 módulos)"] --> messages["messages (1 módulos)"]
+    errors["errors (24 módulos)"] --> shared["shared (24 módulos)"]
+    messages["messages (1 módulos)"] --> shared["shared (24 módulos)"]
+    middleware["middleware (5 módulos)"] --> errors["errors (24 módulos)"]
+    middleware["middleware (5 módulos)"] --> messages["messages (1 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (83 módulos)"]
+    middleware["middleware (5 módulos)"] --> shared["shared (24 módulos)"]
+    middleware["middleware (5 módulos)"] --> utils["utils (15 módulos)"]
+    repository["repository (10 módulos)"] --> constants["constants (11 módulos)"]
+    repository["repository (10 módulos)"] --> errors["errors (24 módulos)"]
+    repository["repository (10 módulos)"] --> lib["lib (3 módulos)"]
+    repository["repository (10 módulos)"] --> shared["shared (24 módulos)"]
+    routes["routes (37 módulos)"] --> controllers["controllers (34 módulos)"]
+    routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (37 módulos)"] --> services["services (83 módulos)"]
+    routes["routes (37 módulos)"] --> shared["shared (24 módulos)"]
+    routes["routes (37 módulos)"] --> utils["utils (15 módulos)"]
+    routes["routes (37 módulos)"] --> validators["validators (18 módulos)"]
+    services["services (83 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (83 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (83 módulos)"] --> errors["errors (24 módulos)"]
+    services["services (83 módulos)"] --> lib["lib (3 módulos)"]
+    services["services (83 módulos)"] --> messages["messages (1 módulos)"]
+    services["services (83 módulos)"] --> repository["repository (10 módulos)"]
+    services["services (83 módulos)"] --> shared["shared (24 módulos)"]
+    services["services (83 módulos)"] --> utils["utils (15 módulos)"]
+    services["services (83 módulos)"] --> validators["validators (18 módulos)"]
+    utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
+    utils["utils (15 módulos)"] --> errors["errors (24 módulos)"]
+    utils["utils (15 módulos)"] --> services["services (83 módulos)"]
+    utils["utils (15 módulos)"] --> shared["shared (24 módulos)"]
+    validators["validators (18 módulos)"] --> constants["constants (11 módulos)"]
+    validators["validators (18 módulos)"] --> messages["messages (1 módulos)"]
+    validators["validators (18 módulos)"] --> shared["shared (24 módulos)"]
 ```
 
-> Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se
+> Alcance: módulos JavaScript bajo `src/`. La interfaz Vue y el esquema Prisma se
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (98)
+## Endpoints API (100)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -73,6 +73,8 @@ flowchart LR
 | `GET` | `/api/warehouse/inventory-imports/:id` | [`src/routes/api/warehouse/inventoryImportApiRoute.js`](../../../../src/routes/api/warehouse/inventoryImportApiRoute.js) |
 | `DELETE` | `/api/warehouse/inventory-imports/:id` | [`src/routes/api/warehouse/inventoryImportApiRoute.js`](../../../../src/routes/api/warehouse/inventoryImportApiRoute.js) |
 | `GET` | `/api/warehouse/inventory-imports/:id/errors/excel` | [`src/routes/api/warehouse/inventoryImportApiRoute.js`](../../../../src/routes/api/warehouse/inventoryImportApiRoute.js) |
+| `GET` | `/api/warehouse/historical-deliveries/:resource/preview` | [`src/routes/api/warehouse/historicalDeliveryApiRoute.js`](../../../../src/routes/api/warehouse/historicalDeliveryApiRoute.js) |
+| `POST` | `/api/warehouse/historical-deliveries/:resource/confirm` | [`src/routes/api/warehouse/historicalDeliveryApiRoute.js`](../../../../src/routes/api/warehouse/historicalDeliveryApiRoute.js) |
 | `POST` | `/api/auth/login` | [`src/routes/api/authApiRoute.js`](../../../../src/routes/api/authApiRoute.js) |
 | `GET` | `/api/auth/me` | [`src/routes/api/authApiRoute.js`](../../../../src/routes/api/authApiRoute.js) |
 | `POST` | `/api/auth/refresh` | [`src/routes/api/authApiRoute.js`](../../../../src/routes/api/authApiRoute.js) |
@@ -166,43 +168,20 @@ flowchart LR
 | `POST` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 | `PUT` | `/api/admin/catalogs/:catalog/:id` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 
-## Rutas web (28)
+## Rutas del proceso (5)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
-| `GET` | `/health/live` | [`src/routes/web/healthWebRoute.js`](../../../../src/routes/web/healthWebRoute.js) |
-| `GET` | `/health/ready` | [`src/routes/web/healthWebRoute.js`](../../../../src/routes/web/healthWebRoute.js) |
-| `GET` | `/` | [`src/routes/web/homeWebRoute.js`](../../../../src/routes/web/homeWebRoute.js) |
-| `GET` | `/inicio-sesion` | [`src/routes/web/auth/loginWebRoute.js`](../../../../src/routes/web/auth/loginWebRoute.js) |
-| `GET` | `/revocar-sesion` | [`src/routes/web/auth/refreshWebRoute.js`](../../../../src/routes/web/auth/refreshWebRoute.js) |
-| `POST` | `/cerrar-sesion` | [`src/routes/web/auth/logoutWebRoute.js`](../../../../src/routes/web/auth/logoutWebRoute.js) |
-| `GET` | `/api-docs/openapi.json` | [`src/routes/web/apiDocsWebRoute.js`](../../../../src/routes/web/apiDocsWebRoute.js) |
-| `GET` | `/api-docs` | [`src/routes/web/apiDocsWebRoute.js`](../../../../src/routes/web/apiDocsWebRoute.js) |
-| `GET` | `/almacen/materiales` | [`src/routes/web/warehouse/materialWebRoute.js`](../../../../src/routes/web/warehouse/materialWebRoute.js) |
-| `GET` | `/almacen/consumibles` | [`src/routes/web/warehouse/consumableWebRoute.js`](../../../../src/routes/web/warehouse/consumableWebRoute.js) |
-| `GET` | `/almacen/mermas` | [`src/routes/web/warehouse/wasteWebRoute.js`](../../../../src/routes/web/warehouse/wasteWebRoute.js) |
-| `GET` | `/compras` | [`src/routes/web/warehouse/goodsReceipts/goodsReceiptWebRoute.js`](../../../../src/routes/web/warehouse/goodsReceipts/goodsReceiptWebRoute.js) |
-| `GET` | `/compras/materiales` | [`src/routes/web/warehouse/goodsReceipts/goodsReceiptWebRoute.js`](../../../../src/routes/web/warehouse/goodsReceipts/goodsReceiptWebRoute.js) |
-| `GET` | `/compras/consumibles` | [`src/routes/web/warehouse/goodsReceipts/goodsReceiptWebRoute.js`](../../../../src/routes/web/warehouse/goodsReceipts/goodsReceiptWebRoute.js) |
-| `GET` | `/salidas` | [`src/routes/web/warehouse/goodsIssues/goodsIssueWebRoute.js`](../../../../src/routes/web/warehouse/goodsIssues/goodsIssueWebRoute.js) |
-| `GET` | `/salidas/materiales` | [`src/routes/web/warehouse/goodsIssues/goodsIssueWebRoute.js`](../../../../src/routes/web/warehouse/goodsIssues/goodsIssueWebRoute.js) |
-| `GET` | `/salidas/consumibles` | [`src/routes/web/warehouse/goodsIssues/goodsIssueWebRoute.js`](../../../../src/routes/web/warehouse/goodsIssues/goodsIssueWebRoute.js) |
-| `GET` | `/salidas/mermas` | [`src/routes/web/warehouse/wasteIssueWebRoute.js`](../../../../src/routes/web/warehouse/wasteIssueWebRoute.js) |
-| `GET` | `/usuarios-sistemas` | [`src/routes/web/admin/userWebRoute.js`](../../../../src/routes/web/admin/userWebRoute.js) |
-| `GET` | `/personas` | [`src/routes/web/admin/personWebRoute.js`](../../../../src/routes/web/admin/personWebRoute.js) |
-| `GET` | `/clientes` | [`src/routes/web/sales/clientWebRoute.js`](../../../../src/routes/web/sales/clientWebRoute.js) |
-| `GET` | `/proveedores` | [`src/routes/web/warehouse/supplierWebRoute.js`](../../../../src/routes/web/warehouse/supplierWebRoute.js) |
-| `GET` | `/movimientos/consumibles` | [`src/routes/web/admin/movementWebRoute.js`](../../../../src/routes/web/admin/movementWebRoute.js) |
-| `GET` | `/movimientos/materiales` | [`src/routes/web/admin/movementWebRoute.js`](../../../../src/routes/web/admin/movementWebRoute.js) |
-| `GET` | `/movimientos/mermas` | [`src/routes/web/admin/movementWebRoute.js`](../../../../src/routes/web/admin/movementWebRoute.js) |
-| `GET` | `/movimientos` | [`src/routes/web/admin/movementWebRoute.js`](../../../../src/routes/web/admin/movementWebRoute.js) |
-| `GET` | `/catalogos` | [`src/routes/web/admin/catalogWebRoute.js`](../../../../src/routes/web/admin/catalogWebRoute.js) |
-| `GET` | `/catalogos/:catalog` | [`src/routes/web/admin/catalogWebRoute.js`](../../../../src/routes/web/admin/catalogWebRoute.js) |
+| `GET` | `/health/live` | [`src/routes/system/healthRoute.js`](../../../../src/routes/system/healthRoute.js) |
+| `GET` | `/health/ready` | [`src/routes/system/healthRoute.js`](../../../../src/routes/system/healthRoute.js) |
+| `GET` | `/api-docs/openapi.json` | [`src/routes/system/apiDocsRoute.js`](../../../../src/routes/system/apiDocsRoute.js) |
+| `GET` | `/api-docs` | [`src/routes/system/apiDocsRoute.js`](../../../../src/routes/system/apiDocsRoute.js) |
+| `POST` | `/cerrar-sesion` | [`src/routes/system/logoutRoute.js`](../../../../src/routes/system/logoutRoute.js) |
 
 ## Símbolos exportados por controladores
 
 Este inventario enumera los nombres públicos declarados por los módulos bajo
-`src/controllers`. Permite localizar el adaptador HTTP o web sin inferir su propósito
+`src/controllers`. Permite localizar el adaptador HTTP sin inferir su propósito
 desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
 en la [documentación técnica del backend](backend-technical-documentation/index.md)
 cuando el flujo necesita una vista curada.
@@ -233,6 +212,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js`](../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) | `cancelMaterialGoodsReceiptDetail`, `correctMaterialGoodsReceiptDetail`, `editMaterialGoodsReceipt`, `getAllMaterialGoodsReceipts`, `getMaterialGoodsReceipt`, `registerMaterialGoodsReceipt` |
 | [`src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js`](../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js) | `exportMaterialGoodsReceiptReportExcel` |
 | [`src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js`](../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) | `buildCancellationHandler`, `buildCorrectionHandler`, `buildEditHandler`, `buildListHandler`, `buildReadHandler`, `buildRegisterHandler` |
+| [`src/controllers/api/warehouse/historicalDeliveryController.js`](../../../../src/controllers/api/warehouse/historicalDeliveryController.js) | `confirmHistoricalDeliveryBatch`, `previewHistoricalDeliveryBatch` |
 | [`src/controllers/api/warehouse/inventoryImportController.js`](../../../../src/controllers/api/warehouse/inventoryImportController.js) | `applyInventoryImport`, `discardInventoryImport`, `exportInventoryImportErrors`, `getInventoryImportTemplate`, `prepareInventoryImport`, `readInventoryImport` |
 | [`src/controllers/api/warehouse/materialController.js`](../../../../src/controllers/api/warehouse/materialController.js) | `editMaterial`, `editMaterialStock`, `getAllMaterials`, `registerMaterial`, `removeMaterial` |
 | [`src/controllers/api/warehouse/presentationController.js`](../../../../src/controllers/api/warehouse/presentationController.js) | `getAllPresentations` |
@@ -242,19 +222,6 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/warehouse/unitMeasureController.js`](../../../../src/controllers/api/warehouse/unitMeasureController.js) | `getAllUnitMeasures` |
 | [`src/controllers/api/warehouse/wasteController.js`](../../../../src/controllers/api/warehouse/wasteController.js) | `editWaste`, `editWasteStock`, `getAllWastes`, `getWasteMaterialTemplates`, `registerWaste`, `registerWasteStockAddition` |
 | [`src/controllers/api/warehouse/wasteIssueController.js`](../../../../src/controllers/api/warehouse/wasteIssueController.js) | `editWasteIssue`, `editWasteIssueDetails`, `editWasteIssueHeader`, `getAllWasteIssues`, `getWasteIssue`, `registerWasteIssue`, `registerWasteIssueDetailReturn` |
-| [`src/controllers/web/admin/catalogController.js`](../../../../src/controllers/web/admin/catalogController.js) | `getCatalogsPage` |
-| [`src/controllers/web/admin/movementController.js`](../../../../src/controllers/web/admin/movementController.js) | `getConsumableMovementPage`, `getMaterialMovementPage`, `getWasteMovementPage` |
-| [`src/controllers/web/admin/personController.js`](../../../../src/controllers/web/admin/personController.js) | `getPersonsPage` |
-| [`src/controllers/web/admin/userController.js`](../../../../src/controllers/web/admin/userController.js) | `getUsersPage` |
-| [`src/controllers/web/authController.js`](../../../../src/controllers/web/authController.js) | `login`, `logout`, `refreshAuthToken` |
-| [`src/controllers/web/sales/clientController.js`](../../../../src/controllers/web/sales/clientController.js) | `getClientsPage` |
-| [`src/controllers/web/warehouse/consumableController.js`](../../../../src/controllers/web/warehouse/consumableController.js) | `getConsumablesPage` |
-| [`src/controllers/web/warehouse/goodsIssues/goodsIssueController.js`](../../../../src/controllers/web/warehouse/goodsIssues/goodsIssueController.js) | `getConsumableGoodsIssuesPage`, `getMaterialGoodsIssuesPage` |
-| [`src/controllers/web/warehouse/goodsReceipts/goodsReceiptController.js`](../../../../src/controllers/web/warehouse/goodsReceipts/goodsReceiptController.js) | `getConsumableGoodsReceiptsPage`, `getMaterialGoodsReceiptsPage` |
-| [`src/controllers/web/warehouse/materialController.js`](../../../../src/controllers/web/warehouse/materialController.js) | `getMaterialsPage` |
-| [`src/controllers/web/warehouse/supplierController.js`](../../../../src/controllers/web/warehouse/supplierController.js) | `getSuppliersPage` |
-| [`src/controllers/web/warehouse/wasteController.js`](../../../../src/controllers/web/warehouse/wasteController.js) | `getWastesPage` |
-| [`src/controllers/web/warehouse/wasteIssueController.js`](../../../../src/controllers/web/warehouse/wasteIssueController.js) | `getWasteIssuesPage` |
 
 ## Símbolos exportados por servicios
 
@@ -286,7 +253,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/sales/clientService.js`](../../../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
 | [`src/services/sales/reportService.js`](../../../../src/services/sales/reportService.js) | `findClientReportRows` |
 | [`src/services/serviceErrorHandler.js`](../../../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError` |
-| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `createInitialMaterialStockBatch`, `createStockAdjustment` |
+| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `calculateStockAdjustmentValues`, `createInitialMaterialStockBatch`, `createMaterialStockAdjustmentsBatch`, `createStockAdjustment` |
 | [`src/services/warehouse/consumables/consumableService.js`](../../../../src/services/warehouse/consumables/consumableService.js) | `createConsumable`, `deleteConsumable`, `findAllConsumables`, `updateConsumable`, `updateConsumableStock` |
 | [`src/services/warehouse/fulfillmentStatusService.js`](../../../../src/services/warehouse/fulfillmentStatusService.js) | `findAllFulfillmentStatuses`, `findFulfillmentStatusIdByName`, `findFulfillmentStatusIdsByName` |
 | [`src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js`](../../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js) | `createConsumableGoodsIssue`, `findAllConsumableGoodsIssues`, `findConsumableGoodsIssueReportRows`, `returnConsumableGoodsIssueDetail`, `updateConsumableGoodsIssue`, `updateConsumableGoodsIssueDetails`, `updateConsumableGoodsIssueHeader` |
@@ -309,13 +276,17 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) | `cancelGoodsReceiptDetailAndTotals`, `correctGoodsReceiptDetailAndTotals`, `createGoodsReceiptDetailsAndUpdateTotals` |
 | [`src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) | `cancelMaterialGoodsReceiptDetailLine`, `correctMaterialGoodsReceiptDetailLine`, `createMaterialGoodsReceipt`, `findAllMaterialGoodsReceipts`, `findMaterialGoodsReceiptReportRows`, `updateMaterialGoodsReceipt` |
 | [`src/services/warehouse/imports/inventoryImportCleanup.js`](../../../../src/services/warehouse/imports/inventoryImportCleanup.js) | `expireInventoryImportDrafts`, `startInventoryImportCleanup` |
-| [`src/services/warehouse/imports/inventoryImportConfig.js`](../../../../src/services/warehouse/imports/inventoryImportConfig.js) | `authorizeInventoryImport`, `getImportConfig`, `importUnitLabel` |
-| [`src/services/warehouse/imports/inventoryImportContext.js`](../../../../src/services/warehouse/imports/inventoryImportContext.js) | `importKey`, `importReferenceId`, `importText`, `loadInventoryImportContext`, `materialImportIdentity`, `wasteImportIdentity` |
+| [`src/services/warehouse/imports/inventoryImportConfig.js`](../../../../src/services/warehouse/imports/inventoryImportConfig.js) | `authorizeInventoryImport`, `getImportConfig`, `importUnitLabel`, `inventoryImportColumnLabel` |
+| [`src/services/warehouse/imports/inventoryImportContext.js`](../../../../src/services/warehouse/imports/inventoryImportContext.js) | `importCatalogValue`, `importKey`, `importText`, `loadInventoryImportContext`, `materialImportIdentity`, `wasteImportIdentity` |
 | [`src/services/warehouse/imports/inventoryImportService.js`](../../../../src/services/warehouse/imports/inventoryImportService.js) | `cancelInventoryImport`, `confirmInventoryImport`, `getInventoryImport`, `getInventoryImportErrors`, `previewInventoryImport` |
 | [`src/services/warehouse/imports/inventoryImportTemplateService.js`](../../../../src/services/warehouse/imports/inventoryImportTemplateService.js) | `createInventoryImportTemplate` |
 | [`src/services/warehouse/imports/inventoryImportValidationService.js`](../../../../src/services/warehouse/imports/inventoryImportValidationService.js) | `validateInventoryImportRows` |
 | [`src/services/warehouse/imports/inventoryImportWriteService.js`](../../../../src/services/warehouse/imports/inventoryImportWriteService.js) | `writeInventoryImport` |
+| [`src/services/warehouse/imports/inventoryStockCountValidationService.js`](../../../../src/services/warehouse/imports/inventoryStockCountValidationService.js) | `validateInventoryStockCountRows` |
 | [`src/services/warehouse/imports/inventoryWorkbookService.js`](../../../../src/services/warehouse/imports/inventoryWorkbookService.js) | `processInventoryWorkbook` |
+| [`src/services/warehouse/issues/historicalDeliverySelect.js`](../../../../src/services/warehouse/issues/historicalDeliverySelect.js) | `HISTORICAL_DELIVERY_SELECT` |
+| [`src/services/warehouse/issues/historicalDeliveryService.js`](../../../../src/services/warehouse/issues/historicalDeliveryService.js) | `confirmHistoricalDeliveries`, `previewHistoricalDeliveries` |
+| [`src/services/warehouse/issues/historicalReturnRules.js`](../../../../src/services/warehouse/issues/historicalReturnRules.js) | `assertHistoricalPhysicalReturn` |
 | [`src/services/warehouse/issues/issueAccessService.js`](../../../../src/services/warehouse/issues/issueAccessService.js) | `assertIssueDepartmentAccess`, `buildIssueDepartmentWhere` |
 | [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `assertIssueNotCanceled`, `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
@@ -341,5 +312,5 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/wastes/wasteOperationService.js`](../../../../src/services/warehouse/wastes/wasteOperationService.js) | `executeWasteOperation`, `markWasteOperationRejected` |
 | [`src/services/warehouse/wastes/wasteReportSummary.js`](../../../../src/services/warehouse/wastes/wasteReportSummary.js) | `buildWasteReportSummary`, `createWasteReportSummary` |
 | [`src/services/warehouse/wastes/wasteService.js`](../../../../src/services/warehouse/wastes/wasteService.js) | `addWasteStock`, `createWaste`, `findAllWastes`, `updateWaste`, `updateWasteStock` |
-| [`src/services/warehouse/wastes/wasteStockAdjustmentService.js`](../../../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) | `registerWasteStockAdjustment` |
+| [`src/services/warehouse/wastes/wasteStockAdjustmentService.js`](../../../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) | `calculateWasteStockAdjustmentValues`, `registerWasteStockAdjustment`, `registerWasteStockAdjustmentsBatch` |
 | [`src/services/warehouse/wastes/wasteStockEntryService.js`](../../../../src/services/warehouse/wastes/wasteStockEntryService.js) | `registerWasteStockEntriesBatch`, `registerWasteStockEntry` |

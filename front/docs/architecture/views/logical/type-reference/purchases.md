@@ -34,7 +34,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 14, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 15, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -49,7 +49,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 20, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 21, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -384,7 +384,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseResource
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 4, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 5, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -394,7 +394,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## Decimal
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 5, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 6, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -404,7 +404,7 @@ string | number
 
 ## PurchaseFilters
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 6, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 7, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -415,7 +415,7 @@ string | number
 
 ## PurchaseQuery
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 12, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 13, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -430,7 +430,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseRow
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 13, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 14, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -456,7 +456,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseDetail
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 28, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 29, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -473,7 +473,7 @@ RecordQuery & PurchaseFilters
 | `conversionUnitCost` | `conversionUnitCost: Decimal;` |
 | `netPurchaseAmount` | `netPurchaseAmount: Decimal;` |
 | `grossPurchaseAmount` | `grossPurchaseAmount: Decimal;` |
-| `status` | `status: 'ACTIVE' \| 'CANCELED';` |
+| `status` | `status: (typeof GOODS_RECEIPT_DETAIL_STATUSES)[keyof typeof GOODS_RECEIPT_DETAIL_STATUSES];` |
 | `isNew` | `isNew: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
@@ -489,7 +489,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseDocument
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 45, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 46, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends PurchaseRow`.
 
@@ -505,7 +505,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseValues
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 49, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 50, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -523,7 +523,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseField
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 58, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 59, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -537,7 +537,7 @@ keyof PurchaseValues
 
 ## PurchaseTarget
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 59, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 60, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -553,7 +553,7 @@ keyof PurchaseValues
 
 ## PurchaseWriteTarget
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 63, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 64, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -567,7 +567,7 @@ Exclude<PurchaseTarget, { action: 'view' }>
 
 ## PurchaseDetailChange
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 64, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 65, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -577,7 +577,7 @@ Exclude<PurchaseTarget, { action: 'view' }>
 
 ## ItemCreation
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 66, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 67, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupCreation`.
 

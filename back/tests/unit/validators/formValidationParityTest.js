@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { validationResult } from 'express-validator';
 import * as fields from '../../../src/validators/fields/fieldsValidator.js';
-import * as front from '../../../src/public/js/utils/validations/validators.js';
-import { validateFields, validateDetailsFields, hasValidationErrors } from '../../../src/public/js/utils/formUtils.js';
+import * as front from '../../../src/shared/validation/validators.js';
+import { validateFields, validateDetailsFields, hasValidationErrors } from '../../helpers/clientValidation.js';
 import { MIN_STOCK_INPUT_FORMAT } from '../../../src/shared/constants/inputValidation.js';
 import { personValidation } from '../../../src/validators/forms/personValidations.js';
 import { clientValidation } from '../../../src/validators/forms/clientValidations.js';

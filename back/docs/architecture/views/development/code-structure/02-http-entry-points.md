@@ -6,20 +6,21 @@ cada carpeta en un servicio independiente. Los conteos y el detalle método–UR
 en el [mapa generado](../code-map.md), evitando mantener cifras manuales divergentes.
 
 **Identificador:** `DIA-COD-HTTP-001`. **Pregunta:** ¿qué módulos montan la API y las
-páginas de Nexus? **Fuente:** `src/routes/api/index.js`, `src/routes/web/index.js` y
+rutas operativas del proceso? **Fuente:** `src/routes/api/index.js`, `src/routes/system/index.js` y
 `src/app.js`. Las flechas representan registro y agrupación, no orden de peticiones.
 
 ```mermaid
 flowchart TB
     app["src/app.js<br/>aplicación Express"] --> api["registerApiRoutes<br/>prefijo /api"]
-    app --> web["registerWebRoutes<br/>páginas y redirecciones"]
+    app --> web["registerSystemRoutes<br/>salud · documentación · cierre"]
     api --> auth["auth<br/>login · identidad · refresh"]
     api --> admin["admin<br/>personas · usuarios · catálogos<br/>movimientos · reportes propios"]
     api --> sales["sales<br/>clientes · reporte de clientes"]
     api --> warehouse["warehouse<br/>inventarios · proveedores · lecturas operativas<br/>entradas · salidas · reportes propios"]
-    web --> pages["Routers web<br/>autenticación y páginas de cada recurso"]
-    web --> redirects["Redirecciones de compatibilidad<br/>URLs anteriores"]
-    app --> fallback["Ruta de error y middleware final<br/>404 HTML/API · traducción de errores"]
+    web --> health["healthRoute.js<br/>vida y disponibilidad"]
+    web --> docs["apiDocsRoute.js<br/>Swagger de desarrollo"]
+    web --> logout["logoutRoute.js<br/>POST y redirección 303 hacia Vue"]
+    app --> fallback["Ruta de error y middleware final<br/>404 JSON · traducción de errores"]
 ```
 
 Compras y salidas tienen variantes de materiales y consumibles. Los catálogos auxiliares

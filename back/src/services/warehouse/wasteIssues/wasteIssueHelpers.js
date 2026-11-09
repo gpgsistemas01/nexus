@@ -7,23 +7,25 @@ import {
     WasteIssueRequesterNotFound,
     WasteIssueWasteUnavailableConflict
 } from '../../../errors/warehouse/wasteIssueError.js';
-import { GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { GOODS_ISSUE_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
+import { HISTORICAL_DELIVERY_SELECT } from '../issues/historicalDeliverySelect.js';
 import { resolveIssueHeaderData } from '../issues/issueHeaderService.js';
 import { assertPieceQuantity, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 
-const normalizeWasteIssueDetailResponse = detail => ({
+const normalizeWasteIssueDetailResponse = (detail, historical = false) => ({
     ...detail,
-    maxUnitCost: detail.maxUnitCost ?? detail.waste?.maxUnitCost ?? null,
+    maxUnitCost: historical ? null : detail.maxUnitCost ?? detail.waste?.maxUnitCost ?? null,
     projectConvertedQuantity: detail.projectConvertedQuantity ?? null,
     convertedQuantityDifference: detail.convertedQuantityDifference ?? null
 });
 
 export const normalizeWasteIssueResponse = issue => issue && ({
     ...issue,
-    ...(issue.details && { details: issue.details.map(normalizeWasteIssueDetailResponse) })
+    ...(issue.details && { details: issue.details.map(detail => normalizeWasteIssueDetailResponse(detail, !!issue.historicalDeliveryBatchId)) })
 });
 
 export const WASTE_ISSUE_INCLUDE = {
+    historicalDeliveryBatch: { select: HISTORICAL_DELIVERY_SELECT },
     createdBy: { select: { id: true, name: true } },
     status: { select: { id: true, name: true } },
     fulfillmentStatus: { select: { id: true, name: true } },

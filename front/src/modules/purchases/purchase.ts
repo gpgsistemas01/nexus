@@ -1,3 +1,4 @@
+import type { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
 import type { RecordQuery } from '../../shared/list.js';
 import type { LookupCreation, LookupItem } from '../../shared/lookup.js';
 
@@ -39,7 +40,7 @@ export interface PurchaseDetail {
     conversionUnitCost: Decimal;
     netPurchaseAmount: Decimal;
     grossPurchaseAmount: Decimal;
-    status: 'ACTIVE' | 'CANCELED';
+    status: (typeof GOODS_RECEIPT_DETAIL_STATUSES)[keyof typeof GOODS_RECEIPT_DETAIL_STATUSES];
     isNew: boolean;
 }
 export interface PurchaseDocument extends PurchaseRow {

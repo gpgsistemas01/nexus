@@ -92,7 +92,10 @@ onMounted(() => {
     >
         <template #actions>
             <VBtn
-                v-if="permissions.canRead && permissions.canWrite && permissions.canReadCosts"
+                v-if="
+                    permissions.canRead &&
+                    ((permissions.canWrite && permissions.canReadCosts) || permissions.canAdjust)
+                "
                 variant="outlined"
                 @click="isImportOpen = true"
             >
@@ -178,6 +181,8 @@ onMounted(() => {
         :resource="resource"
         :user-id="session.user.value!.id"
         :can-read-suppliers="session.user.value!.permissions.includes(PERMISSIONS.SUPPLIERS_READ)"
+        :can-edit-data="permissions.canWrite && permissions.canReadCosts"
+        :can-adjust="permissions.canAdjust"
         :initial-supplier-id="query.supplierId"
         :initial-search="query.search"
         @close="isImportOpen = false"

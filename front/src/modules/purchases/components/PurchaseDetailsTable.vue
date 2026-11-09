@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
 import { computed } from 'vue';
 import { VDataTable } from 'vuetify/components/VDataTable';
 import type { DataTableHeader } from 'vuetify';
@@ -91,7 +92,7 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
             <template #[`item.name`]="{ item }">
                 {{ item.name }}
                 <small
-                    v-if="item.status === 'CANCELED'"
+                    v-if="item.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED"
                     class="d-block text-error"
                 >
                     Cancelado
@@ -99,13 +100,23 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
             </template>
             <template #[`item.actions`]="{ item }">
                 <TableAction
-                    v-if="item.status === 'ACTIVE' && item.isNew && canRemove"
+                    v-if="
+                        item.status === GOODS_RECEIPT_DETAIL_STATUSES.ACTIVE &&
+                        item.isNew &&
+                        canRemove
+                    "
                     label="Quitar detalle nuevo"
                     icon="$delete"
                     :is-disabled="isDisabled"
                     @click="emit('remove', item.id)"
                 />
-                <template v-if="canChange && !item.isNew && item.status === 'ACTIVE'">
+                <template
+                    v-if="
+                        canChange &&
+                        !item.isNew &&
+                        item.status === GOODS_RECEIPT_DETAIL_STATUSES.ACTIVE
+                    "
+                >
                     <TableAction
                         label="Corregir detalle"
                         icon="$edit"

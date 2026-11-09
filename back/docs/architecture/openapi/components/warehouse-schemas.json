@@ -101,7 +101,7 @@
   },
   "SupplierMaterial": {
     "type": "object",
-    "description": "Relaci\u00f3n proveedor-material. El identificador de nivel superior corresponde a SupplierMaterial; la identidad y los datos descriptivos del material permanecen anidados en material.",
+    "description": "Relación proveedor-material. El identificador de nivel superior corresponde a SupplierMaterial; la identidad y los datos descriptivos del material permanecen anidados en material.",
     "properties": {
       "id": {
         "type": "string",
@@ -135,7 +135,7 @@
           "null"
         ],
         "maximum": 999.99,
-        "description": "Referencia hist\u00f3rica del rollo completo; ya no se captura ni modifica.",
+        "description": "Referencia histórica del rollo completo; ya no se captura ni modifica.",
         "multipleOf": 0.01,
         "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0,
@@ -150,7 +150,7 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 999.99,
-        "description": "Referencia hist\u00f3rica del rollo completo; ya no se captura ni modifica.",
+        "description": "Referencia histórica del rollo completo; ya no se captura ni modifica.",
         "multipleOf": 0.01,
         "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "readOnly": true,
@@ -248,7 +248,7 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 999.99,
-        "description": "Peso neto en kg por unidad de merma de Rollo: total con cono menos cono. S\u00f3lo consulta.",
+        "description": "Peso neto en kg por unidad de merma de Rollo: total con cono menos cono. Sólo consulta.",
         "multipleOf": 0.01,
         "readOnly": true
       },
@@ -259,7 +259,7 @@
           "null"
         ],
         "maximum": 999.99,
-        "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
         "minimum": 0,
         "readOnly": true
@@ -272,7 +272,7 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 999.99,
-        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
         "readOnly": true
       },
@@ -325,7 +325,7 @@
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
         "multipleOf": 1e-06,
-        "description": "Largo de muestra hist\u00f3rico. Las altas nuevas lo dejan nulo y obtienen el largo del material de origen.",
+        "description": "Largo de muestra histórico. Las altas nuevas lo dejan nulo y obtienen el largo del material de origen.",
         "readOnly": true,
         "deprecated": true
       },
@@ -338,7 +338,7 @@
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
         "multipleOf": 1e-06,
-        "description": "Peso neto de muestra hist\u00f3rico. Las altas nuevas lo dejan nulo y calculan el neto con el total del rollo completo menos el cono.",
+        "description": "Peso neto de muestra histórico. Las altas nuevas lo dejan nulo y calculan el neto con el total del rollo completo menos el cono.",
         "readOnly": true,
         "deprecated": true
       },
@@ -437,6 +437,23 @@
       },
       "fulfillmentStatus": {
         "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "historicalDeliveryBatchId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      },
+      "historicalDeliveryBatch": {
+        "anyOf": [
+          {
+            "$ref": "../openapi.json#/components/schemas/HistoricalDeliveryEvidence"
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     },
     "additionalProperties": true,
@@ -844,7 +861,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "exclusiveMinimum": 0,
-        "description": "Mayor que cero, hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "description": "Mayor que cero, hasta 8 enteros y 6 decimales; se convierte a número en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -853,13 +870,13 @@
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       },
       "expectedMaterialVersion": {
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       }
     },
     "additionalProperties": false,
@@ -902,7 +919,7 @@
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       }
     },
     "additionalProperties": false,
@@ -924,7 +941,7 @@
       "materialId": {
         "type": "string",
         "format": "uuid",
-        "description": "Material de origen con unidad m\u00b2 (por s\u00edmbolo o nombre metro cuadrado), excluyendo consumibles."
+        "description": "Material de origen con unidad m² (por símbolo o nombre metro cuadrado), excluyendo consumibles."
       },
       "supplierId": {
         "type": "string",
@@ -936,7 +953,7 @@
           "string",
           "null"
         ],
-        "description": "Dimensi\u00f3n final de la merma. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensi\u00f3n transversal del material.",
+        "description": "Dimensión final de la merma. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensión transversal del material.",
         "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
@@ -948,7 +965,7 @@
           "string",
           "null"
         ],
-        "description": "Dimensi\u00f3n final de la merma. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensi\u00f3n transversal del material.",
+        "description": "Dimensión final de la merma. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensión transversal del material.",
         "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
@@ -975,7 +992,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -1002,7 +1019,7 @@
           "null"
         ],
         "maximum": 999.99,
-        "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
         "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0
@@ -1015,7 +1032,7 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 999.99,
-        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
         "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       },
@@ -1034,7 +1051,7 @@
       "operationId": {
         "type": "string",
         "format": "uuid",
-        "description": "UUID v4 persistido antes de enviar. Un reintento del mismo actor conserva clave y captura; devuelve el resultado original sin nuevos efectos. No expira autom\u00e1ticamente."
+        "description": "UUID v4 persistido antes de enviar. Un reintento del mismo actor conserva clave y captura; devuelve el resultado original sin nuevos efectos. No expira automáticamente."
       }
     },
     "additionalProperties": false,
@@ -1047,7 +1064,7 @@
       "initialQuantity",
       "operationId"
     ],
-    "description": "Origen MATERIAL en m\u00b2. No se permite crear Rollo sin pesos ni sustituir el c\u00e1lculo con medidas manuales. Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No env\u00ede netos ni sampleLengthM/sampleNetWeightKg. El largo y neto de muestra se calculan sin persistirlos; esos dos campos quedan reservados a hist\u00f3ricos. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m\u00b2 usan medidas manuales sin pesos."
+    "description": "Origen MATERIAL en m². No se permite crear Rollo sin pesos ni sustituir el cálculo con medidas manuales. Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No envíe netos ni sampleLengthM/sampleNetWeightKg. El largo y neto de muestra se calculan sin persistirlos; esos dos campos quedan reservados a históricos. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m² usan medidas manuales sin pesos."
   },
   "WasteUpdateRequest": {
     "type": "object",
@@ -1078,7 +1095,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "exclusiveMinimum": 0,
-        "description": "Mayor que cero, hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "description": "Mayor que cero, hasta 8 enteros y 6 decimales; se convierte a número en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -1087,7 +1104,7 @@
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       }
     },
     "additionalProperties": false,
@@ -1124,7 +1141,7 @@
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       }
     },
     "additionalProperties": false,
@@ -1163,7 +1180,7 @@
       "requestDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": [
@@ -1212,7 +1229,7 @@
       "requestDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": [
@@ -1300,7 +1317,7 @@
       "requestDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": [
@@ -1375,7 +1392,7 @@
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
-              "description": "Cantidad total de proyecto en la unidad de conversi\u00f3n, hasta 8 enteros y 2 decimales. Se conserva tal como se captura, incluso si la diferencia resultante es negativa; no se acumula por entrega ni determina el descuento de stock."
+              "description": "Cantidad total de proyecto en la unidad de conversión, hasta 8 enteros y 2 decimales. Se conserva tal como se captura, incluso si la diferencia resultante es negativa; no se acumula por entrega ni determina el descuento de stock."
             },
             "quantityToSupply": {
               "type": [
@@ -1391,7 +1408,7 @@
             "expectedSuppliedQuantity": {
               "type": "number",
               "minimum": 0,
-              "description": "Acumulado suppliedQuantity le\u00eddo al abrir el surtido; null hist\u00f3rico se representa como 0. Debe acompa\u00f1ar quantityToSupply. Si cambi\u00f3, responde 409 RECORD_VERSION_CONFLICT sin repetir el descuento."
+              "description": "Acumulado suppliedQuantity leído al abrir el surtido; null histórico se representa como 0. Debe acompañar quantityToSupply. Si cambió, responde 409 RECORD_VERSION_CONFLICT sin repetir el descuento."
             }
           },
           "additionalProperties": false,
@@ -1434,6 +1451,10 @@
       "observations": {
         "type": "string",
         "maxLength": 500
+      },
+      "physicalReturnConfirmed": {
+        "type": "boolean",
+        "description": "Debe ser true para una salida regularizada: confirma la entrada física actual al almacén. Se rechaza sin efectos si falta."
       }
     },
     "additionalProperties": false,
@@ -1462,7 +1483,7 @@
       "receptionDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": "string",
@@ -1545,7 +1566,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
       }
     },
     "additionalProperties": false,
@@ -1824,7 +1845,7 @@
       "operationId": {
         "type": "string",
         "format": "uuid",
-        "description": "UUID v4 persistido antes de enviar. Un reintento del mismo actor conserva clave y captura; devuelve el resultado original sin nuevos efectos. No expira autom\u00e1ticamente."
+        "description": "UUID v4 persistido antes de enviar. Un reintento del mismo actor conserva clave y captura; devuelve el resultado original sin nuevos efectos. No expira automáticamente."
       }
     },
     "additionalProperties": false,
@@ -1934,7 +1955,7 @@
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       }
     },
     "additionalProperties": false,
@@ -1966,7 +1987,7 @@
       "receptionDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": "string",
@@ -2016,7 +2037,7 @@
           ]
         },
         "minItems": 1,
-        "description": "S\u00f3lo detalles nuevas. Omitir el campo cuando no se agreguen detalles; una lista expl\u00edcita vac\u00eda es inv\u00e1lida."
+        "description": "Sólo detalles nuevas. Omitir el campo cuando no se agreguen detalles; una lista explícita vacía es inválida."
       }
     },
     "additionalProperties": false,
@@ -2056,7 +2077,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "exclusiveMinimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
       },
       "height": {
         "type": [
@@ -2068,7 +2089,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "exclusiveMinimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
       },
       "minStock": {
         "type": [
@@ -2091,7 +2112,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -2122,7 +2143,7 @@
       "maxUnitCost",
       "newStock"
     ],
-    "description": "Alta independiente con costo m\u00e1ximo y existencia inicial."
+    "description": "Alta independiente con costo máximo y existencia inicial."
   },
   "GoodsReceiptMaterialCreateRequest": {
     "type": "object",
@@ -2154,7 +2175,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "exclusiveMinimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
       },
       "height": {
         "type": [
@@ -2166,7 +2187,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "exclusiveMinimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
       },
       "minStock": {
         "type": [
@@ -2189,7 +2210,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -2214,7 +2235,7 @@
         "enum": [
           "goodsReceipt"
         ],
-        "description": "Alta para una compra: omite costo m\u00e1ximo y existencia inicial; crea la oferta con stock cero."
+        "description": "Alta para una compra: omite costo máximo y existencia inicial; crea la oferta con stock cero."
       }
     },
     "additionalProperties": false,
@@ -2226,6 +2247,6 @@
       "isActive",
       "creationContext"
     ],
-    "description": "Alta para una compra: crea la oferta con stock cero y sin costo m\u00e1ximo; ambos campos se ignoran si se env\u00edan."
+    "description": "Alta para una compra: crea la oferta con stock cero y sin costo máximo; ambos campos se ignoran si se envían."
   }
 }

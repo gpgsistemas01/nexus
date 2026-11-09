@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import ExcelJS from 'exceljs';
 import { getImportConfig } from '../../src/services/warehouse/imports/inventoryImportConfig.js';
-import { INVENTORY_IMPORT_FORMAT } from '../../src/shared/constants/inventoryImport.js';
+import { INVENTORY_IMPORT_FORMAT } from '../../src/constants/inventoryImport.js';
 import { PERMISSIONS } from '../../src/shared/constants/permissions.js';
 import { ROLE_KEYS } from '../../src/constants/roles.js';
 import { DEPARTMENT_KEYS } from '../../src/constants/departments.js';
@@ -58,9 +58,12 @@ export const createInventoryImportFixture = async prisma => {
         const adjustments = await prisma.stockAdjustment.findMany({ where: { createdById: user.id }, select: { id: true } });
         const adjustmentIds = adjustments.map(item => item.id);
         const wasteEntries = await prisma.wasteStockEntry.findMany({ where: { createdById: user.id }, select: { wasteMovementId: true } });
-        const movementIds = wasteEntries.map(item => item.wasteMovementId);
+        const wasteAdjustments = await prisma.wasteStockAdjustment.findMany({ where: { createdById: user.id }, select: { id: true, wasteMovementId: true } });
+        const movementIds = [...wasteEntries, ...wasteAdjustments].map(item => item.wasteMovementId);
         await prisma.wasteStockEntry.deleteMany({ where: { createdById: user.id } });
         await prisma.wasteMovementDetail.deleteMany({ where: { movementId: { in: movementIds } } });
+        await prisma.wasteStockAdjustmentDetail.deleteMany({ where: { wasteStockAdjustmentId: { in: wasteAdjustments.map(item => item.id) } } });
+        await prisma.wasteStockAdjustment.deleteMany({ where: { id: { in: wasteAdjustments.map(item => item.id) } } });
         await prisma.wasteMovement.deleteMany({ where: { id: { in: movementIds } } });
         await prisma.waste.deleteMany({ where: { supplierId: { in: supplierIds } } });
         await prisma.movementDetail.deleteMany({ where: { supplierId: { in: supplierIds } } });

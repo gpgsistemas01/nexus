@@ -2,7 +2,10 @@
 
 ## Importaciones de inventario
 
-`RF-IMP-001/002/003` añade importación por lotes a las altas y ediciones de Almacén.
+`RF-IMP-001/002/003` cubre un archivo por operación de Almacén, elegido mediante selector,
+con estructura de consulta e IDs/versiones cuando corresponden.
+`RF-ISS-009` añade reconocimiento histórico por lote sin movimientos, con evidencia
+HTTP/Prisma en `historicalDeliveryControllerDbTest.js` y cliente/navegador en Vue.
 `inventoryImportControllerDbTest.js` cubre permisos, stock inicial, mermas, datos
 compartidos, versiones, recibos, rollback y limpieza. `inventoryWorkbookTest.js`
 comprueba contenido y límites del libro. Los diseños/casos `DP-IMP-*` y `CP-INT-IMP-*`
@@ -75,17 +78,17 @@ no una demostración de todos los CU.
 | `CU-AUT-01` | `authControllerDbTest.js`; pruebas Vue de login/sesión y `front/tests/system/application.spec.ts`. | HTTP/Prisma de captura inválida/rechazada/válida; sistema con login, refresh real y cookies HttpOnly; navegador simulado añade caída/recuperación. | **Evidencia por niveles.** Nexus no repite todas las fronteras ni acredita todos los escenarios de refresh. |
 | `CU-AUT-02` | `cookiesUtilsTest.js`, `sessionRecovery.spec.ts` y `front/tests/system/application.spec.ts`; `CP-VUE-SESSION-004-01`, `CP-VUE-SYS-001-01`. | Helper, navegador simulado y recorrido real: POST de cierre, cookies eliminadas, `/me`/refresh 401 y rechazo posterior de URL protegida. | **Evidencia unitaria, navegador y sistema.** No implica revocar tokens copiados fuera del navegador. |
 | `CU-ALM-01` | `materialControllerTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Unitaria de permisos e interacción; queries y retorno simulado; oculta costos sin permiso y conserva respuesta autorizada. | **Unitaria existente.** |
-| `CU-ALM-02` | `materialValidationTest.js`, `materialMeasurementFieldTest.js`, `materialControllerDbTest.js`. | Unitarias e integración de piezas sin medidas, pareja opcional completa, conversión y alta contextual desde compra. | **Evidencia parcial existente**; no demuestra todo el CRUD de materiales. |
+| `CU-ALM-02` | `materialValidationTest.js`, `inventoryFormTest.ts`, `materialControllerDbTest.js`. | Unitarias e integración de piezas sin medidas, pareja opcional completa, conversión y alta contextual desde compra. | **Evidencia parcial existente**; no demuestra todo el CRUD de materiales. |
 | `CU-ALM-03` | `wasteWeightDbTest.js`, `materialDTOTest.js`. | Edición de costo conserva pesos históricos; DTO descarta referencias del material. | **Evidencia parcial existente**; no acredita toda la edición de materiales. |
 | `CU-ALM-04` | `supplierMaterialServiceTest.js`. | Unitaria de elegibilidad por relaciones históricas y consulta de uso. | **Unitaria parcial**; falta baja HTTP/Prisma con historia protegida. |
 | `CU-ALM-05` | `stockHelpersTest.js`, `supplierMaterialStockServiceTest.js`, `warehouseConcurrencyControllerDbTest.js`. | Cero, insuficiencia y ajuste por servicio coincidente con una entrada, con saldos e historial. | **Evidencia parcial existente**; falta integración del endpoint de ajuste de material y sus controles. |
 | `CU-ALM-06` | `inventoryReportControllerDbTest.js`, `reportExcelUtilsTest.js`. | Exportación XLSX real con más de 5000 filas, tipos, alcances, orden, vacío y stock conservado. | **Integración existente**, sin atribuirle privacidad de costos no comprobada. |
 | `CU-ALM-07..08` | `movementContextDbTest.js`. | Routers reales con cookie/JWT, filtros, paginación, separación de tipos y XLSX personalizado/mensual. | **Integración existente**, incluidos 401/403 para los accesos probados. |
 | `CU-ALM-09` | `wasteControllerTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Unitaria de consulta con filtros, búsqueda, proveedor, orden, paginación y servicio simulado. | **Unitaria existente.** |
-| `CU-ALM-10` | `wasteControllerFlowTest.js`, `wasteRegistrationBoundaryTest.js`, `wasteFormTest.js`, `wasteWeightDbTest.js`, `materialControllerDbTest.js`. | Límites, duplicado, origen MATERIAL en m², referencia de rollo completo y neto/largo recalculados; rechazo sin efectos y payload sin derivados de muestra; entrada EME inicial, cantidad cero sin documentos ni folio y rollback de entrada/movimiento/contador (`CP-INT-MER-004`). | **Unitarias e integración existentes**; interacción real Select2/Swal/modal requiere navegador. |
+| `CU-ALM-10` | `wasteControllerFlowTest.js`, `wasteRegistrationBoundaryTest.js`, `inventoryFormTest.ts`, `wasteWeightDbTest.js`, `materialControllerDbTest.js`. | Límites, duplicado, origen MATERIAL en m², referencia de rollo completo y neto/largo recalculados; rechazo sin efectos y payload sin derivados de muestra; entrada EME inicial, cantidad cero sin documentos ni folio y rollback de entrada/movimiento/contador (`CP-INT-MER-004`). | **Unitarias e integración existentes**; interacción real Select2/Swal/modal requiere navegador. |
 | `CU-ALM-11` | `wasteControllerFlowTest.js`, `wasteWeightDbTest.js`. | Edición de campos permitidos, rechazo de pesos inmutables y conservación de muestras históricas. | **Unitarias e integración existentes**, limitadas a las reglas descritas. |
 | `CU-ALM-12` | `wasteWeightDbTest.js`, `wasteControllerFlowTest.js`, `warehouseConcurrencyControllerDbTest.js`. | Ajuste AME independiente de EME, por controller HTTP y coincidente con entrada, diferencias sobre saldo vigente y movimientos reales; la variante de material usa servicio directo. | **Evidencia parcial existente**; el harness de concurrencia no monta validadores ni permisos de la ruta de producción. |
-| `CU-ALM-13` | `wasteControllerTest.js`, `wasteFormTest.js`, `wasteStockAdditionModalTest.js`, `wasteWeightDbTest.js`. | Agregar stock conserva pesos, suma cantidad y genera entrada EME; confirmar duplicado sólo abre modal, permite revisar captura y evita escritura directa. | **Unitarias e integración existentes**; falta recorrido completo de navegador. |
+| `CU-ALM-13` | `wasteControllerTest.js`, `inventoryFormTest.ts`, `wasteStockAdditionModalTest.js`, `wasteWeightDbTest.js`. | Agregar stock conserva pesos, suma cantidad y genera entrada EME; confirmar duplicado sólo abre modal, permite revisar captura y evita escritura directa. | **Unitarias e integración existentes**; falta recorrido completo de navegador. |
 | `CU-ALM-14` | `reportControllerTest.js`, `reportServiceTest.js`, `wasteWeightDbTest.js`. | Agrupación y cálculo; integración descarga Excel, comprueba peso neto total, fórmula SUM y peso desconocido sin modificar inventario. | **Unitarias e integración del archivo existentes**, sin afirmar todos sus filtros. |
 | `CU-ALM-15` | `movementQueryServiceTest.js`. | Unitaria de consulta por identidad de merma con Prisma simulado. | **Unitaria existente**; falta integración. |
 | `CU-ALM-16` | Sin prueba funcional directa del reporte. | Fixtures de movimientos, periodo, filtros, columnas/fórmulas y vacío. | **Brecha.** |
@@ -116,7 +119,7 @@ no una demostración de todos los CU.
 | `CU-SAL-21` | `goodsIssueContextServicesTest.js`, `goodsIssueControllerDbTest.js`. | Delegación de consulta de reporte con tipo fijo e integración de filas limitadas al contexto. | **Evidencia de aislamiento existente**; falta integración del archivo Excel, fórmulas y resultado vacío de consumibles. |
 | `CU-ENT-01..02`, `CU-ENT-07..08` | `goodsReceiptContextServicesTest.js`, `goodsReceiptContextDbTest.js`. | Consulta de compras homogéneas; alta concurrente CMA/CCO con tipo fijo, stock y movimientos; fallo revierte contador/compra/stock. | **Unitarias e integración existentes**, limitadas a esos escenarios. |
 | `CU-ENT-03..04`, `CU-ENT-09..10` | `goodsReceiptControllerTest.js`, `goodsReceiptContextDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. | Cabecera homogénea y rechazo cruzado; correcciones concurrentes y fallo de historial revierten stock/costos en compra material. | **Evidencia existente**; no atribuir corrección completa de consumibles a fixtures de material. |
-| `CU-ENT-05`, `CU-ENT-11` | `goodsReceiptContextDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. | Contexto cruzado rechazado sin cambios; cancelación duplicada de compra material modifica stock una vez y conserva estado al agregar detalle. | **Integración parcial existente**; cancelación homogénea de consumibles requiere revisión propia. |
+| `CU-ENT-05`, `CU-ENT-11` | `goodsReceiptContextDbTest.js`, `warehouseConcurrencyControllerDbTest.js`, `goodsReceiptCancellationTotalsDbTest.js`; `DP-REC-001`. | Contexto cruzado rechazado sin cambios; cancelación duplicada modifica stock una vez. Cancelar sucesivamente partidas conserva los totales previos a la última, sin reincorporar las canceladas; recuperación histórica atómica e idempotente. | **Integración parcial existente**; cancelación homogénea de consumibles requiere revisión propia. |
 | `CU-ENT-06`, `CU-ENT-12` | `reportControllerTest.js` y `goodsReceiptContextServicesTest.js`. | Unitaria de delimitación, fórmulas, importes y resúmenes con escritor simulado. | **Unitaria existente**; falta integración del archivo. |
 
 ## Escrituras concurrentes de almacén
@@ -138,7 +141,7 @@ por campo antes del controller. La integración comprueba que no cambian documen
 saldos ni movimientos ante esos rechazos.
 
 La recuperación compartida de lecturas de listados se verifica en `DP-UI-001` con
-`createDataTableTest.js` y `errorHandlerTest.js`: reintento limitado, Swal ante error
+`createDataTableTest.js` y `apiClientTest.ts`: reintento limitado, Swal ante error
 definitivo y ausencia de resultados tardíos. Esta evidencia transversal no sustituye
 los filtros, permisos o consultas de cada caso ni un recorrido real de navegador.
 `DP-VAL-002` añade el contrato de acceso (`CU-AUT-01`) con router y servicio reales:
@@ -160,7 +163,7 @@ La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 | Pruebas | Comportamiento verificado |
 | --- | --- |
 | `wasteValidatorsTest.js`, `wasteRegistrationBoundaryTest.js` | Formato, precisión y rango; errores de campo antes de invocar el servicio. |
-| `wasteWeightFieldTest.js` | Captura del peso del rollo completo y del sobrante, cálculo automático, limpieza y consulta posterior. |
+| `inventoryFormTest.ts` | Captura del peso del rollo completo y del sobrante, cálculo automático, limpieza y consulta posterior. |
 | `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, rollo completo capturado desde merma, largo del material y cono compartido, conservación histórica, cálculo automático en base o altura, edición protegida, stock independiente y Excel con peso neto. |
 | `reportServiceTest.js` | Agrupación, peso total y datos desconocidos. |
 | `wasteWeightCapDbTest.js`, `wasteWeightScaleDbTest.js`, `wasteRollCaptureDbTest.js` | Restricciones en PostgreSQL, conservación de valores compatibles y rollback de las migraciones ante valores incompatibles. |
@@ -172,7 +175,7 @@ medidas y rechazo de referencias históricas. `wasteRegistrationBoundaryTest.js`
 peso del rollo completo, campos calculados, precisión y códigos de `errorMap` antes de ejecutar el servicio.
 `wasteSampleReferenceDbTest.js` prueba conservación histórica y el CHECK de muestra completa.
 
-Las pruebas de UI de merma comprueban selección recibida desde Select2,
+Las pruebas de UI de merma comprueban selección del formulario Vue,
 recálculo al modificar pesos y limpieza de resultados obsoletos. Las plantillas
 de otras presentaciones omiten las referencias de peso sin consultarlas.
 
@@ -181,14 +184,14 @@ de Agregar stock con cantidad y observaciones precargadas, sin registrar entrada
 desde el Swal. También cubre cancelación, cantidad inicial cero y separación de
 permisos y modos. `wasteStockAdditionModalTest.js` comprueba la precarga, la cantidad
 vacía cuando se recibe cero y el saldo resultante al editar.
-`wasteMaterialTemplateTest.js` cubre selección, cálculo con el peso del rollo completo capturado y largo del material y
+`remoteOptionsTest.ts` cubre selección, cálculo con el peso del rollo completo capturado y largo del material y
 limpieza programática sin reconstruir la selección desde el DOM.
 
-`materialMeasurementFieldTest.js` comprueba medidas según unidad y consumibles siempre
-sin medidas. `materialFormTest.js` omite las referencias históricas del payload.
+`inventoryFormTest.ts` comprueba medidas según unidad y consumibles siempre
+sin medidas. `inventoryFormTest.ts` omite las referencias históricas del payload.
 `materialControllerDbTest.js` verifica altas directas y desde compra, conversión,
 consumibles sin dimensiones y origen de merma limitado a materiales en m². El rechazo
-de identificadores forzados demuestra que el filtro de Select2 no sustituye el control
+de identificadores forzados demuestra que el selector del cliente no sustituye el control
 al guardar. `wasteWeightDbTest.js` verifica el cono compartido, el guardado del total de muestra, la ausencia de valores derivados nuevos y la conservación de históricos.
 
 `wasteFullRollReferenceDbTest.js` prueba que la migración conserva referencias anteriores
@@ -210,7 +213,7 @@ En `CU-AUT-01`, `authValidationTest.js` compara presencia/tipo y fronteras de lo
 inventario, catálogos y documentos. `CP-INT-VAL-004` prueba con routers reales los
 rechazos de tipos, precisión y fecha, junto con la ausencia de escrituras. Para
 `CU-IDA-02..03`, la prueba de tabla verifica carga/retiro/reinicio con dobles; para
-edición de compras, `goodsReceiptFormTest.js` verifica la lista incremental omitida o
+edición de compras, `purchaseTest.ts` verifica la lista incremental omitida o
 presente. No cierra las brechas de persistencia exitosa de personas ni el recorrido
 real de navegador, y no acredita validación de estado de roles/áreas en el servicio.
 

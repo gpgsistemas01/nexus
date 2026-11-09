@@ -1,4 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { DOCUMENT_REFERENCE_TYPES } from '../../../constants/documentReferenceTypes.js';
+import { updateWasteStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
+import { RecordVersionConflictError } from '../../../errors/concurrencyError.js';
 import {
     STOCK_ADJUSTMENT_STATUS_NAMES,
     STOCK_ADJUSTMENT_TYPES,
@@ -6,6 +9,7 @@ import {
 } from '../../../constants/inventory.js';
 import {
     generateYearlyReferenceNumber,
+    reserveYearlyReferenceNumbers,
     throwIfReferenceNumberAlreadyExists
 } from '../../document/referenceNumberService.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
@@ -13,7 +17,7 @@ import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { assertPieceQuantity, assertSufficientStock, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { createWasteMovement } from './wasteMovementService.js';
 
-const calculateWasteStockAdjustmentValues = ({
+export const calculateWasteStockAdjustmentValues = ({
     waste,
     newStock
 }) => {
@@ -51,6 +55,32 @@ const calculateWasteStockAdjustmentValues = ({
         newConvertedQuantity,
         convertedDifference
     };
+};
+
+export const registerWasteStockAdjustmentsBatch = async ({ tx, entries, userId }) => {
+    if (!entries.length) return [];
+    const references = await reserveYearlyReferenceNumbers({ type: DOCUMENT_REFERENCE_TYPES.WASTE_STOCK_ADJUSTMENT, tx, count: entries.length });
+    const adjustments = [], details = [], movements = [], movementDetails = [], changes = [];
+    const now = new Date();
+    entries.forEach((entry, index) => {
+        const values = calculateWasteStockAdjustmentValues(entry);
+        const id = randomUUID(), detailId = randomUUID(), movementId = randomUUID();
+        movements.push({ id: movementId, type: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT });
+        adjustments.push({ id, referenceNumber: references[index], reasonId: entry.reasonId, observations: entry.observations,
+            type: values.difference >= 0 ? STOCK_ADJUSTMENT_TYPES.INCREASE : STOCK_ADJUSTMENT_TYPES.DECREASE,
+            status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED, appliedAt: now, createdById: userId, approvedById: userId, wasteMovementId: movementId });
+        details.push({ id: detailId, wasteStockAdjustmentId: id, wasteId: entry.waste.id, materialName: entry.waste.name, ...values });
+        movementDetails.push({ movementId, wasteId: entry.waste.id, wasteStockAdjustmentDetailId: detailId,
+            quantity: values.difference, previousStock: values.previousStock, newStock: values.newStock });
+        changes.push({ id: entry.waste.id, quantityChange: values.difference, convertedQuantityChange: values.convertedDifference });
+    });
+    await tx.wasteMovement.createMany({ data: movements });
+    await tx.wasteStockAdjustment.createMany({ data: adjustments });
+    await tx.wasteStockAdjustmentDetail.createMany({ data: details });
+    await tx.wasteMovementDetail.createMany({ data: movementDetails });
+    const balances = await updateWasteStocks({ tx, changes });
+    if (balances.length !== entries.length) throw new RecordVersionConflictError();
+    return references;
 };
 
 export const registerWasteStockAdjustment = async ({

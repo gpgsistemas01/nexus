@@ -4,7 +4,7 @@ export const getSequenceCodeReferenceFailures = ({ body = '', sequence, sourceCo
     const participants = getSequenceParticipantSources(body, sequence);
     const configurations = new Map(
         [...body.matchAll(/^\| `([^`]+)` \|[^|]+\|([^\n]+)\|$/gm)]
-            .map(([, alias, cell]) => [alias, cell.match(/src\/[\w./-]+\.(?:js|ejs)/g) ?? []])
+            .map(([, alias, cell]) => [alias, cell.match(/src\/[\w./-]+\.(?:js|ts|vue)/g) ?? []])
     );
     const bindings = [...body.matchAll(/^\| `([^`]+)` \| `([^`]+)` \| `([^`]+)` · `([\w$]+)\(\.\.\.\)` \|$/gm)];
     const failures = [];

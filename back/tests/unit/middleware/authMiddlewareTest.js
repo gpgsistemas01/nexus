@@ -18,7 +18,7 @@ vi.mock('../../../src/services/authService.js', () => ({
     loginUser: vi.fn()
 }));
 
-const { authorizeUserApi, authorizeUserWeb, verifyApiTokenRequired, verifyCookiesAuthTokenRequired } =
+const { authorizeUserApi, verifyApiTokenRequired } =
     await import('../../../src/middleware/authMiddleware.js');
 const { getCurrentUser } = await import('../../../src/controllers/api/authController.js');
 
@@ -33,8 +33,10 @@ describe('authMiddleware authorization', () => {
                 }]) } };
                 const res = { redirect: vi.fn(), status: vi.fn().mockReturnThis(), json: vi.fn() };
                 const nextPage = vi.fn();
-                authorizeUserWeb(permission)(req, res, nextPage);
-                expect(res.redirect).toHaveBeenCalledWith('/error/404');
+                authorizeUserApi(permission)(req, res, nextPage);
+                expect(res.status).toHaveBeenCalledWith(403);
+                expect(res.json).toHaveBeenCalledWith({ code: errorMap.message.FORBIDDEN });
+                res.status.mockClear();
                 expect(nextPage).not.toHaveBeenCalled();
                 for (const allowed of [PERMISSIONS.CLIENTS_READ, PERMISSIONS.CLIENTS_CREATE,
                     PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE]) {
@@ -49,7 +51,7 @@ describe('authMiddleware authorization', () => {
             }]) } };
             const res = { redirect: vi.fn() };
             const next = vi.fn();
-            authorizeUserWeb(permission)(req, res, next);
+            authorizeUserApi(permission)(req, res, next);
             expect(next).toHaveBeenCalledOnce();
             expect(res.redirect).not.toHaveBeenCalled();
         }
@@ -121,32 +123,4 @@ describe('authMiddleware authorization', () => {
         expect(next).not.toHaveBeenCalled();
     });
 
-    it('redirects web requests when a token has no active logged user', async () => {
-        verifyAccessToken.mockReturnValue({ id: 'user-1' });
-        getLoggedUser.mockResolvedValue(null);
-        const req = { cookies: { accessToken: 'valid-token' } };
-        const res = { redirect: vi.fn() };
-        const next = vi.fn();
-
-        await verifyCookiesAuthTokenRequired(req, res, next);
-
-        expect(res.redirect).toHaveBeenCalledWith('/error/404');
-        expect(next).not.toHaveBeenCalled();
-    });
-
-    it('loads and assigns the user in the web token middleware', async () => {
-        const user = { id: 'user-1', permissions: [PERMISSIONS.MATERIALS_READ] };
-        verifyAccessToken.mockReturnValue({ id: user.id });
-        getLoggedUser.mockResolvedValue(user);
-        const req = { cookies: { accessToken: 'valid-token' } };
-        const res = {};
-        const next = vi.fn();
-
-        await verifyCookiesAuthTokenRequired(req, res, next);
-
-        expect(getLoggedUser).toHaveBeenCalledOnce();
-        expect(req.userId).toBe(user.id);
-        expect(req.user).toBe(user);
-        expect(next).toHaveBeenCalledOnce();
-    });
 });

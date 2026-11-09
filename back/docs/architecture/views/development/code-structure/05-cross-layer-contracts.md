@@ -1,82 +1,15 @@
 # 5. Contratos entre capas
 
-### 5.1 Fronteras y contratos de implementación
+Vue coordina captura y presentación; su transporte envía JSON, multipart o peticiones
+de descarga según el [contrato HTTP](../../../openapi/api-contract.md).
+Express autentica, autoriza y valida la entrada antes de delegar en el controller.
+El DTO normaliza los campos admitidos; el servicio resuelve pertenencia, estado y
+reglas, y ejecuta las escrituras relacionadas con un único cliente transaccional.
 
-**Identificador:** `DIA-COD-FRO-001`. **Pregunta:** ¿qué responsabilidad adapta cada
-frontera de una petición? **Alcance:** composición general; las flechas continuas
-muestran delegación y las discontinuas, colaboraciones condicionales. El orden exacto
-del middleware y de cada operación se consulta en su router y secuencia `CU-*`.
+Las respuestas y errores conservan sus códigos públicos. El cliente no determina
+roles, saldos, importes persistidos ni permisos. Los helpers públicos sólo permiten
+una vista previa de la captura. Las consultas paginadas y los reportes conservan el
+contexto de su endpoint.
 
-```mermaid
-flowchart TB
-    web["Router web<br/>middleware de sesión y permiso cuando aplica"] --> webController["Controller web<br/>prepara res.render"]
-    webController --> ejs["EJS + parciales compartidos"]
-    ejs --> page["Página del navegador<br/>UI y callbacks"]
-    page --> application["Application<br/>operaciones del recurso"]
-    application --> http["Servicio HTTP<br/>request + apiRequest"]
-    http --> api["Router API<br/>pipeline declarado por operación"]
-    api --> controller["Controller API<br/>params · body · respuesta"]
-    controller -.-> dto["DTO cuando aplica<br/>campos aceptados y normalización"]
-    controller --> service["Servicio de dominio<br/>reglas y efectos"]
-    service -.-> tx["Una transacción para escrituras compuestas<br/>helpers reciben tx"]
-    service --> persistence["getDb(tx) / Prisma"]
-    tx --> persistence
-    controller -.-> events["Publicación de inventario<br/>después del resultado exitoso"]
-```
-
-Las páginas EJS y los endpoints de lectura no ejecutan necesariamente un DTO o una
-transacción. `materialApiRoute.js` valida determinadas escrituras antes de autorizar;
-`catalogApiRoute.js` instala autenticación y autorización a nivel de router antes de
-validar. El login tiene su propio contrato de acceso. Ninguna cadena genérica sustituye
-estos órdenes concretos.
-
-`auditWrites` se monta en `src/app.js`: registra la observación de `finish` antes de
-delegar y persiste posteriormente, fuera de la transacción funcional. Su colaboración
-se mantiene en la [secuencia canónica de auditoría](../../processes/shared-runtime-behavior/01-write-audit.md#secuencia-transversal-de-auditoría-de-escrituras).
-Las fuentes de esta figura son `src/routes`, `src/controllers`, `src/dtos`,
-`src/services`, `src/public/js` y `src/repository/baseRepository.js`.
-
-### 5.2 Dónde ampliar cada frontera
-
-| Necesidad | Fuente propietaria |
-| --- | --- |
-| Imports y contrato de una operación del recurso | Referencias técnicas de [backend](../backend-technical-documentation/index.md) y [frontend](../frontend-technical-documentation/index.md). |
-| Decisión de middleware, DTO, permisos o composición | [Patrones aplicados](../design-and-construction-patterns/index.md). |
-| Configuración de factories, handlers, requests o tablas | [Mecanismos reutilizables](../reuse-and-refactoring/index.md). |
-| Cliente generado, conexión y selección de `tx` | [Integración Prisma](06-prisma-and-persistence.md). |
-| Orden de llamadas, rollback, eventos o renovación de sesión | [Vista de procesos](../../processes/index.md). |
-
-### 5.3 Relación con las otras vistas
-
-La realización de cada operación se consulta en los índices de
-[secuencias backend](../../processes/backend-code-sequences/index.md) y
-[frontend](../../processes/frontend-code-sequences/index.md). Los estados de negocio y
-los datos que cambia una acción permanecen en
-[modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md).
-La matriz requisito–caso–código–prueba pertenece a
-[componentes y reutilización](../../logical/01-components-and-reuse.md).
-
-Esta colección conserva el mapa de fronteras y las colaboraciones compartidas; no
-mantiene otra matriz de casos ni duplica secuencias. Para un cambio de implementación
-se revisa la frontera afectada aquí y el recorrido exacto en procesos. El código y las
-pruebas sustentan el dibujo; la figura no amplía su cobertura por sí misma.
-
-### 5.4 Responsabilidad y organización
-
-La separación de responsabilidades es parte de la arquitectura. Crear carpetas no
-garantiza esa separación: cada módulo debe tener un motivo concreto para cambiar.
-
-| Pieza | Responsabilidad y límite |
-| --- | --- |
-| Router y middleware | Declarar endpoints y aplicar autenticación, permisos y validación. |
-| Validator | Verificar captura y normalizar su tipo antes del controller; no consultar existencia o estado del registro. |
-| DTO | Seleccionar y adaptar campos permitidos; no acceder a HTTP ni a la base. `catalogDTO.js` recibe la configuración confiable y normaliza las capturas de los seis catálogos. |
-| Controller | Adaptar petición/respuesta y delegar; no calcular reglas ni construir consultas. |
-| Servicio | Resolver el caso, invariantes y transacciones. Puede comprobar invariantes ante llamadas internas y usar `getDb(tx)`; una consulta específica no exige crear un repository que sólo la reenvíe. |
-| Repository | Encapsular consultas reutilizables, versiones y paginación; no decidir mensajes HTTP. |
-| Vista y serializador de salida | Escapar según HTML, atributo o JSON en script, sin modificar los datos persistidos. |
-
-En Vue, la page coordina el caso, el composable conserva comportamiento reactivo,
-el servicio adapta HTTP y los componentes reciben props y emiten eventos. Los
-límites verificados con ESLint y los criterios para compartir código se mantienen en
-[la arquitectura del frontend](../../../../../../front/docs/architecture/views/development/code-structure.md).
+La implementación se localiza en la [referencia backend](../backend-technical-documentation/index.md)
+y la [referencia de contratos Vue](../../../../../../front/docs/architecture/contracts/client-contracts.md).

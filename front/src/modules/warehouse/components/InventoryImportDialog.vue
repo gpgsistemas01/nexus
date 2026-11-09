@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VFileInput } from 'vuetify/components/VFileInput';
-import { VSelect } from 'vuetify/components/VSelect';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VPagination } from 'vuetify/components/VPagination';
+import { VSelect } from 'vuetify/components/VSelect';
+import {
+    INVENTORY_IMPORT_MODES as modes,
+    INVENTORY_IMPORT_MODE_LABELS,
+    INVENTORY_IMPORT_LIMITS as limits,
+} from '@nexus/inventory-imports';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
-import { IMPORT_FIELD_LABELS } from '../inventoryImport.js';
+import { IMPORT_FIELD_LABELS, isInventoryImportMode } from '../inventoryImport.js';
 import type { ImportValue, InventoryImportBatch, InventoryImportMode } from '../inventoryImport.js';
 import type { InventoryResource } from '../inventory.js';
 import type { LookupState } from '../../../shared/lookup.js';
@@ -16,6 +21,7 @@ import type { LookupState } from '../../../shared/lookup.js';
 const props = defineProps<{
     resource: InventoryResource;
     mode: InventoryImportMode;
+    availableModes: readonly InventoryImportMode[];
     batch: InventoryImportBatch | null;
     file: File | null;
     isWorking: boolean;
@@ -31,8 +37,8 @@ const props = defineProps<{
     canReadSuppliers: boolean;
 }>();
 const emit = defineEmits<{
-    mode: [value: InventoryImportMode];
     file: [value: File | null];
+    mode: [value: InventoryImportMode];
     prepare: [];
     confirm: [];
     recover: [];
@@ -48,7 +54,20 @@ const emit = defineEmits<{
     retrySuppliers: [];
 }>();
 const page = ref(1);
+watch(
+    () => props.batch?.id,
+    () => {
+        page.value = 1;
+    },
+);
 const preview = computed(() => props.batch?.result ?? props.batch?.preview);
+const modeOptions = computed(() =>
+    props.availableModes.map((value) => ({
+        value,
+        title: INVENTORY_IMPORT_MODE_LABELS[value],
+    })),
+);
+const modeLabel = computed(() => INVENTORY_IMPORT_MODE_LABELS[props.mode]);
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
 );
@@ -75,6 +94,10 @@ const details = (value: Record<string, ImportValue>) =>
     );
 
 const locked = computed(() => props.isWorking || props.isDownloading);
+
+const selectMode = (value: unknown) => {
+    if (isInventoryImportMode(value)) emit('mode', value);
+};
 </script>
 
 <template>
@@ -117,24 +140,25 @@ const locked = computed(() => props.isWorking || props.isDownloading);
         <template v-if="!batch && !recoveryRequired">
             <VSelect
                 :model-value="mode"
-                label="Operación"
-                :items="[
-                    { title: 'Crear registros', value: 'create' },
-                    { title: 'Actualizar datos', value: 'update' },
-                ]"
+                :items="modeOptions"
+                label="Operación del archivo"
                 :disabled="locked"
-                @update:model-value="emit('mode', $event)"
+                class="mb-4"
+                @update:model-value="selectMode"
             />
             <p class="mb-4">
                 {{
-                    mode === 'create'
+                    mode === modes.CREATE
                         ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
-                        : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
+                        : mode === modes.ADJUST
+                          ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
+                          : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
                 }}
             </p>
             <p class="mb-4">
-                Un duplicado o error bloquea todo el archivo. La vista previa indica las filas que
-                debes corregir.
+                Todas las filas realizan la operación seleccionada. Descarga su plantilla y
+                selecciona esa misma operación al cargarla. Un duplicado o error bloquea todo el
+                archivo. Cambiar la operación retira el archivo seleccionado.
             </p>
             <div class="template-fields">
                 <RemoteSelect
@@ -152,22 +176,22 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                     :model-value="search"
                     label="Buscar registros de la plantilla"
                     :disabled="locked"
-                    maxlength="200"
+                    :maxlength="limits.maxSearchLength"
                     @update:model-value="emit('search', $event)"
                 />
                 <VTextField
-                    v-if="mode === 'update'"
+                    v-if="mode !== modes.CREATE"
                     :model-value="templatePage"
                     label="Página de la plantilla (100 filas)"
                     type="number"
                     min="1"
-                    max="999"
+                    :max="limits.maxTemplatePage"
                     :disabled="locked"
                     @update:model-value="emit('templatePage', Number($event))"
                 />
             </div>
             <p
-                v-if="resource === 'wastes' && mode === 'create'"
+                v-if="resource === 'wastes' && mode === modes.CREATE"
                 class="mb-3"
             >
                 Selecciona el proveedor para incluir sus materiales de referencia en m². En el
@@ -178,10 +202,10 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                 class="mb-5"
                 :disabled="
                     locked ||
-                    (resource === 'wastes' && mode === 'create' && !supplierId) ||
+                    (resource === 'wastes' && mode === modes.CREATE && !supplierId) ||
                     !Number.isInteger(templatePage) ||
                     templatePage < 1 ||
-                    templatePage > 999
+                    templatePage > limits.maxTemplatePage
                 "
                 :loading="isDownloading"
                 @click="emit('template')"
@@ -200,11 +224,15 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                 "
             />
             <p class="retention-note">
-                El servidor descarta el archivo después del análisis. El borrador vence en 24 horas.
-                El original de tu equipo permanece bajo tu control.
+                El servidor descarta el archivo después del análisis. El borrador vence en
+                {{ limits.draftHours }} horas. El original de tu equipo permanece bajo tu control.
             </p>
         </template>
         <template v-if="batch">
+            <p class="mb-2">
+                Operación del archivo:
+                <strong>{{ modeLabel }}</strong>
+            </p>
             <p class="retention-note mb-3">Referencia: {{ batch.id }}</p>
             <VAlert
                 v-if="batch.status === 'COMPLETED'"
@@ -277,7 +305,9 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                                 :key="key"
                             >
                                 <dt>{{ IMPORT_FIELD_LABELS[key] }}</dt>
-                                <dd>{{ text(value) }}</dd>
+                                <dd>
+                                    {{ text(value) }}
+                                </dd>
                             </template>
                             <template
                                 v-for="(value, key) in row.after"

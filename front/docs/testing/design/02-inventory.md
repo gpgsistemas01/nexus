@@ -62,3 +62,20 @@ Los casos `apiClientTest.ts` mantienen renovación única, límite de un reinten
 rechazo público sin refresh, errores de red sin repetición de escritura y cancelación.
 `inventoryReportTest.ts` conserva por separado los parámetros del reporte y el
 rechazo de HTML presentado como Excel.
+
+## Un archivo por operación y conteo final
+
+`DP-VUE-IMP-001` cubre `RF-VUE-015`: el selector asigna una operación a todo el
+archivo; cambiarla retira el XLSX previo y se bloquea durante una descarga, borrador
+o confirmación incierta. Particiones por permiso y por operación compatible/cruzada;
+transiciones selección → carga → vista previa → confirmación/recuperación.
+Un operador con ajuste y sin costos sólo ve Ajustar existencias. Las descargas
+conservan la operación en su nombre; un rechazo deja la captura sin confirmar.
+El conteo muestra stock anterior/final, incluido cero, y confirma una sola solicitud.
+HTTP/Prisma comprueba columnas de consulta e IDs, identidad, versiones, datos
+compartidos, rollback y ausencia de efectos de archivos incompatibles. Chromium
+no sustituye esa evidencia persistente.
+
+La captura, consulta y recuperación admiten exclusivamente las tres operaciones del
+selector. Se conservan los casos de atomicidad independiente de altas, ediciones
+y conteos, y el rechazo de operaciones no admitidas.

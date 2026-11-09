@@ -34,7 +34,11 @@ o **Actualizar** confirma todas las asignaciones.
 4. Mantenga al menos una responsabilidad válida y pulse **Actualizar**.
 5. Compruebe que se conservaron las asignaciones que no debía retirar.
 
-Cambie las responsabilidades según la organización real del trabajo.
+En edición están habilitados **Nombre completo**, la selección de **Área** y **Rol**,
+y los controles para agregar o quitar responsabilidades. Para cambiar una asignación,
+quite la anterior y agregue la correcta; no se edita una celda de la lista. Los cambios
+se confirman juntos con **Actualizar**. Cambie las responsabilidades según la
+organización real del trabajo.
 <!-- manual:any users:manage -->
 Los accesos de una cuenta se administran por separado en **Usuarios**.
 <!-- manual:end -->

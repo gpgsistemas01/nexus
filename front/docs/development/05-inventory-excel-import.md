@@ -1,38 +1,58 @@
 # 5. Importación de inventario por Excel
 
 **Importar Excel** está disponible en Materiales, Consumibles y Mermas para cuentas
-con lectura, escritura y lectura de costos. Comparte formulario, servicio y
-recuperación entre los tres módulos.
+con lectura y capacidad de alta/edición o de ajuste. Alta/edición exige escritura y
+lectura de costos; el conteo exige el permiso de ajuste. Cada fila conserva su permiso.
+Comparte formulario, servicio y recuperación entre los tres módulos.
 
-## Altas y edición
+## Un archivo por operación, con estructura de inventario
 
-| Operación | Archivo y tratamiento de IDs |
+El selector **Operación del archivo** indica qué hacen todas las filas:
+
+| Selección | Tratamiento |
 | --- | --- |
-| Crear registros | Descargar una plantilla de altas vacía. El servidor genera el ID del registro nuevo. Elegir proveedor, presentación y unidad en las listas; para merma, seleccionar la opción completa del material de referencia, que ya incluye su ID. |
-| Actualizar datos | Descargar los registros actuales con IDs y versiones, modificar los campos habilitados y volver a subir ese archivo. Conservar las columnas grises; una fila sin ID produce error y no se convierte en un alta. |
+| Alta | Crea registros y existencia inicial. El servidor genera los IDs nuevos. |
+| Editar datos | Conserva IDs/versiones; cambia nombre, mínimo, costo y activo, sin stock. |
+| Ajustar existencias | Conserva IDs/versiones; reemplaza el saldo por el conteo físico final. |
 
-Cada archivo tiene un solo modo. Cambiar el nombre en una edición conserva el registro.
-**Importar Excel** descarga las plantillas; **Exportar Excel**, reportes de consulta.
+Las columnas iniciales siguen el reporte: Proveedor, Material, Base, Altura, Stock
+actual, Stock mínimo, Presentación, Conversión, Unidad y Costo unitario. El ajuste
+omite el costo. Después se agregan Activo, los IDs/versiones necesarios y los
+campos de la operación. Las columnas grises se conservan como referencia. En altas,
+Proveedor muestra opciones `código | nombre`. En merma, la plantilla contiene
+registros individuales para identificar el destino aunque la consulta agrupe totales.
+
+IDs/versiones se incluyen para cualquier cuenta con el permiso correspondiente;
+no es necesario ser administrador. El ID permite cambiar el nombre sin crear otro
+registro. La plantilla lleva el módulo y la operación; un archivo de otra operación
+se rechaza. El reporte de consulta conserva su estructura y no es una carga operativa.
+
+**Cantidad inicial** se captura en altas. **Stock contado** es el saldo físico final
+en ajuste: cero es válido y vacío se rechaza. Motivo activo y observaciones son
+obligatorios al ajustar. Nombre y mínimo son comunes entre proveedores. Edición
+conserva identidad y medidas. Pieza exige enteros; un alta sin costo avisa que no
+podrá surtirse hasta configurarlo.
 
 ## Recorrido
 
-1. Elegir **Crear registros** o **Actualizar datos**.
-2. Descargar la plantilla. En actualización, elegir página de 100 registros y
-   filtros; en alta de merma, seleccionar proveedor para obtener sus referencias.
-3. Conservar hojas/encabezados, completar valores y seleccionar el `.xlsx`.
-4. Pulsar **Validar archivo** y revisar filas, cantidad inicial, valores anteriores,
-   cambios, errores y advertencias. Se muestran diez filas por página, en tarjetas
-   adaptadas al móvil.
-5. Corregir el archivo si hay errores; **Descartar borrador** permite subirlo de nuevo.
-   **Descargar errores** genera una sola hoja con fila, nombre, columna y mensaje.
-6. Pulsar **Confirmar importación**. El recibo confirma el resultado; el modal permanece
-   abierto para revisarlo y ofrece **Otro archivo**.
+1. Abrir **Importar Excel** y elegir Alta, Editar datos o Ajustar existencias.
+2. Filtrar registros/proveedor y página; descargar la plantilla de esa operación.
+   Para altas de merma, seleccionar proveedor para obtener sus referencias en m².
+3. Completar las columnas de captura de todas las filas, conservando referencias,
+   IDs/versiones, hojas y encabezados.
+4. Seleccionar la misma operación al subir el `.xlsx` y pulsar **Validar archivo**.
+5. Revisar diez filas por página, sus datos anteriores/finales, diferencias y errores.
+6. Si hay errores, descargarlos, descartar el borrador, corregir el archivo y validarlo.
+7. **Confirmar importación** guarda toda la operación y muestra el recibo;
+   **Otro archivo** reinicia.
 
-La actualización admite nombre, mínimo, costo y activo; conserva existencias,
-dimensiones, unidades, presentación y pesos. Nombre y mínimo afectan al material
-compartido entre proveedores.
-Pieza exige enteros; un alta sin costo muestra advertencia y no puede usarse en salidas
-hasta configurar un costo positivo en Almacén.
+Cambiar la operación retira el archivo seleccionado. Se bloquea mientras hay una
+descarga, validación o borrador, o una confirmación pendiente. El selector sólo
+muestra operaciones permitidas: lectura/escritura/costos para alta y edición;
+lectura/ajuste para conteo. Para editar y contar se completan dos operaciones,
+descargando una plantilla actual después de la primera.
+El [procedimiento de conciliación](06-inventory-reconciliation.md) explica el conteo
+actual y el tratamiento de salidas antiguas entregadas.
 
 ## Duplicados y resultado
 
@@ -67,7 +87,9 @@ establece su boundary. Confirmar envía una sola petición JSON con `expectedVer
 y `operationId`, sin escrituras por fila. El contrato de respuesta se comprueba
 antes de mostrar éxito. Un `200` incompleto no confirma la importación.
 
-Los límites públicos se comparten por `@nexus/inventory-imports`: 2 MiB y 100 filas.
+Modos, etiquetas, estados, acciones y límites se comparten por
+`@nexus/inventory-imports`: 2 MiB y 100 filas. El nombre de la descarga incluye la
+operación elegida al iniciar la solicitud, usando `useFileExport`.
 El navegador comprueba tamaño/extensión; Express valida el contenido y las reglas.
 Las plantillas de actualización se descargan por páginas y sus catálogos se acotan.
 SheetKit analiza el libro en el backend; Vue sólo transmite el archivo y muestra

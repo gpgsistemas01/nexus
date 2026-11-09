@@ -9,7 +9,7 @@ el cliente no selecciona modelos Prisma o campos arbitrarios. Es un registro de
 configuración con lista blanca, no un CRUD universal para las entidades de Nexus.
 
 Las [referencias backend](../backend-technical-documentation/16-catalogs-code.md) y
-[frontend](../frontend-technical-documentation/16-catalogs-code.md) poseen los mapas de
+[frontend](../../../../../../front/docs/architecture/views/development/code-structure.md) poseen los mapas de
 archivos, los seis registros, contratos y metadata de pantalla. Las consultas operativas
 y los recursos con reglas propias mantienen sus módulos. Clientes y proveedores son
 datos maestros comerciales, pero no pertenecen al registro auxiliar.
@@ -31,12 +31,12 @@ flowchart TB
     registry -.->|configuración resuelta por servicio| dto
     metadata["catalogService<br/>getManagedCatalog"] -->|etiquetas · campos · longitudes| registry
     web["controller web<br/>getCatalogsPage"] -->|consume metadata sin model| metadata
-    metadata -.->|configuración de presentación| view["catalogsPage.ejs<br/>catalogContext data-*<br/>formulario y tabla comunes"]
+    metadata -.->|configuración de presentación| view["CatalogPage.vue<br/>estado reactivo<br/>formulario y tabla comunes"]
 ```
 
 El servicio conserva la resolución del modelo y la validación incluso si se invoca
 fuera del router. `getManagedCatalog` devuelve metadata de presentación y omite `model`:
-el servidor conserva la decisión de persistencia. EJS la proyecta en atributos que
+el servidor conserva la decisión de persistencia. Vue la presenta mediante props que
 configuran formulario, modal y columnas; esa metadata no concede permisos.
 
 ## Mecanismos reutilizados y fronteras
@@ -44,9 +44,9 @@ configuran formulario, modal y columnas; esa metadata no concede permisos.
 | Decisión | Aplicación comprobable y fuente de detalle |
 | --- | --- |
 | Lista blanca del servidor | El registro fija modelos, campos y longitudes. Validator y servicio usan `findManagedCatalog`; el validator omite un catálogo desconocido y el servicio devuelve `CATALOG_NOT_FOUND`. Nombres heredados como `constructor` no son entradas del registro. [Backend](../backend-technical-documentation/16-catalogs-code.md#contratos-y-límites-implementados). |
-| Configuración de presentación | Un controller web y plantilla publican metadata para una pantalla común. [Frontend](../frontend-technical-documentation/16-catalogs-code.md#configuración-entre-ejs-y-el-navegador). |
+| Configuración de presentación | Un controller web y plantilla publican metadata para una pantalla común. [Frontend](../../../../../../front/docs/architecture/views/development/code-structure.md). |
 | Composición de aplicación | `catalogs.js` configura `createCrudApplication` con `getAll`, `register` y `edit`, manteniendo el catálogo como argumento del transporte. [Contrato de reutilización](../reuse-and-refactoring/02-browser-applications-and-requests.md). |
-| Contratos de formulario y tabla | Se componen `useForm`, `handleSubmit`, `createDataTable` y `buildMdbEditActionButton`; las columnas derivan de campos, sin seis implementaciones. [Frontend](../frontend-technical-documentation/16-catalogs-code.md). |
+| Contratos de formulario y tabla | Se componen `useForm`, `handleSubmit`, `createDataTable` y `buildMdbEditActionButton`; las columnas derivan de campos, sin seis implementaciones. [Frontend](../../../../../../front/docs/architecture/views/development/code-structure.md). |
 | Separación de lectura operativa | Las opciones activas se consultan con permisos y adaptadores propios; el listado administrativo permite reactivar filas. [Lecturas backend](../backend-technical-documentation/16-catalogs-code.md#lecturas-operativas-de-los-mismos-datos). |
 
 ## Límites y extensión
@@ -65,7 +65,7 @@ caben en el contrato común mantiene un módulo específico.
 
 Los pasos y alternativas se consultan en las secuencias de
 [backend](../../processes/backend-code-sequences/catalogs/index.md) y
-[frontend](../../processes/frontend-code-sequences/catalogs/index.md). Aquí se conserva
+[frontend](../../../../../../front/docs/architecture/views/processes/index.md). Aquí se conserva
 la decisión de configuración; los mapas del módulo y de reutilización amplían sus
 colaboradores sin repetirlos como un segundo diagrama del patrón.
 

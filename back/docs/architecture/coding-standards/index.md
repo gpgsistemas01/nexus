@@ -9,7 +9,7 @@
 5. [5. Convenciones de controladores y rutas](05-conventions-of-controllers-and-routes.md)
 6. [6. Funciones y control de flujo](06-functions-and-control-of-flow.md)
 7. [7. Objetos, colecciones y datos](07-objects-collections-and-data.md)
-8. [8. Frontend, DOM y EJS](08-frontend-dom-and-ejs.md)
+8. [8. Contratos públicos y frontend Vue](08-public-contracts-and-vue.md)
 9. [9. Errores, seguridad, auditoría y logging](09-errors-security-audit-and-logging.md)
 10. [10. Comentarios y documentación](10-comments-and-documentation.md)
 11. [11. Pruebas](11-tests.md)

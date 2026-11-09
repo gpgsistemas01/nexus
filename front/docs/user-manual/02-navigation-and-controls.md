@@ -11,6 +11,32 @@ teléfono, también puede cerrarlo con **Cerrar menú**.
 
 Puede guardar la dirección de una página como favorito.
 
+### Áreas operativas: Almacén y Salidas
+
+Las cuentas asignadas únicamente a Impresión, Router, Taller/Herrería (TALLER 3D),
+PT/TRÁFICO, Instalaciones o Acabados trabajan sólo en **Almacén** y **Salidas**.
+Esto aplica también a sus coordinadores; ser coordinador de un área operativa
+no concede las funciones de Almacén.
+
+| Sección | Qué puede hacer el área operativa |
+| --- | --- |
+| Almacén: Materiales, Consumibles y Mermas | Consultar la tabla, buscar, filtrar, ordenar, recorrer páginas y actualizar la consulta. |
+| Salidas: Materiales, Consumibles y Mermas | Consultar, registrar y editar solicitudes de sus áreas asignadas, según el estado del documento. |
+
+En Almacén no hay acciones de alta, edición, eliminación, entrada o ajuste de
+existencias, importación ni exportación. Tampoco se muestran costos ni el botón
+**Detalles de peso** de Mermas.
+
+En Salidas se seleccionan clientes y artículos con proveedores existentes. Las áreas
+operativas no registran clientes ni proveedores, no surten ni registran devoluciones.
+Si falta un registro o necesita corregir el inventario, solicítelo al responsable de
+Almacén. Compras, Directorio, Identidad y acceso, Movimientos, Catálogos y Reportes
+no forman parte de ese acceso operativo.
+
+Almacén y Sistemas tienen funciones propias. Si una cuenta tiene además una
+asignación autorizada en esas áreas, su menú y su manual reúnen los permisos de
+todas sus asignaciones activas.
+
 ![Menú expandido con los grupos y páginas disponibles para la cuenta.](images/02-navigation.png)
 
 ## Buscar y recorrer una tabla
@@ -86,3 +112,28 @@ Si aparece un conflicto, siga [Errores y recuperación](15-errors-and-recovery.m
 Si la presentación es **PIEZA**, capture cantidades y stock mínimo enteros:
 por ejemplo, **2**, no **2.5**. Corrija la fracción indicada; el sistema no la redondea.
 Los costos, medidas y cantidades convertidas conservan su precisión.
+
+## Campos de captura y de consulta
+
+Un campo de captura permite escribir o seleccionar un valor. Un campo de consulta
+muestra un dato conservado o calculado; puede copiarlo, pero no modificarlo en esa
+operación. Cada capítulo indica los campos habilitados al editar.
+
+Los selectores dependientes se habilitan al completar su selección previa. Durante
+una carga o al guardar, espere a que termine el trabajo. Si aparece un conflicto,
+actualice el registro siguiendo [Errores y recuperación](15-errors-and-recovery.md#conflictos-de-edición).
+Los botones y campos disponibles dependen de su permiso y del estado del documento.
+
+## Archivos en su equipo
+
+Guarde las descargas en una carpeta reconocible y distinga reportes de consulta,
+plantillas de captura e informes de errores. Conserve el archivo descargado y una
+copia de trabajo con un nombre que identifique el inventario, la operación y la fecha.
+Renombrar el archivo no cambia su operación ni reemplaza su contenido.
+
+Al abrirlo en Excel o una aplicación compatible, mantenga el formato `.xlsx`.
+Cerrar Nexus, descartar un borrador o cerrar sesión no elimina archivos de su equipo.
+Conserve las copias necesarias para comprobar el trabajo y elimine las restantes
+cuando ya no se necesiten, según el procedimiento de su organización. Los archivos
+pueden contener cantidades, costos y datos de otras personas; compártalos sólo con
+quienes deban utilizarlos y no incluya contraseñas en ellos.

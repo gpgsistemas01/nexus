@@ -9,7 +9,7 @@ Nexus es una aplicación web de control operativo de materiales, consumibles y m
 
 | Parte de Nexus | Responsabilidad | Qué revisar al cambiarla |
 | --- | --- | --- |
-| Rutas web y controladores web | Autorizar la página y preparar sus datos para las plantillas EJS | Menú, permiso de página, contexto y composición de la pantalla |
+| Frontend Vue | Captura, navegación, composición y permisos visuales | `front/src/app`, `front/src/modules` y `front/src/shared` |
 | Página y componentes del navegador | Mostrar datos, recoger entradas y coordinar formularios y peticiones | Estado local, callbacks, controles compartidos y presentación de errores |
 | Rutas API, middleware, validadores y DTO | Autorizar la petición, validar y normalizar la entrada | Contrato HTTP, permiso de operación y campos admitidos; DTO significa objeto de transferencia de datos |
 | Controlador API | Traducir HTTP y delegar la operación | Parámetros, resultado y tratamiento común de errores |
@@ -21,7 +21,7 @@ Una página visible no autoriza todas sus operaciones. Consulte las políticas d
 ## Seguir una recepción de materiales
 
 1. Lea `CU-ENT-02` en [casos de uso de compras](../../../requirements/use-cases/purchases/index.md): explica por qué el operador registra la recepción y qué resultado debe conservar.
-2. Localice la página `/compras/materiales` en la [navegación web](../scenarios/web-navigation-and-screen-catalog/index.md) y siga su formulario en la [referencia frontend](frontend-technical-documentation/index.md). El selector puede crear un material con existencia cero; abrir o guardar ese catálogo no debe registrar lo recibido.
+2. Localice la página `/compras/materiales` en la [navegación web](../../../../../front/docs/architecture/views/scenarios/navigation-and-screens.md) y siga su formulario en la [referencia frontend](../../../../../front/docs/architecture/views/development/code-structure.md). El selector puede crear un material con existencia cero; abrir o guardar ese catálogo no debe registrar lo recibido.
 3. Revise la solicitud en el [contrato API](../../openapi/api-contract.md) y la ruta registrada. La ruta fija el contexto de materiales o consumibles; la entrada del navegador no debe cambiarlo.
 4. Siga el controlador y el servicio en la [secuencia backend de la recepción](../processes/backend-code-sequences/purchases/cu-ent-02.md). Al confirmar la compra, documento, detalles, existencias y movimientos deben conservarse juntos; un fallo no debe dejar una recepción parcial.
 5. Prepare el cliente y las migraciones con la [guía de Prisma](code-structure/06-prisma-and-persistence.md). Compruebe el modelo en `prisma/schema.prisma` y la [vista de datos](../logical/data-and-persistence/index.md). El diccionario generado explica la representación, mientras la SRS explica la garantía funcional.

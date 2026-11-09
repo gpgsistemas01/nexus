@@ -42,7 +42,7 @@ compartido, sin mezclarlos con los errores por campo del formulario.
 
 ## Registro y autorización de rutas
 
-- Agrupar routers en `src/routes/web` y `src/routes/api` y registrarlos en el `index.js`
+- Agrupar routers en `src/routes/system` y `src/routes/api` y registrarlos en el `index.js`
   correspondiente. No añadir registros de dominio directamente a `src/app.js`.
 - Mantener las rutas específicas antes de parámetros generales cuando puedan colisionar.
   El orden CRUD no debe hacer que `/:id` intercepte un destino estático.

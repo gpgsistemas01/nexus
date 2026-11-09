@@ -12,14 +12,7 @@
 - En expresiones multilínea, los elementos hermanos comparten columna o nivel. No se
   alinean manualmente con grupos variables de espacios, porque una edición cercana
   rompería esa alineación.
-- En EJS, la indentación representa la estructura HTML resultante. Las directivas EJS
-  se alinean con el elemento o bloque al que pertenecen.
-
-### 2.2 Líneas, espacios y fin de archivo
-
-- Los archivos nuevos de texto terminan con una sola nueva línea, sin líneas vacías
-  adicionales. Al editar un EJS existente se conserva exactamente su terminación,
-  incluido si carece de salto final, conforme a la sección 8.
+- Los archivos nuevos de texto terminan con una sola nueva línea.
 - No quedan espacios al final de una línea ni líneas que sólo contengan espacios.
 - Se usa una línea vacía entre imports y declaraciones de módulo, entre funciones de
   nivel de módulo y entre fases semánticas de una función.

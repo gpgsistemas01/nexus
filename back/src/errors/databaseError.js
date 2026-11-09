@@ -1,10 +1,16 @@
 import { AppError } from './AppError.js';
 import { errorMap } from '../messages/codeMessages.js';
+import { PRISMA_ERROR_CODES } from '../constants/prisma.js';
 
 const PRISMA_VALIDATION_ERROR_NAME = 'PrismaClientValidationError';
 const UNKNOWN_SCHEMA_MEMBER_PATTERN = /Unknown (?:argument|field)\b/;
 const INVALID_TEXT_REPRESENTATION = '22P02';
 const INVALID_UUID_INPUT_PATTERN = /^invalid input syntax for type uuid\b/i;
+const CONTENTION_CODES = new Set(['55P03', '57014', '40P01']);
+
+export const isDatabaseContentionError = error => error?.code === PRISMA_ERROR_CODES.TRANSACTION_FAILED
+    || CONTENTION_CODES.has(error?.meta?.code)
+    || CONTENTION_CODES.has(error?.meta?.driverAdapterError?.cause?.originalCode);
 
 export class RecordIdentifierInvalid extends AppError {
     constructor() {

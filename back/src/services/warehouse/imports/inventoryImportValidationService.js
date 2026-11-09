@@ -6,7 +6,11 @@ import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { assertWasteMaterialReference, prepareWasteMeasurements } from '../wastes/wasteHelpers.js';
 import { createMaterialDtoForRegister, createMaterialDtoForEdit } from '../../../dtos/materialDTO.js';
 import { createWasteDtoForRegister, createWasteDtoForEdit } from '../../../dtos/wasteDTO.js';
-import { loadInventoryImportContext, importKey, importReferenceId, materialImportIdentity, wasteImportIdentity } from './inventoryImportContext.js';
+import { loadInventoryImportContext, importKey, importCatalogValue, materialImportIdentity, wasteImportIdentity } from './inventoryImportContext.js';
+import { validateInventoryStockCountRows } from './inventoryStockCountValidationService.js';
+import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
+import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
+import { errorMap } from '../../../messages/codeMessages.js';
 
 const snapshot = (item, material = item) => ({
     name: material.name, minStock: Number(material.minStock),
@@ -14,19 +18,25 @@ const snapshot = (item, material = item) => ({
 });
 const editable = dto => ({ name: dto.name, minStock: dto.minStock ?? 0, maxUnitCost: dto.maxUnitCost, isActive: dto.isActive });
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const issue = (field, message, code = 'INVENTORY_IMPORT_VALIDATION') => ({ field, message, code });
+const issue = (field, message, code = errorMap.inventoryImport.VALIDATION) => ({ field, message, code });
 
 export const validateInventoryImportRows = async ({ db, config, rows }) => {
-    const context = await loadInventoryImportContext({ db, config, rows });
+    // Las columnas de consulta no se convierten en captura. Consumibles conserva sus dimensiones nulas.
+    const captureRows = config.mode === modes.CREATE ? rows.map(input => ({ ...input,
+        values: Object.fromEntries(Object.entries(input.values).filter(([key]) => !config.readonlyFields.includes(key)))
+    })) : rows;
+    const context = await loadInventoryImportContext({ db, config, rows: captureRows });
+    if (config.mode === modes.ADJUST) return validateInventoryStockCountRows({ config, rows: captureRows, context });
     const results = [];
     const targets = new Map();
     const shared = new Map();
-    for (const input of rows) {
+    for (const input of captureRows) {
         const body = { ...input.values };
         const errors = [];
         const warnings = [];
         const add = (field, message) => errors.push(issue(field, message));
-        if (config.mode === 'create') {
+        if (config.mode === modes.CREATE) {
+            body.supplierCode = importCatalogValue(body.supplierCode);
             body.supplierId ||= context.supplierCodes.get(importKey(body.supplierCode))?.id ?? '';
             if (body.minStock === '') body.minStock = 0;
             if (body.isActive === '') body.isActive = true;
@@ -35,7 +45,7 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                 body.unitMeasureId ||= context.unitLabels.get(importKey(body.unitLabel))?.id ?? '';
             } else {
                 body.operationId = randomUUID();
-                body.materialId = importReferenceId(body.materialId);
+                body.materialId = importCatalogValue(body.materialId);
             }
         } else {
             if (!UUID_V4_PATTERN.test(String(body.id ?? ''))) add('id', 'El identificador del registro no es válido.');
@@ -60,18 +70,18 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
         const supplier = context.suppliers.get(body.supplierId);
         const target = config.resource === 'wastes' ? context.wastes.get(body.id)
             : context.offers.get(`${body.id}:${body.supplierId}`);
-        if (config.mode === 'create' && !supplier) add('supplierCode', 'El código del proveedor no existe.');
-        if (config.mode === 'create' && supplier?.isActive === false) add('supplierCode', 'El proveedor está inactivo.');
-        if (config.mode === 'update' && (!target || (config.type && target.material.type !== config.type))) {
+        if (config.mode === modes.CREATE && !supplier) add('supplierCode', 'El código del proveedor no existe.');
+        if (config.mode === modes.CREATE && supplier?.isActive === false) add('supplierCode', 'El proveedor está inactivo.');
+        if (config.mode === modes.UPDATE && (!target || (config.type && target.material.type !== config.type))) {
             add('id', 'El registro o proveedor no corresponde a este módulo.');
         }
         if (!errors.length) {
             dto = config.resource === 'wastes'
-                ? config.mode === 'create' ? createWasteDtoForRegister(validated.body) : createWasteDtoForEdit(validated.body)
-                : config.mode === 'create' ? createMaterialDtoForRegister(validated.body) : createMaterialDtoForEdit(validated.body);
+                ? config.mode === modes.CREATE ? createWasteDtoForRegister(validated.body) : createWasteDtoForEdit(validated.body)
+                : config.mode === modes.CREATE ? createMaterialDtoForRegister(validated.body) : createMaterialDtoForEdit(validated.body);
             let domainField = 'minStock';
             try {
-                if (config.mode === 'update') {
+                if (config.mode === modes.UPDATE) {
                     if (target.version !== dto.expectedVersion
                         || (config.type && target.material.version !== dto.expectedMaterialVersion)) {
                         add('expectedVersion', 'El registro cambió desde que se descargó la plantilla.');
@@ -126,10 +136,10 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
             }
             if (identity && targets.has(identity)) add('name', `El registro está repetido: coincide con la fila ${targets.get(identity)} del archivo.`);
             else if (identity) targets.set(identity, input.row);
-            if (config.mode === 'create' && dto.maxUnitCost === 0) warnings.push('Alta sin costo: no podrá usarse en salidas hasta configurar un costo mayor que cero en Almacén.');
+            if (config.mode === modes.CREATE && dto.maxUnitCost === 0) warnings.push('Alta sin costo: no podrá usarse en salidas hasta configurar un costo mayor que cero en Almacén.');
         }
         const after = dto ? editable(dto) : null;
-        const details = config.mode === 'create' && dto ? {
+        const details = config.mode === modes.CREATE && dto ? {
             supplier: supplier?.tradeName ?? '', supplierCode: supplier?.code ?? '',
             ...(config.resource === 'wastes' ? { materialId: dto.materialId,
                 sourceMaterial: context.offers.get(`${dto.materialId}:${dto.supplierId}`)?.material.name ?? '', ...reference,
@@ -138,10 +148,10 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                 : { presentation: context.presentations.get(dto.presentationId)?.name ?? '',
                     unit: context.units.get(dto.unitMeasureId)?.symbol ?? '', base: dto.base, height: dto.height, initialQuantity: dto.newStock }),
             observations: dto.observations ?? ''
-        } : config.mode === 'update' && target ? { supplier: target.supplier?.tradeName ?? '', supplierCode: target.supplier?.code ?? '' } : {};
-        const action = errors.length ? 'error' : config.mode === 'create' ? 'create' : same(before, after) ? 'unchanged' : 'update';
+        } : config.mode === modes.UPDATE && target ? { supplier: target.supplier?.tradeName ?? '', supplierCode: target.supplier?.code ?? '' } : {};
+        const action = errors.length ? actions.ERROR : config.mode === modes.CREATE ? actions.CREATE : same(before, after) ? actions.UNCHANGED : actions.UPDATE;
         results.push({ row: input.row, id: body.id ?? null, name: String(body.name ?? ''), before, after, details,
-            action, errors: errors.map(error => ({ ...error, column: config.columns.find(([, key]) => key === error.field)?.[0] ?? error.field })),
+            action, errors: errors.map(error => ({ ...error, column: inventoryImportColumnLabel(config, error.field) })),
             warnings, ...(dto && { dto }), reference });
         if (results.length % 5 === 0) await setImmediate();
     }
@@ -149,11 +159,11 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
     const candidates = results.filter(row => row.dto && !row.errors.length);
     const probes = candidates.map(row => {
         if (config.resource === 'wastes') {
-            const source = config.mode === 'create' ? { ...row.dto, ...row.reference } : context.wastes.get(row.id);
+            const source = config.mode === modes.CREATE ? { ...row.dto, ...row.reference } : context.wastes.get(row.id);
             return { supplierId: source.supplierId, name: row.dto.name, base: source.base, height: source.height,
                 coneWeightKg: source.coneWeightKg ?? null, totalWeightKg: source.totalWeightKg ?? null };
         }
-        const source = config.mode === 'create' ? row.dto : context.offers.get(`${row.id}:${row.dto.supplierId}`).material;
+        const source = config.mode === modes.CREATE ? row.dto : context.offers.get(`${row.id}:${row.dto.supplierId}`).material;
         return { name: { equals: row.dto.name, mode: 'insensitive' }, type: config.type,
             presentationId: source.presentationId, unitMeasureId: source.unitMeasureId, base: source.base ?? null, height: source.height ?? null };
     });
@@ -169,23 +179,23 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
             const identity = config.resource === 'wastes' ? wasteImportIdentity(probe)
                 : materialImportIdentity({ ...probe, name: row.dto.name });
             const existingId = identities.get(identity);
-            const conflict = config.mode === 'update' ? existingId && existingId !== row.id
+            const conflict = config.mode === modes.UPDATE ? existingId && existingId !== row.id
                 : config.resource === 'wastes' && existingId;
             const previous = proposed.get(identity);
-            if (conflict || (previous && config.mode === 'update' && previous !== row.id)) {
-                const message = config.mode === 'create' && config.resource === 'wastes'
+            if (conflict || (previous && config.mode === modes.UPDATE && previous !== row.id)) {
+                const message = config.mode === modes.CREATE && config.resource === 'wastes'
                     ? 'Esta merma ya está registrada. Usa Actualizar datos para corregirla o Agregar stock para recibir otras unidades.'
                     : 'La identidad resultante corresponde a otro registro.';
-                row.errors.push({ ...issue('name', message), column: 'nombre' });
-                row.action = 'error';
+                row.errors.push({ ...issue('name', message), column: inventoryImportColumnLabel(config, 'name') });
+                row.action = actions.ERROR;
             }
             proposed.set(identity, row.id);
         }
     }
     return { context, rows: results, summary: {
-        total: results.length, creates: results.filter(row => row.action === 'create').length,
-        updates: results.filter(row => row.action === 'update').length,
-        unchanged: results.filter(row => row.action === 'unchanged').length,
-        errors: results.filter(row => row.action === 'error').length
+        total: results.length, creates: results.filter(row => row.action === actions.CREATE).length,
+        updates: results.filter(row => row.action === actions.UPDATE).length,
+        unchanged: results.filter(row => row.action === actions.UNCHANGED).length,
+        errors: results.filter(row => row.action === actions.ERROR).length
     } };
 };

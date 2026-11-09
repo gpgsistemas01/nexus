@@ -16,6 +16,7 @@ explica las herramientas, archivos y credenciales de cada nivel.
 
 | Caso | Objetivo | Diseño |
 | --- | --- | --- |
+| [CP-VUE-ISS-006-01](cases/cp-vue-iss-006-01.md) | registrar y recuperar entregas históricas sin otro descuento. | DP-VUE-ISS-006 |
 | [CP-VUE-IMP-001-01](cases/cp-vue-imp-001-01.md) | importar y recuperar el mismo lote sin otra alta. | DP-VUE-IMP-001 |
 | [CP-VUE-AUT-001](cases/cp-vue-aut-001.md) | captura de login y credencial histórica. | DP-VUE-AUTH-002 |
 | [CP-VUE-SESSION-001-01](cases/cp-vue-session-001-01.md) | renovación transparente. | DP-VUE-SESSION-001 |

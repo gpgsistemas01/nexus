@@ -36,4 +36,11 @@ const emit = defineEmits<{ click: [] }>();
     outline: 3px solid rgb(var(--v-theme-filter-action));
     outline-offset: 3px;
 }
+
+@media (max-width: 599.98px) {
+    .table-action {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
 </style>

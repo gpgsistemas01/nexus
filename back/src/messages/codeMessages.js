@@ -1,4 +1,7 @@
+import { HISTORICAL_DELIVERY_ERROR_CODES } from '../shared/constants/historicalDelivery.js';
+
 export const errorMap = {
+    historicalDelivery: HISTORICAL_DELIVERY_ERROR_CODES,
     inventoryImport: {
         FILE: 'INVENTORY_IMPORT_FILE',
         LIMIT: 'INVENTORY_IMPORT_LIMIT',

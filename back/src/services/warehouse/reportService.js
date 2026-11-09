@@ -2,7 +2,7 @@ import { formatDateLongWithTime, toNumber } from '../../utils/formattersUtils.js
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
-import { FULFILLMENT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../shared/constants/fulfillmentStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { findBatches } from '../../repository/paginationRepository.js';
 import { QUERY_BATCH_SIZES } from '../../constants/pagination.js';
@@ -87,9 +87,13 @@ const mapIssueDetailRow = ({ issue, detail, material, supplier, requestDate }) =
     presentationName: material?.presentation?.name,
     convertedQuantity: toNumber(detail.convertedQuantity),
     convertedUnitMeasureName: material?.unitMeasure?.symbol || material?.unitMeasure?.name,
-    projectConvertedQuantity: toNumber(detail.projectConvertedQuantity),
-    convertedQuantityDifference: toNumber(detail.convertedQuantityDifference),
-    detailFulfillmentStatusName: detail.fulfillmentStatus?.name
+    projectConvertedQuantity: issue.historicalDeliveryBatch && detail.projectConvertedQuantity == null ? null : toNumber(detail.projectConvertedQuantity),
+    convertedQuantityDifference: issue.historicalDeliveryBatch && detail.convertedQuantityDifference == null ? null : toNumber(detail.convertedQuantityDifference),
+    detailFulfillmentStatusName: detail.fulfillmentStatus?.name,
+    historicalDeliveryReference: issue.historicalDeliveryBatch?.id ?? '',
+    historicalDeliveryReason: issue.historicalDeliveryBatch?.reason ?? '',
+    historicalDeliveryRegisteredAt: issue.historicalDeliveryBatch ? formatDateLongWithTime(issue.historicalDeliveryBatch.createdAt) : '',
+    historicalDeliveryNote: issue.historicalDeliveryBatch ? 'Entrega histórica: costo y cantidad de proyecto sin verificar; sin descuento de stock.' : ''
 });
 
 const mapGoodsIssueDetailRows = function* (goodsIssues = [], { supplierId = '', materialId = '' } = {}) {
@@ -114,7 +118,7 @@ const mapWasteIssueDetailRows = function* (wasteIssues = []) {
             yield mapIssueDetailRow({
                 issue,
                 detail,
-                material: { name: detail.waste?.name, base: detail.waste?.base, height: detail.waste?.height },
+                material: detail.waste,
                 supplier: detail.waste?.supplier,
                 requestDate
             });

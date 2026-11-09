@@ -1,10 +1,11 @@
 <script setup lang="ts" generic="Row extends { id: string }">
+import { computed } from 'vue';
 import { VDataTableServer } from 'vuetify/components/VDataTable';
 import type { DataTableHeader, DataTableSortItem } from 'vuetify';
 import TableFrame from './TableFrame.vue';
 import type { TableOptions } from '../composables/useTableQuery.js';
 
-withDefaults(
+const props = withDefaults(
     defineProps<{
         headers: DataTableHeader<Row>[];
         rows: Row[];
@@ -21,6 +22,11 @@ withDefaults(
 const emit = defineEmits<{
     options: [options: TableOptions];
 }>();
+const headers = computed(() =>
+    props.headers.map((header) =>
+        header.key === 'actions' ? { ...header, fixed: 'end' as const } : header,
+    ),
+);
 </script>
 
 <template>

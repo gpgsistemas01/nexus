@@ -1,33 +1,91 @@
 # 5. Mermas
 
-<!-- manual:all wastes:read wastes:write inventory:costs-read -->
+<!-- manual:all wastes:read -->
+<!-- manual:any inventory:costs-read wastes:adjust-stock -->
+<!-- manual:any wastes:write wastes:adjust-stock -->
 ## Importar desde Excel
 
-1. Pulse **Importar Excel** y elija **Crear registros** o **Actualizar datos**.
-2. Para altas, seleccione proveedor y descargue la plantilla con sus materiales de referencia en m².
-3. Capture los datos; en Rollo use cono, merma con cono y rollo completo con cono, en kg. El sistema calcula las medidas.
-4. Seleccione el archivo y pulse **Validar archivo**. Revise cantidad inicial, cambios y errores.
+Cada Excel representa una operación elegida en **Operación del archivo**, según
+las opciones disponibles para su cuenta. Las primeras columnas siguen el orden del
+inventario de consulta. Los registros operativos son individuales aunque el reporte
+agrupa totales. Después se añaden los IDs/versiones y los campos necesarios.
+
+1. Pulse **Importar Excel** y seleccione la operación para todo el archivo.
+2. En Alta, seleccione proveedor y descargue la plantilla con sus materiales de referencia en m². En edición o ajuste, filtre los registros actuales y descargue sus IDs/versiones.
+3. Complete sólo los campos de captura de la operación seleccionada y conserve las columnas de consulta.
+4. Seleccione la misma operación y el archivo; pulse **Validar archivo**. Revise los datos y errores.
 5. Corrija los errores en el original, descarte el borrador y vuelva a validar.
 6. Pulse **Confirmar importación** y espere el recibo.
 
-El ID de la nueva merma lo genera el sistema. Seleccione el material de referencia
-de la lista del Excel; la opción ya incluye su ID. Para editar, descargue
-**Actualizar datos** y vuelva a subirlo conservando IDs y versiones.
+<!-- manual:all wastes:write inventory:costs-read -->
+**Alta:** capture nombre, proveedor, material de referencia, mínimo, costo, Activo,
+**Cantidad inicial** y observaciones; medidas o pesos según la presentación. El sistema
+genera el ID nuevo y obtiene presentación/unidad del material de referencia.
+
+**Editar datos:** cambie **Material**, **Stock mínimo**, **Costo unitario** y **Activo**.
+Se conservan IDs/versiones, proveedor, material de origen, medidas, pesos y existencia.
+<!-- manual:end -->
+
+<!-- manual:any wastes:adjust-stock -->
+
+**Ajustar existencias:** capture **Stock contado**, **Motivo** y **Observaciones**.
+Se conservan IDs/versiones, identidad, medidas y pesos.
+<!-- manual:end -->
+
+<!-- manual:all wastes:write inventory:costs-read -->
+En Alta seleccione el material de referencia de la lista; la opción ya incluye su
+ID. Para Rollo capture cono, merma con cono y rollo completo con cono, en kg; el
+sistema calcula las medidas. La edición de datos conserva el stock.
+<!-- manual:end -->
+
+<!-- manual:any wastes:adjust-stock -->
+En ajuste capture el saldo físico final: cero es válido y vacío se rechaza. Retire
+las filas que aún no haya contado y evite movimientos durante la captura. Para
+cambiar datos y stock complete dos operaciones con una descarga actual entre ellas.
+<!-- manual:end -->
+
+En **Activo**, use **SI** o **NO**. Capture números con punto decimal y sin símbolos
+de moneda; no cambie IDs ni versiones. Si supera 100 filas, prepare archivos separados
+y revise que los grupos no repitan registros.
+
+Conserve los IDs/versiones que se descargan para cada registro existente. No es
+necesario ser administrador: se incluyen según el permiso operativo. Cambiar la
+operación retira el archivo seleccionado.
 
 Si una fila está repetida o es inválida, **no se aplica ninguna fila**. Descargue
 los errores, corrija o retire los repetidos y vuelva a validar. Un alta repetida no suma stock.
 
+Conserve **Datos**, **Instrucciones**, **Catalogos**, los encabezados y las columnas
+grises de referencia. Complete sólo la captura de la operación seleccionada y
+retire las filas que no quiera procesar. Use los valores completos de los catálogos.
+
+Suba el `.xlsx` directamente, sin otro ZIP, fórmulas, macros ni enlaces externos.
+El archivo de **Exportar Excel** sirve para consultar; descargue una plantilla
+operativa para cargar cambios. Las plantillas antiguas deben sustituirse por una
+actual. **Descargar errores** genera un informe: corrija la copia de captura y vuelva
+a validarla, sin importar el informe de errores.
+
 Máximo: 100 filas y 2 MiB. Actualizar sólo cambia nombre, mínimo, costo y activo;
 conserva stock, medidas y pesos. Para entradas posteriores use **Agregar stock**.
 Si se pierde la respuesta, pulse **Revisar y reintentar confirmación** desde la
-misma opción de importación. El borrador vence en 24 h; el archivo de su equipo no se elimina.
+misma opción de importación. No cargue otro archivo para repetir una confirmación
+incierta. El archivo subido se descarta tras el análisis; el borrador y los errores
+vencen en 24 h y se eliminan al confirmar o descartar. El recibo confirmado se conserva.
+El original y las descargas de su equipo permanecen bajo su control: guarde una copia
+hasta comprobar el resultado y siga el [manejo de archivos locales](02-navigation-and-controls.md#archivos-en-su-equipo).
+<!-- manual:end -->
+<!-- manual:end -->
 <!-- manual:end -->
 
 ## Consultar una merma
 
 Abra **Almacén → Mermas**. Busque por nombre y proveedor y revise medidas, cantidad y
-conversión. **Detalles de peso** muestra los pesos guardados cuando están disponibles;
+conversión. Los pesos de cono, total y neto se consultan directamente en la tabla.
+
+<!-- manual:any wastes:write wastes:adjust-stock wastes:add-stock -->
+**Detalles de peso** muestra las referencias guardadas cuando están disponibles;
 **Cerrar detalles** termina esa consulta.
+<!-- manual:end -->
 
 ![Tabla de mermas con sus medidas y existencias.](images/08-wastes-list.png)
 
@@ -90,8 +148,10 @@ avise al responsable del inventario.
 <!-- manual:any wastes:write -->
 ## Editar datos
 
-Use **Editar** para los campos habilitados. Identidad, medidas y pesos se conservan
-como consulta. **Referencia histórica** muestra la muestra guardada; no debe recapturarla.
+Use **Editar** para cambiar **Nombre de la merma**, **Stock mínimo**, **Costo máximo
+unitario** y **Activo**. Proveedor, presentación, unidad, medidas y pesos permanecen
+de consulta. El material de origen y la existencia se conservan. **Referencia histórica**
+muestra la muestra guardada; no debe recapturarla. Guarde y compruebe los datos actualizados.
 <!-- manual:end -->
 
 <!-- manual:any wastes:adjust-stock -->

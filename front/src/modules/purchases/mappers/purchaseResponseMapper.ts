@@ -1,3 +1,4 @@
+import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -67,7 +68,7 @@ const normalizePurchaseDetail = (value: unknown, resource: PurchaseResource): Pu
         !value.id ||
         !isRecord(value.material) ||
         value.material.type !== PURCHASE_CONFIG[resource].type ||
-        !['ACTIVE', 'CANCELED'].includes(String(value.status))
+        !Object.values(GOODS_RECEIPT_DETAIL_STATUSES).some((status) => status === value.status)
     )
         throw createInvalidResponseError();
 

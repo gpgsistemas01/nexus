@@ -268,7 +268,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ServerTable.defineProps
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 8, columna 17. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 9, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -284,7 +284,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ServerTable.defineEmits
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 21, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 22, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -339,7 +339,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- |
 | `canExport` | `canExport: () => boolean;` |
 | `request` | `request: (scope: Scope, signal: AbortSignal) => Promise<Blob>;` |
-| `filename` | `filename: string;` |
+| `filename` | `filename: string \| (() => string);` |
 | `onDenied` | `onDenied: (status: number) => void;` |
 
 ## InteractiveForm
@@ -463,7 +463,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## InventoryCatalogPath
 
-**Fuente:** [src/shared/http/apiPaths.ts](../../../../../src/shared/http/apiPaths.ts) · línea 81, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/http/apiPaths.ts](../../../../../src/shared/http/apiPaths.ts) · línea 82, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

@@ -32,6 +32,7 @@ export const API_PATHS = {
     },
     catalogs: `${admin}/catalogs`,
     inventoryImports: `${warehouse}/inventory-imports`,
+    historicalDeliveries: `${warehouse}/historical-deliveries`,
     purchases: {
         materials: `${warehouse}/goods-receipts/materials`,
         consumables: `${warehouse}/goods-receipts/consumables`,

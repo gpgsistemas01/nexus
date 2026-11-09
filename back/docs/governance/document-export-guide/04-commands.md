@@ -1,116 +1,15 @@
 # 4. Comandos
 
-Ejecuta todos los comandos de esta sección desde `back/`. Si la terminal está
-en la raíz del repositorio, ejecuta primero `cd back`. Los argumentos y nombres
-de scripts se mantienen; las salidas se crean dentro de `back/`.
-
-Esta sección es la referencia de sintaxis para los comandos de exportación y capturas. Los
-capítulos posteriores describen el orden de ejecución y los requisitos de cada flujo sin cambiar
-esta interfaz.
-
-## Exportación documental
+Ejecute los comandos técnicos desde `back/`.
 
 | Objetivo | Comando |
 | --- | --- |
-| Validar todos los paquetes sin generar archivos | `npm run docs:export -- --check` |
-| Validar un paquete | `npm run docs:export -- <paquete> --check` |
-| Validar fuentes del manual Vue sin exigir capturas locales | `npm run docs:export -- manual-vue manual-usuario --check-sources` |
-| Validar sólo la documentación Vue | `npm run docs:export -- arquitectura frontend-vue --check` |
-| Publicar las fuentes Vue en DOCX y PDF | `npm run docs:export -- arquitectura frontend-vue ambos` |
-| Publicar sólo el contrato API en DOCX y PDF, junto con OpenAPI | `npm run docs:export -- arquitectura contrato-api ambos` |
-| Generar toda la entrega en DOCX y PDF | `npm run docs:export` |
-| Generar un paquete y formato concretos | `npm run docs:export -- <paquete> <docx\|pdf\|ambos>` |
+| Validar arquitectura de la API | `npm run docs:export -- arquitectura backend --check-sources` |
+| Exportar contrato HTTP y OpenAPI | `npm run docs:export -- arquitectura contrato-api ambos` |
+| Exportar desarrollo del backend | `npm run docs:export -- arquitectura desarrollo ambos` |
+| Exportar la documentación Vue | `npm run docs:export -- arquitectura frontend-vue ambos` |
 
-Sin argumentos, `npm run docs:export` genera **todos** los paquetes en DOCX y PDF. Los argumentos
-permiten limitar deliberadamente una ejecución: `<paquete>` significa qué colección documental se
-va a generar y `<formato>` admite `docx`, `pdf` o `ambos`. No son paquetes de npm. Elija uno de
-estos valores cuando no necesite la entrega completa:
-
-| Valor de `<paquete>` | Contenido generado | Cuándo usarlo |
-| --- | --- | --- |
-| `manuales` | Las carpetas `manuales/administrador/` y `manuales/almacen/`, con todos sus documentos. | Para publicar los manuales; no se permite exportar sólo un actor o una sección. |
-| `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
-| `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
-| `arquitectura` | Diseño, documentación técnica y contrato API con estructuras JSON y validaciones. | Para revisión técnica y de integraciones HTTP. |
-| `pruebas` | Plan, registro selectivo de casos automatizados y cobertura relevante por caso de uso. | Para estrategia y trazabilidad basada en riesgo, sin duplicar la suite ni los resultados de CI. |
-| `gobernanza` | Normas, responsabilidades, aceptación, versionado y guía de publicación. | Para mantener y revisar el gobierno documental. |
-| `todos` | Todos los paquetes anteriores. | Para preparar una entrega documental completa con un solo comando. |
-
-Al indicar sólo un paquete técnico se reconstruyen todos sus documentos. Para regenerar uno solo,
-agregue el nombre de la sección mostrado en la salida, por ejemplo
-`npm run docs:export -- arquitectura backend docx`. La selección de sección no se admite con
-`todos` ni con `manuales`: la exportación general siempre reconstruye todo y los manuales siempre
-se exportan completos para ambos actores.
-
-Los paquetes por actor reutilizan las secciones comunes y omiten las que
-no corresponden a ese recorrido. En particular, los reportes de movimientos se exportan sólo en
-el manual de administrador; las compras y salidas se exportan en ambos perfiles, con imágenes y acciones del área correspondiente. Los
-formatos
-admitidos son `docx`, `pdf` y `ambos`; `pdf` y
-`ambos` conservan el DOCX intermedio además del PDF, mientras que `ambos` permite expresar esa
-intención de forma explícita. Markdown permanece como fuente navegable y por eso no se genera una
-copia HTML equivalente.
-
-`--check` exige las imágenes referenciadas. `--check-sources` valida fuentes,
-enlaces y declaraciones de imagen sin exigir los PNG generados por separado;
-es un modo de comprobación que no publica archivos. La exportación normal
-siempre exige las imágenes de la publicación seleccionada.
-
-Los manuales se dividen por los destinos visibles del menú: cada inventario, compra y salida conserva su contexto de materiales, consumibles o mermas. Las colecciones técnicas conservan su organización por grupo funcional. Las
-capturas de consultas y exportaciones se incluyen en el grupo del caso de uso al que dan evidencia;
-no se genera un grupo genérico de reportes.
-
-La exportación de `arquitectura` y `todos` resuelve las fuentes modulares de OpenAPI y
-genera el contrato autocontenido `build/docs/openapi/openapi.json`. Se entrega separado
-del DOCX o PDF porque está destinado a validadores, generadores de clientes y
-visualizadores; dividirlo por formato de respuesta no aporta documentos adicionales al
-lector.
-
-## Mantenimiento del contrato API
-
-`npm run docs:check` comprueba referencias, IDs, grupos, parámetros, seguridad y
-respuestas OpenAPI; compara las operaciones con el mapa de rutas.
-`npm run docs:api:lint` añade las reglas recomendadas de Redocly y
-`npm run docs:api:bundle` genera el JSON autocontenido. La correspondencia con los
-datos reales se verifica con validadores, DTO, controladores y pruebas.
-
-Al cambiar una operación, actualice su definición en `docs/architecture/openapi/`,
-los esquemas reutilizados y las pruebas relacionadas. El
-[contrato HTTP](../../architecture/openapi/api-contract.md) mantiene las reglas
-compartidas de consumo.
-
-## Capturas del manual
-
-Las capturas siempre se solicitan para un área. El comando acepta `almacen` o `sistemas`, y no
-genera documentos ni actualiza por sí solo las imágenes versionadas:
-
-Los nombres técnicos de área se escriben en español, en minúsculas y sin acento en argumentos y
-rutas (`almacen`, `sistemas`), y en mayúsculas sin acento dentro de variables e identificadores
-(`ALMACEN`, `SISTEMAS`). No use los nombres de actor `warehouse`, `admin` o `administrador` como
-alias del área.
-
-| Objetivo | Comando |
-| --- | --- |
-| Consultar el inventario completo | `npm run docs:screenshots -- --list` |
-| Generar o reanudar las capturas de un área | `npm run docs:screenshots -- --area <almacen\|sistemas>` |
-| Generar sólo las capturas ausentes de un área | `npm run docs:screenshots -- --area <almacen\|sistemas> --missing` |
-| Regenerar todas las capturas de un área | `npm run docs:screenshots -- --area <almacen\|sistemas> --fresh` |
-
-`DOCS_CAPTURE_AREA` puede sustituir `--area` en CI. La selección por identificador, la reanudación
-desde un punto y la preparación de las sesiones se detallan en
-[Actualizar las capturas del manual](08-update-the-screenshots-of-the-manual.md#reanudación-y-capturas-selectivas).
-`--missing`, `--fresh`, la selección por identificador y la reanudación desde un punto son
-alternativas excluyentes.
-
-## Fuentes y publicación propias de Vue
-
-El frontend conserva documentación completa en `front/docs`, incluida su
-especificación, casos, estándar, plan de pruebas y modelos generales/aplicados de
-patrones. Desde la raíz se valida con `npm --prefix front run docs:check` y se
-publica con `npm --prefix front run docs:export -- ambos`.
-Una selección exclusiva `arquitectura frontend-vue` escribe DOCX/PDF y caché en
-`front/build/docs`. Las demás selecciones y publicaciones combinadas conservan
-`back/build/docs`. Compartir el motor no mueve ni elimina fuentes del backend.
-Los comandos frontend comprueban además que la referencia generada corresponda
-al código; su [guía propia](../../../../front/docs/governance/02-generation-and-publication.md)
-explica herramientas, formatos y exclusión de producción.
+Los manuales y capturas se ejecutan desde `front/`: `npm run docs:manuals -- --profile <id>`
+y `npm run docs:screenshots -- --all`. La [guía Vue](../../../../front/docs/development/00-commands.md)
+conserva sus opciones, cuentas y rutas de salida. `manual-vue` identifica las fuentes
+del manual cuando lo invoca la herramienta compartida de exportación.

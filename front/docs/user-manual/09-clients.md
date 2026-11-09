@@ -38,6 +38,9 @@ campos y guarde. Compruebe el cliente en el listado.
 2. Corrija **Nombre** o cambie **Activo**.
 3. Pulse **Actualizar** y compruebe el resultado.
 
+Los campos habilitados son **Nombre** y **Activo**. Se conserva el mismo cliente
+y la relación con sus documentos; el formulario no modifica partidas de salidas.
+
 Desactivar retira el cliente de nuevas operaciones y conserva sus salidas anteriores.
 Ante un conflicto, siga [Errores y recuperación](15-errors-and-recovery.md).
 <!-- manual:end -->

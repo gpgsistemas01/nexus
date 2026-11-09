@@ -4,6 +4,41 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 [Alcance y notación](index.md#alcance-y-notación).
 
+## HistoricalDeliveryDialog.defineProps
+
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 15, columna 13. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `values` | `values: { cutoffDate: string; deliveredAt: string; reason: string; declaredDelivered: boolean; search: string; };` |
+| `preview` | `preview: HistoricalDeliveryPreview \| null;` |
+| `receipt` | `receipt: HistoricalDeliveryReceipt \| null;` |
+| `selected` | `selected: string[];` |
+| `isWorking` | `isWorking: boolean;` |
+| `recoveryRequired` | `recoveryRequired: boolean;` |
+| `canConfirm` | `canConfirm: boolean;` |
+| `error` | `error: string;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [HistoricalDeliveryPreview](../../../../../src/modules/issues/historicalDelivery.ts) | `preview` |
+| association | [HistoricalDeliveryReceipt](../../../../../src/modules/issues/historicalDelivery.ts) | `receipt` |
+
+## HistoricalDeliveryDialog.defineEmits
+
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 31, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `update` | `update: [field: 'cutoffDate' \| 'deliveredAt' \| 'reason' \| 'search', value: string];` |
+| `declare` | `declare: [value: boolean];` |
+| `select` | `select: [id: string];` |
+| `selectAll` | `selectAll: [];` |
+| `load` | `load: [page?: number];` |
+| `confirm` | `confirm: [];` |
+| `recover` | `recover: [];` |
+| `close` | `close: [];` |
+
 ## IssueDetailsTable.defineProps
 
 **Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 19, columna 27. **Declaración:** SFC contract.
@@ -37,10 +72,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 19, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 20, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
+| `historicalDelivery` | `historicalDelivery?: HistoricalDeliveryEvidence;` |
 | `title` | `title: string;` |
 | `values` | `values: IssueValues;` |
 | `errors` | `errors: Partial<Record<IssueField, string>>;` |
@@ -56,6 +92,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
+| association | [HistoricalDeliveryEvidence](../../../../../src/modules/issues/historicalDelivery.ts) | `historicalDelivery` |
 | association | [IssueValues](../../../../../src/modules/issues/issue.ts) | `values` |
 | dependency | [IssueField](../../../../../src/modules/issues/issue.ts) | `errors` |
 | dependency | [IssueMode](../../../../../src/modules/issues/issue.ts) | `mode` |
@@ -63,7 +100,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 35, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -164,7 +201,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueReturnForm.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 8, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 10, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -178,10 +215,13 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `message` | `message: string;` |
 | `isSubmitting` | `isSubmitting: boolean;` |
 | `isConflicted` | `isConflicted: boolean;` |
+| `isHistorical` | `isHistorical?: boolean;` |
+| `physicalReturnConfirmed` | `physicalReturnConfirmed?: boolean;` |
+| `physicalReturnError` | `physicalReturnError?: string;` |
 
 ## IssueReturnForm.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 20, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 25, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -190,6 +230,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `submit` | `submit: [];` |
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |
+| `confirmPhysicalReturn` | `confirmPhysicalReturn: [value: boolean];` |
 
 ## IssueTable.defineProps
 
@@ -241,9 +282,80 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | association | [IssueRow](../../../../../src/modules/issues/issue.ts) | `row` |
 | dependency | [IssueOpenMode](../../../../../src/modules/issues/issue.ts) | `mode` |
 
+## HistoricalDeliveryCandidate
+
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 3, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `id` | `id: string;` |
+| `revision` | `revision: string;` |
+| `referenceNumber` | `referenceNumber: string;` |
+| `requestDate` | `requestDate: string;` |
+| `departmentName` | `departmentName: string;` |
+| `projectNumber` | `projectNumber: string;` |
+| `details` | `details: { id: string; name: string; quantity: number; suppliedQuantity: number; returnedQuantity: number; pendingQuantity: number; }[];` |
+
+## HistoricalDeliveryPreview
+
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 19, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `resource` | `resource: IssueResource;` |
+| `cutoffDate` | `cutoffDate: string;` |
+| `page` | `page: number;` |
+| `hasMore` | `hasMore: boolean;` |
+| `documents` | `documents: HistoricalDeliveryCandidate[];` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
+| association | [HistoricalDeliveryCandidate](../../../../../src/modules/issues/historicalDelivery.ts) | `documents` |
+
+## HistoricalDeliveryCommand
+
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 26, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `operationId` | `operationId: string;` |
+| `cutoffDate` | `cutoffDate: string;` |
+| `deliveredAt` | `deliveredAt: string \| null;` |
+| `reason` | `reason: string;` |
+| `declaredDelivered` | `declaredDelivered: true;` |
+| `documents` | `documents: { id: string; revision: string }[];` |
+
+## HistoricalDeliveryReceipt
+
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 34, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `id` | `id: string;` |
+| `resource` | `resource: IssueResource;` |
+| `documents` | `documents: { id: string; referenceNumber: string }[];` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
+
+## HistoricalDeliveryEvidence
+
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 39, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `id` | `id: string;` |
+| `reason` | `reason: string;` |
+| `cutoffDate` | `cutoffDate: string;` |
+| `deliveredAt` | `deliveredAt: string \| null;` |
+| `createdAt` | `createdAt: string;` |
+| `user` | `user: { name: string } \| null;` |
+
 ## IssueResource
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 4, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 5, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -253,7 +365,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueMode
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 5, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 6, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -263,10 +375,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueRow
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 6, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 7, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
+| `historicalDelivery` | `historicalDelivery?: HistoricalDeliveryEvidence;` |
 | `id` | `id: string;` |
 | `referenceNumber` | `referenceNumber: string;` |
 | `requestDate` | `requestDate: string;` |
@@ -283,9 +396,13 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `status` | `status: string;` |
 | `fulfillmentStatus` | `fulfillmentStatus: string;` |
 
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [HistoricalDeliveryEvidence](../../../../../src/modules/issues/historicalDelivery.ts) | `historicalDelivery` |
+
 ## IssueDetail
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 23, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 25, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -311,7 +428,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueSupplyChanges
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 44, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 46, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -327,7 +444,7 @@ Partial<
 
 ## IssueDocument
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 47, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 49, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends IssueRow`.
 
@@ -342,7 +459,7 @@ Partial<
 
 ## IssueValues
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 50, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 52, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -361,7 +478,7 @@ Partial<
 
 ## IssueField
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 60, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 62, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -375,7 +492,7 @@ keyof IssueValues
 
 ## IssueWriteMode
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 61, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 63, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -385,7 +502,7 @@ keyof IssueValues
 
 ## IssueOpenMode
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 62, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 64, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -395,7 +512,7 @@ keyof IssueValues
 
 ## IssueWriteTarget
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 63, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 65, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -411,7 +528,7 @@ keyof IssueValues
 
 ## IssueTarget
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 66, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 68, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -426,7 +543,7 @@ IssueWriteTarget | { mode: 'view' | 'return'; document: IssueDocument }
 
 ## IssueFilters
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 67, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 69, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -440,7 +557,7 @@ IssueWriteTarget | { mode: 'view' | 'return'; document: IssueDocument }
 
 ## IssueQuery
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 76, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 78, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -455,7 +572,7 @@ RecordQuery & IssueFilters
 
 ## IssueLookup
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 77, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 79, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -465,7 +582,7 @@ RecordQuery & IssueFilters
 
 ## IssueHeaderSelect
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 78, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 80, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -484,7 +601,7 @@ RecordQuery & IssueFilters
 
 ## IssueFilterSelect
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 87, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 89, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -498,6 +615,29 @@ RecordQuery & IssueFilters
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `state` |
+
+## HistoricalDeliveryPage.defineProps
+
+**Fuente:** [src/modules/issues/pages/HistoricalDeliveryPage.vue](../../../../../src/modules/issues/pages/HistoricalDeliveryPage.vue) · línea 6, columna 27. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `resource` | `resource: IssueResource;` |
+| `userId` | `userId: string` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
+
+## HistoricalDeliveryPage.defineEmits
+
+**Fuente:** [src/modules/issues/pages/HistoricalDeliveryPage.vue](../../../../../src/modules/issues/pages/HistoricalDeliveryPage.vue) · línea 7, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `close` | `close: [];` |
+| `saved` | `saved: [];` |
+| `unauthorized` | `unauthorized: []` |
 
 ## IssueEditorPage.defineProps
 

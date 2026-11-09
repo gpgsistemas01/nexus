@@ -6,7 +6,7 @@ import {
   WasteIssueFulfillmentStatusNotFound
 } from '../../../src/errors/warehouse/wasteIssueError.js';
 import { errorMap } from '../../../src/messages/codeMessages.js';
-import { getErrorMessage } from '../../../src/public/js/constants/apiMessages.js';
+import { getErrorMessage } from '../../../src/shared/messages/apiMessages.js';
 
 describe('códigos de conflicto de salidas de merma', () => {
   it.each([

@@ -1,5 +1,5 @@
 import { GoodsReceiptDetailAlreadyCanceled } from '../../../errors/warehouse/goodsReceiptError.js';
-import { GOODS_RECEIPT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { GOODS_RECEIPT_STATUS_NAMES } from '../../../shared/constants/goodsReceiptStatuses.js';
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from './goodsReceiptHelpers.js';
 
 const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, detailId, detailData }) => {
@@ -25,14 +25,12 @@ const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, det
         }
     });
     const allDetailsCanceled = receiptDetails.every(detail => detail.status === 'CANCELED');
-    const totals = calculateGoodsReceiptTotals(receiptDetails, {
-        includeCanceled: allDetailsCanceled
-    });
+    const totals = calculateGoodsReceiptTotals(receiptDetails);
 
     const updatedReceipt = await tx.goodsReceipt.update({
         where: { id: goodsReceiptId },
         data: {
-            ...totals,
+            ...(!allDetailsCanceled && totals),
             ...(allDetailsCanceled && {
                 status: {
                     connect: {

@@ -9,11 +9,17 @@ stock mínimo, presentación y unidad de medida. Lea la unidad para interpretar 
 También puede consultar el costo unitario.
 <!-- manual:end -->
 
-<!-- manual:all materials:read materials:write inventory:costs-read -->
+<!-- manual:all materials:read -->
+<!-- manual:any inventory:costs-read materials:adjust-stock -->
+<!-- manual:any materials:write materials:adjust-stock -->
 ## Importar desde Excel
 
 Pulse **Importar Excel** y siga el [procedimiento de materiales y consumibles](03-materials.md#importar-materiales-o-consumibles-desde-excel).
-La plantilla de consumibles no incluye dimensiones.
+El selector asigna una sola operación a todo el archivo. Base y Altura permanecen
+como referencias vacías en la estructura de consulta; los consumibles no capturan
+dimensiones. Conserve los IDs/versiones incluidos para editar o ajustar.
+<!-- manual:end -->
+<!-- manual:end -->
 <!-- manual:end -->
 
 ![Listado de consumibles y sus existencias.](images/06-consumables-list.png)
@@ -40,9 +46,11 @@ se recibe al guardar la compra; no la duplique como cantidad inicial.
 <!-- manual:any materials:write -->
 ## Editar datos
 
-Para corregir los datos habilitados, pulse **Editar** en el registro, revise los
-valores, cambie lo necesario y pulse **Guardar**. La edición no cambia proveedor,
-presentación o unidad de un registro con identidad ya establecida.
+Pulse **Editar** y cambie **Nombre**, **Stock mínimo**, **Costo máximo unitario**
+o **Activo**; después pulse **Guardar**. Proveedor, presentación y unidad son de
+consulta. El stock y su conversión permanecen sin cambios y no hay campos de
+dimensiones. Nombre y mínimo se comparten entre proveedores; costo y Activo
+afectan la oferta seleccionada.
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->

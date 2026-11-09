@@ -28,7 +28,7 @@ documentar una ruta Express. Para Nexus se combinan referencias según la pregun
 
 Por tanto, las tablas de símbolos, firmas y bloques de código de las referencias de
 [backend](../../architecture/views/development/backend-technical-documentation/index.md) y
-[interfaz EJS](../../architecture/views/development/frontend-technical-documentation/index.md) son una convención local
+[interfaz Vue](../../../../front/docs/architecture/views/development/code-structure.md) son una convención local
 alineada selectivamente con 1016. Las fichas actuales del
 [contrato API](../../architecture/openapi/api-contract.md) se complementan con la
 [especificación OpenAPI 3.1](../../architecture/openapi/openapi.json). No se atribuye a ninguna ISO

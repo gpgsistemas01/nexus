@@ -7,6 +7,13 @@ permitida, mezclar cuentas o registrar una operación para preparar una captura.
 Tabla de decisiones por área, rol, permiso de tarea, estado del documento y
 completitud de los artefactos. Es una prueba de la herramienta documental.
 
+Los doce perfiles operativos deben seleccionar sólo Materiales, Consumibles,
+Mermas y Salidas como capítulos de tareas, sin procedimientos de altas comerciales
+ni Detalles de peso. La interfaz se comprueba por separado en
+`operationalAccess.spec.ts`: navegación, tablas y selectores sin acciones ajenas.
+La integración HTTP/Prisma del servidor verifica el rechazo de escrituras; las
+capturas y los dobles del navegador no sustituyen esa evidencia persistente.
+
 ## Especificación del caso y datos
 
 | ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
@@ -92,3 +99,9 @@ particiones de host, puerto, modo y protocolo.
 Registrar ambiente, revisión, fecha, comando, código de salida y artefactos como
 evidencia EP conforme al [plan](../01-test-plan.md). No versionar resultados de una
 corrida ni credenciales en esta ficha.
+
+La variante de autorización `DP-VUE-MAN-004` filtra las fuentes reales de los tres
+inventarios con lectura/escritura/costos, lectura/ajuste y sus particiones de rechazo.
+El procedimiento de importación sólo aparece cuando la cuenta puede utilizarlo;
+los bloques de cada operación conservan sus permisos. `manualProfilesTest.ts` ejecuta
+esta tabla de decisión sin crear ni modificar registros de inventario.

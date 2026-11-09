@@ -1,6 +1,6 @@
 # Nexus
 
-Nexus es una plataforma de control operativo para administrar inventario, compras, salidas de almacén, mermas, proveedores, clientes, usuarios, reportes y KPIs. El proyecto expone vistas web renderizadas con EJS y una API REST sobre Express, con persistencia en PostgreSQL mediante Prisma.
+Nexus es una plataforma de control operativo para administrar inventario, compras, salidas de almacén, mermas, proveedores, clientes, usuarios, reportes y KPIs. El backend expone una API REST sobre Express, con persistencia PostgreSQL mediante Prisma. La interfaz Vue 3 se implementa en `front/`.
 
 Los comandos npm, Prisma y Node de este documento se ejecutan desde `back/`.
 Desde la raíz del repositorio usa `cd back`; para Docker Compose vuelve con
@@ -54,7 +54,7 @@ que aún no tienen un flujo accesible completo.
 
 - **Runtime:** Node.js con módulos ES (`type: module`).
 - **Framework web:** Express 5.
-- **Vistas:** EJS con `express-ejs-layouts`.
+- **Cliente:** Vue 3, TypeScript y Vite en `front/`.
 - **Base de datos:** PostgreSQL.
 - **ORM:** Prisma.
 - **Tiempo real:** Socket.IO.
@@ -66,20 +66,19 @@ que aún no tienen un flujo accesible completo.
 
 ```text
 src/
-├── app.js                  # Punto de entrada, middlewares, rutas web/API y servidor HTTP
-├── controllers/            # Controladores web y API por dominio
+├── app.js                  # Punto de entrada, middlewares y rutas de API/proceso
+├── controllers/            # Controladores API por dominio
 ├── dtos/                   # Objetos de transferencia y normalización de datos
 ├── errors/                 # Errores de dominio y AppError
 ├── lib/                    # Prisma y resolución de URL de base de datos
 ├── messages/               # Catálogo de mensajes/códigos de respuesta
 ├── middleware/             # Autenticación, validaciones y content-type
-├── public/                 # CSS y JavaScript del cliente
 ├── repository/             # Repositorio base
-├── routes/                 # Definición de rutas web y API
+├── routes/                 # Rutas API y operativas del proceso
 ├── services/               # Lógica de negocio por dominio
 ├── utils/                  # Utilidades compartidas
 ├── validators/             # Validadores de formularios y campos
-└── views/                  # Vistas EJS y layouts
+└── shared/                 # Contratos públicos compilados por Vue
 
 prisma/
 ├── schema.prisma           # Modelo de datos
@@ -91,7 +90,7 @@ scripts/                    # Scripts auxiliares de verificación
 
 La aplicación usa una separación por capas: las rutas delegan en controladores, los controladores coordinan validación/entrada y los servicios concentran la lógica de negocio. Prisma se crea desde `src/lib/prisma.js`, usando la URL resuelta por `src/lib/databaseUrl.js`.
 
-Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` componen
+Los registros centrales `src/routes/api/index.js` y `src/routes/system/index.js` componen
 los routers por dominio. `src/app.js` exporta `createApp()` sin abrir puertos;
 `src/server.js` crea HTTP y Socket.IO, escucha y coordina el cierre del proceso. Las convenciones equivalentes entre backend y frontend,
 incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en la
@@ -99,7 +98,7 @@ incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detall
 
 ## Documentación
 
-El [índice de documentación](docs/README.md#organización-de-los-artefactos) agrupa cada
+El [índice de documentación](docs/README.md) agrupa cada
 artefacto por familia, distingue su documento principal de los complementos y declara su
 fuente de verdad. El mapa de rutas y dependencias se genera desde el código; el esquema y
 el diccionario técnico se derivan de Prisma; los diagramas de diseño se mantienen de
@@ -112,8 +111,7 @@ forma curada. CI comprueba que el contenido generado esté actualizado.
 - Para modificar el servidor, consulta la
   [documentación técnica del backend](docs/architecture/views/development/backend-technical-documentation/index.md)
   y sus [responsabilidades por capa](docs/architecture/views/development/code-structure/index.md).
-- La [documentación de la interfaz EJS](docs/architecture/views/development/frontend-technical-documentation/index.md)
-  describe sus pantallas y controles visuales.
+- La [documentación de Vue](../front/docs/index.md) describe pantallas, captura y componentes.
 
 ## Requisitos
 
@@ -151,7 +149,7 @@ Git no mueve el `.env`, las dependencias ni el cliente Prisma generado de tu equ
 
 ### Dependencias y actualizaciones
 
-Se actualizan dotenv 18, EJS 7 y Vitest 5 con su
+Se actualizan dotenv 18 y Vitest 5 con su
 proveedor V8 de la misma versión. Prisma conserva la versión estable 7.10.1 en
 CLI, cliente y adaptador; una etiqueta `latest` con `8.0.0-rc` no representa una
 versión estable para producción.
@@ -303,45 +301,26 @@ reúne API, Vue, base de datos, pruebas, capturas y publicación desde la raíz.
 | `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
 | `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
 | `npm run docs:export` | Genera todos los paquetes en DOCX y PDF; acepta opcionalmente `<paquete> <docx\|pdf\|ambos>` para limitar la ejecución. |
-| `npm run docs:screenshots -- --area <almacen\|sistemas>` | Comprueba o inicia Nexus, genera en Chromium las capturas del área y detiene la instancia temporal al terminar. |
 
 ## Publicación de documentos y capturas
 
-Los manuales por cuenta de **Vue** se generan desde `front/`; consulte sus
-[comandos](../front/docs/development/00-commands.md#capturas-y-manuales-por-cuenta).
-Los comandos de capturas de este backend corresponden a la interfaz EJS.
-
-Estos procesos no forman parte del arranque normal de Nexus y requieren herramientas distintas:
-
-- la **exportación** usa las dependencias instaladas por `npm ci` y Pandoc; prepara Mermaid CLI
-  para los diagramas y LibreOffice para PDF cuando hacen falta;
-- la **captura** usa Playwright y su navegador Chromium, además de Nexus en ejecución, una base de
-  datos ficticia con estados específicos y una sesión autenticada con los permisos necesarios.
-
-La guía completa y secuencial —instalación por sistema operativo, validación, nombres de paquetes,
-creación y eliminación del estado de sesión, cierre de Playwright y detención de Nexus— está en
-[Exportar la documentación](docs/governance/document-export-guide/index.md). No ejecute
-`docs:screenshots` sólo para exportar: Pandoc reutiliza las imágenes ya revisadas.
-La sintaxis admitida para ambos procesos se concentra en la sección
-[Comandos](docs/governance/document-export-guide/04-commands.md).
+La documentación técnica se exporta con `npm run docs:export`. Los manuales y
+capturas pertenecen a `front/`; sus [comandos](../front/docs/development/00-commands.md)
+y [guía por cuenta](../front/docs/governance/06-manuals-by-access.md) definen preparación,
+permisos y reanudación. La captura no realiza escrituras para preparar imágenes.
+La exportación técnica usa Pandoc, Mermaid y las herramientas indicadas en la
+[guía documental](docs/governance/document-export-guide/index.md).
 
 ## Rutas principales
 
-### Vistas web
+### Operación del proceso
 
-- `/` página de inicio.
-- `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
-- `/materiales`, `/almacen/consumibles`, `/mermas` y `/salidas-almacen` para inventario.
-- `/compras/materiales` y `/compras/consumibles` para compras separadas por contexto;
-  `/compras` redirige a `/compras/materiales`.
-- `/proveedores` para el catálogo administrativo de proveedores.
-- `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
-- `/clientes` como catálogo contextual administrado por sistemas.
+- `/health/live` comprueba vida; `/health/ready`, disponibilidad de PostgreSQL.
+- `/api-docs/` presenta Swagger UI en desarrollo.
+- `POST /cerrar-sesion` elimina cookies y devuelve el navegador al login Vue con 303.
 
-Las tablas de detalle son responsivas. En compras se prioriza la columna de acciones y,
-en salidas, se conservan con la misma prioridad la cantidad convertida y el control para
-surtir; las columnas menos operativas pasan primero al detalle desplegable cuando se
-reduce el ancho disponible.
+Las pantallas se sirven desde Vue; sus rutas y estados pertenecen al
+[cliente](../front/docs/architecture/views/scenarios/navigation-and-screens.md).
 
 ### API REST
 
@@ -404,7 +383,7 @@ permanece observando cambios y se cierra con `Ctrl+C`.
 - Usa DTOs para normalizar entradas/salidas cuando aplique.
 - Usa `AppError` y errores de dominio para respuestas controladas.
 - Agrega validadores en `src/validators` para nuevas entradas de usuario.
-- Mantén las rutas agrupadas por dominio en `src/routes/web` y `src/routes/api`.
+- Mantén las rutas agrupadas por dominio en `src/routes/system` y `src/routes/api`.
 - Registra cada router nuevo en el `index.js` web o API correspondiente; `src/app.js`
   sólo debe coordinar infraestructura y los registros principales.
 - Reutiliza componentes y casos de uso existentes cuando un CRUD cambie únicamente de

@@ -56,7 +56,7 @@ sequenceDiagram
 [PersonEditorPage.vue](../../../../../src/modules/identity/pages/PersonEditorPage.vue),
 [usePersonEditor.ts](../../../../../src/modules/identity/composables/usePersonEditor.ts),
 [useOrganizationOptions.ts](../../../../../src/shared/composables/useOrganizationOptions.ts),
-[personAccessValidation](../../../../../../back/src/public/js/utils/validations/validators.js).
+[personAccessValidation](../../../../../../back/src/shared/validation/validators.js).
 
 ## Secuencias relacionadas
 

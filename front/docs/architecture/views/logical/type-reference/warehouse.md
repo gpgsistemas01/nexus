@@ -120,12 +120,13 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryImportDialog.defineProps
 
-**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 16, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 21, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `resource` | `resource: InventoryResource;` |
 | `mode` | `mode: InventoryImportMode;` |
+| `availableModes` | `availableModes: readonly InventoryImportMode[];` |
 | `batch` | `batch: InventoryImportBatch \| null;` |
 | `file` | `file: File \| null;` |
 | `isWorking` | `isWorking: boolean;` |
@@ -144,17 +145,18 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 | dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
+| dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `availableModes` |
 | association | [InventoryImportBatch](../../../../../src/modules/warehouse/inventoryImport.ts) | `batch` |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `suppliers` |
 
 ## InventoryImportDialog.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 39, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `mode` | `mode: [value: InventoryImportMode];` |
 | `file` | `file: [value: File \| null];` |
+| `mode` | `mode: [value: InventoryImportMode];` |
 | `prepare` | `prepare: [];` |
 | `confirm` | `confirm: [];` |
 | `recover` | `recover: [];` |
@@ -477,17 +479,17 @@ Record<string, string | number | boolean | null>
 
 ## InventoryImportMode
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 3, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 8, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
 ```typescript
-'create' | 'update'
+(typeof INVENTORY_IMPORT_MODES)[keyof typeof INVENTORY_IMPORT_MODES]
 ```
 
 ## ImportValue
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 4, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 14, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -497,14 +499,14 @@ string | number | boolean | null
 
 ## InventoryImportRow
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 5, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 15, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `row` | `row: number;` |
 | `id` | `id: string \| null;` |
 | `name` | `name: string;` |
-| `action` | `action: 'create' \| 'update' \| 'unchanged' \| 'error';` |
+| `action` | `action: (typeof INVENTORY_IMPORT_ROW_ACTIONS)[keyof typeof INVENTORY_IMPORT_ROW_ACTIONS];` |
 | `before` | `before: Record<string, ImportValue> \| null;` |
 | `after` | `after: Record<string, ImportValue> \| null;` |
 | `details` | `details: Record<string, ImportValue>;` |
@@ -519,7 +521,7 @@ string | number | boolean | null
 
 ## InventoryImportPreview
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 16, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 26, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -532,7 +534,7 @@ string | number | boolean | null
 
 ## InventoryImportBatch
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 20, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 30, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -540,7 +542,7 @@ string | number | boolean | null
 | `version` | `version: number;` |
 | `resource` | `resource: InventoryResource;` |
 | `mode` | `mode: InventoryImportMode;` |
-| `status` | `status: 'DRAFT' \| 'COMPLETED' \| 'CANCELED' \| 'EXPIRED';` |
+| `status` | `status: (typeof INVENTORY_IMPORT_STATUSES)[keyof typeof INVENTORY_IMPORT_STATUSES];` |
 | `filename` | `filename: string;` |
 | `expiresAt` | `expiresAt: string;` |
 | `preview` | `preview: InventoryImportPreview \| null;` |
@@ -555,7 +557,7 @@ string | number | boolean | null
 
 ## PendingInventoryImport
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 31, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 41, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -604,13 +606,15 @@ string | number | boolean | null
 
 ## InventoryImportPage.defineProps
 
-**Fuente:** [src/modules/warehouse/pages/InventoryImportPage.vue](../../../../../src/modules/warehouse/pages/InventoryImportPage.vue) · línea 8, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryImportPage.vue](../../../../../src/modules/warehouse/pages/InventoryImportPage.vue) · línea 9, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `resource` | `resource: InventoryResource;` |
 | `userId` | `userId: string;` |
 | `canReadSuppliers` | `canReadSuppliers: boolean;` |
+| `canEditData` | `canEditData: boolean;` |
+| `canAdjust` | `canAdjust: boolean;` |
 | `initialSupplierId` | `initialSupplierId: string;` |
 | `initialSearch` | `initialSearch: string;` |
 
@@ -620,7 +624,7 @@ string | number | boolean | null
 
 ## InventoryImportPage.defineEmits
 
-**Fuente:** [src/modules/warehouse/pages/InventoryImportPage.vue](../../../../../src/modules/warehouse/pages/InventoryImportPage.vue) · línea 15, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryImportPage.vue](../../../../../src/modules/warehouse/pages/InventoryImportPage.vue) · línea 18, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

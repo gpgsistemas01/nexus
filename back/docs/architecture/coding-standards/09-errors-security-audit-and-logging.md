@@ -4,13 +4,13 @@
   se responde con una forma de error exclusiva de un endpoint.
 - Las reglas de `express-validator` entregan códigos declarados en `errorMap`; no
   incluyen mensajes visibles literales en `withMessage`. Todo código nuevo que deba
-  mostrarse se registra también en `public/js/constants/apiMessages.js` para conservar
+  mostrarse se registra también en `shared/messages/apiMessages.js` para conservar
   una sola traducción de servidor a interfaz.
 - Los mensajes para el cliente no exponen stack traces, SQL, credenciales ni detalles
   internos.
 - Autenticación y autorización permanecen en middleware y servidor. Ocultar un control
   en la interfaz no sustituye verificar el permiso.
-- Todo JavaScript entregado al navegador, incluido `/shared`, es público y el usuario
+- Todo JavaScript entregado al navegador, incluidos los módulos públicos compartidos, es público y el usuario
   puede modificar su copia. La seguridad de una escritura debe mantenerse ante una
   solicitud directa que omita el formulario o altere sus campos.
 - El servidor calcula los importes y demás resultados derivados que guarda a partir
@@ -44,11 +44,9 @@ de línea para observaciones. Cada campo puede aplicar una regla más específic
 histórico no representa un filtro XSS ni una validación recursiva.
 
 El escape pertenece al contexto de salida. Vue interpola texto de forma segura; no
-se introduce `v-html` para nombres, observaciones o errores del servidor. EJS usa
-`<%=` para texto y atributos. Para datos JSON dentro de `<script>`, se usa
-`serializeScriptData`, disponible en los locals de Express: `JSON.stringify` solo
-no impide que una entrada con `</script>` cierre la etiqueta. No se guardan entidades
-HTML en la base para intentar resolver el escape de todas las salidas.
+se introduce `v-html` para nombres, observaciones o errores del servidor.
+Las respuestas JSON contienen datos y los componentes los presentan como texto.
+No se guardan entidades HTML en la base para resolver el escape de las salidas.
 
 ### Qué significa sanitizar en este proyecto
 
@@ -67,7 +65,6 @@ Axios que borre etiquetas no sustituye ninguno de esos controles.
 | Booleanos, números, fechas y detalles | Validar tipo, rango, precisión, calendario e items antes de convertir; no usar `parseInt`, `Boolean` o `Number` para decidir por sí solos que una captura es válida. |
 | Identificadores y campos adicionales | El DTO admite sólo los campos del caso. El servicio resuelve existencia, pertenencia, estado y versión; un UUID válido no concede autorización. `findManagedCatalog` sólo resuelve propiedades propias del registro. |
 | SQL | Prisma o parámetros de consulta. Los dos `$executeRawUnsafe` de costos usan SQL fijo con placeholders y valores separados; no se insertan nombres o capturas en el texto SQL. El escape HTML no protege una consulta. |
-| HTML EJS / JSON en script | `<%=` para texto y atributos entre comillas; `<%-` sólo para composición confiable o JSON producido por `serializeScriptData`. Ese helper se limita a datos JSON, no permite insertar funciones ni código. |
 | Vue y avisos | Interpolación y props de texto; SweetAlert2 usa `titleText`/`text`. El frontend no usa `v-html`, `innerHTML` ni HTML procedente de un error. El [estándar de seguridad de Vue](../../../../front/docs/architecture/security-standards.md) establece estas reglas. |
 
 `TEXT_INPUT_PATTERN` conserva restricciones históricas de captura; su exclusión de
@@ -80,7 +77,7 @@ o claves debe revisar comparación, unicidad e históricos antes de adoptarse.
 
 **Identificador:** `DIA-SEC-FRO-001`. **Pregunta:** ¿dónde se verifica cada dato y
 dónde se adapta la salida? **Fuente:** routers API, validators, DTOs, servicios,
-`catalogDTO`, Prisma y serializador EJS. Es un recorrido de responsabilidades;
+`catalogDTO`, Prisma y presentación Vue. Es un recorrido de responsabilidades;
 el orden de autenticación, permiso y validación se conserva en cada router.
 
 ```mermaid
@@ -95,7 +92,6 @@ flowchart TB
     service --> db["Prisma / SQL parametrizado"]
     controller --> json["res.json<br/>datos, no HTML"]
     json --> text["Vue / SweetAlert2<br/>salida como texto"]
-    legacy["Datos para vistas EJS"] --> output["Escape de HTML o<br/>serializeScriptData para JSON"]
 ```
 
 Los DTOs usados desde el controller entregan su resultado al servicio; el DTO de

@@ -9,7 +9,6 @@ export default defineConfig({
         coverage: {
             provider: 'v8',
             include: ['src/**/*.js'],
-            exclude: ['src/public/**'],
             reporter: ['text-summary', 'html', 'lcov', 'json-summary'],
             reportsDirectory: 'coverage/integration',
             reportOnFailure: true

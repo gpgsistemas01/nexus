@@ -21,7 +21,7 @@ npm run docs:export -- arquitectura contrato-api ambos
 | Exportación | Publica esta colección en Word/PDF y genera el contrato JSON. Revisar los archivos antes de distribuirlos. |
 
 Los validadores comprueban la descripción; las pruebas HTTP verifican el comportamiento.
-Las reglas de negocio permanecen en requisitos y las vistas EJS en su propia colección.
+Las reglas de negocio permanecen en requisitos y la interfaz Vue en su propia colección.
 
 ## Swagger UI en desarrollo
 

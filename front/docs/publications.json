@@ -197,9 +197,9 @@
         },
         "propuestas": {
             "title": "Conciliación de inventario propuesta",
-            "entry": "development/06-inventory-reconciliation-proposal.md",
+            "entry": "development/06-inventory-reconciliation.md",
             "includeInComplete": false,
-            "sources": ["development/06-inventory-reconciliation-proposal.md"]
+            "sources": ["development/06-inventory-reconciliation.md"]
         }
     }
 }
