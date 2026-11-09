@@ -2,9 +2,16 @@
 
 ## Producto documental
 
-El generador inicia sesión, consulta `/api/auth/me` y selecciona tareas y capturas
+La captura inicia sesión, consulta `/api/auth/me` y selecciona tareas y capturas
 con los mismos permisos que consume Vue. Una cuenta con varias asignaciones
 activas recibe la unión de sus funciones. El generador no concede permisos.
+
+`docs:screenshots` prepara fuentes y capturas sin exportar documentos.
+`docs:manuals` exporta Word/PDF desde la edición preparada y verificada, sin
+Playwright, servicios ni credenciales. Una edición incompleta requiere ejecutar
+el comando de capturas; exportar no la completa automáticamente. Los manuales
+reflejan el acceso verificado al capturar: un cambio de asignaciones exige repetir
+esa etapa antes de distribuir una edición nueva.
 
 Se ejecuta sólo en desarrollo local. Las URLs se validan también en Playwright;
 los comandos de generación rechazan el entorno de producción.
@@ -65,15 +72,15 @@ asignaciones conservan la unión de sus permisos.
 | [capture.mjs](../../scripts/manual/capture.mjs) | Cancelación de la página al agotar el tiempo y espera de la operación antes de continuar. |
 | [paths.mjs](../../scripts/manual/paths.mjs) | Directorio local por cuenta, traslado desde la ubicación anterior y exclusión del catálogo general. |
 | [preparation.mjs](../../scripts/manual/preparation.mjs) | Búsqueda paginada de referencias ROLLO y preparación de documentos con consultas simultáneas acotadas. |
-| [manuals.mjs](../../scripts/manuals.mjs) | Selección de perfiles, capturas y exportación con el motor común. |
+| [manuals.mjs](../../scripts/manuals.mjs) | Dos comandos independientes: `capture` ejecuta el recorrido; `export` valida ediciones preparadas y usa el motor común. |
 | [profileManuals.spec.ts](../../tests/manual-profiles/profileManuals.spec.ts) | Sesión aislada, control de escrituras y recuperación de capturas. |
 | [captureRecipes.ts](../../tests/manual-profiles/captureRecipes.ts) | Recorridos visibles sin confirmar operaciones. |
 | [selectPreparation.ts](../../tests/manual-profiles/selectPreparation.ts) | Lecturas de preparación con la sesión del navegador y selección visible de proveedor/material; una referencia por cuenta. |
 
 ## Configuración interna del recorrido
 
-`manuals.mjs` lee los archivos locales y pasa estas variables a Playwright durante
-la ejecución. No requieren otro `.env` ni se completan manualmente:
+Al capturar, `manuals.mjs` lee los archivos locales y pasa estas variables a Playwright.
+No se utilizan al exportar. No requieren otro `.env` ni se completan manualmente:
 
 | Variables | Función |
 | --- | --- |
@@ -93,15 +100,13 @@ el exportador común. Las flechas expresan dependencia y orden del flujo documen
 el diagrama no representa operaciones de inventario.
 
 ```mermaid
-flowchart TB
-    cfg["Cuentas y variables locales"] --> auth["Autenticar"]
-    auth --> session["Consultar /api/auth/me"]
-    session --> plan["Seleccionar tareas permitidas"]
-    source["Fuentes del manual"] --> plan
-    plan --> capture["Capturas con esa cuenta"]
-    capture --> ready{"¿Completo y vigente?"}
-    ready -->|No| pending["Guardar pendientes"]
-    pending --> capture
+flowchart LR
+    cfg["Cuentas y credenciales"] --> capture["docs:screenshots<br/>Autenticar, seleccionar tareas y capturar"]
+    source["Fuentes del manual"] --> capture
+    capture --> saved["Fuentes, PNG y manifiesto"]
+    saved -.->|Datos preparados| export["docs:manuals<br/>Leer edición preparada"]
+    export --> ready{"¿Completa y verificada?"}
+    ready -->|No| blocked["Informar que requiere capturas"]
     ready -->|Sí| publish["Exportar Word y PDF"]
 ```
 
@@ -115,8 +120,8 @@ El navegador bloquea escrituras de negocio; permite la renovación de sesión.
 Abrir formularios o agregar detalles a un borrador no los guarda. Al terminar se
 comprueba de nuevo el acceso: si cambió, se interrumpe la publicación. Una imagen
 requerida ausente deja el manual pendiente; no se sustituye por otra de administración.
-Antes de exportar, se contrastan capítulos e imágenes con los permisos de esa
-cuenta. Cada referencia debe pertenecer a su selección y carpeta; cada PNG debe
+Antes de exportar, se contrastan capítulos e imágenes con los permisos verificados
+en la captura de esa cuenta. Cada referencia debe pertenecer a su selección y carpeta; cada PNG debe
 conservar la huella verificada. Un archivo de otra cuenta no cubre una captura faltante.
 Los ejemplos históricos son condicionales en `dev`: su ausencia se registra y se
 conserva la explicación textual del estado. Las capturas de acciones siguen siendo

@@ -131,6 +131,11 @@ reales de `RemoteSelect`, incluidos filtros y altas contextuales con API simulad
 
 ## Preparación y recuperación de capturas del manual
 
+La captura y la exportación son comandos independientes. Se retiró la combinación
+automática y su opción `--capture-only`; las decisiones se cubren con las operaciones
+`capture` y `export` y sus opciones específicas, conservando los rechazos de entorno,
+acceso, selección e integridad de imágenes.
+
 `manualProfilesTest.ts` comprueba la publicación de los quince perfiles de
 referencia con sus propias selecciones. Añade rechazos de capítulos sin permiso,
 imágenes no seleccionadas, rutas de otra cuenta, capturas ausentes y huellas
@@ -144,6 +149,10 @@ modificadas. La disponibilidad de un PNG en otro perfil no completa el seleccion
 | `DP-VUE-MAN-004` | Publicar importación o modos no autorizados; tabla de decisión de lectura, escritura, costos y ajuste. | Lectura/escritura/costos o lectura/ajuste habilitan el procedimiento; lectura sola, escritura sin costos, costos sin escritura o falta de lectura lo excluyen en Materiales, Consumibles y Mermas. | `manualProfilesTest.ts`; variante documental de `CP-VUE-MAN-001-01`. |
 | `DP-VUE-MAN-004` | Continuar con consultas huérfanas tras un límite o saturar la preparación; transiciones consulta → cancelación → captura siguiente. | La página se cierra y la tarea termina antes de continuar en la misma cuenta. Las consultas se limitan a cuatro simultáneas y sus lotes terminan antes de devolver un resultado o error; un fallo del servicio no se presenta como falta de datos. | `manualCaptureRunTest.ts`, `manualPreparationTest.ts` y `manualCapture.spec.ts`. |
 | `DP-VUE-MAN-005` | Publicar una selección parcial o atribuir escritura a consulta; particiones por permiso y conjunto completo/omitido/repetido. | Los capítulos y capturas coinciden con la selección de la sesión. Retirar un capítulo, captura o referencia requerida bloquea la publicación; los ejemplos sin datos conservan su excepción. Consulta no recibe instrucciones, imágenes ni alcance de escritura. | `manualProfilesTest.ts`; `CP-VUE-MAN-001-01`. |
+| `DP-VUE-MAN-006` | Mezclar captura y publicación; particiones por comando, formato, edición lista/ausente/incompleta y modo compatible/cruzado. | Capturar no exporta documentos. Exportar conserva PNG, no abre navegador ni requiere credenciales, valida las ediciones antes de publicar y rechaza opciones de captura. | `manualCommandsTest.ts`, `manualOptionsTest.ts`; variante de `CP-VUE-MAN-001-01`. |
+
+El recorrido demo real y la exportación Word/PDF complementan esa evidencia con
+herramientas instaladas.
 
 Las capturas de compra mixta se retiraron por duplicar la explicación de estados.
 `purchases.spec.ts` conserva su caso funcional: una compra con partidas activas y

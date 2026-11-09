@@ -26,12 +26,15 @@ reúne las variantes por cuenta, formato y reanudación.
 
 | Necesidad | Comando o modo | Requisitos |
 | --- | --- | --- |
-| Sólo capturas por cuenta | `npm run docs:screenshots -- --all` | API funcionando, cuentas y los dos archivos locales. Inicia Vue si hace falta. |
-| Capturas y manuales por cuenta | `npm run docs:manuals -- --all` | Lo anterior y herramientas de Word/PDF. |
-| Revisar ediciones ficticias | `npm run docs:manuals -- --mode demo --all` | Perfiles incluidos; no usa credenciales. Inicia Vite en el puerto 5177. |
+| Capturas por cuenta | `npm run docs:screenshots -- --all` | API funcionando, cuentas y credenciales locales. Inicia Vue si hace falta; no exporta documentos. |
+| Word/PDF desde capturas preparadas | `npm run docs:manuals -- --all` | Fuentes y capturas verificadas de cada cuenta y herramientas de Word/PDF. No inicia navegador ni servicios. |
+| Capturas ficticias | `npm run docs:screenshots -- --mode demo --all` | Perfiles incluidos; no usa credenciales. Inicia Vite en el puerto 5177. |
+| Word/PDF ficticios | `npm run docs:manuals -- --mode demo --all` | Capturas demo preparadas y herramientas de Word/PDF. |
 
-El modo predeterminado es `dev`: ambos comandos leen
-`manual.accounts.local.json` y `.env.manual.local`. `docs:manual` es un alias de
+El modo predeterminado es `dev`: ambos comandos seleccionan cuentas de
+`manual.accounts.local.json`; sólo capturar lee `.env.manual.local` e inicia sesión.
+La exportación reutiliza el acceso verificado y las fuentes preparadas durante la captura.
+`docs:manual` es un alias de
 `docs:manuals`. Los comandos con sufijo `:reference` mantienen las capturas y el
 manual general descritos en [mantenimiento](05-user-manual.md).
 
@@ -158,9 +161,11 @@ en el JSON ni en archivos versionados.
 Si falta el usuario o la contraseña, o alguno está vacío, la cuenta se omite.
 Puedes dejar sin completar las cuentas que todavía no utilizarás.
 
-## 7. Generar capturas y manuales
+## 7. Capturar y exportar en dos pasos
 
-Con la API funcionando, elige el resultado que necesitas; Vue se prepara automáticamente.
+Primero prepare las capturas. En `dev`, mantenga la API funcionando; el comando de
+capturas prepara Vue automáticamente. Esta etapa también prepara las fuentes
+filtradas y el manifiesto de la cuenta, sin generar Word/PDF.
 
 Sólo capturas de una cuenta:
 
@@ -174,17 +179,24 @@ Sólo capturas de todas las cuentas del JSON:
 npm run docs:screenshots -- --all
 ```
 
-Capturas actualizadas y manuales Word/PDF de todas las cuentas en una ejecución:
+Después, exporte Word/PDF desde las capturas preparadas:
 
 ```bash
 npm run docs:manuals -- --all --format ambos
 ```
 
-Sustituye `--all` por `--profile cuenta-01` para generar una sola edición.
-`--profile` usa el `id` del JSON. La herramienta comprueba sus credenciales antes
-de abrir el navegador, informa los identificadores omitidos sin mostrar valores
-y autentica las cuentas completas por separado. `--all` selecciona la lista del
-JSON, no todos los usuarios de la base ni todas las variables del `.env`.
+Sustituya `--all` por `--profile cuenta-01` para seleccionar una sola cuenta.
+`--profile` usa el `id` del JSON. Al capturar, la herramienta comprueba las credenciales
+antes de abrir el navegador e informa las cuentas omitidas sin mostrar sus valores.
+`--all` selecciona la lista del JSON, no todos los usuarios de la base ni todas las
+variables del `.env`.
+
+Exportar no abre el navegador, inicia servicios, consulta la API ni lee credenciales.
+Con `--all`, informa y omite las cuentas que aún no tienen capturas preparadas. Si
+una edición existente está incompleta, tiene imágenes alteradas o corresponde a
+otro modo, bloquea la exportación antes de publicar cualquiera de las seleccionadas.
+Con `--profile`, una edición ausente también es un error. Ejecute `docs:screenshots`
+para resolverlo y vuelva a exportar; la exportación nunca captura automáticamente.
 
 Las cuentas se procesan una por una, en el orden del JSON. Sus capturas siguen
 el orden de archivo: `09`, `09a`, `09b`, `10`. La consola muestra cuenta, número,
@@ -218,17 +230,19 @@ Si no hay cuentas con credenciales completas, termina sin abrir el navegador ni
 exportar documentos. Las cuentas omitidas conservan sus archivos anteriores;
 esta ejecución no actualiza sus capturas ni sus manuales.
 
-Para revisar las opciones, usa `npm run docs:manuals -- --help`.
+Para revisar las opciones de cada etapa, use `npm run docs:screenshots -- --help`
+y `npm run docs:manuals -- --help`.
 Para una edición ficticia:
 
 ```bash
+npm run docs:screenshots -- --mode demo --profile instalaciones-instalador
 npm run docs:manuals -- --mode demo --profile instalaciones-instalador --format ambos
 ```
 
 En `demo`, sustituir `--profile instalaciones-instalador` por `--all` para revisar
 todos los perfiles incluidos. Este modo no lee credenciales ni demuestra permisos
-de una instalación real. Añadir `--capture-only` obtiene fuentes y capturas sin
-invocar Pandoc/LibreOffice.
+de una instalación real. Capturar no invoca Pandoc/LibreOffice; exportar requiere
+las capturas del mismo modo y no ejecuta Playwright.
 
 ## 8. Entender los archivos generados
 
@@ -262,10 +276,11 @@ copiar cookies del navegador.
 ## 9. Reanudar y localizar un problema
 
 ```bash
-npm run docs:manuals -- --profile cuenta-01 --missing --format ambos
+npm run docs:screenshots -- --profile cuenta-01 --missing
+npm run docs:manuals -- --profile cuenta-01 --format ambos
 ```
 
-El comando principal reanuda por defecto: en el primer uso captura todo y después
+El comando de capturas reanuda por defecto: en el primer uso captura todo y después
 conserva las imágenes completas con la misma cuenta, acceso, modo, interfaz
 y huella del PNG. Completa las faltantes o desactualizadas en cada cuenta
 de `--all`; `--missing` conserva ese mismo comportamiento.
@@ -276,6 +291,10 @@ Cambiar Vue, el acceso o el entorno invalida las capturas. Editar el texto del
 manual o sus herramientas conserva las imágenes verificadas; las referencias
 nuevas se capturan por estar faltantes. Use `--fresh` para revisar un recorrido
 modificado o buscar de nuevo ejemplos antes marcados como `unavailable`.
+Después de cambiar textos, ejecute también esta etapa para actualizar las fuentes
+filtradas, conservando los PNG verificados que sigan vigentes. La exportación utiliza
+esa edición preparada. Si cambia el acceso de una cuenta, vuelva a capturar con ella
+antes de distribuir el manual; exportar no consulta de nuevo sus permisos.
 
 | Situación | Recuperación |
 | --- | --- |
@@ -300,7 +319,9 @@ modificado o buscar de nuevo ejemplos antes marcados como `unavailable`.
 | Cambió el acceso | Autenticar de nuevo y regenerar la edición. |
 | Cambió un PNG | Recapturar; la imagen alterada no se publica como verificada. |
 | Capítulo o imagen ajenos a la selección | Regenerar la edición con esa cuenta. La exportación contrasta los permisos y sólo admite capturas verificadas de su carpeta. No copiar archivos entre cuentas. |
-| Falla Word/PDF | Revisar Pandoc/LibreOffice y código de salida. Una versión anterior no acredita la ejecución actual. |
+| Faltan capturas al exportar | Ejecutar `docs:screenshots` para la cuenta y después `docs:manuals`; exportar no abre el navegador para resolver faltantes. |
+| El modo no coincide | Preparar las capturas en el modo `dev` o `demo` solicitado. No se mezclan los modos al exportar. |
+| Falla Word/PDF | Revisar Pandoc/LibreOffice y repetir `docs:manuals` con las capturas preparadas. No hace falta recapturar por un fallo del conversor. Una versión anterior no acredita la ejecución actual. |
 
 ## 10. Revisar y distribuir
 

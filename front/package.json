@@ -23,9 +23,9 @@
     "docs:generate": "node scripts/docs.mjs generate",
     "docs:check": "node scripts/docs.mjs check",
     "docs:export": "node scripts/docs.mjs export",
-    "docs:manual": "node scripts/manuals.mjs",
-    "docs:manuals": "node scripts/manuals.mjs",
-    "docs:screenshots": "node scripts/manuals.mjs --capture-only",
+    "docs:manual": "node scripts/manuals.mjs export",
+    "docs:manuals": "node scripts/manuals.mjs export",
+    "docs:screenshots": "node scripts/manuals.mjs capture",
     "docs:manual:reference": "node scripts/docs.mjs export manual",
     "docs:screenshots:reference": "playwright test --config playwright.manual.config.ts"
   },

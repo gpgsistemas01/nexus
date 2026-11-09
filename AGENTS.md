@@ -89,7 +89,8 @@ en la raíz del repositorio.
 ## Capturas del manual
 
 - La automatización de capturas no crea ni modifica registros. Las capturas de edición requieren datos existentes y permisos adecuados en una sesión del entorno de prueba; un listado vacío no demuestra por sí solo una función pendiente de implementar.
-- Ante una captura pendiente, revisa su preparación y el selector antes de cambiar código. Conserva la reanudación automática con `npm run docs:screenshots -- --area <area>` y no omitas silenciosamente una captura requerida.
+- Ante una captura pendiente, revisa su preparación y el selector antes de cambiar código. Conserva la reanudación automática con `npm run docs:screenshots -- --profile <id>` y no omitas silenciosamente una captura requerida.
+- Captura imágenes con `docs:screenshots` y exporta el manual después con `docs:manuals`. Cada comando ejecuta sólo su etapa; la exportación utiliza fuentes y capturas preparadas, sin navegador ni generación automática de faltantes.
 
 ## Integración continua
 

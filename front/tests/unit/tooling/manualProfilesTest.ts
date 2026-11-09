@@ -699,6 +699,7 @@ it.each([['--all'], ['--profile', 'cuenta-01']])(
       process.execPath,
       [
         path.resolve('scripts/manuals.mjs'),
+        'capture',
         ...selection,
         '--accounts',
         configFile,
@@ -764,16 +765,16 @@ it.each([
   expect(() => parseManualBaseUrl(baseUrl)).toThrow('sólo de desarrollo local');
 });
 
-it.each([[], ['--capture-only']])(
-  'bloquea la generación en producción antes de leer credenciales: %j',
-  async (...args) => {
+it.each(['capture', 'export'])(
+  'bloquea %s en producción antes de leer credenciales',
+  async (command) => {
     const root = await tempRoot();
     const result = spawnSync(
       process.execPath,
       [
         path.resolve('scripts/manuals.mjs'),
+        command,
         '--all',
-        ...args,
         '--accounts',
         path.join(root, 'no-existe.json'),
       ],

@@ -96,10 +96,13 @@ ignoradas.
 
 ```bash
 npm run docs:check
+npm run docs:screenshots -- --all
 npm run docs:manuals -- --all
 ```
 
-El comando genera una edición por cuenta configurada. `docs:manual:reference -- ambos` reúne
+Las capturas y la exportación se ejecutan por separado. `docs:screenshots` prepara
+fuentes e imágenes por cuenta; `docs:manuals` sólo exporta las ediciones preparadas,
+sin navegador ni credenciales. `docs:manual:reference -- ambos` reúne
 todas las tareas en una referencia para mantenimiento; no es la edición por usuario.
 `docs:check` verifica enlaces y referencias de imagen sin iniciar el navegador ni
 exigir las capturas generadas. La exportación exige las imágenes del manual. Las rutas de

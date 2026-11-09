@@ -136,17 +136,19 @@ instalan en el equipo de desarrollo y quedan fuera de la imagen final de producc
 
 Prepara `front/manual.accounts.local.json` y `front/.env.manual.local` con la
 [guía por cuenta](docs/governance/07-manual-accounts-and-files.md). Mantén la API
-funcionando; el comando inicia Vite si hace falta o reutiliza el que ya esté activo.
+funcionando para capturar; ese comando inicia Vite si hace falta o reutiliza el existente.
 Elige desde la raíz:
 
 | Resultado | Comando |
 | --- | --- |
 | Sólo capturas por cuenta | `npm --prefix front run docs:screenshots -- --all` |
-| Capturas y manuales Word/PDF por cuenta | `npm --prefix front run docs:manuals -- --all` |
+| Word/PDF desde las capturas preparadas | `npm --prefix front run docs:manuals -- --all` |
 
-Ambos leen los mismos archivos locales y detectan áreas, roles y permisos al
-ingresar. Las cuentas sin usuario o sin contraseña se informan como omitidas y
-se continúa con las completas. Cada entrada del JSON identifica una cuenta y su
+Ejecute primero `docs:screenshots` y después `docs:manuals`. Sólo capturar lee
+credenciales e inicia sesión para detectar áreas, roles y permisos. Las cuentas sin
+credenciales completas se informan como omitidas. Exportar usa las fuentes y capturas
+verificadas, sin abrir navegador, iniciar servicios ni leer el archivo de credenciales.
+Cada entrada del JSON identifica una cuenta y su
 carpeta de imágenes en
 `front/docs/user-manual/accounts/<cuenta>/images/`. Usa `--profile <id>` en lugar de `--all`
 para procesar una sola cuenta; `--help` muestra las opciones.
