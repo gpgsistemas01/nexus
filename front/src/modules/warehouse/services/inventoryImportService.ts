@@ -1,5 +1,11 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
-import { INVENTORY_IMPORT_LIMITS } from '@nexus/inventory-imports';
+import {
+    INVENTORY_IMPORT_LIMITS,
+    INVENTORY_IMPORT_MODES,
+    LEGACY_INVENTORY_IMPORT_MODE,
+    INVENTORY_IMPORT_STATUSES,
+    INVENTORY_IMPORT_ROW_ACTIONS,
+} from '@nexus/inventory-imports';
 import { UUID_V4_PATTERN } from '@nexus/input-validation';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
@@ -11,6 +17,7 @@ import type { InventoryResource } from '../inventory.js';
 import type {
     InventoryImportBatch,
     InventoryImportMode,
+    InventoryImportOperation,
     PendingInventoryImport,
 } from '../inventoryImport.js';
 
@@ -39,16 +46,18 @@ const readBatch = (
         (expected.resource !== undefined && batch.resource !== expected.resource) ||
         (expected.mode !== undefined && batch.mode !== expected.mode) ||
         !['materials', 'consumables', 'wastes'].includes(String(batch.resource)) ||
-        !['create', 'update', 'adjust', 'mixed'].includes(String(batch.mode)) ||
-        !['DRAFT', 'COMPLETED', 'CANCELED', 'EXPIRED'].includes(String(batch.status)) ||
+        ![...Object.values(INVENTORY_IMPORT_MODES), LEGACY_INVENTORY_IMPORT_MODE].some(
+            (mode) => mode === batch.mode,
+        ) ||
+        !Object.values(INVENTORY_IMPORT_STATUSES).some((status) => status === batch.status) ||
         typeof batch.filename !== 'string' ||
         typeof batch.expiresAt !== 'string'
     )
         throw invalid();
 
     if (
-        (batch.status === 'DRAFT' && batch.preview === null) ||
-        (batch.status === 'COMPLETED' && batch.result === null)
+        (batch.status === INVENTORY_IMPORT_STATUSES.DRAFT && batch.preview === null) ||
+        (batch.status === INVENTORY_IMPORT_STATUSES.COMPLETED && batch.result === null)
     )
         throw invalid();
 
@@ -75,7 +84,9 @@ const readBatch = (
                 !isRecord(row) ||
                 !Number.isInteger(row.row) ||
                 typeof row.name !== 'string' ||
-                !['create', 'update', 'unchanged', 'error'].includes(String(row.action)) ||
+                !Object.values(INVENTORY_IMPORT_ROW_ACTIONS).some(
+                    (action) => action === row.action,
+                ) ||
                 !scalarRecord(row.before) ||
                 !scalarRecord(row.after) ||
                 !isRecord(row.details) ||
@@ -101,7 +112,7 @@ const readBatch = (
 export const inventoryImportService = {
     template(
         resource: InventoryResource,
-        mode: InventoryImportMode,
+        mode: InventoryImportOperation,
         query: { supplierId: string; search: string; page: number },
         signal: AbortSignal,
     ) {
@@ -116,7 +127,7 @@ export const inventoryImportService = {
     },
     async preview(
         resource: InventoryResource,
-        mode: InventoryImportMode,
+        mode: InventoryImportOperation,
         file: File,
         signal: AbortSignal,
     ) {
@@ -151,7 +162,7 @@ export const inventoryImportService = {
         );
         confirmMutation(result, successCodeMessages.INVENTORY_IMPORT_COMPLETED);
         const batch = readBatch(result, { id: pending.id });
-        if (batch.status !== 'COMPLETED') throw invalid();
+        if (batch.status !== INVENTORY_IMPORT_STATUSES.COMPLETED) throw invalid();
 
         return batch;
     },

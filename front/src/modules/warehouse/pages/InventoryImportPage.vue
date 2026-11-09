@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { INVENTORY_IMPORT_MODES as modes } from '@nexus/inventory-imports';
 import InventoryImportDialog from '../components/InventoryImportDialog.vue';
 import { useInventoryImport } from '../composables/useInventoryImport.js';
 import { useRemoteOptions } from '../composables/useRemoteOptions.js';
@@ -9,6 +10,8 @@ const props = defineProps<{
     resource: InventoryResource;
     userId: string;
     canReadSuppliers: boolean;
+    canEditData: boolean;
+    canAdjust: boolean;
     initialSupplierId: string;
     initialSearch: string;
 }>();
@@ -23,11 +26,17 @@ const suppliers = useRemoteOptions(
 const state = useInventoryImport({
     resource: props.resource,
     userId: props.userId,
-    initialMode: 'mixed',
+    availableModes: () => [
+        ...(props.canEditData ? [modes.CREATE, modes.UPDATE] : []),
+        ...(props.canAdjust ? [modes.ADJUST] : []),
+    ],
     onSaved: () => emit('saved'),
     onUnauthorized: () => emit('unauthorized'),
 });
 const { mode, batch, file, isWorking, error, recoveryRequired, canConfirm } = state;
+watch(mode, () => {
+    templatePage.value = 1;
+});
 const isDownloading = computed(
     () => state.template.isExporting.value || state.errors.isExporting.value,
 );
@@ -47,6 +56,7 @@ const download = () =>
     <InventoryImportDialog
         :resource="resource"
         :mode="mode"
+        :available-modes="state.availableModes.value"
         :batch="batch"
         :file="file"
         :is-working="isWorking"
@@ -61,6 +71,7 @@ const download = () =>
         :suppliers="suppliers.state.value"
         :can-read-suppliers="canReadSuppliers"
         @file="state.selectFile"
+        @mode="state.selectMode"
         @prepare="state.prepare"
         @confirm="state.confirm"
         @recover="state.recover"

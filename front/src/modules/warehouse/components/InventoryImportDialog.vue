@@ -5,16 +5,29 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { VFileInput } from 'vuetify/components/VFileInput';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VPagination } from 'vuetify/components/VPagination';
+import { VSelect } from 'vuetify/components/VSelect';
+import {
+    INVENTORY_IMPORT_MODES as modes,
+    INVENTORY_IMPORT_MODE_LABELS,
+    INVENTORY_IMPORT_LIMITS as limits,
+    LEGACY_INVENTORY_IMPORT_MODE,
+} from '@nexus/inventory-imports';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
-import { IMPORT_FIELD_LABELS } from '../inventoryImport.js';
-import type { ImportValue, InventoryImportBatch, InventoryImportMode } from '../inventoryImport.js';
+import { IMPORT_FIELD_LABELS, isInventoryImportOperation } from '../inventoryImport.js';
+import type {
+    ImportValue,
+    InventoryImportBatch,
+    InventoryImportMode,
+    InventoryImportOperation,
+} from '../inventoryImport.js';
 import type { InventoryResource } from '../inventory.js';
 import type { LookupState } from '../../../shared/lookup.js';
 
 const props = defineProps<{
     resource: InventoryResource;
     mode: InventoryImportMode;
+    availableModes: readonly InventoryImportOperation[];
     batch: InventoryImportBatch | null;
     file: File | null;
     isWorking: boolean;
@@ -31,6 +44,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
     file: [value: File | null];
+    mode: [value: InventoryImportOperation];
     prepare: [];
     confirm: [];
     recover: [];
@@ -53,6 +67,17 @@ watch(
     },
 );
 const preview = computed(() => props.batch?.result ?? props.batch?.preview);
+const modeOptions = computed(() =>
+    props.availableModes.map((value) => ({
+        value,
+        title: INVENTORY_IMPORT_MODE_LABELS[value],
+    })),
+);
+const modeLabel = computed(() =>
+    props.mode === LEGACY_INVENTORY_IMPORT_MODE
+        ? 'Operaciones mixtas (formato anterior)'
+        : INVENTORY_IMPORT_MODE_LABELS[props.mode],
+);
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
 );
@@ -86,6 +111,10 @@ const details = (value: Record<string, ImportValue>) =>
     );
 
 const locked = computed(() => props.isWorking || props.isDownloading);
+
+const selectMode = (value: unknown) => {
+    if (isInventoryImportOperation(value)) emit('mode', value);
+};
 </script>
 
 <template>
@@ -126,20 +155,27 @@ const locked = computed(() => props.isWorking || props.isDownloading);
             </VBtn>
         </VAlert>
         <template v-if="!batch && !recoveryRequired">
+            <VSelect
+                :model-value="mode"
+                :items="modeOptions"
+                label="Operación del archivo"
+                :disabled="locked"
+                class="mb-4"
+                @update:model-value="selectMode"
+            />
             <p class="mb-4">
                 {{
-                    mode === 'mixed'
-                        ? 'Usa un solo archivo. En cada fila elige Alta, Editar, Ajustar, Editar y ajustar o Conservar. Las altas no llevan ID; los registros existentes conservan sus IDs y versiones. Captura el stock inicial en las altas o el saldo físico final en los ajustes, con motivo y observaciones. Los permisos se validan para cada operación.'
-                        : mode === 'create'
-                          ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
-                          : mode === 'adjust'
-                            ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
-                            : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
+                    mode === modes.CREATE
+                        ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
+                        : mode === modes.ADJUST
+                          ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
+                          : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
                 }}
             </p>
             <p class="mb-4">
-                Un duplicado o error bloquea todo el archivo. La vista previa indica las filas que
-                debes corregir.
+                Todas las filas realizan la operación seleccionada. Descarga su plantilla y
+                selecciona esa misma operación al cargarla. Un duplicado o error bloquea todo el
+                archivo. Cambiar la operación retira el archivo seleccionado.
             </p>
             <div class="template-fields">
                 <RemoteSelect
@@ -157,22 +193,22 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                     :model-value="search"
                     label="Buscar registros de la plantilla"
                     :disabled="locked"
-                    maxlength="200"
+                    :maxlength="limits.maxSearchLength"
                     @update:model-value="emit('search', $event)"
                 />
                 <VTextField
-                    v-if="mode !== 'create'"
+                    v-if="mode !== modes.CREATE"
                     :model-value="templatePage"
                     label="Página de la plantilla (100 filas)"
                     type="number"
                     min="1"
-                    max="999"
+                    :max="limits.maxTemplatePage"
                     :disabled="locked"
                     @update:model-value="emit('templatePage', Number($event))"
                 />
             </div>
             <p
-                v-if="resource === 'wastes' && mode === 'create'"
+                v-if="resource === 'wastes' && mode === modes.CREATE"
                 class="mb-3"
             >
                 Selecciona el proveedor para incluir sus materiales de referencia en m². En el
@@ -183,10 +219,10 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                 class="mb-5"
                 :disabled="
                     locked ||
-                    (resource === 'wastes' && mode === 'create' && !supplierId) ||
+                    (resource === 'wastes' && mode === modes.CREATE && !supplierId) ||
                     !Number.isInteger(templatePage) ||
                     templatePage < 1 ||
-                    templatePage > 999
+                    templatePage > limits.maxTemplatePage
                 "
                 :loading="isDownloading"
                 @click="emit('template')"
@@ -210,7 +246,20 @@ const locked = computed(() => props.isWorking || props.isDownloading);
             </p>
         </template>
         <template v-if="batch">
+            <p class="mb-2">
+                Operación del archivo:
+                <strong>{{ modeLabel }}</strong>
+            </p>
             <p class="retention-note mb-3">Referencia: {{ batch.id }}</p>
+            <VAlert
+                v-if="batch.mode === LEGACY_INVENTORY_IMPORT_MODE && batch.status === 'DRAFT'"
+                type="warning"
+                variant="tonal"
+                class="mb-4"
+            >
+                Este borrador mezcla operaciones y ya no puede confirmarse. Descártalo y descarga
+                una plantilla para una sola operación.
+            </VAlert>
             <VAlert
                 v-if="batch.status === 'COMPLETED'"
                 type="success"

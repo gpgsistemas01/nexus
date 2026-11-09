@@ -339,7 +339,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- |
 | `canExport` | `canExport: () => boolean;` |
 | `request` | `request: (scope: Scope, signal: AbortSignal) => Promise<Blob>;` |
-| `filename` | `filename: string;` |
+| `filename` | `filename: string \| (() => string);` |
 | `onDenied` | `onDenied: (status: number) => void;` |
 
 ## InteractiveForm

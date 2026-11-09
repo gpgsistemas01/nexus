@@ -22,6 +22,9 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             alias: {
+                '@nexus/historical-deliveries': fileURLToPath(
+                    new URL('../back/src/shared/constants/historicalDelivery.js', import.meta.url),
+                ),
                 '@nexus/inventory-imports': fileURLToPath(
                     new URL('../back/src/shared/constants/inventoryImport.js', import.meta.url),
                 ),

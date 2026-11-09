@@ -3,6 +3,15 @@ import { RecordVersionConflictError } from '../../errors/concurrencyError.js';
 
 const requireEveryRow = (rows, count) => { if (rows.length !== count) throw new RecordVersionConflictError(); };
 
+export const lockInventoryImport = ({ tx, id, userId }) => tx.$queryRaw`
+    SELECT "id" FROM "InventoryImport" WHERE "id" = ${id}::uuid AND "userId" = ${userId}::uuid FOR UPDATE
+`;
+
+export const tryLockInventoryImportConfirmation = async ({ tx }) => {
+    const [gate] = await tx.$queryRaw`SELECT pg_try_advisory_xact_lock(733040, 1) AS allowed`;
+    return gate.allowed;
+};
+
 export const lockInventoryStockCount = async ({ tx, context }) => {
     const materials = new Map([...context.offers.values()].map(offer => [offer.material.id, offer.material]));
     const presentations = new Map([...materials.values(), ...context.wastes.values()].map(item => [item.presentation.id, item.presentation]));

@@ -6,7 +6,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineProps
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 14, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 15, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -26,7 +26,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineEmits
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 30, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 31, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

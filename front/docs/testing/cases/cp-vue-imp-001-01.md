@@ -19,8 +19,11 @@ La API simulada no prueba stock; la
 [integración HTTP/Prisma](../../../../back/tests/integration/controllers/inventoryImportControllerDbTest.js)
 comprueba recibos, movimientos, versiones y rollback reales.
 
-La variante de archivo único muestra tres filas: Alta de Lona, Editar costo 10→15
-y Ajustar stock 2→0. Una sola carga y confirmación devuelve las tres. La plantilla
-mixta permite operación por fila, conserva las columnas de IDs/versiones y comparte
-recuperación con contratos anteriores. El permiso de ajuste permite importar conteos
-sin lectura de costos; sin escritura/costos ni ajuste, el botón permanece oculto.
+La variante de conteo selecciona Ajustar existencias para todo el archivo y muestra
+stock 2→0. Cambiar de Alta a Ajustar retira el archivo previo y exige cargarlo otra
+vez. Se confirma una sola solicitud. Las plantillas de edición/alta conservan su
+operación en los parámetros y nombre de descarga. Un archivo incompatible muestra
+el rechazo sin confirmación. Un operador de ajuste sin lectura de costos sólo ve
+Ajustar existencias; sin escritura/costos ni ajuste, el botón permanece oculto.
+La integración contrasta columnas del reporte, IDs/versiones, conservación del destino,
+conteo real y recuperación de comprobantes mixtos anteriores.

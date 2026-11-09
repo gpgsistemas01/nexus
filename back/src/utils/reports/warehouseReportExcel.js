@@ -1,4 +1,5 @@
 import { createFormulaCell } from '../reportExcelUtils.js';
+import { INVENTORY_SPREADSHEET_COLUMNS } from '../../constants/inventorySpreadsheet.js';
 import { VAT_RATE, VAT_MULTIPLIER } from '../../shared/inventory/goodsReceiptCalculations.js';
 import { createWasteReportSummary } from '../../services/warehouse/wastes/wasteReportSummary.js';
 import { createMonthlyGoodsReceiptSummary } from '../../services/warehouse/goodsReceipts/goodsReceiptReportSummary.js';
@@ -68,31 +69,8 @@ export const buildIssueReportData = async function* (rows, { baseHeader = 'Base'
 };
 
 export const buildInventoryReportData = async function* (rows) {
-    yield [
-        'Proveedor',
-        'Material',
-        'Base',
-        'Altura',
-        'Stock actual',
-        'Stock mínimo',
-        'Presentación',
-        'Conversión',
-        'Unidad',
-        'Costo unitario'
-    ];
-
-    for await (const row of rows) yield [
-        row.supplier,
-        row.name,
-        row.base,
-        row.height,
-        row.currentStock,
-        row.minStock,
-        row.presentation,
-        row.convertedQuantity,
-        row.unitMeasure,
-        row.maxUnitCost
-    ];
+    yield INVENTORY_SPREADSHEET_COLUMNS.map(([header]) => header);
+    for await (const row of rows) yield INVENTORY_SPREADSHEET_COLUMNS.map(([, key]) => row[key]);
 };
 
 export const buildGoodsReceiptReportData = async function* (rows, { isConsumableReport = false, monthlyReport = false } = {}) {

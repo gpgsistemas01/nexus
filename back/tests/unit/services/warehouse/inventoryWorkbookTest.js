@@ -55,7 +55,7 @@ describe('fronteras y contenido del libro de inventario', () => {
         await expect(read(await inventoryWorkbook({ rows: [{ name: 'Material' }], alter })))
             .rejects.toMatchObject({ code: 'INVENTORY_IMPORT_LIMIT' });
     });
-    it.each(['materials', 'consumables', 'wastes'].flatMap(resource => ['create', 'update'].map(mode => ({ resource, mode }))))(
+    it.each(['materials', 'consumables', 'wastes'].flatMap(resource => ['create', 'update', 'adjust'].map(mode => ({ resource, mode }))))(
         'genera una plantilla $resource/$mode compatible con el lector anterior', async ({ resource, mode }) => {
             const { workbook } = await readExcelReport(Buffer.from(await processInventoryWorkbook({
                 action: 'template', config: getImportConfig(resource, mode), catalogs: {
@@ -72,12 +72,20 @@ describe('fronteras y contenido del libro de inventario', () => {
             expect(workbook.getWorksheet('Instrucciones').getCell('B2').value).toBe(resource);
             expect(workbook.getWorksheet('Instrucciones').getCell('B3').value).toBe(mode);
             const columns = getImportConfig(resource, mode).columns;
+            const common = ['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual', 'Stock mínimo', 'Presentación', 'Conversión', 'Unidad', 'Costo unitario']
+                .filter(header => mode !== 'adjust' || header !== 'Costo unitario');
+            expect(data.getRow(1).values.slice(1, common.length + 1)).toEqual(common);
+            expect(columns.some(([, key]) => key === 'operation')).toBe(false);
             const active = columns.findIndex(([, key]) => key === 'isActive') + 1;
-            expect(data.getRow(2).getCell(active).dataValidation).toMatchObject({ type: 'list', formulae: ['"SI,NO"'] });
-            if (mode === 'update') expect(data.getCell('A2').fill.fgColor.argb).toBe('FFE7EDF0');
+            if (mode !== 'adjust') expect(data.getRow(2).getCell(active).dataValidation).toMatchObject({ type: 'list', formulae: ['"SI,NO"'] });
+            if (mode !== 'create') {
+                const id = columns.findIndex(([, key]) => key === 'id') + 1;
+                expect(data.getRow(2).getCell(id).fill.fgColor.argb).toBe('FFE7EDF0');
+            }
             else {
                 const supplier = columns.findIndex(([, key]) => key === 'supplierCode') + 1;
                 expect(data.getRow(2).getCell(supplier).dataValidation.formulae).toEqual(["'Catalogos'!$A$2:$A$2"]);
+                expect(workbook.getWorksheet('Catalogos').getCell('A2').value).toBe('PRO-001 | Proveedor');
             }
             const name = columns.findIndex(([, key]) => key === 'name') + 1;
             data.getRow(2).getCell(name).value = 'Captura editada';

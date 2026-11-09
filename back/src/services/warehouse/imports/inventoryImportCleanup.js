@@ -1,3 +1,4 @@
+import { INVENTORY_IMPORT_STATUSES as statuses } from '../../../shared/constants/inventoryImport.js';
 import { Prisma } from '../../../../generated/prisma/client.ts';
 import { getDb } from '../../../repository/baseRepository.js';
 import { createServiceLogger } from '../../../utils/logger.js';
@@ -5,12 +6,12 @@ import { createServiceLogger } from '../../../utils/logger.js';
 const logger = createServiceLogger('warehouse.inventoryImport.cleanup');
 
 export const expireInventoryImportDrafts = async ({ db = getDb(), now = new Date() } = {}) => {
-    const expired = await db.inventoryImport.findMany({ where: { status: 'DRAFT', expiresAt: { lte: now } },
+    const expired = await db.inventoryImport.findMany({ where: { status: statuses.DRAFT, expiresAt: { lte: now } },
         orderBy: [{ expiresAt: 'asc' }, { id: 'asc' }], take: 100, select: { id: true } });
     if (!expired.length) return 0;
     const result = await db.inventoryImport.updateMany({ where: {
-        id: { in: expired.map(row => row.id) }, status: 'DRAFT', expiresAt: { lte: now }
-    }, data: { status: 'EXPIRED', payload: Prisma.DbNull, preview: Prisma.DbNull } });
+        id: { in: expired.map(row => row.id) }, status: statuses.DRAFT, expiresAt: { lte: now }
+    }, data: { status: statuses.EXPIRED, payload: Prisma.DbNull, preview: Prisma.DbNull } });
     return result.count;
 };
 

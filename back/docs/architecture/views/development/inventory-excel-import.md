@@ -1,8 +1,8 @@
 # Importación de inventario por Excel
 
-Almacén importa altas, ediciones y conteos en un único archivo por inventario.
-Cada fila indica Alta, Editar, Ajustar, Editar y ajustar o Conservar. Aplica a
-Materiales, Consumibles y Mermas.
+Almacén importa un archivo para una sola operación, elegida en el selector:
+**Alta**, **Editar datos** o **Ajustar existencias**. Todas las filas realizan esa
+operación. Aplica a Materiales, Consumibles y Mermas desde el mismo botón.
 El [procedimiento y cliente Vue](../../../../../front/docs/development/05-inventory-excel-import.md)
 pertenecen a `front/`; los contratos HTTP están en [OpenAPI](../../openapi/index.md).
 
@@ -11,15 +11,30 @@ pertenecen a `front/`; los contratos HTTP están en [OpenAPI](../../openapi/inde
 | Operación | Datos admitidos |
 | --- | --- |
 | Alta de materiales | Nombre, código de proveedor, presentación, unidad, base/altura opcionales, mínimo, costo máximo unitario, activo, cantidad inicial y observaciones. |
-| Alta de consumibles | Los mismos campos, sin base/altura. |
+| Alta de consumibles | Los mismos campos; base/altura son referencias vacías y no se capturan. |
 | Alta de mermas | Nombre, código de proveedor, material de referencia en m², mínimo, costo, activo, cantidad inicial y observaciones; base/altura para otras presentaciones o los tres pesos para Rollo. |
 | Actualización de materiales y consumibles | IDs de material/proveedor y sus dos versiones; nombre, mínimo, costo y activo. |
 | Actualización de mermas | ID y versión; nombre, mínimo, costo y activo. |
+| Ajuste de existencias en los tres inventarios | IDs/versiones originales, Stock contado final, motivo activo y observaciones; las demás columnas son referencias. |
 
-El formato `NEXUS_INVENTORY_V1` contiene `Datos`, `Instrucciones` y `Catalogos`.
-La plantilla de actualización contiene hasta 100 relaciones por página y admite
-filtros por nombre y proveedor. Sus IDs y versiones deben conservarse. La de alta
+El formato `NEXUS_INVENTORY_V2` contiene `Datos`, `Instrucciones` y `Catalogos`.
+Las plantillas de edición y ajuste contienen hasta 100 relaciones por página y admiten
+filtros por nombre y proveedor. Sus IDs y versiones se incluyen automáticamente para
+quien tiene el permiso operativo; no dependen de ser administrador y deben conservarse. La de alta
 incluye hasta 500 opciones activas por catálogo; para merma se elige proveedor.
+
+La estructura parte del Excel de consulta, con los mismos encabezados y orden:
+Proveedor, Material, Base, Altura, Stock actual, Stock mínimo, Presentación,
+Conversión, Unidad y Costo unitario. `INVENTORY_SPREADSHEET_COLUMNS` es la fuente
+compartida por el reporte y las plantillas. En ajuste se omite el costo, sin exigir
+su permiso de lectura. Después se agregan Activo, IDs/versiones cuando corresponden
+y los campos propios de la operación: Cantidad inicial o Stock contado/Motivo.
+En altas, Proveedor ofrece `código | nombre` del catálogo. En merma, los renglones
+operativos son individuales, aunque el reporte de consulta agrupe sus totales.
+Las columnas grises son referencias: el servidor calcula conversiones y usa los IDs
+originales; una base/altura escrita en un alta de consumible se descarta.
+El reporte de consulta conserva su contrato; para escribir se descarga la plantilla
+operativa, que incluye instrucciones, catálogos y metadatos de módulo/operación.
 
 La actualización conserva stock, dimensiones, unidad, presentación y pesos. Un vacío
 obligatorio produce error; no borra valores. Las filas sin cambios se omiten al escribir.
@@ -33,8 +48,10 @@ a catálogos se resuelven por código de proveedor, presentación y unidad; en m
 la opción seleccionada del catálogo contiene el ID del material de origen.
 La actualización se descarga con IDs y versiones y se vuelve a subir conservándolos.
 Se identifica el destino por ID, por lo que editar el nombre no crea otro artículo.
-Una edición o ajuste sin ID se rechaza. El archivo mixto conserva una sola fila por
-destino; Editar y ajustar combina datos y conteo sin refrescar las versiones originales.
+Una edición o ajuste sin ID se rechaza. Cada destino ocupa una sola fila del archivo.
+La operación se toma del selector y debe coincidir con `Instrucciones!B3`; no se
+deduce por nombre, IDs o columnas, ni se elige por fila. Para editar y contar un
+registro se completan dos operaciones y se descarga una plantilla actual tras la primera.
 
 Materiales y consumibles comparan su identidad de nombre, tipo, presentación, unidad
 y dimensiones, y verifican la relación con el proveedor. Una relación nueva puede
@@ -50,7 +67,8 @@ y no deja efectos parciales. Las filas sin cambios de una edición se omiten al 
 ## Flujo HTTP y permisos
 
 Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables`,
-`wastes`. La interfaz usa `mixed`; `create`, `update` y `adjust` conservan contratos recuperables.
+`wastes`. La captura admite `create`, `update` y `adjust`. Cada descarga incluye su
+modo en el archivo y en el nombre; un XLSX de otra operación o módulo se rechaza.
 
 | Ruta | Resultado |
 | --- | --- |
@@ -62,11 +80,14 @@ Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables
 | `GET /:id/errors/excel` | Una hoja `Datos` con fila, nombre, columna y mensaje. No es una plantilla para reimportar. |
 
 Alta/edición requiere lectura, escritura y `inventory:costs-read`; conteo requiere
-lectura y ajuste. El modo mixto autoriza cada operación antes de leer datos privados.
+lectura y ajuste. Los permisos se comprueban para la operación de todo el archivo.
 Consumibles usa los permisos de Materiales. Un lote sólo es accesible por su creador
 mientras conserva esos permisos. La autorización precede al parser multipart.
-Si un lote mixto contiene precios, pierde acceso quien ya no tenga lectura de costos;
-un lote formado sólo por conteos sigue recuperable con lectura y ajuste.
+Los comprobantes mixtos anteriores siguen consultables y pueden recuperar una
+confirmación completada con la misma clave. Sus precios permanecen protegidos por
+el permiso de costos; un conteo puro sigue consultable con lectura y ajuste. Los
+borradores mixtos anteriores devuelven `INVENTORY_IMPORT_MODE_RETIRED` al confirmar:
+se descartan y recrean con una operación. No se eliminan comprobantes históricos.
 Las rutas JSON existentes conservan su transporte.
 
 ## Reglas y confirmación
@@ -123,7 +144,7 @@ establecen un SLA. Los comandos están en la sección de desarrollo de Vue y en 
 | Borrador, recibo y limpieza | Revisar antes de escribir, recuperar una confirmación incierta y eliminar contenido temporal. |
 | Plantilla | Generar hojas, catálogos, listas desplegables y referencias de edición. |
 
-La plantilla y el informe de errores comparten la hoja y encabezados. El informe
+La plantilla y el informe de errores reutilizan la creación de hojas y encabezados. El informe
 sólo genera sus cuatro columnas; omite instrucciones y catálogos vacíos. Los errores
 se conservan en el JSON del borrador hasta su descarte, confirmación o vencimiento;
 no se conserva el XLSX descargado. Los reportes generales de otros módulos usan un
@@ -136,21 +157,23 @@ Los límites, contratos, validaciones del dominio y recibos permanecen en sus ca
 
 ExcelJS queda como dependencia de desarrollo para generar fixtures anteriores y
 comprobar estructura, estilos y fórmulas; `read-excel-file` contrasta sus valores.
-Las seis variantes de plantilla se descargan, editan con el motor anterior y
+Las nueve variantes de plantilla se descargan, editan con el motor anterior y
 vuelven a analizar con SheetKit. La [decisión del motor](excel-library-decision.md)
 registra alternativas y criterios para futuras actualizaciones.
 
-## Archivo mixto y conteo físico
+## Operación única, conteo y organización del código
 
-`inventoryMixedImportService` agrupa las filas por operación y reutiliza validadores,
-DTO, catálogos y cálculos existentes. Editar y ajustar se valida en ambos contratos y
-se presenta como una fila. Detecta repetidos, identidades y datos compartidos entre
-operaciones. Las referencias de altas y saldos de conteo se bloquean antes de escribir;
-los datos compartidos se actualizan una vez y los conteos usan el saldo protegido.
+`inventoryImportConfig` concentra modos admitidos, columnas editables/referencias y
+permisos. Las constantes públicas reúnen modos, etiquetas, estados, acciones y
+límites. La configuración de columnas del reporte se reutiliza en las plantillas;
+la traducción de campo a encabezado es común a la edición y al conteo.
+Se retiró el agrupador de operaciones por fila y su escritura recursiva.
 
-La plantilla incluye registros actuales inicialmente Conservar, columnas de captura,
-stock de referencia y `stock_contado_o_inicial` vacío. El conteo interpreta cero como
-saldo final válido y rechaza vacío. Ajustar genera AJU/AME, conversiones e historia;
-no actualiza costo, nombre ni dimensiones por sí mismo. Un fallo del recibo revierte
-altas, ediciones, ajustes, movimientos y folios. El [flujo de conciliación](inventory-reconciliation.md)
-explica la secuencia con entregas antiguas sin otro descuento.
+El conteo captura **Stock contado** como saldo final físico; cero es válido y vacío
+se rechaza. Genera AJU/AME, conversiones e historia mediante los servicios existentes,
+sin modificar costo, nombre ni medidas. Un fallo del recibo revierte todas las filas,
+movimientos y folios de la operación. Los repositories encapsulan los bloqueos SQL;
+la transacción y revalidación permanecen en el servicio. La traducción compartida de
+contención reconoce también los códigos anidados del adaptador PostgreSQL de Prisma.
+El [flujo de conciliación](inventory-reconciliation.md) explica la secuencia con
+entregas antiguas sin otro descuento.

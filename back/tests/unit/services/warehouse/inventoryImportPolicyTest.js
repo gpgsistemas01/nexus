@@ -1,18 +1,15 @@
-import { describe, expect, it, vi } from 'vitest';
-vi.mock('../../../../src/lib/prisma.js', () => ({ prisma: {} }));
-import { authorizeInventoryImport, getImportConfig } from '../../../../src/services/warehouse/imports/inventoryImportConfig.js';
+import { describe, expect, it } from 'vitest';
+import { authorizeInventoryImport, authorizeSavedInventoryImport, getImportConfig } from '../../../../src/services/warehouse/imports/inventoryImportConfig.js';
 import { PERMISSIONS } from '../../../../src/shared/constants/permissions.js';
-import { validateMixedInventoryImport } from '../../../../src/services/warehouse/imports/inventoryMixedImportService.js';
 
 describe('decisiones de acceso a importaciones', () => {
-    it('el archivo mixto no consulta ni revela costos al intentar una edición sin permiso de costos', async () => {
-        const validate = vi.fn();
-        const result = await validateMixedInventoryImport({ db: {}, config: getImportConfig('materials', 'mixed'),
-            rows: [{ row: 2, values: { operation: 'Editar', name: 'Artículo' } }],
-            user: { permissions: [PERMISSIONS.MATERIALS_READ, PERMISSIONS.MATERIALS_ADJUST_STOCK] }, validate });
-        expect(validate).not.toHaveBeenCalled();
-        expect(result.rows[0]).toMatchObject({ before: null, after: null, action: 'error' });
-        expect(result.summary.errors).toBe(1);
+    it('sólo admite comprobantes mixtos anteriores y protege sus costos aunque el usuario aún pueda ajustar', () => {
+        const user = { permissions: [PERMISSIONS.MATERIALS_READ, PERMISSIONS.MATERIALS_ADJUST_STOCK] };
+        const batch = { resource: 'materials', mode: 'mixed', result: { rows: [{ before: { currentStock: 2 }, after: { currentStock: 3 } }] } };
+        expect(authorizeSavedInventoryImport(user, batch)).toBeDefined();
+        batch.result.rows[0].before.maxUnitCost = 10;
+        expect(() => authorizeSavedInventoryImport(user, batch)).toThrow(expect.objectContaining({ statusCode: 403 }));
+        expect(() => authorizeInventoryImport(user, 'materials', 'mixed')).toThrow(expect.objectContaining({ code: 'INVENTORY_IMPORT_FILE' }));
     });
     it.each(['materials', 'consumables', 'wastes'])('el conteo de %s exige lectura y ajuste, sin exigir ni exponer costos', resource => {
         const config = getImportConfig(resource, 'adjust');
@@ -21,11 +18,11 @@ describe('decisiones de acceso a importaciones', () => {
         expect(() => authorizeInventoryImport({ permissions: [config.read, config.write, PERMISSIONS.INVENTORY_COSTS_READ] }, resource, 'adjust'))
             .toThrow(expect.objectContaining({ statusCode: 403 }));
     });
-    it.each(['materials', 'consumables', 'wastes'])('exige cada permiso de %s también para actualizar', resource => {
+    it.each(['materials', 'consumables', 'wastes'].flatMap(resource => ['create', 'update'].map(mode => [resource, mode])))('exige cada permiso de %s para %s', (resource, mode) => {
         const config = getImportConfig(resource);
         const required = [config.read, config.write, PERMISSIONS.INVENTORY_COSTS_READ];
-        expect(authorizeInventoryImport({ permissions: required }, resource, 'update').mode).toBe('update');
-        for (const missing of required) expect(() => authorizeInventoryImport({ permissions: required.filter(value => value !== missing) }, resource, 'update'))
+        expect(authorizeInventoryImport({ permissions: required }, resource, mode).mode).toBe(mode);
+        for (const missing of required) expect(() => authorizeInventoryImport({ permissions: required.filter(value => value !== missing) }, resource, mode))
             .toThrow(expect.objectContaining({ statusCode: 403 }));
     });
     it('rechaza recursos y modos fuera de la lista blanca', () => {

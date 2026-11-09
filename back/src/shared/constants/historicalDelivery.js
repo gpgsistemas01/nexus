@@ -1,0 +1,17 @@
+import { FORM_FIELD_LIMITS } from './inputValidation.js';
+
+export const HISTORICAL_DELIVERY_LIMITS = Object.freeze({
+    maxDocuments: 100,
+    maxPage: 999,
+    maxSearchLength: 200,
+    maxReasonLength: FORM_FIELD_LIMITS.OBSERVATIONS
+});
+
+export const HISTORICAL_DELIVERY_REVISION_PATTERN = /^[a-f0-9]{64}$/;
+
+export const HISTORICAL_DELIVERY_ERROR_CODES = Object.freeze({
+    VALIDATION: 'HISTORICAL_DELIVERY_VALIDATION',
+    CONFLICT: 'HISTORICAL_DELIVERY_CONFLICT',
+    BUSY: 'HISTORICAL_DELIVERY_BUSY',
+    PHYSICAL_RETURN_REQUIRED: 'HISTORICAL_PHYSICAL_RETURN_REQUIRED'
+});

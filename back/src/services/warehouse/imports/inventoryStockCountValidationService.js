@@ -1,18 +1,21 @@
+import { INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { validateInventoryImportRow } from '../../../validators/forms/inventoryImportValidations.js';
 import { calculateStockAdjustmentValues } from '../adjustmentService.js';
 import { calculateWasteStockAdjustmentValues } from '../wastes/wasteStockAdjustmentService.js';
-import { importReferenceId } from './inventoryImportContext.js';
+import { importCatalogValue } from './inventoryImportContext.js';
+import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
+import { errorMap } from '../../../messages/codeMessages.js';
 
 // El conteo reemplaza el saldo. Las columnas de referencia del Excel nunca son una fuente de datos.
 export const validateInventoryStockCountRows = async ({ config, rows, context }) => {
     const targets = new Map();
     const results = [];
     for (const input of rows) {
-        const body = { ...input.values, reasonId: importReferenceId(input.values.reasonId) };
+        const body = { ...input.values, reasonId: importCatalogValue(input.values.reasonId) };
         const errors = [];
-        const add = (field, message, code = 'INVENTORY_IMPORT_VALIDATION') => errors.push({ field, message, code,
-            column: config.columns.find(([, key]) => key === field)?.[0] ?? field });
+        const add = (field, message, code = errorMap.inventoryImport.VALIDATION) => errors.push({ field, message, code,
+            column: inventoryImportColumnLabel(config, field) });
         if (!UUID_V4_PATTERN.test(String(body.id ?? ''))) add('id', 'El identificador del registro no es válido.');
         if (body.newStock === '' || body.newStock == null) add('newStock', 'Captura el stock contado. Cero es válido; una celda vacía no es un conteo.');
         if (!String(body.observations ?? '').trim()) add('observations', 'Describe el conteo físico que justifica el ajuste.');
@@ -53,10 +56,10 @@ export const validateInventoryStockCountRows = async ({ config, rows, context })
             before, after, reference, dto,
             details: { supplier: target?.supplier?.tradeName ?? '', presentation: material?.presentation?.name ?? '',
                 unit: material?.unitMeasure?.symbol ?? '', difference, reason: reason?.name ?? '', observations: dto.observations },
-            action: errors.length ? 'error' : difference === 0 && before.convertedQuantity === after.convertedQuantity ? 'unchanged' : 'update',
+            action: errors.length ? actions.ERROR : difference === 0 && before.convertedQuantity === after.convertedQuantity ? actions.UNCHANGED : actions.UPDATE,
             errors, warnings: [] });
     }
     return { context, rows: results, summary: { total: results.length, creates: 0,
-        updates: results.filter(row => row.action === 'update').length,
-        unchanged: results.filter(row => row.action === 'unchanged').length, errors: results.filter(row => row.action === 'error').length } };
+        updates: results.filter(row => row.action === actions.UPDATE).length,
+        unchanged: results.filter(row => row.action === actions.UNCHANGED).length, errors: results.filter(row => row.action === actions.ERROR).length } };
 };

@@ -4,10 +4,17 @@ import {
   DatabaseTableMissing,
   RecordIdentifierInvalid,
   PrismaClientOutOfSync,
-  normalizeDatabaseError
+  normalizeDatabaseError,
+  isDatabaseContentionError
 } from '../../../src/errors/databaseError.js';
 
 describe('normalización de errores del esquema de base de datos', () => {
+  it.each(['55P03', '57014', '40P01'])('reconoce la contención %s tanto en Prisma como en su adaptador PG', code => {
+    expect(isDatabaseContentionError({ code: 'P2010', meta: { code } })).toBe(true);
+    expect(isDatabaseContentionError({ code: 'P2010', meta: { driverAdapterError: { cause: { originalCode: code } } } })).toBe(true);
+    expect(isDatabaseContentionError({ code: 'P2028' })).toBe(true);
+    expect(isDatabaseContentionError({ code: 'P2003', meta: { code: '23503' } })).toBe(false);
+  });
   it.each(['P2007', 'P2010'])('traduce un UUID mal formado de Prisma %s a un código público sin detalles SQL', code => {
     const error = { code, meta: { driverAdapterError: { cause: {
       originalCode: '22P02',

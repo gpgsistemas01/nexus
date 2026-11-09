@@ -5,8 +5,8 @@
       "tags": [
         "Importaciones de inventario"
       ],
-      "summary": "Descargar archivo único para altas, ediciones y conteos",
-      "description": "La interfaz usa mode=mixed: operacion por fila Alta, Editar, Ajustar, Editar y ajustar o Conservar. Hasta 100 filas y 2 MiB. Registros actuales con IDs/versiones originales, saldos de referencia y stock_contado_o_inicial vacío. Alta usa existencia inicial y genera ID; editar conserva stock/identidad; ajuste reemplaza el saldo por el conteo físico final y exige motivo activo y observaciones. Cero es válido, vacío de conteo se rechaza. Conservar no cambia datos. Un destino ocupa una fila. Alta/edición requiere lectura, escritura y inventory:costs-read; conteo requiere lectura y ajuste del recurso. Mixto autoriza cada operación antes de leer costos. Un error bloquea todo el archivo. create/update/adjust conservan recuperación de contratos anteriores. Catálogos hasta 500 opciones; merma usa material de referencia existente y proveedor filtrado.",
+      "summary": "Descargar plantilla de una operación con estructura de inventario",
+      "description": "Una operación para todo el archivo: create (Alta), update (Editar datos) o adjust (Ajustar existencias). Columnas iniciales y orden del reporte de inventario; después Activo, IDs/versiones y campos de captura. Ajuste omite costos. IDs/versiones incluidos automáticamente para toda cuenta con permiso operativo, sin exigir administrador. Alta genera IDs y captura Cantidad inicial; edición conserva stock; ajuste usa Stock contado final con motivo/observaciones, cero válido y vacío rechazado. Hasta 100 filas/2 MiB y catálogos de 500 opciones. La plantilla identifica módulo y operación; se rechaza una selección incompatible. Merma usa referencia existente y proveedor filtrado.",
       "security": [
         {
           "cookieAuth": []
@@ -34,8 +34,7 @@
             "enum": [
               "create",
               "update",
-              "adjust",
-              "mixed"
+              "adjust"
             ],
             "default": "create"
           }
@@ -66,7 +65,7 @@
             "maximum": 999,
             "default": 1
           },
-          "description": "Actualización: 100 filas por página, orden estable por nombre e identificador."
+          "description": "Edición o ajuste: 100 filas por página, orden estable por nombre e identificador."
         }
       ],
       "responses": {
@@ -163,7 +162,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Validar archivo sin cambiar el inventario",
-      "description": "Autoriza antes del multipart; analiza un único file XLSX mediante SheetKit en worker. mode=mixed mezcla operaciones por fila y valida cada permiso, duplicados, versiones, identidad y conteo final sin modificar inventario. Vista previa temporal por cuenta, hasta 100 filas y 2 MiB. Un error bloquea la confirmación de todo el archivo.",
+      "description": "Autoriza la operación seleccionada para todo el archivo antes del multipart. Analiza un único XLSX con SheetKit en worker y comprueba formato V2, módulo, operación, encabezados, permisos, duplicados, versiones, identidad y conteo final. No deduce la operación por fila o por nombre. Un error bloquea todo el archivo sin modificar inventario. Hasta 100 filas/2 MiB. mode=mixed se rechaza para nuevas cargas.",
       "security": [
         {
           "cookieAuth": []
@@ -191,8 +190,7 @@
             "enum": [
               "create",
               "update",
-              "adjust",
-              "mixed"
+              "adjust"
             ],
             "default": "create"
           }
@@ -310,7 +308,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Confirmar todas las filas del borrador",
-      "description": "Requiere sesión, lectura y escritura del módulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes sólo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, catálogos, identidad y versiones. Una única transacción guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso después de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente. Un duplicado surgido después de la vista previa produce 409 sin aplicar ninguna fila. Las filas sin cambios de una actualización se omiten.",
+      "description": "Requiere sesión, lectura y escritura del módulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes sólo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, catálogos, identidad y versiones. Una única transacción guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso después de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente. Un duplicado surgido después de la vista previa produce 409 sin aplicar ninguna fila. Las filas sin cambios de una actualización se omiten. Los comprobantes mixtos anteriores conservan lectura y repetición exacta. Un borrador mixto anterior devuelve 409 INVENTORY_IMPORT_MODE_RETIRED y debe descartarse y recrearse para una operación.",
       "security": [
         {
           "cookieAuth": []

@@ -9,19 +9,30 @@ Busque y filtre para localizar el registro correcto.
 <!-- manual:any materials:write materials:adjust-stock -->
 ## Importar materiales o consumibles desde Excel
 
-1. En el módulo correspondiente, pulse **Importar Excel** para trabajar con un archivo único.
-2. Filtre proveedor/nombre y página; pulse **Descargar plantilla**. Sus filas existentes empiezan en Conservar.
-3. Elija por fila Alta, Editar, Ajustar, Editar y ajustar o Conservar. Complete los datos sin cambiar hojas, encabezados ni IDs/versiones de registros existentes.
-4. Seleccione el `.xlsx` y pulse **Validar archivo**. Revise cambios, cantidades y errores.
-5. Si hay errores, descárguelos, pulse **Descartar borrador**, corrija el original y vuelva a validarlo.
-6. Pulse **Confirmar importación** y espere el recibo. Use **Otro archivo** para continuar.
+1. En el módulo correspondiente, pulse **Importar Excel**.
+2. En **Operación del archivo**, elija **Alta**, **Editar datos** o **Ajustar existencias**. Todas las filas harán esa operación.
+3. Filtre proveedor/nombre y página; pulse **Descargar plantilla**.
+4. Complete los campos de captura sin cambiar hojas, encabezados ni columnas grises.
+5. Seleccione la misma operación y el `.xlsx`; pulse **Validar archivo** y revise cambios, cantidades y errores.
+6. Si hay errores, descárguelos, pulse **Descartar borrador**, corrija el original y vuelva a validarlo.
+7. Pulse **Confirmar importación** y espere el recibo. Use **Otro archivo** para continuar.
 
-Use un archivo por inventario y mezcle sus altas, ediciones y ajustes. En Alta, el ID
-queda vacío y el servidor lo genera. Para Editar/Ajustar conserve los IDs/versiones.
-Editar deja el stock vacío; Ajustar/Editar y ajustar captura el saldo físico final
-en `stock_contado_o_inicial`, con motivo y observaciones. Cero es válido y vacío se
-rechaza. Para Alta esa columna es existencia inicial. Conservar no aplica cambios.
-Una fila por destino; si necesita datos y stock, elija Editar y ajustar.
+Las columnas iniciales tienen los mismos nombres y orden que el reporte de consulta:
+Proveedor, Material, Base, Altura, Stock actual, Stock mínimo, Presentación,
+Conversión, Unidad y Costo unitario. El ajuste omite el costo. Al final se añaden
+Activo, IDs/versiones y los campos propios de la operación. Para cargar cambios use
+la plantilla operativa; el Excel de consulta conserva su función de reporte.
+
+En Alta seleccione el proveedor del catálogo y capture **Cantidad inicial**. El
+sistema genera el ID nuevo. Para Editar datos y Ajustar existencias, la descarga
+incluye IDs/versiones automáticamente según su permiso, sin exigir ser administrador.
+Consérvelos: permiten cambiar el nombre sin crear otro artículo. En ajuste, capture
+el saldo físico final en **Stock contado**, motivo y observaciones. Cero es válido y
+vacío se rechaza. Stock actual y Conversión son referencias.
+
+Un archivo tiene una operación. Para editar y ajustar, complete primero una operación
+y descargue una plantilla actual para la siguiente. Cambiar de operación retira el
+archivo seleccionado; un Excel de otra operación se rechaza.
 
 Un duplicado o error bloquea **todo el archivo**: todavía no se guarda ninguna fila.
 **Descargar errores** indica cuáles corregir o retirar antes de volver a validar.

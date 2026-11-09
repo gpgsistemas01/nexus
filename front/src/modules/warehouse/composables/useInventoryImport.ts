@@ -1,25 +1,40 @@
-import { INVENTORY_IMPORT_LIMITS } from '@nexus/inventory-imports';
+import {
+    INVENTORY_IMPORT_LIMITS,
+    INVENTORY_IMPORT_MODES as modes,
+    INVENTORY_IMPORT_STATUSES as statuses,
+    LEGACY_INVENTORY_IMPORT_MODE,
+} from '@nexus/inventory-imports';
 import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { createUuid } from '../../../shared/utils/createUuid.js';
 import { useFileExport } from '../../../shared/composables/useFileExport.js';
 import { inventoryImportService } from '../services/inventoryImportService.js';
 import { pendingInventoryImport } from '../services/pendingInventoryImport.js';
+import { isInventoryImportOperation } from '../inventoryImport.js';
 import type { InventoryResource } from '../inventory.js';
 import type {
     InventoryImportBatch,
     InventoryImportMode,
+    InventoryImportOperation,
     PendingInventoryImport,
 } from '../inventoryImport.js';
 
 export const useInventoryImport = (options: {
     resource: InventoryResource;
     userId: string;
-    initialMode?: InventoryImportMode;
+    initialMode?: InventoryImportOperation;
+    availableModes?: () => readonly InventoryImportOperation[];
     onSaved: () => void;
     onUnauthorized: () => void;
 }) => {
-    const mode = ref<InventoryImportMode>(options.initialMode ?? 'create');
+    const availableModes = computed(() => options.availableModes?.() ?? Object.values(modes));
+
+    const initialMode = () =>
+        availableModes.value.find((value) => value === options.initialMode) ??
+        availableModes.value[0] ??
+        modes.CREATE;
+
+    const mode = ref<InventoryImportMode>(initialMode());
     const batch = shallowRef<InventoryImportBatch | null>(null);
     const file = shallowRef<File | null>(null);
     const isWorking = ref(false);
@@ -72,7 +87,8 @@ export const useInventoryImport = (options: {
     };
 
     const selectFile = (value: File | null) => {
-        if (isWorking.value || batch.value || recoveryRequired.value) return;
+        if (isWorking.value || batch.value || recoveryRequired.value || template.isExporting.value)
+            return;
 
         error.value = '';
 
@@ -90,13 +106,42 @@ export const useInventoryImport = (options: {
         file.value = value;
     };
 
+    const selectMode = (value: unknown) => {
+        if (
+            !isInventoryImportOperation(value) ||
+            !availableModes.value.includes(value) ||
+            value === mode.value ||
+            isWorking.value ||
+            batch.value ||
+            recoveryRequired.value ||
+            template.isExporting.value ||
+            errors.isExporting.value
+        )
+            return;
+
+        mode.value = value;
+        file.value = null;
+        error.value = '';
+        template.exportError.value = '';
+        errors.exportError.value = '';
+    };
+
     const prepare = () => {
-        if (!file.value || batch.value || recoveryRequired.value) return Promise.resolve();
+        const operation = mode.value;
+        if (
+            !file.value ||
+            batch.value ||
+            recoveryRequired.value ||
+            template.isExporting.value ||
+            !isInventoryImportOperation(operation) ||
+            !availableModes.value.includes(operation)
+        )
+            return Promise.resolve();
 
         return run(async () => {
             batch.value = await inventoryImportService.preview(
                 options.resource,
-                mode.value,
+                operation,
                 file.value!,
                 controller.signal,
             );
@@ -109,7 +154,8 @@ export const useInventoryImport = (options: {
             if (
                 !batch.value?.preview ||
                 batch.value.preview.summary.errors ||
-                batch.value.status !== 'DRAFT' ||
+                batch.value.status !== statuses.DRAFT ||
+                batch.value.mode === LEGACY_INVENTORY_IMPORT_MODE ||
                 recoveryRequired.value
             )
                 return;
@@ -138,9 +184,9 @@ export const useInventoryImport = (options: {
 
             batch.value = saved;
             mode.value = saved.mode;
-            if (saved.status === 'COMPLETED') return finish(saved);
+            if (saved.status === statuses.COMPLETED) return finish(saved);
 
-            if (saved.status === 'DRAFT') {
+            if (saved.status === statuses.DRAFT) {
                 // GET todavía pendiente no demuestra rollback; el mismo POST resuelve la carrera con el servidor.
                 return finish(
                     await inventoryImportService.confirm(pending.value, controller.signal),
@@ -157,7 +203,8 @@ export const useInventoryImport = (options: {
     const discard = () =>
         run(async () => {
             const id =
-                pending.value?.id ?? (batch.value?.status === 'DRAFT' ? batch.value.id : null);
+                pending.value?.id ??
+                (batch.value?.status === statuses.DRAFT ? batch.value.id : null);
             if (recoveryRequired.value && !id)
                 throw new Error('Conserva la referencia pendiente y contacta al administrador.');
 
@@ -169,15 +216,24 @@ export const useInventoryImport = (options: {
             pending.value = null;
             recoveryRequired.value = false;
             batch.value = null;
-            mode.value = options.initialMode ?? 'create';
+            mode.value = initialMode();
             file.value = null;
         });
 
     const template = useFileExport<{ supplierId: string; search: string; page: number }>({
-        canExport: () => !isWorking.value && !recoveryRequired.value,
-        filename: `plantilla_${options.resource}`,
-        request: (query, signal) =>
-            inventoryImportService.template(options.resource, mode.value, query, signal),
+        canExport: () =>
+            !batch.value &&
+            !isWorking.value &&
+            !recoveryRequired.value &&
+            isInventoryImportOperation(mode.value) &&
+            availableModes.value.includes(mode.value),
+        filename: () => `plantilla_${options.resource}_${mode.value}`,
+        request: (query, signal) => {
+            if (!isInventoryImportOperation(mode.value))
+                throw new Error('Selecciona una operación vigente.');
+
+            return inventoryImportService.template(options.resource, mode.value, query, signal);
+        },
         onDenied: (status) => {
             if (status === 401) options.onUnauthorized();
         },
@@ -192,9 +248,10 @@ export const useInventoryImport = (options: {
     });
     const canConfirm = computed(
         () =>
-            batch.value?.status === 'DRAFT' &&
+            batch.value?.status === statuses.DRAFT &&
             !!batch.value.preview &&
             !batch.value.preview.summary.errors &&
+            batch.value.mode !== LEGACY_INVENTORY_IMPORT_MODE &&
             !recoveryRequired.value,
     );
     onBeforeUnmount(() => {
@@ -203,7 +260,8 @@ export const useInventoryImport = (options: {
         file.value = null;
     });
     return {
-        mode,
+        mode: computed(() => mode.value),
+        availableModes,
         batch,
         file,
         isWorking,
@@ -211,6 +269,7 @@ export const useInventoryImport = (options: {
         recoveryRequired,
         canConfirm,
         selectFile,
+        selectMode,
         prepare,
         confirm,
         recover,

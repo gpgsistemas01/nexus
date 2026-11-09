@@ -1,3 +1,4 @@
+import { INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { importUnitLabel } from './inventoryImportConfig.js';
 import { findInitialStockAdjustmentReason } from '../reasonService.js';
@@ -6,7 +7,7 @@ import { InventoryImportError } from '../../../errors/warehouse/inventoryImportE
 
 export const importText = value => String(value ?? '').trim();
 export const importKey = value => importText(value).toLowerCase();
-export const importReferenceId = value => importText(value).split(' | ')[0];
+export const importCatalogValue = value => importText(value).split(' | ')[0];
 export const materialImportIdentity = value => JSON.stringify([
     importKey(value.name), value.type, value.presentationId, value.unitMeasureId,
     value.base == null ? null : Number(value.base), value.height == null ? null : Number(value.height)
@@ -16,7 +17,7 @@ export const wasteImportIdentity = value => JSON.stringify([
     value.coneWeightKg == null ? null : Number(value.coneWeightKg), value.totalWeightKg == null ? null : Number(value.totalWeightKg)
 ]);
 const unique = values => [...new Set(values.filter(Boolean))];
-const ids = values => unique(values.map(importReferenceId).filter(value => UUID_V4_PATTERN.test(value)));
+const ids = values => unique(values.map(importCatalogValue).filter(value => UUID_V4_PATTERN.test(value)));
 const catalogLimit = INVENTORY_IMPORT_LIMITS.maxRows * 2;
 const bounded = rows => {
     if (rows.length > catalogLimit) throw new InventoryImportError('LIMIT');
@@ -25,7 +26,7 @@ const bounded = rows => {
 
 export const loadInventoryImportContext = async ({ db, config, rows }) => {
     const values = rows.map(row => row.values);
-    const supplierCodes = unique(values.map(row => importText(row.supplierCode)).filter(Boolean));
+    const supplierCodes = unique(values.map(row => importCatalogValue(row.supplierCode)).filter(Boolean));
     const supplierIds = ids(values.map(row => row.supplierId));
     const suppliers = bounded(await db.supplier.findMany({ take: catalogLimit + 1, where: { OR: [
         { id: { in: supplierIds } }, { code: { in: supplierCodes, mode: 'insensitive' } }
@@ -40,7 +41,7 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
         const key = importKey(row.code);
         context.supplierCodes.set(key, context.supplierCodes.has(key) ? null : row);
     }
-    if (config.mode === 'create' && config.resource !== 'wastes') {
+    if (config.mode === modes.CREATE && config.resource !== 'wastes') {
         const names = unique(values.map(row => importText(row.presentationName)).filter(Boolean));
         const presentationIds = ids(values.map(row => row.presentationId));
         const presentations = bounded(await db.presentation.findMany({ take: catalogLimit + 1, where: { isActive: true, OR: [
@@ -84,9 +85,9 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
     }
     const pairs = [];
     for (const row of values) {
-        const supplierId = row.supplierId || context.supplierCodes.get(importKey(row.supplierCode))?.id;
-        let materialId = config.mode !== 'create' ? importReferenceId(row.id) : importReferenceId(row.materialId);
-        if (config.mode === 'create' && config.resource !== 'wastes') {
+        const supplierId = row.supplierId || context.supplierCodes.get(importKey(importCatalogValue(row.supplierCode)))?.id;
+        let materialId = config.mode !== modes.CREATE ? importCatalogValue(row.id) : importCatalogValue(row.materialId);
+        if (config.mode === modes.CREATE && config.resource !== 'wastes') {
             const presentationId = row.presentationId || context.presentationNames.get(importKey(row.presentationName))?.id;
             const unitMeasureId = row.unitMeasureId || context.unitLabels.get(importKey(row.unitLabel))?.id;
             materialId = context.identities.get(materialImportIdentity({ ...row, type: config.type, presentationId, unitMeasureId,
@@ -94,20 +95,20 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
         }
         if (UUID_V4_PATTERN.test(supplierId ?? '') && UUID_V4_PATTERN.test(materialId ?? '')) pairs.push({ materialId, supplierId });
     }
-    if (pairs.length && (config.resource !== 'wastes' || config.mode === 'create')) {
+    if (pairs.length && (config.resource !== 'wastes' || config.mode === modes.CREATE)) {
         const offers = await db.supplierMaterial.findMany({ where: { OR: pairs }, include: {
             material: { include: { presentation: true, unitMeasure: true } }, supplier: true
         } });
         for (const row of offers) context.offers.set(`${row.materialId}:${row.supplierId}`, row);
     }
-    if (config.resource === 'wastes' && config.mode !== 'create') {
+    if (config.resource === 'wastes' && config.mode !== modes.CREATE) {
         const wastes = await db.waste.findMany({ where: { id: { in: ids(values.map(row => row.id)) } },
             include: { presentation: true, unitMeasure: true, supplier: true } });
         for (const row of wastes) {
             context.wastes.set(row.id, row);
         }
     }
-    if (config.mode === 'adjust') {
+    if (config.mode === modes.ADJUST) {
         const reasons = await db.stockAdjustmentReason.findMany({ where: { id: { in: ids(values.map(row => row.reasonId)) }, isActive: true } });
         context.reasons = new Map(reasons.map(row => [row.id, row]));
     }

@@ -1,7 +1,7 @@
-import { AppError } from '../../../errors/AppError.js';
+import { HistoricalDeliveryError } from '../../../errors/warehouse/historicalDeliveryError.js';
 
 export const assertHistoricalPhysicalReturn = ({ issue, returnDto }) => {
     if (issue.historicalDeliveryBatchId && returnDto.physicalReturnConfirmed !== true) {
-        throw new AppError('Confirma la entrada física actual de esta devolución histórica.', 'HISTORICAL_PHYSICAL_RETURN_REQUIRED', 400);
+        throw new HistoricalDeliveryError('PHYSICAL_RETURN_REQUIRED');
     }
 };

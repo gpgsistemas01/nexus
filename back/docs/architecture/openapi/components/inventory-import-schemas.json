@@ -197,7 +197,8 @@
           "update",
           "adjust",
           "mixed"
-        ]
+        ],
+        "description": "Operación de todo el archivo. mixed sólo identifica borradores o comprobantes anteriores; se rechaza para nuevas cargas y no se confirman borradores mixtos."
       },
       "status": {
         "enum": [

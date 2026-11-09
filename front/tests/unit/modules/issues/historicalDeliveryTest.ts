@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '../../../../src/shared/http/apiClient.js';
 import { ApiError } from '../../../../src/shared/http/apiError.js';
 import { historicalDeliveryService } from '../../../../src/modules/issues/services/historicalDeliveryService.js';
+import { pendingHistoricalDelivery } from '../../../../src/modules/issues/services/pendingHistoricalDelivery.js';
 import { useHistoricalDelivery } from '../../../../src/modules/issues/composables/useHistoricalDelivery.js';
 import { normalizeIssueDocument } from '../../../../src/modules/issues/mappers/issueResponseMapper.js';
 import { useIssueReturn } from '../../../../src/modules/issues/composables/useIssueReturn.js';
@@ -35,6 +36,15 @@ const mount = () =>
   );
 
 describe('registro histórico: contrato, selección explícita y recuperación durable', () => {
+  it('separa la recuperación por cuenta y recurso y guarda únicamente la captura necesaria', () => {
+    const storage = pendingHistoricalDelivery(ids.user, 'materials');
+    const command = { ...historicalCommand(), snapshot: 'Datos que no deben persistirse' };
+    storage.save(command);
+    expect(storage.read()).toEqual(historicalCommand());
+    expect(localStorage.getItem(localStorage.key(0)!)).not.toContain('snapshot');
+    expect(pendingHistoricalDelivery(ids.supplier, 'materials').read()).toBeNull();
+    expect(pendingHistoricalDelivery(ids.user, 'wastes').read()).toBeNull();
+  });
   it('envía sólo las revisiones originales y una declaración explícita, sin saldos calculados', async () => {
     const transport = vi.fn((config: InternalAxiosRequestConfig) => {
       expect(config.method).toBe('post');

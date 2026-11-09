@@ -5,39 +5,52 @@ con lectura y capacidad de alta/edición o de ajuste. Alta/edición exige escrit
 lectura de costos; el conteo exige el permiso de ajuste. Cada fila conserva su permiso.
 Comparte formulario, servicio y recuperación entre los tres módulos.
 
-## Un archivo para altas, ediciones y ajustes
+## Un archivo por operación, con estructura de inventario
 
-El diálogo descarga la plantilla mixta (`mode=mixed`) del inventario actual.
-No es necesario dividir el trabajo en archivos de alta, edición y ajuste.
+El selector **Operación del archivo** indica qué hacen todas las filas:
 
-| Valor de `operacion` | Tratamiento |
+| Selección | Tratamiento |
 | --- | --- |
-| Alta | ID vacío; crea identidad/oferta y existencia inicial. |
-| Editar | Conserva IDs/versiones; cambia nombre, mínimo, costo y activo, sin stock. |
-| Ajustar | Conserva IDs/versiones; reemplaza el saldo por el conteo físico final. |
-| Editar y ajustar | Cambia datos y saldo en la misma fila/transacción. |
-| Conservar | No aplica cambios; es el valor inicial de las filas descargadas. |
+| Alta | Crea registros y existencia inicial. El servidor genera los IDs nuevos. |
+| Editar datos | Conserva IDs/versiones; cambia nombre, mínimo, costo y activo, sin stock. |
+| Ajustar existencias | Conserva IDs/versiones; reemplaza el saldo por el conteo físico final. |
 
-`stock_contado_o_inicial` contiene existencia inicial en Alta y saldo físico final
-en Ajustar o Editar y ajustar. Editar lo deja vacío. En ajuste, cero es válido;
-vacío se rechaza. Motivo activo y observaciones son obligatorios al ajustar.
-Las columnas grises de IDs/versiones y saldos de referencia se conservan.
-Nombre y mínimo son comunes entre proveedores. Edición conserva identidad y medidas.
-Pieza exige enteros; un alta sin costo avisa que no podrá surtirse hasta configurarlo.
+Las columnas iniciales siguen el reporte: Proveedor, Material, Base, Altura, Stock
+actual, Stock mínimo, Presentación, Conversión, Unidad y Costo unitario. El ajuste
+omite el costo. Después se agregan Activo, los IDs/versiones necesarios y los
+campos de la operación. Las columnas grises se conservan como referencia. En altas,
+Proveedor muestra opciones `código | nombre`. En merma, la plantilla contiene
+registros individuales para identificar el destino aunque la consulta agrupe totales.
+
+IDs/versiones se incluyen para cualquier cuenta con el permiso correspondiente;
+no es necesario ser administrador. El ID permite cambiar el nombre sin crear otro
+registro. La plantilla lleva el módulo y la operación; un archivo de otra operación
+se rechaza. El reporte de consulta conserva su estructura y no es una carga operativa.
+
+**Cantidad inicial** se captura en altas. **Stock contado** es el saldo físico final
+en ajuste: cero es válido y vacío se rechaza. Motivo activo y observaciones son
+obligatorios al ajustar. Nombre y mínimo son comunes entre proveedores. Edición
+conserva identidad y medidas. Pieza exige enteros; un alta sin costo avisa que no
+podrá surtirse hasta configurarlo.
 
 ## Recorrido
 
-1. Abrir **Importar Excel** y filtrar los registros/proveedor y página de la plantilla.
-2. Descargarla: hasta 100 filas existentes por página, inicialmente Conservar.
-   Puede contener sólo altas si la consulta no tiene registros. Para referencias
-   de alta de merma, seleccionar proveedor antes de descargar.
-3. Indicar operación por fila y completar valores; las altas dejan vacío el ID.
-4. Conservar hojas/encabezados, seleccionar el `.xlsx` y pulsar **Validar archivo**.
+1. Abrir **Importar Excel** y elegir Alta, Editar datos o Ajustar existencias.
+2. Filtrar registros/proveedor y página; descargar la plantilla de esa operación.
+   Para altas de merma, seleccionar proveedor para obtener sus referencias en m².
+3. Completar las columnas de captura de todas las filas, conservando referencias,
+   IDs/versiones, hojas y encabezados.
+4. Seleccionar la misma operación al subir el `.xlsx` y pulsar **Validar archivo**.
 5. Revisar diez filas por página, sus datos anteriores/finales, diferencias y errores.
 6. Si hay errores, descargarlos, descartar el borrador, corregir el archivo y validarlo.
-7. **Confirmar importación** guarda todo junto y muestra el recibo; **Otro archivo** reinicia.
+7. **Confirmar importación** guarda toda la operación y muestra el recibo;
+   **Otro archivo** reinicia.
 
-Un mismo registro sólo ocupa una fila. Para editarlo y contarlo se elige Editar y ajustar.
+Cambiar la operación retira el archivo seleccionado. Se bloquea mientras hay una
+descarga, validación o borrador, o una confirmación pendiente. El selector sólo
+muestra operaciones permitidas: lectura/escritura/costos para alta y edición;
+lectura/ajuste para conteo. Para editar y contar se completan dos operaciones,
+descargando una plantilla actual después de la primera.
 El [procedimiento de conciliación](06-inventory-reconciliation.md) explica el conteo
 actual y el tratamiento de salidas antiguas entregadas.
 
@@ -74,7 +87,9 @@ establece su boundary. Confirmar envía una sola petición JSON con `expectedVer
 y `operationId`, sin escrituras por fila. El contrato de respuesta se comprueba
 antes de mostrar éxito. Un `200` incompleto no confirma la importación.
 
-Los límites públicos se comparten por `@nexus/inventory-imports`: 2 MiB y 100 filas.
+Modos, etiquetas, estados, acciones y límites se comparten por
+`@nexus/inventory-imports`: 2 MiB y 100 filas. El nombre de la descarga incluye la
+operación elegida al iniciar la solicitud, usando `useFileExport`.
 El navegador comprueba tamaño/extensión; Express valida el contenido y las reglas.
 Las plantillas de actualización se descargan por páginas y sus catálogos se acotan.
 SheetKit analiza el libro en el backend; Vue sólo transmite el archivo y muestra
@@ -87,6 +102,10 @@ local separada por cuenta y recurso. No contiene archivo, filas ni costos. Si se
 la respuesta, **Revisar y reintentar confirmación** consulta el mismo lote: recupera
 su recibo si terminó o repite la misma confirmación si sigue pendiente. No crea otra
 importación. **Descartar borrador** queda condicionado por el estado del servidor.
+
+Los comprobantes confirmados con el formato mixto anterior siguen recuperables.
+Un borrador mixto anterior debe descartarse y recrearse con una operación; no se
+confirma ni transforma automáticamente.
 
 El archivo subido y el Excel de errores sólo existen en memoria durante su procesamiento
 o envío; no dejan copias en disco del servidor. El borrador de datos/errores vence en

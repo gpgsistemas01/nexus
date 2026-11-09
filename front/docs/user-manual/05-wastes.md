@@ -3,22 +3,25 @@
 <!-- manual:any wastes:write wastes:adjust-stock -->
 ## Importar desde Excel
 
-Indique Alta, Editar, Ajustar, Editar y ajustar o Conservar en cada fila. Los registros
-existentes conservan IDs/versiones; las altas dejan el ID vacío.
-`stock_contado_o_inicial` es cantidad inicial en Alta y saldo físico final en Ajustar
-o Editar y ajustar. Cero contado es válido; vacío se rechaza. Ajustar exige motivo
-y observaciones. Editar conserva stock; Conservar no aplica cambios.
+Cada Excel representa una operación elegida en **Operación del archivo**: **Alta**,
+**Editar datos** o **Ajustar existencias**. Las primeras columnas siguen el orden del
+inventario de consulta. Los registros operativos son individuales aunque el reporte
+agrupa totales. Después se añaden los IDs/versiones y los campos necesarios.
 
-1. Pulse **Importar Excel** para descargar un único archivo de altas, ediciones y ajustes.
-2. Para altas, seleccione proveedor y descargue la plantilla con sus materiales de referencia en m².
-3. Capture los datos; en Rollo use cono, merma con cono y rollo completo con cono, en kg. El sistema calcula las medidas.
-4. Seleccione el archivo y pulse **Validar archivo**. Revise cantidad inicial, cambios y errores.
+1. Pulse **Importar Excel** y seleccione la operación para todo el archivo.
+2. En Alta, seleccione proveedor y descargue la plantilla con sus materiales de referencia en m². En edición o ajuste, filtre los registros actuales y descargue sus IDs/versiones.
+3. Capture los datos de la operación. En Alta de Rollo use cono, merma con cono y rollo completo con cono, en kg; el sistema calcula las medidas.
+4. Seleccione la misma operación y el archivo; pulse **Validar archivo**. Revise los datos y errores.
 5. Corrija los errores en el original, descarte el borrador y vuelva a validar.
 6. Pulse **Confirmar importación** y espere el recibo.
 
 El ID de la nueva merma lo genera el sistema. Seleccione el material de referencia
-de la lista del Excel; la opción ya incluye su ID. Para editar, cambie la operación
-de la fila descargada a **Editar** o **Editar y ajustar** y conserve IDs/versiones.
+de la lista; la opción ya incluye su ID. En edición y ajuste conserve los IDs/versiones
+que se descargan automáticamente para quien tiene el permiso, sin exigir ser administrador.
+La edición conserva stock. El ajuste captura **Stock contado**, motivo y observaciones;
+cero es válido y vacío se rechaza. En Alta se usa **Cantidad inicial**.
+Para cambiar datos y stock, complete dos operaciones con una descarga actual después
+de la primera. Cambiar la operación retira el archivo seleccionado.
 
 Si una fila está repetida o es inválida, **no se aplica ninguna fila**. Descargue
 los errores, corrija o retire los repetidos y vuelva a validar. Un alta repetida no suma stock.

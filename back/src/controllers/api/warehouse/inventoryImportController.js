@@ -1,3 +1,4 @@
+import { INVENTORY_IMPORT_MODES } from '../../../shared/constants/inventoryImport.js';
 import { successCodeMessages } from '../../../shared/constants/apiSuccessCodes.js';
 import { readInventoryImportUpload } from '../../../middleware/inventoryImportUpload.js';
 import { createInventoryImportTemplate } from '../../../services/warehouse/imports/inventoryImportTemplateService.js';
@@ -26,8 +27,8 @@ const sendWorkbook = (res, bytes, filename) => {
 
 export const getInventoryImportTemplate = async (req, res) => withSignal(res, async signal => {
     const bytes = await createInventoryImportTemplate({ user: req.user, resource: req.params.resource,
-        mode: req.query.mode ?? 'create', query: req.query, signal });
-    sendWorkbook(res, bytes, `plantilla_${req.params.resource}_${req.query.mode ?? 'create'}`);
+        mode: req.query.mode ?? INVENTORY_IMPORT_MODES.CREATE, query: req.query, signal });
+    sendWorkbook(res, bytes, `plantilla_${req.params.resource}_${req.query.mode ?? INVENTORY_IMPORT_MODES.CREATE}`);
 });
 
 export const prepareInventoryImport = async (req, res) => {
@@ -38,7 +39,7 @@ export const prepareInventoryImport = async (req, res) => {
             const uploaded = await readInventoryImportUpload(req);
             try {
                 const batch = await previewInventoryImport({ user: req.user, resource: req.params.resource,
-                    mode: req.query.mode ?? 'create', ...uploaded, signal });
+                    mode: req.query.mode ?? INVENTORY_IMPORT_MODES.CREATE, ...uploaded, signal });
                 res.set('Cache-Control', 'no-store');
                 res.json({ code: successCodeMessages.INVENTORY_IMPORT_PREVIEW, batch });
             } finally { uploaded.buffer = null; }

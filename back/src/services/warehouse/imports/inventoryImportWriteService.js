@@ -6,6 +6,7 @@ import { registerWasteStockEntriesBatch } from '../wastes/wasteStockEntryService
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { materialImportIdentity } from './inventoryImportContext.js';
 import { lockInventoryImportReferences, lockInventoryStockCount, updateImportedMaterials, updateImportedWastes } from '../../../repository/warehouse/inventoryImportWriteRepository.js';
+import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 
 const createMaterials = async ({ tx, config, rows, context, userId }) => {
     const identities = new Map(context.identities);
@@ -58,24 +59,10 @@ const createWastes = async ({ tx, rows, context, userId }) => {
 };
 
 // Las reglas y conversiones son las de los formularios; el lote agrupa las escrituras dentro de su única tx.
-export const writeInventoryImport = async ({ tx, config, rows, context, userId, referencesLocked = false }) => {
-    if (config.mode === 'mixed') {
-        for (const group of context.groups) {
-            if (group.config.mode === 'create') await lockInventoryImportReferences({ tx, context: group.context });
-            if (group.config.mode === 'adjust') await lockInventoryStockCount({ tx, context: group.context });
-        }
-        const saved = new Map();
-        for (const mode of ['update', 'create', 'adjust']) for (const group of context.groups.filter(group => group.config.mode === mode)) {
-            const clean = group.rows.map(row => { const { operation, ...dto } = row.dto; return { ...row, dto }; });
-            const ids = await writeInventoryImport({ tx, ...group, rows: clean, userId, referencesLocked: true });
-            for (const [row, id] of ids) saved.set(row, id);
-            for (const row of clean) if (row.details.adjustmentReference) rows.find(item => item.row === row.row).details.adjustmentReference = row.details.adjustmentReference;
-        }
-        return saved;
-    }
-    const changed = rows.filter(row => row.action !== 'unchanged');
-    if (config.mode === 'adjust') {
-        if (!referencesLocked) await lockInventoryStockCount({ tx, context });
+export const writeInventoryImport = async ({ tx, config, rows, context, userId }) => {
+    const changed = rows.filter(row => row.action !== actions.UNCHANGED);
+    if (config.mode === modes.ADJUST) {
+        await lockInventoryStockCount({ tx, context });
         const references = config.type
             ? await createMaterialStockAdjustmentsBatch({ tx, userId, entries: changed.map(row => ({
                 ...row.dto, materialId: row.id, supplierMaterial: context.offers.get(`${row.id}:${row.dto.supplierId}`)
@@ -87,8 +74,8 @@ export const writeInventoryImport = async ({ tx, config, rows, context, userId, 
         return new Map(changed.map(row => [row.row, row.id]));
     }
     if (!changed.length) return new Map();
-    if (config.mode === 'create') {
-        if (!referencesLocked) await lockInventoryImportReferences({ tx, context });
+    if (config.mode === modes.CREATE) {
+        await lockInventoryImportReferences({ tx, context });
         return config.resource === 'wastes'
             ? createWastes({ tx, rows: changed, context, userId })
             : createMaterials({ tx, config, rows: changed, context, userId });

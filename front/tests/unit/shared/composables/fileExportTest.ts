@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { mountComposable } from '../../../helpers/mountComposable.js';
 import { useReportScope } from '../../../../src/shared/composables/useReportScope.js';
+import { useFileExport } from '../../../../src/shared/composables/useFileExport.js';
 import { reportFilename, reportParams } from '../../../../src/shared/report.js';
 import type { ReportScope } from '../../../../src/shared/report.js';
 
@@ -8,6 +9,38 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   vi.useRealTimers();
+});
+
+it('el nombre de una plantilla conserva la operación elegida al iniciar la descarga', async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-11-05T12:00:00Z'));
+  vi.stubGlobal('URL', { createObjectURL: () => 'blob:excel', revokeObjectURL: vi.fn() });
+  const names: string[] = [];
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+    this: HTMLAnchorElement,
+  ) {
+    names.push(this.download);
+  });
+  let mode = 'create';
+  let complete!: (file: Blob) => void;
+  const mounted = mountComposable(() =>
+    useFileExport({
+      canExport: () => true,
+      filename: () => `plantilla_materials_${mode}`,
+      onDenied: vi.fn(),
+      request: () =>
+        new Promise<Blob>((resolve) => {
+          complete = resolve;
+        }),
+    }),
+  );
+  const download = mounted.value.exportReport(undefined);
+  mode = 'adjust';
+  complete(new Blob(['xlsx']));
+  await download;
+  expect(names).toEqual(['plantilla_materials_create_11_2026.xlsx']);
+  mounted.wrapper.unmount();
+  vi.runAllTimers();
 });
 
 it.each(['reporte_clientes', 'reporte_clientes.xlsx'])(

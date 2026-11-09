@@ -1,12 +1,24 @@
 import type { InventoryResource } from './inventory.js';
+import {
+    INVENTORY_IMPORT_MODES,
+    INVENTORY_IMPORT_STATUSES,
+    INVENTORY_IMPORT_ROW_ACTIONS,
+    LEGACY_INVENTORY_IMPORT_MODE,
+} from '@nexus/inventory-imports';
 
-export type InventoryImportMode = 'create' | 'update' | 'adjust' | 'mixed';
+export type InventoryImportOperation =
+    (typeof INVENTORY_IMPORT_MODES)[keyof typeof INVENTORY_IMPORT_MODES];
+export type InventoryImportMode = InventoryImportOperation | typeof LEGACY_INVENTORY_IMPORT_MODE;
+
+export const isInventoryImportOperation = (value: unknown): value is InventoryImportOperation =>
+    Object.values(INVENTORY_IMPORT_MODES).some((mode) => mode === value);
+
 export type ImportValue = string | number | boolean | null;
 export interface InventoryImportRow {
     row: number;
     id: string | null;
     name: string;
-    action: 'create' | 'update' | 'unchanged' | 'error';
+    action: (typeof INVENTORY_IMPORT_ROW_ACTIONS)[keyof typeof INVENTORY_IMPORT_ROW_ACTIONS];
     before: Record<string, ImportValue> | null;
     after: Record<string, ImportValue> | null;
     details: Record<string, ImportValue>;
@@ -22,7 +34,7 @@ export interface InventoryImportBatch {
     version: number;
     resource: InventoryResource;
     mode: InventoryImportMode;
-    status: 'DRAFT' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
+    status: (typeof INVENTORY_IMPORT_STATUSES)[keyof typeof INVENTORY_IMPORT_STATUSES];
     filename: string;
     expiresAt: string;
     preview: InventoryImportPreview | null;

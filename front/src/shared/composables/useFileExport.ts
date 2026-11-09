@@ -5,7 +5,7 @@ import { reportFilename } from '../report.js';
 export interface FileExportOptions<Scope> {
     canExport: () => boolean;
     request: (scope: Scope, signal: AbortSignal) => Promise<Blob>;
-    filename: string;
+    filename: string | (() => string);
     onDenied: (status: number) => void;
 }
 
@@ -24,13 +24,15 @@ export const useFileExport = <Scope>(options: FileExportOptions<Scope>) => {
         exportError.value = '';
 
         try {
+            const filename =
+                typeof options.filename === 'function' ? options.filename() : options.filename;
             const file = await options.request(scope, current.signal);
             if (current.signal.aborted) return;
 
             const url = URL.createObjectURL(file);
             const link = document.createElement('a');
             link.href = url;
-            link.download = reportFilename(options.filename);
+            link.download = reportFilename(filename);
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (cause) {

@@ -1,3 +1,4 @@
+import { INVENTORY_IMPORT_MODES } from '../../../shared/constants/inventoryImport.js';
 import { Router } from 'express';
 import { verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { authorizeInventoryImport } from '../../../services/warehouse/imports/inventoryImportConfig.js';
@@ -10,7 +11,7 @@ import { getInventoryImportTemplate, prepareInventoryImport, applyInventoryImpor
 const router = Router();
 router.use(verifyApiTokenRequired);
 const authorizeUpload = (req, _res, next) => {
-    authorizeInventoryImport(req.user, req.params.resource, req.query.mode ?? 'create');
+    authorizeInventoryImport(req.user, req.params.resource, req.query.mode ?? INVENTORY_IMPORT_MODES.CREATE);
     next();
 };
 router.get('/:resource/template', authorizeUpload, getInventoryImportTemplate);

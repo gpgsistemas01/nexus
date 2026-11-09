@@ -96,91 +96,81 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(adjustment.type).toBe('DECREASE');
     });
 
-    it('un mismo Excel aplica alta, edición y conteo juntos; Editar y ajustar conserva una sola revisión original', async () => {
-        const edit = await seedOffer('Mixto editar');
-        const adjust = await seedOffer('Mixto ajustar');
-        const both = await seedOffer('Mixto ambos');
-        const rows = [
-            { ...fixture.row('Mixto nuevo'), operation: 'Alta' },
-            { ...updateRow(edit), operation: 'Editar', maxUnitCost: 18 },
-            { ...await countRow(adjust, 0), operation: 'Ajustar' },
-            { ...updateRow(both), ...await countRow(both, 7), operation: 'Editar y ajustar', name: `${both.material.name} corregido`, maxUnitCost: 22 }
-        ];
-        const batch = await preview(rows, 'materials', 'mixed');
-        expect(batch.preview.summary).toMatchObject({ creates: 1, updates: 3, errors: 0 });
-        const operationId = randomUUID();
-        await confirm(batch, operationId).expect(200);
-        expect(await savedOffer(fixture.row('Mixto nuevo').name)).not.toBeNull();
-        expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: edit.id } })).maxUnitCost)).toBe(18);
-        expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: adjust.id } })).currentStock)).toBe(0);
-        const saved = await prisma.supplierMaterial.findUnique({ where: { id: both.id }, include: { material: true } });
-        expect(Number(saved.currentStock)).toBe(7); expect(Number(saved.maxUnitCost)).toBe(22);
-        expect(saved.material.name).toBe(`${both.material.name} corregido`);
+    it.each(['materials', 'consumables', 'wastes'])('rechaza nuevas plantillas y cargas mixtas de %s antes de analizar el archivo', async resource => {
         const before = await inventorySnapshot();
-        await confirm(batch, operationId).expect(200);
+        const drafts = await prisma.inventoryImport.count({ where: { userId: fixture.user.id } });
+        await request(app).get(`/${resource}/template`).query({ mode: 'mixed' }).set('Cookie', cookie)
+            .expect(400).expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_FILE'));
+        await request(app).post(`/${resource}/preview`).query({ mode: 'mixed' }).set('Cookie', cookie)
+            .send('ni siquiera es XLSX').expect(400).expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_FILE'));
         expect(await inventorySnapshot()).toEqual(before);
+        expect(await prisma.inventoryImport.count({ where: { userId: fixture.user.id } })).toBe(drafts);
     });
 
-    it('una sola fila repetida entre operaciones o una versión vieja impide todas las altas y ajustes del archivo único', async () => {
-        const offer = await seedOffer('Mixto bloqueado');
-        const wrongSupplier = await preview([{ ...fixture.row('Mixto proveedor ambiguo'), operation: 'Alta', supplierId: fixture.suppliers[1].id }], 'materials', 'mixed');
-        expect(wrongSupplier.preview.summary.errors).toBe(1);
-        await confirm(wrongSupplier).expect(400);
-        expect(await savedOffer(fixture.row('Mixto proveedor ambiguo').name)).toBeNull();
-        const rows = [{ ...fixture.row('Mixto nunca guardado'), operation: 'Alta' },
-            { ...updateRow(offer), operation: 'Editar', maxUnitCost: 20 },
-            { ...await countRow(offer, 8), operation: 'Ajustar' }];
-        const invalid = await preview(rows, 'materials', 'mixed');
-        expect(invalid.preview.summary.errors).toBe(1);
-        await confirm(invalid).expect(400);
-        expect(await savedOffer(fixture.row('Mixto nunca guardado').name)).toBeNull();
-        const good = await preview([rows[0], { ...updateRow(offer), ...await countRow(offer, 8), operation: 'Editar y ajustar', maxUnitCost: 20 }], 'materials', 'mixed');
-        expect(good.preview.summary.errors).toBe(0);
-        await prisma.supplierMaterial.update({ where: { id: offer.id }, data: { currentStock: 3, convertedQuantity: 18 } });
+    it('la operación del archivo debe coincidir con la selección; ninguna combinación cruzada crea borradores ni escrituras', async () => {
         const before = await inventorySnapshot();
-        await confirm(good).expect(409);
-        expect(await inventorySnapshot()).toEqual(before);
-        expect(await savedOffer(fixture.row('Mixto nunca guardado').name)).toBeNull();
-    });
-
-    it('el archivo único de merma usa la misma columna de stock para alta y conteo, con recuperación exacta', async () => {
-        const row = await newRow('wastes', 'Merma en mixto');
-        const batch = await preview([{ ...row, newStock: 4, operation: 'Alta' }], 'wastes', 'mixed');
-        expect(batch.preview.summary.errors).toBe(0);
-        await confirm(batch).expect(200);
-        const saved = await prisma.waste.findFirst({ where: { name: row.name } });
-        expect(Number(saved.currentStock)).toBe(4);
-        const reason = await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } });
-        const next = await preview([{ id: saved.id, expectedVersion: saved.version, operation: 'Editar y ajustar',
-            name: `${row.name} editada`, minStock: 1, maxUnitCost: 12, isActive: 'SI', newStock: 2,
-            reasonId: reason.id, observations: 'Conteo y datos verificados' }], 'wastes', 'mixed');
-        expect(next.preview.summary.errors).toBe(0);
-        const operationId = randomUUID();
-        await confirm(next, operationId).expect(200); await confirm(next, operationId).expect(200);
-        const after = await prisma.waste.findUnique({ where: { id: saved.id } });
-        expect(Number(after.currentStock)).toBe(2); expect(Number(after.maxUnitCost)).toBe(12);
-    });
-
-    it('descarga y vuelve a importar la plantilla mixta real de merma conservando sus columnas de referencia', async () => {
-        const row = await newRow('wastes', 'Merma plantilla mixta');
-        await confirm(await preview([row], 'wastes')).expect(200);
-        const original = await prisma.waste.findFirst({ where: { name: row.name } });
-        const response = await request(app).get('/wastes/template').query({ mode: 'mixed', supplierId: fixture.suppliers[0].id, search: row.name }).set('Cookie', cookie)
-            .buffer(true).parse((res, done) => { const chunks = []; res.on('data', chunk => chunks.push(chunk)); res.on('end', () => done(null, Buffer.concat(chunks))); }).expect(200);
-        const workbook = new ExcelJS.Workbook(); await workbook.xlsx.load(response.body);
-        const sheet = workbook.getWorksheet('Datos'); const headers = sheet.getRow(1).values.slice(1);
-        const reason = await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } });
-        for (const [header, value] of Object.entries({ operacion: 'Editar y ajustar', nombre: `${row.name} corregida`,
-            costo_maximo_unitario: 19, stock_contado_o_inicial: 2, motivo: `${reason.id} | ${reason.name}`, observaciones: 'Conteo físico comprobado' })) {
-            sheet.getCell(2, headers.indexOf(header) + 1).value = value;
+        const drafts = await prisma.inventoryImport.count({ where: { userId: fixture.user.id } });
+        for (const source of ['create', 'update', 'adjust']) {
+            const buffer = await inventoryWorkbook({ mode: source, rows: [fixture.row('Operación cruzada')] });
+            for (const selected of ['create', 'update', 'adjust'].filter(mode => mode !== source)) {
+                await request(app).post('/materials/preview').query({ mode: selected }).set('Cookie', cookie)
+                    .attach('file', buffer, 'inventario.xlsx').expect(400)
+                    .expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_FILE'));
+            }
         }
-        const uploaded = await request(app).post('/wastes/preview').query({ mode: 'mixed' }).set('Cookie', cookie)
-            .attach('file', await writeInventoryWorkbook(workbook), 'merma-mixta.xlsx').expect(200);
-        expect(uploaded.body.batch.preview.summary.errors).toBe(0);
-        await confirm(uploaded.body.batch).expect(200);
-        const saved = await prisma.waste.findUnique({ where: { id: original.id } });
-        expect(saved.name).toBe(`${row.name} corregida`); expect(Number(saved.currentStock)).toBe(2);
-        expect(Number(saved.maxUnitCost)).toBe(19); expect(saved.base).toEqual(original.base); expect(saved.height).toEqual(original.height);
+        expect(await inventorySnapshot()).toEqual(before);
+        expect(await prisma.inventoryImport.count({ where: { userId: fixture.user.id } })).toBe(drafts);
+    });
+
+    it('conserva y repite un comprobante mixto anterior sin aplicar otra vez sus efectos', async () => {
+        const batch = await preview([fixture.row('Comprobante anterior')]);
+        const operationId = randomUUID();
+        const completed = await confirm(batch, operationId).expect(200);
+        await prisma.inventoryImport.update({ where: { id: batch.id }, data: { mode: 'mixed' } });
+        const before = await inventorySnapshot();
+        const read = await request(app).get(`/${batch.id}`).set('Cookie', cookie).expect(200);
+        expect(read.body.batch).toMatchObject({ mode: 'mixed', status: 'COMPLETED', result: completed.body.batch.result });
+        await confirm(batch, operationId).expect(200);
+        await confirm(batch).expect(409).expect(({ body }) => expect(body.code).toBe('OPERATION_KEY_CONFLICT'));
+        expect(await inventorySnapshot()).toEqual(before);
+    });
+
+    it('un borrador mixto anterior se puede consultar y descartar, pero nunca confirmar', async () => {
+        const batch = await preview([fixture.row('Borrador anterior')]);
+        await prisma.inventoryImport.update({ where: { id: batch.id }, data: { mode: 'mixed' } });
+        const before = await inventorySnapshot();
+        await request(app).get(`/${batch.id}`).set('Cookie', cookie).expect(200);
+        await confirm(batch).expect(409).expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_MODE_RETIRED'));
+        expect(await inventorySnapshot()).toEqual(before);
+        await request(app).delete(`/${batch.id}`).set('Cookie', cookie).expect(200);
+        expect(await prisma.inventoryImport.findUnique({ where: { id: batch.id } })).toMatchObject({ status: 'CANCELED', payload: null, preview: null });
+    });
+
+    it('usa la misma estructura de consulta al editar y contar merma en archivos separados con IDs originales', async () => {
+        const row = await newRow('wastes', 'Plantilla de merma');
+        const created = await confirm(await preview([row], 'wastes')).expect(200);
+        const id = created.body.batch.result.rows[0].id;
+        const original = await prisma.waste.findUnique({ where: { id } });
+        const reason = await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } });
+        for (const mode of ['update', 'adjust']) {
+            const response = await request(app).get('/wastes/template').query({ mode, supplierId: fixture.suppliers[0].id, search: row.name }).set('Cookie', cookie)
+                .buffer(true).parse((res, done) => { const chunks = []; res.on('data', chunk => chunks.push(chunk)); res.on('end', () => done(null, Buffer.concat(chunks))); }).expect(200);
+            const workbook = new ExcelJS.Workbook(); await workbook.xlsx.load(response.body);
+            const sheet = workbook.getWorksheet('Datos'); const headers = sheet.getRow(1).values.slice(1);
+            expect(headers.slice(0, 5)).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual']);
+            expect(sheet.getCell(2, headers.indexOf('ID merma') + 1).value).toBe(id);
+            const changes = mode === 'update' ? { Material: `${row.name} corregida`, 'Costo unitario': 19 }
+                : { 'Stock contado': 2, Motivo: `${reason.id} | ${reason.name}`, Observaciones: 'Conteo físico comprobado' };
+            for (const [header, value] of Object.entries(changes)) sheet.getCell(2, headers.indexOf(header) + 1).value = value;
+            const uploaded = await request(app).post('/wastes/preview').query({ mode }).set('Cookie', cookie)
+                .attach('file', await writeInventoryWorkbook(workbook), `merma-${mode}.xlsx`).expect(200);
+            expect(uploaded.body.batch.preview.summary.errors).toBe(0);
+            await confirm(uploaded.body.batch).expect(200);
+            const saved = await prisma.waste.findUnique({ where: { id } });
+            expect(saved.name).toBe(`${row.name} corregida`); expect(Number(saved.maxUnitCost)).toBe(19);
+            expect(Number(saved.currentStock)).toBe(mode === 'update' ? 3 : 2);
+            expect(saved.base).toEqual(original.base); expect(saved.height).toEqual(original.height);
+        }
     });
 
     it('rechaza vacío, negativo, motivo ausente, duplicado y recurso cruzado sin aplicar el conteo válido', async () => {
@@ -236,16 +226,17 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         await workbook.xlsx.load(response.body);
         const sheet = workbook.getWorksheet('Datos');
         const headers = sheet.getRow(1).values.slice(1);
-        expect(headers).toContain('stock_contado');
-        expect(headers).not.toContain('costo_maximo_unitario');
-        expect(sheet.getCell(2, headers.indexOf('stock_contado') + 1).value ?? '').toBe('');
-        expect(sheet.getCell(2, headers.indexOf('stock_referencia') + 1).value).toBe(2);
+        expect(headers).toContain('Stock contado');
+        expect(headers).not.toContain('Costo unitario');
+        expect(sheet.getCell(2, headers.indexOf('Stock contado') + 1).value ?? '').toBe('');
+        expect(sheet.getCell(2, headers.indexOf('Stock actual') + 1).value).toBe(2);
     });
 
-    it('al perder lectura de costos, un lote mixto con precios queda protegido y uno de conteo sigue recuperable', async () => {
+    it('al perder lectura de costos, protege precios en comprobantes anteriores sin bloquear conteos puros', async () => {
         const offer = await seedOffer('Permisos recuperables');
-        const editing = await preview([{ ...updateRow(offer), operation: 'Editar', maxUnitCost: 17 }], 'materials', 'mixed');
-        const counting = await preview([{ ...await countRow(offer, 3), operation: 'Ajustar' }], 'materials', 'mixed');
+        const editing = await preview([{ ...updateRow(offer), maxUnitCost: 17 }], 'materials', 'update');
+        const counting = await preview([await countRow(offer, 3)], 'materials', 'adjust');
+        await prisma.inventoryImport.updateMany({ where: { id: { in: [editing.id, counting.id] } }, data: { mode: 'mixed' } });
         const user = { ...fixture.user, permissions: [PERMISSIONS.MATERIALS_READ, PERMISSIONS.MATERIALS_ADJUST_STOCK] };
         const { getInventoryImport } = await import('../../../src/services/warehouse/imports/inventoryImportService.js');
         await expect(getInventoryImport({ id: editing.id, user })).rejects.toMatchObject({ statusCode: 403 });
@@ -380,44 +371,23 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(await prisma.inventoryImport.findUnique({ where: { id: completed.id } })).toMatchObject({ status: 'COMPLETED', result: expect.any(Object) });
     });
 
-    it('revierte artículos, saldos, historia y folios si falla la escritura final del recibo', async () => {
-        const offer = await seedOffer('Rollback contado');
-        const batch = await preview([
-            { ...fixture.row('Rollback A'), operation: 'Alta' }, { ...fixture.row('Rollback B'), operation: 'Alta' },
-            { ...updateRow(offer), ...await countRow(offer, 0), maxUnitCost: 20, operation: 'Editar y ajustar' }
-        ], 'materials', 'mixed');
-        expect(batch.preview.summary.errors, JSON.stringify(batch.preview.rows.filter(row => row.errors.length))).toBe(0);
+    it.each(['create', 'adjust'])('revierte filas, saldos, historia y folios si falla el recibo de %s', async mode => {
+        const offer = await seedOffer(`Rollback ${mode}`);
+        const batch = mode === 'create' ? await preview([fixture.row('Rollback A'), fixture.row('Rollback B')])
+            : await preview([await countRow(offer, 0)], 'materials', 'adjust');
+        expect(batch.preview.summary.errors).toBe(0);
         const inventoryBefore = await inventorySnapshot();
-        const counters = () => prisma.referenceNumberCounter.findMany({ orderBy: [{ prefix: 'asc' }, { year: 'asc' }] });
-        const before = await counters();
         await prisma.$executeRawUnsafe(`CREATE FUNCTION test_import_failure() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.id = '${batch.id}'::uuid AND NEW.status = 'COMPLETED' THEN RAISE EXCEPTION 'test receipt failure'; END IF; RETURN NEW; END $$`);
         await prisma.$executeRawUnsafe('CREATE TRIGGER test_import_failure BEFORE UPDATE ON "InventoryImport" FOR EACH ROW EXECUTE FUNCTION test_import_failure()');
         try {
             await confirm(batch).expect(500);
             expect(await savedOffer(fixture.row('Rollback A').name)).toBeNull();
-            expect(await counters()).toEqual(before);
             expect(await inventorySnapshot()).toEqual(inventoryBefore);
             expect(await prisma.inventoryImport.findUnique({ where: { id: batch.id } })).toMatchObject({ status: 'DRAFT', version: batch.version });
         } finally {
             await prisma.$executeRawUnsafe('DROP TRIGGER test_import_failure ON "InventoryImport"');
             await prisma.$executeRawUnsafe('DROP FUNCTION test_import_failure()');
         }
-    });
-
-    it('agrupa datos compartidos entre filas Editar y Editar y ajustar del mismo material', async () => {
-        const first = await seedOffer('Mixto compartido');
-        const second = await prisma.supplierMaterial.create({ data: { materialId: first.materialId, supplierId: fixture.suppliers[1].id,
-            maxUnitCost: 10, currentStock: 3, convertedQuantity: 18 }, include: { material: true } });
-        const name = `${first.material.name} nuevo`;
-        const batch = await preview([
-            { ...updateRow(first), name, operation: 'Editar', maxUnitCost: 17 },
-            { ...updateRow(second), ...await countRow(second, 0), name, operation: 'Editar y ajustar', maxUnitCost: 19 }
-        ], 'materials', 'mixed');
-        expect(batch.preview.summary.errors).toBe(0);
-        await confirm(batch).expect(200);
-        const material = await prisma.material.findUnique({ where: { id: first.materialId } });
-        expect(material.name).toBe(name); expect(material.version).toBe(first.material.version + 1);
-        expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: second.id } })).currentStock)).toBe(0);
     });
 
     it('serializa el mismo lote y responde rápido si otra confirmación ocupa la puerta global', async () => {
@@ -478,9 +448,12 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(Buffer.from(bytes));
         const sheet = workbook.getWorksheet('Datos');
-        expect(sheet.getRow(2).values.slice(1, 5)).toEqual([offer.materialId, offer.supplierId, offer.version, offer.material.version]);
+        const headers = sheet.getRow(1).values.slice(1);
+        expect(headers.slice(0, 10)).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual', 'Stock mínimo', 'Presentación', 'Conversión', 'Unidad', 'Costo unitario']);
+        expect(['ID material', 'ID proveedor', 'Versión proveedor', 'Versión material'].map(header => sheet.getCell(2, headers.indexOf(header) + 1).value))
+            .toEqual([offer.materialId, offer.supplierId, offer.version, offer.material.version]);
         const name = fixture.row('Plantilla editada').name;
-        sheet.getCell('E2').value = name;
+        sheet.getCell(2, headers.indexOf('Material') + 1).value = name;
         const response = await request(app).post('/materials/preview?mode=update').set('Cookie', cookie)
             .attach('file', await writeInventoryWorkbook(workbook), 'actualizar.xlsx').expect(200);
         const batch = response.body.batch;
@@ -497,7 +470,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const offer = await seedOffer('Proveedor inválido');
         const batch = await preview([{ ...updateRow(offer), supplierId: 'no-es-uuid' }], 'materials', 'update');
         expect(batch.preview.summary.errors).toBe(1);
-        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'id_proveedor' }));
+        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'ID proveedor' }));
         expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).maxUnitCost)).toBe(10);
     });
 
@@ -507,7 +480,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const before = await inventorySnapshot();
         const batch = await preview([valid, row, { ...row, name: `  ${row.name}  `, newStock: 9, initialQuantity: 9 }], resource);
         expect(batch.preview.summary).toMatchObject({ total: 3, creates: 2, errors: 1 });
-        expect(batch.preview.rows[2].errors).toContainEqual(expect.objectContaining({ column: 'nombre', message: expect.stringContaining('fila 3') }));
+        expect(batch.preview.rows[2].errors).toContainEqual(expect.objectContaining({ column: 'Material', message: expect.stringContaining('fila 3') }));
         await confirm(batch).expect(400);
         expect(await inventorySnapshot()).toEqual(before);
     });
@@ -521,7 +494,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const before = await inventorySnapshot();
         const batch = await preview([valid, { ...row, newStock: 8, initialQuantity: 8 }], resource);
         expect(batch.preview.summary).toMatchObject({ creates: 1, errors: 1 });
-        expect(batch.preview.rows[1].errors).toContainEqual(expect.objectContaining({ column: 'nombre', message: expect.stringMatching(/ya existe|ya está registrada/) }));
+        expect(batch.preview.rows[1].errors).toContainEqual(expect.objectContaining({ column: 'Material', message: expect.stringMatching(/ya existe|ya está registrada/) }));
         await confirm(batch).expect(400);
         expect(await inventorySnapshot()).toEqual(before);
     });
@@ -544,7 +517,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const batch = await preview([{ name: fixture.row('Actualización sin ID').name, supplierId: fixture.suppliers[0].id,
             expectedVersion: 0, expectedMaterialVersion: 0, minStock: 1, maxUnitCost: 10, isActive: 'SI' }], 'materials', 'update');
         expect(batch.preview.summary).toMatchObject({ creates: 0, updates: 0, errors: 1 });
-        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'id_material' }));
+        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'ID material' }));
         await confirm(batch).expect(400);
         expect(await inventorySnapshot()).toEqual(before);
     });
@@ -557,10 +530,10 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         await workbook.xlsx.load(Buffer.from(bytes));
         const reference = workbook.getWorksheet('Catalogos').getCell('E2').value;
         expect(reference).toContain(`${source.materialId} | ${source.material.name}`);
-        const data = { name: fixture.row('Merma desde catálogo').name, supplierCode: fixture.suppliers[0].code,
+        const data = { name: fixture.row('Merma desde catálogo').name, supplierCode: workbook.getWorksheet('Catalogos').getCell('A2').value,
             materialId: reference, base: 1.5, height: 2, minStock: 0, maxUnitCost: 10, isActive: 'SI', initialQuantity: 3 };
         const columns = getImportConfig('wastes', 'create').columns;
-        expect(columns.map(([header]) => header)).not.toContain('id_merma');
+        expect(columns.map(([header]) => header)).not.toContain('ID merma');
         workbook.getWorksheet('Datos').getRow(2).values = columns.map(([, key]) => data[key] ?? '');
         const response = await request(app).post('/wastes/preview').set('Cookie', cookie)
             .attach('file', await writeInventoryWorkbook(workbook), 'mermas.xlsx').expect(200);

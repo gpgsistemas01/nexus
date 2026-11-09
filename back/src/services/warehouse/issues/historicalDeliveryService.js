@@ -1,13 +1,19 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { getDb } from '../../../repository/baseRepository.js';
 import { AppError } from '../../../errors/AppError.js';
+import { HistoricalDeliveryError } from '../../../errors/warehouse/historicalDeliveryError.js';
+import { isDatabaseContentionError } from '../../../errors/databaseError.js';
+import { errorMap } from '../../../messages/codeMessages.js';
+import { errorMessages } from '../../../shared/messages/apiMessages.js';
+import { HISTORICAL_DELIVERY_LIMITS as limits, HISTORICAL_DELIVERY_REVISION_PATTERN } from '../../../shared/constants/historicalDelivery.js';
+import { INVENTORY_COLLECTIONS, MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { OperationKeyConflictError, RecordVersionConflictError } from '../../../errors/concurrencyError.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { isDateTime } from '../../../shared/validation/baseValidations.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
-import { lockHistoricalDeliveryDocuments } from '../../../repository/warehouse/historicalDeliveryRepository.js';
+import { lockHistoricalDeliveryDocuments, lockHistoricalDeliveryOperation } from '../../../repository/warehouse/historicalDeliveryRepository.js';
 import { updateGoodsIssueDetails, updateWasteIssueDetails } from '../../../repository/warehouse/issueDetailRepository.js';
 import { buildGoodsIssueContextWhere } from '../goodsIssues/goodsIssueHelpers.js';
 import { findFulfillmentStatusIdsByName } from '../fulfillmentStatusService.js';
@@ -17,14 +23,14 @@ import { assertIssueNotCanceled, resolveIssueFulfillmentStatus } from './issueFu
 const pendingStatuses = [FULFILLMENT_STATUS_NAMES.PENDING, FULFILLMENT_STATUS_NAMES.PARTIAL];
 const json = value => JSON.parse(JSON.stringify(value));
 const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const invalid = message => new AppError(message, 'HISTORICAL_DELIVERY_VALIDATION', 400);
+const invalid = message => new HistoricalDeliveryError('VALIDATION', message);
 const include = { status: true, fulfillmentStatus: true,
     details: { orderBy: { id: 'asc' }, include: { fulfillmentStatus: true } } };
-const model = (db, resource) => resource === 'wastes' ? db.wasteIssue : db.goodsIssue;
+const model = (db, resource) => resource === INVENTORY_COLLECTIONS.WASTES ? db.wasteIssue : db.goodsIssue;
 const authorize = (user, resource) => {
-    if (!['materials', 'consumables', 'wastes'].includes(resource)) throw invalid('El módulo no es válido.');
+    if (!Object.values(INVENTORY_COLLECTIONS).includes(resource)) throw invalid('El módulo no es válido.');
     if (!user?.permissions?.includes(PERMISSIONS.ISSUES_RECONCILE)) {
-        throw new AppError('No tiene permiso para reconocer entregas históricas.', 'FORBIDDEN', 403);
+        throw new AppError(errorMessages[errorMap.message.FORBIDDEN], errorMap.message.FORBIDDEN, 403);
     }
 };
 const date = value => {
@@ -39,7 +45,7 @@ const cutoff = value => {
     return result;
 };
 const contextWhere = (resource, user) => ({
-    ...(resource !== 'wastes' && buildGoodsIssueContextWhere(resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE')),
+    ...(resource !== INVENTORY_COLLECTIONS.WASTES && buildGoodsIssueContextWhere(resource === INVENTORY_COLLECTIONS.MATERIALS ? MATERIAL_TYPES.MATERIAL : MATERIAL_TYPES.CONSUMABLE)),
     ...buildIssueDepartmentWhere({ accesses: user.accesses })
 });
 const activeDetails = issue => issue.details.filter(detail => detail.fulfillmentStatus.name !== FULFILLMENT_STATUS_NAMES.CANCELED);
@@ -58,24 +64,24 @@ export const previewHistoricalDeliveries = async ({ user, resource, query = {} }
     const cutoffDate = cutoff(query.cutoffDate);
     const page = Number(query.page ?? 1);
     const search = query.search ?? '';
-    if (!Number.isInteger(page) || page < 1 || page > 999 || typeof search !== 'string' || search.length > 200) throw invalid('Revisa la búsqueda y la página.');
+    if (!Number.isInteger(page) || page < 1 || page > limits.maxPage || typeof search !== 'string' || search.length > limits.maxSearchLength) throw invalid('Revisa la búsqueda y la página.');
     const issues = await model(getDb(), resource).findMany({ where: { ...contextWhere(resource, user),
         historicalDeliveryBatchId: null, requestDate: { lte: cutoffDate },
         status: { name: { not: GOODS_ISSUE_STATUS_NAMES.CANCELED } }, fulfillmentStatus: { name: { in: pendingStatuses } },
         ...(search && { OR: [{ referenceNumber: { contains: search, mode: 'insensitive' } }, { projectNumber: { contains: search, mode: 'insensitive' } }] })
-    }, include, orderBy: [{ requestDate: 'asc' }, { id: 'asc' }], skip: (page - 1) * 100, take: 101 });
-    return { resource, cutoffDate, page, hasMore: issues.length > 100,
-        documents: issues.slice(0, 100).filter(issue => pendingDetails(issue).length).map(candidate) };
+    }, include, orderBy: [{ requestDate: 'asc' }, { id: 'asc' }], skip: (page - 1) * limits.maxDocuments, take: limits.maxDocuments + 1 });
+    return { resource, cutoffDate, page, hasMore: issues.length > limits.maxDocuments,
+        documents: issues.slice(0, limits.maxDocuments).filter(issue => pendingDetails(issue).length).map(candidate) };
 };
 
 const normalizeCommand = command => {
     const { operationId, documents, declaredDelivered } = command;
     if (!UUID_V4_PATTERN.test(operationId ?? '') || declaredDelivered !== true || !Array.isArray(documents)
-        || !documents.length || documents.length > 100
-        || documents.some(item => !UUID_V4_PATTERN.test(item?.id ?? '') || !/^[a-f0-9]{64}$/.test(item?.revision ?? ''))
-        || new Set(documents.map(item => item.id)).size !== documents.length) throw invalid('Selecciona de 1 a 100 salidas distintas y declara su entrega física completa.');
+        || !documents.length || documents.length > limits.maxDocuments
+        || documents.some(item => !UUID_V4_PATTERN.test(item?.id ?? '') || !HISTORICAL_DELIVERY_REVISION_PATTERN.test(item?.revision ?? ''))
+        || new Set(documents.map(item => item.id)).size !== documents.length) throw invalid(`Selecciona de 1 a ${limits.maxDocuments} salidas distintas y declara su entrega física completa.`);
     const reason = typeof command.reason === 'string' ? command.reason.trim() : '';
-    if (typeof reason !== 'string' || !reason || Array.from(reason).length > 500) throw invalid('Describe el motivo de la regularización (hasta 500 caracteres).');
+    if (!reason || Array.from(reason).length > limits.maxReasonLength) throw invalid(`Describe el motivo de la regularización (hasta ${limits.maxReasonLength} caracteres).`);
     const cutoffDate = cutoff(command.cutoffDate);
     const deliveredAt = command.deliveredAt ? date(command.deliveredAt) : null;
     if (deliveredAt && deliveredAt > cutoffDate) throw invalid('La entrega debe ser anterior o igual al corte.');
@@ -90,7 +96,7 @@ export const confirmHistoricalDeliveries = async ({ user, resource, command }) =
     try {
         return await getDb().$transaction(async tx => {
             await tx.$executeRaw`SET LOCAL lock_timeout = '1500ms'`;
-            await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`${user.id}:${capture.operationId}:historical-delivery`}, 0))`;
+            await lockHistoricalDeliveryOperation({ tx, userId: user.id, operationId: capture.operationId });
             const receipt = await tx.historicalDeliveryBatch.findUnique({ where: { userId_operationId: { userId: user.id, operationId: capture.operationId } } });
             if (receipt) {
                 if (receipt.commandHash !== commandHash) throw new OperationKeyConflictError();
@@ -112,7 +118,7 @@ export const confirmHistoricalDeliveries = async ({ user, resource, command }) =
                 if (issue.historicalDeliveryBatchId || issue.requestDate > capture.cutoffDate
                     || !pendingStatuses.includes(issue.fulfillmentStatus?.name) || !pendingDetails(issue).length
                     || (capture.deliveredAt && capture.deliveredAt < issue.requestDate)) {
-                    throw new AppError('La salida no tiene pendientes elegibles para este corte.', 'HISTORICAL_DELIVERY_CONFLICT', 409);
+                    throw new HistoricalDeliveryError('CONFLICT');
                 }
                 result.documents.push({ ...candidate(issue), before: json(issue),
                     recognized: pendingDetails(issue).map(detail => ({ detailId: detail.id,
@@ -125,7 +131,7 @@ export const confirmHistoricalDeliveries = async ({ user, resource, command }) =
             for (const issue of issues) {
                 const details = pendingDetails(issue).map(detail => ({ ...detail, suppliedQuantity: detail.quantity,
                     isSupplied: true, fulfillmentStatusId: statusIds.get(FULFILLMENT_STATUS_NAMES.COMPLETE) }));
-                const write = resource === 'wastes' ? updateWasteIssueDetails : updateGoodsIssueDetails;
+                const write = resource === INVENTORY_COLLECTIONS.WASTES ? updateWasteIssueDetails : updateGoodsIssueDetails;
                 if (await write({ tx, id: issue.id, details }) !== details.length) throw new RecordVersionConflictError();
                 const changed = new Map(details.map(detail => [detail.id, detail]));
                 const fulfillment = resolveIssueFulfillmentStatus(activeDetails(issue).map(detail => changed.get(detail.id) ?? detail));
@@ -136,9 +142,7 @@ export const confirmHistoricalDeliveries = async ({ user, resource, command }) =
             return { receipt: json(result), replayed: false };
         }, { maxWait: 1500, timeout: 30000 });
     } catch (error) {
-        if (error.code === 'P2028' || ['55P03', '57014', '40P01'].includes(error.meta?.code)) {
-            throw new AppError('Otra operación está modificando estas salidas. Reintenta con la misma clave.', 'HISTORICAL_DELIVERY_BUSY', 409);
-        }
+        if (isDatabaseContentionError(error)) throw new HistoricalDeliveryError('BUSY');
         throw error;
     }
 };

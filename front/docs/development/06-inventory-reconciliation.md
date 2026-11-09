@@ -1,21 +1,20 @@
 # 6. Conciliación de inventario y entregas históricas
 
-**Estado: implementado.** Almacén usa un archivo por inventario con altas, ediciones
-y ajustes mezclados por fila. Salidas permite registrar por lote entregas físicas
+**Estado: implementado.** Almacén usa el mismo botón de Excel para alta, edición
+y ajuste, con una operación elegida para todo el archivo. Salidas permite registrar por lote entregas físicas
 antiguas que permanecen pendientes o parciales.
 
 ## Inventario desactualizado
 
 1. Hacer un conteo físico actual y evitar movimientos mientras se captura.
-2. Abrir **Importar Excel** y descargar la plantilla de los registros filtrados.
-3. Elegir por fila **Alta**, **Editar**, **Ajustar**, **Editar y ajustar** o **Conservar**.
-4. Capturar el saldo físico final en `stock_contado_o_inicial` para ajustar,
-   con motivo y observaciones. Cero es válido; vacío produce error.
-5. Validar, revisar saldo anterior/final y diferencia, corregir errores y confirmar.
+2. Abrir **Importar Excel**, elegir **Ajustar existencias** y descargar los registros filtrados.
+3. Conservar las columnas de consulta y los IDs/versiones; capturar **Stock contado**,
+   motivo y observaciones. Cero es válido; vacío produce error.
+4. Validar, revisar saldo anterior/final y diferencia, corregir errores y confirmar.
 
-Editar conserva stock; Alta usa esa columna como existencia inicial. Editar y ajustar
-resuelve datos y saldo en una fila. Conservar no escribe nada. Los IDs/versiones de
-registros existentes se mantienen desde la descarga; las altas dejan el ID vacío.
+Cada Excel representa una operación. Editar datos conserva stock; Alta captura
+Cantidad inicial y genera los IDs nuevos. Si también se corrigen datos, completar
+esa operación y descargar una plantilla actual para ajustar las existencias.
 Un error, repetido o versión vieja bloquea todo el archivo. No se copian conteos
 antiguos sobre saldos actuales sin conciliar los movimientos posteriores.
 
@@ -51,5 +50,7 @@ recibo si ya terminó. No se crea una segunda entrega.
 
 `HistoricalDeliveryPage` compone `HistoricalDeliveryDialog` y `useHistoricalDelivery`.
 Reutiliza `EditorDialog`, controles Vuetify, Axios, errores, UUID y conversión horaria.
+`pendingHistoricalDelivery` encapsula la recuperación por cuenta/recurso; los límites,
+revisiones y códigos de error usan `@nexus/historical-deliveries`, compartido con Express.
 El [backend](../../../back/docs/architecture/views/development/inventory-reconciliation.md)
 define transacciones, persistencia, permisos y ausencia de movimientos históricos.

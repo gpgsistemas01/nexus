@@ -13,47 +13,50 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    constants["constants (11 módulos)"] --> shared["shared (23 módulos)"]
+    constants["constants (12 módulos)"] --> shared["shared (24 módulos)"]
     controllers["controllers (34 módulos)"] --> dtos["dtos (12 módulos)"]
-    controllers["controllers (34 módulos)"] --> errors["errors (23 módulos)"]
+    controllers["controllers (34 módulos)"] --> errors["errors (24 módulos)"]
     controllers["controllers (34 módulos)"] --> messages["messages (1 módulos)"]
     controllers["controllers (34 módulos)"] --> middleware["middleware (5 módulos)"]
-    controllers["controllers (34 módulos)"] --> services["services (84 módulos)"]
-    controllers["controllers (34 módulos)"] --> shared["shared (23 módulos)"]
+    controllers["controllers (34 módulos)"] --> services["services (83 módulos)"]
+    controllers["controllers (34 módulos)"] --> shared["shared (24 módulos)"]
     controllers["controllers (34 módulos)"] --> utils["utils (15 módulos)"]
-    dtos["dtos (12 módulos)"] --> shared["shared (23 módulos)"]
-    errors["errors (23 módulos)"] --> messages["messages (1 módulos)"]
-    errors["errors (23 módulos)"] --> shared["shared (23 módulos)"]
-    middleware["middleware (5 módulos)"] --> errors["errors (23 módulos)"]
+    dtos["dtos (12 módulos)"] --> shared["shared (24 módulos)"]
+    errors["errors (24 módulos)"] --> constants["constants (12 módulos)"]
+    errors["errors (24 módulos)"] --> messages["messages (1 módulos)"]
+    errors["errors (24 módulos)"] --> shared["shared (24 módulos)"]
+    messages["messages (1 módulos)"] --> shared["shared (24 módulos)"]
+    middleware["middleware (5 módulos)"] --> errors["errors (24 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (1 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (84 módulos)"]
-    middleware["middleware (5 módulos)"] --> shared["shared (23 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (83 módulos)"]
+    middleware["middleware (5 módulos)"] --> shared["shared (24 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (15 módulos)"]
-    repository["repository (10 módulos)"] --> constants["constants (11 módulos)"]
-    repository["repository (10 módulos)"] --> errors["errors (23 módulos)"]
+    repository["repository (10 módulos)"] --> constants["constants (12 módulos)"]
+    repository["repository (10 módulos)"] --> errors["errors (24 módulos)"]
     repository["repository (10 módulos)"] --> lib["lib (3 módulos)"]
-    repository["repository (10 módulos)"] --> shared["shared (23 módulos)"]
+    repository["repository (10 módulos)"] --> shared["shared (24 módulos)"]
     routes["routes (37 módulos)"] --> controllers["controllers (34 módulos)"]
     routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (37 módulos)"] --> services["services (84 módulos)"]
-    routes["routes (37 módulos)"] --> shared["shared (23 módulos)"]
+    routes["routes (37 módulos)"] --> services["services (83 módulos)"]
+    routes["routes (37 módulos)"] --> shared["shared (24 módulos)"]
     routes["routes (37 módulos)"] --> utils["utils (15 módulos)"]
     routes["routes (37 módulos)"] --> validators["validators (18 módulos)"]
-    services["services (84 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (84 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (84 módulos)"] --> errors["errors (23 módulos)"]
-    services["services (84 módulos)"] --> lib["lib (3 módulos)"]
-    services["services (84 módulos)"] --> repository["repository (10 módulos)"]
-    services["services (84 módulos)"] --> shared["shared (23 módulos)"]
-    services["services (84 módulos)"] --> utils["utils (15 módulos)"]
-    services["services (84 módulos)"] --> validators["validators (18 módulos)"]
-    utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
-    utils["utils (15 módulos)"] --> errors["errors (23 módulos)"]
-    utils["utils (15 módulos)"] --> services["services (84 módulos)"]
-    utils["utils (15 módulos)"] --> shared["shared (23 módulos)"]
-    validators["validators (18 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (83 módulos)"] --> constants["constants (12 módulos)"]
+    services["services (83 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (83 módulos)"] --> errors["errors (24 módulos)"]
+    services["services (83 módulos)"] --> lib["lib (3 módulos)"]
+    services["services (83 módulos)"] --> messages["messages (1 módulos)"]
+    services["services (83 módulos)"] --> repository["repository (10 módulos)"]
+    services["services (83 módulos)"] --> shared["shared (24 módulos)"]
+    services["services (83 módulos)"] --> utils["utils (15 módulos)"]
+    services["services (83 módulos)"] --> validators["validators (18 módulos)"]
+    utils["utils (15 módulos)"] --> constants["constants (12 módulos)"]
+    utils["utils (15 módulos)"] --> errors["errors (24 módulos)"]
+    utils["utils (15 módulos)"] --> services["services (83 módulos)"]
+    utils["utils (15 módulos)"] --> shared["shared (24 módulos)"]
+    validators["validators (18 módulos)"] --> constants["constants (12 módulos)"]
     validators["validators (18 módulos)"] --> messages["messages (1 módulos)"]
-    validators["validators (18 módulos)"] --> shared["shared (23 módulos)"]
+    validators["validators (18 módulos)"] --> shared["shared (24 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. La interfaz Vue y el esquema Prisma se
@@ -273,13 +276,12 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) | `cancelGoodsReceiptDetailAndTotals`, `correctGoodsReceiptDetailAndTotals`, `createGoodsReceiptDetailsAndUpdateTotals` |
 | [`src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) | `cancelMaterialGoodsReceiptDetailLine`, `correctMaterialGoodsReceiptDetailLine`, `createMaterialGoodsReceipt`, `findAllMaterialGoodsReceipts`, `findMaterialGoodsReceiptReportRows`, `updateMaterialGoodsReceipt` |
 | [`src/services/warehouse/imports/inventoryImportCleanup.js`](../../../../src/services/warehouse/imports/inventoryImportCleanup.js) | `expireInventoryImportDrafts`, `startInventoryImportCleanup` |
-| [`src/services/warehouse/imports/inventoryImportConfig.js`](../../../../src/services/warehouse/imports/inventoryImportConfig.js) | `authorizeInventoryImport`, `getImportConfig`, `importUnitLabel` |
-| [`src/services/warehouse/imports/inventoryImportContext.js`](../../../../src/services/warehouse/imports/inventoryImportContext.js) | `importKey`, `importReferenceId`, `importText`, `loadInventoryImportContext`, `materialImportIdentity`, `wasteImportIdentity` |
+| [`src/services/warehouse/imports/inventoryImportConfig.js`](../../../../src/services/warehouse/imports/inventoryImportConfig.js) | `authorizeInventoryImport`, `authorizeSavedInventoryImport`, `getImportConfig`, `importUnitLabel`, `inventoryImportColumnLabel` |
+| [`src/services/warehouse/imports/inventoryImportContext.js`](../../../../src/services/warehouse/imports/inventoryImportContext.js) | `importCatalogValue`, `importKey`, `importText`, `loadInventoryImportContext`, `materialImportIdentity`, `wasteImportIdentity` |
 | [`src/services/warehouse/imports/inventoryImportService.js`](../../../../src/services/warehouse/imports/inventoryImportService.js) | `cancelInventoryImport`, `confirmInventoryImport`, `getInventoryImport`, `getInventoryImportErrors`, `previewInventoryImport` |
 | [`src/services/warehouse/imports/inventoryImportTemplateService.js`](../../../../src/services/warehouse/imports/inventoryImportTemplateService.js) | `createInventoryImportTemplate` |
 | [`src/services/warehouse/imports/inventoryImportValidationService.js`](../../../../src/services/warehouse/imports/inventoryImportValidationService.js) | `validateInventoryImportRows` |
 | [`src/services/warehouse/imports/inventoryImportWriteService.js`](../../../../src/services/warehouse/imports/inventoryImportWriteService.js) | `writeInventoryImport` |
-| [`src/services/warehouse/imports/inventoryMixedImportService.js`](../../../../src/services/warehouse/imports/inventoryMixedImportService.js) | `validateMixedInventoryImport` |
 | [`src/services/warehouse/imports/inventoryStockCountValidationService.js`](../../../../src/services/warehouse/imports/inventoryStockCountValidationService.js) | `validateInventoryStockCountRows` |
 | [`src/services/warehouse/imports/inventoryWorkbookService.js`](../../../../src/services/warehouse/imports/inventoryWorkbookService.js) | `processInventoryWorkbook` |
 | [`src/services/warehouse/issues/historicalDeliverySelect.js`](../../../../src/services/warehouse/issues/historicalDeliverySelect.js) | `HISTORICAL_DELIVERY_SELECT` |

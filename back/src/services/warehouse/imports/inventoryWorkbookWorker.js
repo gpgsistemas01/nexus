@@ -2,7 +2,8 @@ import { parentPort, workerData } from 'node:worker_threads';
 import { Workbook, isResourceLimitError } from '@sheetkit/node';
 import unzipper from 'unzipper';
 import { createSpreadsheet, spreadsheetColumn } from '../../../utils/spreadsheetUtils.js';
-import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_LIMITS as limits } from '../../../shared/constants/inventoryImport.js';
+import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_LIMITS as limits,
+    INVENTORY_IMPORT_MODE_LABELS } from '../../../shared/constants/inventoryImport.js';
 
 const fail = kind => { const error = new Error(kind); error.kind = kind; throw error; };
 const scalar = value => {
@@ -76,7 +77,7 @@ const createDataWorkbook = (columns, rows) => {
         fill: { pattern: 'solid', fgColor: '#174A5B' }, alignment: { wrapText: true, vertical: 'center' } });
     columns.forEach(([header, key], index) => {
         const column = spreadsheetColumn(index + 1);
-        workbook.setColWidth('Datos', column, key === 'materialId' ? 80 : header.startsWith('id_') ? 40 : 25);
+        workbook.setColWidth('Datos', column, key === 'materialId' ? 80 : ['id', 'supplierId'].includes(key) ? 40 : 25);
         workbook.setCellStyle('Datos', `${column}1`, headerStyle);
     });
     workbook.setRowValues('Datos', 1, 'A', columns.map(([header]) => header));
@@ -92,15 +93,15 @@ const template = async ({ config, rows = [], catalogs }) => {
     workbook.setColWidth('Instrucciones', 'B', 110);
     const instructions = [
         ['Formato', INVENTORY_IMPORT_FORMAT], ['Recurso', config.resource], ['Operacion', config.mode],
-        ['Archivo único', 'Modo mixed: elige por fila Alta, Editar, Ajustar, Editar y ajustar o Conservar. Altas sin ID; las demás conservan sus IDs/versiones. Usa una sola fila por registro.'],
-        ['Stock en archivo único', 'stock_contado_o_inicial es existencia inicial en Alta y saldo final físico en Ajustar o Editar y ajustar. Déjalo vacío en Editar. Motivo y observaciones obligatorios al ajustar. Conservar no aplica cambios.'],
+        ['Operación del archivo', `${INVENTORY_IMPORT_MODE_LABELS[config.mode]}. Todas las filas realizan esta operación. Selecciona la misma operación al importar; para otra operación descarga otra plantilla.`],
+        ['Estructura de inventario', 'Las primeras columnas siguen el orden del reporte: Proveedor, Material, Base, Altura, Stock actual, Stock mínimo, Presentación, Conversión, Unidad y Costo unitario. En ajuste se omite el costo. Después se agregan Activo, IDs/versiones y los campos de la operación.'],
         ['Límites', 'Hasta 100 filas y 2 MiB. Conserva hojas, encabezados, identificadores y versiones.'],
-        ['Identificadores', 'Altas: el sistema genera los IDs nuevos. Actualización: descarga los registros actuales y conserva sus IDs y versiones en las columnas grises.'],
+        ['Identificadores', 'Altas: el sistema genera los IDs nuevos. Edición y ajuste: los IDs y versiones del destino se incluyen automáticamente según tu permiso operativo. Conserva las columnas grises; el nombre no identifica el destino.'],
         ['Captura', 'Una fila por registro. Usa números sin signo de moneda. Activo: SI o NO. No uses fórmulas.'],
         ['Catálogos', 'Listas de hasta 500 opciones. Elige proveedor, presentación y unidad; en merma selecciona la opción completa del material de referencia, incluido su ID, sin escribirlo manualmente.'],
         ['Duplicados', 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
         ['Cantidad inicial', 'Sólo en altas. Es cantidad por presentación, no área ni peso. Pieza exige enteros.'],
-        ['Conteo físico', 'En ajuste, stock_contado es el saldo final contado por presentación; cero es válido y vacío se rechaza. Captura motivo y observaciones en cada fila. El stock de referencia no se suma.'],
+        ['Conteo físico', 'En ajuste, Stock contado es el saldo final contado por presentación; cero es válido y vacío se rechaza. Captura Motivo y Observaciones en cada fila. Stock actual y Conversión son referencias y no se suman.'],
         ['Corte del conteo', 'Usa un conteo físico actual y evita movimientos mientras capturas. Si cambió una versión, descarga una plantilla nueva y vuelve a verificar el conteo; no copies saldos antiguos sin conciliarlos.'],
         ['Medidas', 'Base y altura en metros. Consumibles no tienen dimensiones. En Rollo de merma deja ambas vacías: el servidor las calcula con los tres pesos en kg.'],
         ['Actualización', 'Nombre y mínimo se comparten entre proveedores. Costo y activo corresponden a cada proveedor. Un vacío no borra datos.'],
@@ -115,11 +116,12 @@ const template = async ({ config, rows = [], catalogs }) => {
     });
     workbook.newSheet('Catalogos');
     catalogs.reasons ??= [];
-    workbook.setRowValues('Catalogos', 1, 'A', ['proveedor_codigo', 'proveedor', 'presentacion', 'unidad', 'material_referencia', 'motivo']);
+    workbook.setRowValues('Catalogos', 1, 'A', ['Proveedor (código | nombre)', 'Proveedor', 'Presentación', 'Unidad', 'Material de referencia', 'Motivo']);
     [20, 45, 25, 35, 100, 65].forEach((width, index) => workbook.setColWidth('Catalogos', spreadsheetColumn(index + 1), width));
     const count = Math.max(catalogs.suppliers.length, catalogs.presentations.length, catalogs.units.length, catalogs.materials.length, catalogs.reasons.length);
     for (let index = 0; index < count; index++) workbook.setRowValues('Catalogos', index + 2, 'A', [
-        catalogs.suppliers[index]?.code, catalogs.suppliers[index]?.tradeName,
+        catalogs.suppliers[index] ? `${catalogs.suppliers[index].code} | ${catalogs.suppliers[index].tradeName}` : null,
+        catalogs.suppliers[index]?.tradeName,
         catalogs.presentations[index]?.name, catalogs.units[index], catalogs.materials[index], catalogs.reasons[index]
     ].map(value => value ?? null));
     const lists = { supplierCode: ['A', catalogs.suppliers.length], presentationName: ['C', catalogs.presentations.length],
@@ -129,15 +131,11 @@ const template = async ({ config, rows = [], catalogs }) => {
         const key = config.columns[index][1];
         const column = spreadsheetColumn(index + 1);
         const sqref = `${column}2:${column}${limits.maxRows + 1}`;
-        if (key === 'isActive') workbook.addDataValidation('Datos', { sqref, validationType: 'list', allowBlank: false, formula1: '"SI,NO"' });
-        if (key === 'operation') workbook.addDataValidation('Datos', { sqref, validationType: 'list', allowBlank: false,
-            formula1: '"Alta,Editar,Ajustar,Editar y ajustar,Conservar"' });
+        if (key === 'isActive' && !config.readonlyFields.includes(key)) workbook.addDataValidation('Datos', { sqref, validationType: 'list', allowBlank: false, formula1: '"SI,NO"' });
         const list = lists[key];
         if (list?.[1]) workbook.addDataValidation('Datos', { sqref, validationType: 'list', allowBlank: false,
             formula1: `'Catalogos'!$${list[0]}$2:$${list[0]}$${list[1] + 1}` });
-        if (key.startsWith('expected') || key === 'id' || key === 'supplierId'
-            || (config.mode === 'mixed' && ['currentStock', 'supplierName'].includes(key))
-            || (config.mode === 'adjust' && ['name', 'supplierName', 'presentationName', 'unitLabel', 'currentStock'].includes(key))) {
+        if (config.readonlyFields.includes(key)) {
             for (let row = 2; row <= limits.maxRows + 1; row++) workbook.setCellStyle('Datos', `${column}${row}`, identityStyle);
         }
     }

@@ -1,5 +1,9 @@
 import { UUID_V4_PATTERN } from '@nexus/input-validation';
 import { successCodeMessages } from '@nexus/api-success-codes';
+import {
+    HISTORICAL_DELIVERY_LIMITS as limits,
+    HISTORICAL_DELIVERY_REVISION_PATTERN,
+} from '@nexus/historical-deliveries';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -27,19 +31,19 @@ export const readHistoricalDeliveryCommand = (value: unknown): HistoricalDeliver
         value.declaredDelivered !== true ||
         !isText(value.reason) ||
         !value.reason.trim() ||
-        value.reason.length > 500 ||
+        Array.from(value.reason).length > limits.maxReasonLength ||
         !isText(value.cutoffDate) ||
         !Number.isFinite(Date.parse(value.cutoffDate)) ||
         (value.deliveredAt !== null &&
             (!isText(value.deliveredAt) || !Number.isFinite(Date.parse(value.deliveredAt)))) ||
         !Array.isArray(value.documents) ||
         !value.documents.length ||
-        value.documents.length > 100 ||
+        value.documents.length > limits.maxDocuments ||
         value.documents.some(
             (item) =>
                 !isRecord(item) ||
                 !UUID_V4_PATTERN.test(String(item.id)) ||
-                !/^[a-f0-9]{64}$/.test(String(item.revision)),
+                !HISTORICAL_DELIVERY_REVISION_PATTERN.test(String(item.revision)),
         ) ||
         new Set(value.documents.map((item) => item.id)).size !== value.documents.length
     )
@@ -68,14 +72,14 @@ export const historicalDeliveryService = {
             Date.parse(value.cutoffDate) !== Date.parse(query.cutoffDate) ||
             typeof value.hasMore !== 'boolean' ||
             !Array.isArray(value.documents) ||
-            value.documents.length > 100 ||
+            value.documents.length > limits.maxDocuments ||
             new Set(value.documents.map((item) => (isRecord(item) ? item.id : null))).size !==
                 value.documents.length ||
             value.documents.some(
                 (item) =>
                     !isRecord(item) ||
                     !UUID_V4_PATTERN.test(String(item.id)) ||
-                    !/^[a-f0-9]{64}$/.test(String(item.revision)) ||
+                    !HISTORICAL_DELIVERY_REVISION_PATTERN.test(String(item.revision)) ||
                     !['referenceNumber', 'requestDate', 'departmentName', 'projectNumber'].every(
                         (key) => isText(item[key]),
                     ) ||

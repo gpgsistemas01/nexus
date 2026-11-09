@@ -1,7 +1,7 @@
 # Conciliación de inventario y entregas históricas
 
 **Estado: implementado en Express, PostgreSQL y Vue.** El conteo forma parte del
-archivo único de inventario. El registro histórico se ejecuta por lotes desde Salidas.
+Excel de inventario con una operación seleccionada para todo el archivo. El registro histórico se ejecuta por lotes desde Salidas.
 El [procedimiento Vue](../../../../../front/docs/development/06-inventory-reconciliation.md)
 y el [manual de Salidas](../../../../../front/docs/user-manual/12-issues.md) describen su uso.
 
@@ -12,7 +12,7 @@ y el [manual de Salidas](../../../../../front/docs/user-manual/12-issues.md) des
 | Identidad nueva | Alta; crea el artículo/oferta y su existencia inicial con historia. |
 | Datos incorrectos | Editar; cambia nombre, mínimo, costo y activo, conservando stock e identidad. |
 | Existencia desfasada | Ajustar; reemplaza el saldo por el conteo físico final comprobado y registra la diferencia. |
-| Datos y existencia incorrectos | Editar y ajustar en una sola fila y transacción. |
+| Datos y existencia incorrectos | Completar Editar datos y descargar una plantilla actual para Ajustar existencias. Cada archivo confirma una operación. |
 | Salida ya entregada que sigue pendiente o parcial | Registrar entrega histórica; reconoce sólo la cantidad faltante sin otro descuento. |
 
 Contar físicamente las existencias actuales, evitar movimientos durante la captura,
@@ -21,20 +21,21 @@ conteo no demuestra por sí mismo la entrega de una salida. No se necesitan comp
 históricas para declarar hechos comprobados. Un conteo antiguo requiere conciliar
 los movimientos posteriores antes de usarlo como saldo actual.
 
-## Archivo único y conteo
+## Un archivo por operación y conteo
 
-`mode=mixed` admite Alta, Editar, Ajustar, Editar y ajustar y Conservar en la columna
-`operacion`. Un archivo por inventario puede mezclar esas filas; no son cargas separadas.
-Las filas existentes se descargan como Conservar para exigir una decisión explícita.
-`stock_contado_o_inicial` es existencia inicial en Alta y saldo final en los ajustes;
-Editar lo deja vacío. Los contratos `create`, `update` y `adjust` conservan recuperación
-para consumidores y borradores anteriores.
+Un selector indica Alta (`create`), Editar datos (`update`) o Ajustar existencias
+(`adjust`) para todo el archivo. La plantilla conserva las columnas/orden del
+inventario de consulta y agrega las referencias técnicas y la captura necesaria.
+El servidor comprueba formato, módulo y operación; no infiere operaciones por fila.
+Para editar y contar se completan dos operaciones con una descarga actual entre ellas.
 
 El conteo mantiene IDs y versiones originales, proveedor, saldo de referencia y
-presentación. Stock contado empieza vacío: vacío se rechaza y cero es válido.
-Motivo activo y observaciones son obligatorios. Las columnas de referencia no
-reemplazan datos del servidor. Un mismo destino sólo ocupa una fila; para datos y
-stock se usa Editar y ajustar. Nombre y mínimo son comunes entre proveedores.
+presentación. **Stock contado** empieza vacío: vacío se rechaza y cero es válido.
+Motivo activo y observaciones son obligatorios. Las referencias no reemplazan datos
+del servidor. Un mismo destino sólo ocupa una fila. Nombre y mínimo son comunes
+entre proveedores. Alta captura **Cantidad inicial** y el servidor genera los IDs.
+Los comprobantes mixtos anteriores conservan consulta y repetición exacta; un borrador
+mixto anterior debe descartarse y recrearse con una operación.
 
 La vista previa muestra anterior, final y diferencia. Un duplicado, permiso ausente,
 captura inválida o versión vieja bloquea el archivo completo. Confirmar revalida el
@@ -83,4 +84,10 @@ No se habilita otra regularización mientras el resultado permanezca incierto.
 Fuentes ejecutables: `inventoryImportControllerDbTest.js`, `historicalDeliveryControllerDbTest.js`,
 `inventoryStockCountTest.js`, `historicalDeliveryTest.ts` y los recorridos Chromium de
 importación y entregas históricas. Cubren saldo cero, Pieza fraccionaria, vacío,
-repetidos, archivo mixto, versión vieja, fallo tardío, repetición y carreras con surtido.
+repetidos, operación/archivo incompatibles, recuperación de comprobantes anteriores, versión vieja, fallo tardío, repetición y carreras con surtido.
+
+Las constantes compartidas de regularización reúnen límites de documentos, búsqueda,
+página, motivo, revisión y códigos de error. Se reutiliza el límite de observaciones
+del formulario. `HistoricalDeliveryError` sigue el patrón de errores de dominio y
+la detección de contención de Prisma/PostgreSQL es común con importaciones. Los
+bloqueos SQL se mantienen en repositories y todas las escrituras reciben el mismo `tx`.

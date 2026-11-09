@@ -17,6 +17,7 @@ export const errorMessages = {
     INVENTORY_IMPORT_NOT_FOUND: 'La importación no existe o no pertenece a tu cuenta.',
     INVENTORY_IMPORT_STATE: 'La importación ya no está pendiente de confirmación.',
     INVENTORY_IMPORT_CONFLICT: 'Los datos cambiaron o la clave corresponde a otra confirmación. Revisa el resultado y valida una nueva plantilla.',
+    INVENTORY_IMPORT_MODE_RETIRED: 'Este borrador mezcla operaciones y ya no puede confirmarse. Descártalo y descarga una plantilla para Alta, Editar datos o Ajustar existencias.',
     INVENTORY_PIECE_QUANTITY_REQUIRED: PIECE_QUANTITY_MESSAGE,
     ISSUE_SUPPLY_QUANTITY_CONFLICT: 'La cantidad a surtir debe ser positiva y no superar el saldo pendiente del detalle.',
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',

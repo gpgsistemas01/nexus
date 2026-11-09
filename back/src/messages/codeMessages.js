@@ -1,4 +1,7 @@
+import { HISTORICAL_DELIVERY_ERROR_CODES } from '../shared/constants/historicalDelivery.js';
+
 export const errorMap = {
+    historicalDelivery: HISTORICAL_DELIVERY_ERROR_CODES,
     inventoryImport: {
         FILE: 'INVENTORY_IMPORT_FILE',
         LIMIT: 'INVENTORY_IMPORT_LIMIT',
@@ -7,7 +10,8 @@ export const errorMap = {
         EXPIRED: 'INVENTORY_IMPORT_EXPIRED',
         NOT_FOUND: 'INVENTORY_IMPORT_NOT_FOUND',
         STATE: 'INVENTORY_IMPORT_STATE',
-        CONFLICT: 'INVENTORY_IMPORT_CONFLICT'
+        CONFLICT: 'INVENTORY_IMPORT_CONFLICT',
+        MODE_RETIRED: 'INVENTORY_IMPORT_MODE_RETIRED'
     },
     id: { INVALID_UUID: 'RECORD_ID_INVALID' },
     operationId: { REQUIRED: 'OPERATION_ID_REQUIRED', INVALID_UUID: 'OPERATION_ID_INVALID' },

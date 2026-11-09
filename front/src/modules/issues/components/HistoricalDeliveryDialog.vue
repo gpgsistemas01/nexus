@@ -4,6 +4,7 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
+import { HISTORICAL_DELIVERY_LIMITS as limits } from '@nexus/historical-deliveries';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
 import type {
@@ -108,7 +109,7 @@ const emit = defineEmits<{
             <VTextField
                 :model-value="values.search"
                 label="Buscar folio o proyecto"
-                maxlength="200"
+                :maxlength="limits.maxSearchLength"
                 :disabled="isWorking"
                 @update:model-value="emit('update', 'search', $event ?? '')"
             />
@@ -170,7 +171,7 @@ const emit = defineEmits<{
                         Página anterior
                     </VBtn>
                     <VBtn
-                        :disabled="isWorking || !preview.hasMore"
+                        :disabled="isWorking || !preview.hasMore || preview.page >= limits.maxPage"
                         @click="emit('load', preview.page + 1)"
                     >
                         Página siguiente
@@ -180,7 +181,7 @@ const emit = defineEmits<{
                 <VTextarea
                     :model-value="values.reason"
                     label="Motivo y evidencia de la entrega histórica"
-                    maxlength="500"
+                    :maxlength="limits.maxReasonLength"
                     :disabled="isWorking"
                     @update:model-value="emit('update', 'reason', $event ?? '')"
                 />

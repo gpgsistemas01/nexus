@@ -2,10 +2,9 @@ import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue
 import { zonedDateTimeToUtcIso } from '@nexus/date-time';
 import { createUuid } from '../../../shared/utils/createUuid.js';
 import { ApiError } from '../../../shared/http/apiError.js';
-import {
-    historicalDeliveryService,
-    readHistoricalDeliveryCommand,
-} from '../services/historicalDeliveryService.js';
+import { HISTORICAL_DELIVERY_ERROR_CODES } from '@nexus/historical-deliveries';
+import { historicalDeliveryService } from '../services/historicalDeliveryService.js';
+import { pendingHistoricalDelivery } from '../services/pendingHistoricalDelivery.js';
 import type { IssueResource } from '../issue.js';
 import type {
     HistoricalDeliveryCommand,
@@ -34,16 +33,12 @@ export const useHistoricalDelivery = (options: {
     const pending = shallowRef<HistoricalDeliveryCommand | null>(null);
     const recoveryRequired = ref(false);
     const controller = new AbortController();
-    const storageKey = `nexus:historical-delivery:${options.userId}:${options.resource}`;
+    const storage = pendingHistoricalDelivery(options.userId, options.resource);
     let disposed = false;
 
     try {
-        const stored = localStorage.getItem(storageKey);
-
-        if (stored) {
-            pending.value = readHistoricalDeliveryCommand(JSON.parse(stored));
-            recoveryRequired.value = true;
-        }
+        pending.value = storage.read();
+        recoveryRequired.value = !!pending.value;
     } catch {
         recoveryRequired.value = true;
         error.value =
@@ -91,9 +86,11 @@ export const useHistoricalDelivery = (options: {
                     pending.value &&
                     cause instanceof ApiError &&
                     [400, 404, 409].includes(cause.status) &&
-                    !['HISTORICAL_DELIVERY_BUSY', 'OPERATION_KEY_CONFLICT'].includes(cause.code)
+                    ![HISTORICAL_DELIVERY_ERROR_CODES.BUSY, 'OPERATION_KEY_CONFLICT'].includes(
+                        cause.code,
+                    )
                 ) {
-                    localStorage.removeItem(storageKey);
+                    storage.clear();
                     pending.value = null;
                     recoveryRequired.value = false;
                     preview.value = null;
@@ -132,7 +129,7 @@ export const useHistoricalDelivery = (options: {
         if (disposed) return;
 
         receipt.value = saved;
-        localStorage.removeItem(storageKey);
+        storage.clear();
         pending.value = null;
         recoveryRequired.value = false;
         options.onSaved();
@@ -152,8 +149,7 @@ export const useHistoricalDelivery = (options: {
                     .value!.documents.filter((item) => selected.value.includes(item.id))
                     .map(({ id, revision }) => ({ id, revision })),
             };
-            readHistoricalDeliveryCommand(command);
-            localStorage.setItem(storageKey, JSON.stringify(command));
+            storage.save(command);
             pending.value = command;
             recoveryRequired.value = true;
             await send();
