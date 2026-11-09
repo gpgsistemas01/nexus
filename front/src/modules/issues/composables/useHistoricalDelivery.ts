@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue';
 import { zonedDateTimeToUtcIso } from '@nexus/date-time';
 import { createUuid } from '../../../shared/utils/createUuid.js';
 import { ApiError } from '../../../shared/http/apiError.js';
@@ -22,11 +22,11 @@ export const useHistoricalDelivery = (options: {
     onUnauthorized: () => void;
 }) => {
     const values = reactive({
-        cutoffDate: '',
         deliveredAt: '',
         reason: '',
         declaredDelivered: false,
     });
+    const cutoffDate = new Date().toISOString();
     const preview = shallowRef<HistoricalDeliveryPreview | null>(null);
     const receipt = shallowRef<HistoricalDeliveryReceipt | null>(null);
     const selected = ref<string[]>([]);
@@ -51,16 +51,6 @@ export const useHistoricalDelivery = (options: {
         error.value =
             'No se pudo leer la regularización pendiente. Contacta al administrador antes de registrar otra.';
     }
-
-    watch(
-        () => values.cutoffDate,
-        () => {
-            preview.value = null;
-            selected.value = [];
-            candidates.value = new Map();
-            allSelected.value = false;
-        },
-    );
 
     const utc = (value: string) => zonedDateTimeToUtcIso(new Date(value));
 
@@ -117,10 +107,6 @@ export const useHistoricalDelivery = (options: {
     const load = (page = 1, preserveSelection = false) =>
         run(async () => {
             if (recoveryRequired.value || receipt.value) return;
-
-            const cutoffDate = utc(values.cutoffDate);
-            if (!cutoffDate || Date.parse(cutoffDate) > Date.now())
-                throw new Error('Captura un corte válido que no esté en el futuro.');
 
             const result = await historicalDeliveryService.preview(
                 options.resource,
@@ -224,7 +210,6 @@ export const useHistoricalDelivery = (options: {
             isSelectingAll.value = true;
 
             try {
-                const cutoffDate = utc(values.cutoffDate);
                 const allCandidates = new Map<
                     string,
                     HistoricalDeliveryPreview['documents'][number]
@@ -273,6 +258,10 @@ export const useHistoricalDelivery = (options: {
         disposed = true;
         controller.abort();
     });
+    onMounted(() => {
+        void load();
+    });
+
     return {
         values,
         preview,

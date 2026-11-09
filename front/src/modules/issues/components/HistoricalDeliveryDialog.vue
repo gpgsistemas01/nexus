@@ -16,7 +16,6 @@ import type {
 
 defineProps<{
     values: {
-        cutoffDate: string;
         deliveredAt: string;
         reason: string;
         declaredDelivered: boolean;
@@ -32,7 +31,7 @@ defineProps<{
     error: string;
 }>();
 const emit = defineEmits<{
-    update: [field: 'cutoffDate' | 'deliveredAt' | 'reason', value: string];
+    update: [field: 'deliveredAt' | 'reason', value: string];
     declare: [value: boolean];
     select: [id: string];
     selectAll: [selected: boolean];
@@ -60,7 +59,8 @@ const emit = defineEmits<{
             variant="tonal"
             class="mb-4"
         >
-            Usa este registro para salidas que ya se entregaron físicamente antes del corte. Primero
+            La tabla muestra automáticamente salidas pendientes y parcialmente surtidas hasta la
+            hora actual. Usa este registro sólo para entregas físicas ya realizadas. Primero
             concilia el inventario con un conteo físico actual. Esta operación completa el registro
             pendiente sin descontar stock. Los costos y cantidades de proyecto históricos permanecen
             sin verificar.
@@ -100,24 +100,12 @@ const emit = defineEmits<{
             </ul>
         </VAlert>
         <template v-if="!receipt && !recoveryRequired">
-            <VTextField
-                :model-value="values.cutoffDate"
-                type="datetime-local"
-                label="Fecha y hora de corte"
-                hint="Hora de Ciudad de México."
-                persistent-hint
-                :disabled="isWorking"
-                @update:model-value="emit('update', 'cutoffDate', $event ?? '')"
-            />
-            <div class="historical-actions mb-4">
-                <VBtn
-                    variant="outlined"
-                    :disabled="isWorking || !values.cutoffDate"
-                    @click="emit('load')"
-                >
-                    Cargar salidas pendientes y parcialmente surtidas
-                </VBtn>
-            </div>
+            <p
+                v-if="isWorking && !preview"
+                role="status"
+            >
+                Cargando salidas pendientes y parcialmente surtidas…
+            </p>
             <template v-if="preview">
                 <p>
                     Revisa las partidas pendientes y selecciona sólo las salidas entregadas por
@@ -137,21 +125,7 @@ const emit = defineEmits<{
                     avanzar o seleccionar los resultados de todas las páginas.
                 </p>
                 <template v-if="preview.documents.length || preview.hasMore">
-                    <div class="historical-actions my-4">
-                        <VBtn
-                            variant="outlined"
-                            :disabled="isWorking"
-                            :loading="isSelectingAll"
-                            @click="emit('selectAll', !allSelected)"
-                        >
-                            {{
-                                isSelectingAll
-                                    ? 'Cargando todas las páginas…'
-                                    : allSelected
-                                      ? 'Deseleccionar todo'
-                                      : 'Seleccionar todo'
-                            }}
-                        </VBtn>
+                    <div class="my-4">
                         <span>
                             {{ selected.length }}
                             {{
@@ -176,7 +150,8 @@ const emit = defineEmits<{
                                             :model-value="allSelected"
                                             :indeterminate="selected.length > 0 && !allSelected"
                                             aria-label="Seleccionar todas las salidas de todas las páginas"
-                                            :disabled="isWorking"
+                                            :disabled="isWorking || isSelectingAll"
+                                            :loading="isSelectingAll"
                                             hide-details
                                             @update:model-value="emit('selectAll', $event === true)"
                                         />
@@ -265,7 +240,6 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.historical-actions,
 .historical-pagination {
     display: flex;
     flex-wrap: wrap;
