@@ -152,16 +152,24 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
   ] as const) {
     await page.goto(`/almacen/${path}`);
     await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
-    await chooseOption(page, 'Proveedor de la plantilla', 'Proveedor Central');
+    await chooseOption(page, 'Limitar proveedores disponibles', 'Proveedor Central');
     if (update) {
       await selectOperation(page, 'Editar datos');
+      await expect(page.getByRole('spinbutton')).toHaveCount(0);
       await page
-        .getByRole('spinbutton', { name: 'Página de la plantilla (100 filas)', exact: true })
-        .fill('2');
-      await page
-        .getByRole('textbox', { name: 'Buscar registros de la plantilla', exact: true })
+        .getByRole('textbox', { name: 'Filtrar registros por nombre', exact: true })
         .fill('Lona');
+    } else {
+      await page
+        .getByRole('textbox', { name: 'Buscar material de referencia', exact: true })
+        .fill('Manta');
     }
+    await expect(
+      page.getByText(/La hoja Catalogos contiene opciones para las listas desplegables/),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Las columnas grises son referencias que debes conservar sin editar/),
+    ).toBeVisible();
     const requested = page.waitForRequest((request) =>
       request.url().includes(`/inventory-imports/${resource}/template`),
     );
@@ -175,8 +183,9 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
       `plantilla_${resource}_${update ? 'update' : 'create'}_`,
     );
     expect(params.get('supplierId')).toBe(ids.supplier);
-    expect(params.get('page')).toBe(update ? '2' : '1');
+    expect(params.has('page')).toBe(false);
     if (update) expect(params.get('search')).toBe('Lona');
+    else expect(params.get('search')).toBe('Manta');
     await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
   }
 });

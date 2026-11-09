@@ -33,7 +33,6 @@ const props = defineProps<{
     suppliers: LookupState;
     supplierId: string;
     search: string;
-    templatePage: number;
     canReadSuppliers: boolean;
 }>();
 const emit = defineEmits<{
@@ -48,7 +47,6 @@ const emit = defineEmits<{
     errors: [];
     supplier: [value: string];
     search: [value: string];
-    templatePage: [value: number];
     searchSuppliers: [value: string];
     moreSuppliers: [];
     retrySuppliers: [];
@@ -68,6 +66,25 @@ const modeOptions = computed(() =>
     })),
 );
 const modeLabel = computed(() => INVENTORY_IMPORT_MODE_LABELS[props.mode]);
+const supplierLabel = computed(() =>
+    props.mode === modes.CREATE
+        ? 'Limitar proveedores disponibles'
+        : 'Filtrar registros por proveedor',
+);
+const supplierHint = computed(() =>
+    props.mode === modes.CREATE
+        ? 'En Alta limita las opciones del desplegable Proveedor; no filtra filas existentes.'
+        : 'Déjalo vacío para incluir todos los proveedores que coincidan con el nombre.',
+);
+const showSearch = computed(() => props.mode !== modes.CREATE || props.resource === 'wastes');
+const searchLabel = computed(() =>
+    props.mode === modes.CREATE ? 'Buscar material de referencia' : 'Filtrar registros por nombre',
+);
+const searchHint = computed(() =>
+    props.mode === modes.CREATE
+        ? 'Limita las opciones de Material de referencia en la hoja Catalogos.'
+        : 'Déjalo vacío para incluir todos los registros que coincidan con el proveedor.',
+);
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
 );
@@ -107,7 +124,7 @@ const selectMode = (value: unknown) => {
         :show-submit="!batch && !recoveryRequired"
         :is-submit-disabled="!file"
         submit-label="Validar archivo"
-        note="Hasta 100 filas y 2 MiB. La confirmación aplica todo el lote."
+        :note="`Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB. La confirmación aplica todo el lote.`"
         @close="emit('close')"
         @submit="emit('prepare')"
     >
@@ -149,7 +166,7 @@ const selectMode = (value: unknown) => {
             <p class="mb-4">
                 {{
                     mode === modes.CREATE
-                        ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
+                        ? 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.'
                         : mode === modes.ADJUST
                           ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
                           : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
@@ -160,52 +177,57 @@ const selectMode = (value: unknown) => {
                 selecciona esa misma operación al cargarla. Un duplicado o error bloquea todo el
                 archivo. Cambiar la operación retira el archivo seleccionado.
             </p>
+            <VAlert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+            >
+                Las columnas grises son referencias que debes conservar sin editar; las blancas son
+                los campos que puedes capturar para esta operación. La hoja
+                <strong>Catalogos</strong>
+                contiene opciones para las listas desplegables, no registros de inventario. Elige la
+                opción completa tal como aparece; si incluye un ID, no lo escribas por separado.
+            </VAlert>
+            <VAlert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+            >
+                En edición y ajuste, la plantilla incluye todos los registros que coincidan con los
+                filtros, hasta {{ limits.maxRows }} filas. Si hay más, filtra por proveedor o nombre
+                y procesa grupos de hasta {{ limits.maxRows }} filas. Cada archivo también debe
+                pesar como máximo {{ limits.maxBytes / (1024 * 1024) }} MiB.
+            </VAlert>
             <div class="template-fields">
                 <RemoteSelect
                     v-if="canReadSuppliers"
-                    label="Proveedor de la plantilla"
+                    :label="supplierLabel"
                     :model-value="supplierId"
                     :state="suppliers"
                     :is-disabled="locked"
+                    :hint="supplierHint"
+                    persistent-hint
                     @update:model-value="emit('supplier', $event)"
                     @search="emit('searchSuppliers', $event)"
                     @more="emit('moreSuppliers')"
                     @retry="emit('retrySuppliers')"
                 />
                 <VTextField
+                    v-if="showSearch"
                     :model-value="search"
-                    label="Buscar registros de la plantilla"
+                    :label="searchLabel"
+                    :hint="searchHint"
+                    persistent-hint
                     :disabled="locked"
                     :maxlength="limits.maxSearchLength"
                     @update:model-value="emit('search', $event)"
                 />
-                <VTextField
-                    v-if="mode !== modes.CREATE"
-                    :model-value="templatePage"
-                    label="Página de la plantilla (100 filas)"
-                    type="number"
-                    min="1"
-                    :max="limits.maxTemplatePage"
-                    :disabled="locked"
-                    @update:model-value="emit('templatePage', Number($event))"
-                />
             </div>
-            <p
-                v-if="resource === 'wastes' && mode === modes.CREATE"
-                class="mb-3"
-            >
-                Selecciona el proveedor para incluir sus materiales de referencia en m². En el
-                Excel, elige la opción completa de la lista sin escribir el ID manualmente.
-            </p>
             <VBtn
                 variant="outlined"
                 class="mb-5"
                 :disabled="
-                    locked ||
-                    (resource === 'wastes' && mode === modes.CREATE && !supplierId) ||
-                    !Number.isInteger(templatePage) ||
-                    templatePage < 1 ||
-                    templatePage > limits.maxTemplatePage
+                    locked || (resource === 'wastes' && mode === modes.CREATE && !supplierId)
                 "
                 :loading="isDownloading"
                 @click="emit('template')"

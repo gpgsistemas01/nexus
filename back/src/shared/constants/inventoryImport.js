@@ -1,10 +1,9 @@
 export const INVENTORY_IMPORT_LIMITS = Object.freeze({
     maxBytes: 2 * 1024 * 1024,
-    maxRows: 100,
+    maxRows: 500,
     maxCellLength: 600,
     draftHours: 24,
-    maxSearchLength: 200,
-    maxTemplatePage: 999
+    maxSearchLength: 200
 });
 
 export const INVENTORY_IMPORT_MODES = Object.freeze({

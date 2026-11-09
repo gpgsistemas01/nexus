@@ -21,8 +21,9 @@ comprueba recibos, movimientos, versiones y rollback reales.
 
 La variante de conteo selecciona Ajustar existencias para todo el archivo y muestra
 stock 2→0. Cambiar de Alta a Ajustar retira el archivo previo y exige cargarlo otra
-vez. Se confirma una sola solicitud. Las plantillas de edición/alta conservan su
-operación en los parámetros y nombre de descarga. Un archivo incompatible muestra
+vez. Se confirma una sola solicitud. Las plantillas conservan su operación en los
+parámetros y nombre de descarga, no envían página, y la pantalla explica las columnas
+grises, las opciones de **Catalogos** y los filtros. Un archivo incompatible muestra
 el rechazo sin confirmación. Un operador de ajuste sin lectura de costos sólo ve
 Ajustar existencias; sin escritura/costos ni ajuste, el botón permanece oculto.
 La integración contrasta columnas del reporte, IDs/versiones, conservación del destino,

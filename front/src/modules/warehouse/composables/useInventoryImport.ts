@@ -217,7 +217,7 @@ export const useInventoryImport = (options: {
             file.value = null;
         });
 
-    const template = useFileExport<{ supplierId: string; search: string; page: number }>({
+    const template = useFileExport<{ supplierId: string; search: string }>({
         canExport: () =>
             !batch.value &&
             !isWorking.value &&

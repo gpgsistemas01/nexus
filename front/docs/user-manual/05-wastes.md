@@ -12,7 +12,7 @@ agrupa totales. Después se añaden los IDs/versiones y los campos necesarios.
 
 1. Pulse **Importar Excel** y seleccione la operación para todo el archivo.
 2. En Alta, seleccione proveedor y descargue la plantilla con sus materiales de referencia en m². En edición o ajuste, filtre los registros actuales y descargue sus IDs/versiones.
-3. Complete sólo los campos de captura de la operación seleccionada y conserve las columnas de consulta.
+3. En edición o ajuste, deje vacíos los filtros para incluir todos los registros coincidentes o filtre por proveedor/nombre. La plantilla incluye hasta 500 registros; si hay más, trabaje grupos filtrados. Complete sólo las columnas blancas de captura y conserve las grises.
 4. Seleccione la misma operación y el archivo; pulse **Validar archivo**. Revise los datos y errores.
 5. Corrija los errores en el original, descarte el borrador y vuelva a validar.
 6. Pulse **Confirmar importación** y espere el recibo.
@@ -45,8 +45,8 @@ cambiar datos y stock complete dos operaciones con una descarga actual entre ell
 <!-- manual:end -->
 
 En **Activo**, use **SI** o **NO**. Capture números con punto decimal y sin símbolos
-de moneda; no cambie IDs ni versiones. Si supera 100 filas, prepare archivos separados
-y revise que los grupos no repitan registros.
+de moneda; no cambie IDs ni versiones. Cada archivo admite hasta 500 filas. Para
+trabajar más registros, aplique filtros y evite repetir destinos entre archivos.
 
 Conserve los IDs/versiones que se descargan para cada registro existente. No es
 necesario ser administrador: se incluyen según el permiso operativo. Cambiar la
@@ -56,8 +56,10 @@ Si una fila está repetida o es inválida, **no se aplica ninguna fila**. Descar
 los errores, corrija o retire los repetidos y vuelva a validar. Un alta repetida no suma stock.
 
 Conserve **Datos**, **Instrucciones**, **Catalogos**, los encabezados y las columnas
-grises de referencia. Complete sólo la captura de la operación seleccionada y
-retire las filas que no quiera procesar. Use los valores completos de los catálogos.
+grises de referencia. **Catalogos** contiene opciones de las listas desplegables; no
+son registros de inventario. Elija los valores completos tal como aparecen, incluido
+el ID cuando venga integrado en la opción. Complete sólo la captura de la operación
+seleccionada y retire las filas que no quiera procesar.
 
 Suba el `.xlsx` directamente, sin otro ZIP, fórmulas, macros ni enlaces externos.
 El archivo de **Exportar Excel** sirve para consultar; descargue una plantilla
@@ -65,7 +67,7 @@ operativa para cargar cambios. Las plantillas antiguas deben sustituirse por una
 actual. **Descargar errores** genera un informe: corrija la copia de captura y vuelva
 a validarla, sin importar el informe de errores.
 
-Máximo: 100 filas y 2 MiB. Actualizar sólo cambia nombre, mínimo, costo y activo;
+Máximo: 500 filas y 2 MiB. Actualizar sólo cambia nombre, mínimo, costo y activo;
 conserva stock, medidas y pesos. Para entradas posteriores use **Agregar stock**.
 Si se pierde la respuesta, pulse **Revisar y reintentar confirmación** desde la
 misma opción de importación. No cargue otro archivo para repetir una confirmación

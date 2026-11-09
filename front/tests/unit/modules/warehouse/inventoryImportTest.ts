@@ -97,7 +97,7 @@ describe('contrato de importación y recuperación', () => {
       }),
     );
     mounted.value.selectFile(new File(['xlsx'], 'materiales.xlsx'));
-    const download = mounted.value.template.exportReport({ supplierId: '', search: '', page: 1 });
+    const download = mounted.value.template.exportReport({ supplierId: '', search: '' });
     mounted.value.selectMode('adjust');
     await mounted.value.prepare();
     expect(mounted.value.mode.value).toBe('create');

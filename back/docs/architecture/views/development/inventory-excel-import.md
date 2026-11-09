@@ -18,8 +18,10 @@ pertenecen a `front/`; los contratos HTTP están en [OpenAPI](../../openapi/inde
 | Ajuste de existencias en los tres inventarios | IDs/versiones originales, Stock contado final, motivo activo y observaciones; las demás columnas son referencias. |
 
 El formato `NEXUS_INVENTORY_V2` contiene `Datos`, `Instrucciones` y `Catalogos`.
-Las plantillas de edición y ajuste contienen hasta 100 relaciones por página y admiten
-filtros por nombre y proveedor. Sus IDs y versiones se incluyen automáticamente para
+Las plantillas de edición y ajuste incluyen todos los registros que coinciden con
+los filtros de nombre/proveedor, hasta 500. El servidor consulta una fila adicional
+para detectar el exceso y no devuelve una plantilla parcial; el usuario debe filtrar
+la consulta y procesar grupos de hasta 500. Sus IDs y versiones se incluyen automáticamente para
 quien tiene el permiso operativo; no dependen de ser administrador y deben conservarse. La de alta
 incluye hasta 500 opciones activas por catálogo; para merma se elige proveedor.
 
@@ -75,7 +77,7 @@ se detiene ante un modo no admitido, sin convertir ni borrar registros.
 
 | Ruta | Resultado |
 | --- | --- |
-| `GET /:resource/template?mode=...&supplierId=...&search=...&page=1` | XLSX de captura o actualización; páginas de 100 registros. |
+| `GET /:resource/template?mode=...&supplierId=...&search=...` | XLSX de captura o actualización; devuelve todos los registros coincidentes hasta 500 o rechaza una consulta mayor. |
 | `POST /:resource/preview?mode=...` | Multipart con un único `file`; `{ code, batch }` con versión, vencimiento, resumen y filas. No cambia inventario. |
 | `POST /:id/confirm` | JSON `{ expectedVersion, operationId }`; confirma el borrador del servidor y devuelve su recibo. |
 | `GET /:id` | `{ batch }` con vista previa vigente o resultado confirmado. |
@@ -118,7 +120,7 @@ condicionado por estado no puede borrar una confirmación que ganó la carrera.
 
 | Control | Implementación |
 | --- | --- |
-| Tamaño | 2 MiB, 100 filas, 600 caracteres por celda; ZIP de hasta 16 MiB descomprimidos y 200 entradas. |
+| Tamaño | 2 MiB, 500 filas, 600 caracteres por celda; ZIP de hasta 16 MiB descomprimidos y 200 entradas. |
 | Contenido | Rechaza fórmulas, macros, vínculos externos, objetos de celda y hojas/encabezados incompatibles. |
 | CPU | SheetKit se ejecuta en un worker temporal con 10 s de análisis/generación. Los límites de entrada y descompresión acotan el libro; el límite V8 del worker no limita la memoria nativa de Rust. |
 | Admisión | Una vista previa y un trabajo XLSX por proceso; una confirmación de importación por base. Otra solicitud recibe `429` y puede reintentarse. |

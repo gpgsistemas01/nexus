@@ -52,10 +52,11 @@ const read = async ({ bytes, config }) => {
     const columns = config.columns.map((_, index) => spreadsheetColumn(index + 1));
     if (!config.columns.every(([header], index) => readCell('Datos', `${columns[index]}1`) === header)) fail('FILE');
     const rows = [];
-    const traversal = { limits: { maxRows: 1001, maxColumns: config.columns.length + 1,
-        maxCells: 1001 * (config.columns.length + 1), maxOutputBytes: processing.maxUncompressedBytes } };
+    const maxSheetRow = limits.maxRows * 10 + 1;
+    const traversal = { limits: { maxRows: maxSheetRow + 1, maxColumns: config.columns.length + 1,
+        maxCells: (maxSheetRow + 1) * (config.columns.length + 1), maxOutputBytes: processing.maxUncompressedBytes } };
     for (const row of workbook.getRowsIterator('Datos', traversal)) {
-        if (row.row > 1001 || row.cells.some(cell => !columns.includes(cell.column))) fail('LIMIT');
+        if (row.row > maxSheetRow || row.cells.some(cell => !columns.includes(cell.column))) fail('LIMIT');
         if (row.row === 1) continue;
         const cells = new Map(row.cells.map(cell => [cell.column, cell]));
         const values = columns.map(column => {
@@ -96,10 +97,12 @@ const template = async ({ config, rows = [], catalogs }) => {
         ['Formato', INVENTORY_IMPORT_FORMAT], ['Recurso', config.resource], ['Operacion', config.mode],
         ['Operación del archivo', `${INVENTORY_IMPORT_MODE_LABELS[config.mode]}. Todas las filas realizan esta operación. Selecciona la misma operación al importar; para otra operación descarga otra plantilla.`],
         ['Estructura de inventario', 'Las primeras columnas siguen el orden del reporte: Proveedor, Material, Base, Altura, Stock actual, Stock mínimo, Presentación, Conversión, Unidad y Costo unitario. En ajuste se omite el costo. Después se agregan Activo, IDs/versiones y los campos de la operación.'],
-        ['Límites', 'Hasta 100 filas y 2 MiB. Conserva hojas, encabezados, identificadores y versiones.'],
-        ['Identificadores', 'Altas: el sistema genera los IDs nuevos. Edición y ajuste: los IDs y versiones del destino se incluyen automáticamente según tu permiso operativo. Conserva las columnas grises; el nombre no identifica el destino.'],
+        ['Límites', `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. La plantilla incluye todos los registros coincidentes; si hay más, filtra por proveedor o nombre y procesa grupos de hasta ${limits.maxRows}. Conserva hojas y encabezados.`],
+        ['Columnas editables', `Para esta operación captura sólo: ${config.columns.filter(([, key]) => !config.readonlyFields.includes(key)).map(([header]) => header).join(', ')}.`],
+        ['Columnas grises', 'Las columnas grises son referencias de consulta o identificadores/versiones del destino. No las edites: consérvalas para identificar el registro y sus datos actuales. Las columnas blancas son las de captura indicadas para esta operación.'],
+        ['Identificadores', 'Altas: el sistema genera los IDs nuevos. Edición y ajuste: los IDs y versiones del destino se incluyen automáticamente según tu permiso operativo; no los escribas ni cambies. El nombre no identifica el destino.'],
         ['Captura', 'Una fila por registro. Usa números sin signo de moneda. Activo: SI o NO. No uses fórmulas.'],
-        ['Catálogos', 'Listas de hasta 500 opciones. Elige proveedor, presentación y unidad; en merma selecciona la opción completa del material de referencia, incluido su ID, sin escribirlo manualmente.'],
+        ['Catálogos', 'La hoja Catalogos contiene opciones para las listas desplegables; no son registros de inventario para importar. Elige el valor completo tal como aparece. En Material de referencia y Motivo, el ID viene incluido en la opción: no lo escribas por separado. Conserva la hoja.'],
         ['Duplicados', 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
         ['Cantidad inicial', 'Sólo en altas. Es cantidad por presentación, no área ni peso. Pieza exige enteros.'],
         ['Conteo físico', 'En ajuste, Stock contado es el saldo final contado por presentación; cero es válido y vacío se rechaza. Captura Motivo y Observaciones en cada fila. Stock actual y Conversión son referencias y no se suman.'],

@@ -36,10 +36,13 @@ podrá surtirse hasta configurarlo.
 ## Recorrido
 
 1. Abrir **Importar Excel** y elegir Alta, Editar datos o Ajustar existencias.
-2. Filtrar registros/proveedor y página; descargar la plantilla de esa operación.
-   Para altas de merma, seleccionar proveedor para obtener sus referencias en m².
-3. Completar las columnas de captura de todas las filas, conservando referencias,
-   IDs/versiones, hojas y encabezados.
+2. En edición o ajuste, filtrar por proveedor/nombre si se necesita acotar los
+   registros; sin filtros, descargar todos los registros coincidentes, hasta 500.
+   Si hay más, filtrar y trabajar cada grupo. Para altas de merma, seleccionar
+   proveedor para obtener sus referencias en m²; la búsqueda acota esa lista.
+3. Completar las columnas blancas de captura, conservando sin cambios las columnas
+   grises, IDs/versiones, hojas y encabezados. En **Catalogos**, elegir la opción
+   completa de las listas desplegables; no es una lista de inventario para importar.
 4. Seleccionar la misma operación al subir el `.xlsx` y pulsar **Validar archivo**.
 5. Revisar diez filas por página, sus datos anteriores/finales, diferencias y errores.
 6. Si hay errores, descargarlos, descartar el borrador, corregir el archivo y validarlo.
@@ -88,10 +91,13 @@ y `operationId`, sin escrituras por fila. El contrato de respuesta se comprueba
 antes de mostrar éxito. Un `200` incompleto no confirma la importación.
 
 Modos, etiquetas, estados, acciones y límites se comparten por
-`@nexus/inventory-imports`: 2 MiB y 100 filas. El nombre de la descarga incluye la
+`@nexus/inventory-imports`: 2 MiB y 500 filas. El nombre de la descarga incluye la
 operación elegida al iniciar la solicitud, usando `useFileExport`.
 El navegador comprueba tamaño/extensión; Express valida el contenido y las reglas.
-Las plantillas de actualización se descargan por páginas y sus catálogos se acotan.
+Las plantillas de edición/ajuste incluyen todos los registros coincidentes hasta
+500; el servidor solicita una fila adicional para detectar excedentes y no entrega
+una plantilla parcial. Proveedor/nombre sirven para reducir ese conjunto. Las
+opciones de catálogos se acotan a 500 por lista.
 SheetKit analiza el libro en el backend; Vue sólo transmite el archivo y muestra
 la vista previa.
 

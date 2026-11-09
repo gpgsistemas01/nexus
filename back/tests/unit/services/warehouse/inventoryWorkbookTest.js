@@ -20,15 +20,34 @@ describe('fronteras y contenido del libro de inventario', () => {
         expect(report.sheet.getCell('B2').value).toBe('=1+1');
         await expect(read(bytes)).rejects.toMatchObject({ code: 'INVENTORY_IMPORT_FILE' });
     });
-    it('admite 100 filas, ignora vacías y conserva tipos de las celdas', async () => {
-        const rows = Array.from({ length: 100 }, (_, index) => ({ name: `Material ${index}`, maxUnitCost: 12.123456, isActive: true }));
+    it('admite 500 filas, ignora vacías y conserva tipos de las celdas', async () => {
+        const rows = Array.from({ length: 500 }, (_, index) => ({ name: `Material ${index}`, maxUnitCost: 12.123456, isActive: true }));
         const parsed = await read(await inventoryWorkbook({ rows: [{}, ...rows] }));
-        expect(parsed).toHaveLength(100);
+        expect(parsed).toHaveLength(500);
         expect(parsed[0]).toMatchObject({ row: 3, values: { name: 'Material 0', maxUnitCost: 12.123456, isActive: true } });
     });
-    it('rechaza 101 filas antes de validar catálogos', async () => {
-        await expect(read(await inventoryWorkbook({ rows: Array.from({ length: 101 }, () => ({ name: 'Material' })) })))
+    it('rechaza 501 filas antes de validar catálogos', async () => {
+        await expect(read(await inventoryWorkbook({ rows: Array.from({ length: 501 }, () => ({ name: 'Material' })) })))
             .rejects.toMatchObject({ code: 'INVENTORY_IMPORT_LIMIT' });
+    });
+    it('genera y vuelve a leer una plantilla con 500 filas completas', async () => {
+        const updateConfig = getImportConfig('materials', 'update');
+        const rows = Array.from({ length: 500 }, (_, index) => ({ name: `Material ${index}` }));
+        const bytes = await processInventoryWorkbook({
+            action: 'template',
+            config: updateConfig,
+            rows,
+            catalogs,
+        });
+
+        const parsed = await processInventoryWorkbook({
+            action: 'read',
+            config: updateConfig,
+            bytes,
+        });
+
+        expect(parsed).toHaveLength(500);
+        expect(parsed.at(-1)).toMatchObject({ row: 501, values: { name: 'Material 499' } });
     });
     it.each([
         ['fórmula', book => { book.getWorksheet('Datos').getCell('A2').value = { formula: '1+1', result: 2 }; }],
@@ -49,7 +68,7 @@ describe('fronteras y contenido del libro de inventario', () => {
         await expect(read(Buffer.alloc(2 * 1024 * 1024 + 1))).rejects.toMatchObject({ code: 'INVENTORY_IMPORT_LIMIT' });
     });
     it.each([
-        ['fila fuera del rango', book => { book.getWorksheet('Datos').getCell('A1002').value = 'Fuera'; }],
+        ['fila fuera del rango', book => { book.getWorksheet('Datos').getCell('A5002').value = 'Fuera'; }],
         ['columna adicional', book => { book.getWorksheet('Datos').getRow(2).getCell(config.columns.length + 1).value = 'Fuera'; }]
     ])('limita %s sin expandir coordenadas vacías', async (_name, alter) => {
         await expect(read(await inventoryWorkbook({ rows: [{ name: 'Material' }], alter })))
@@ -71,16 +90,28 @@ describe('fronteras y contenido del libro de inventario', () => {
             expect(data.getCell('A1').fill.fgColor.argb).toBe('FF174A5B');
             expect(workbook.getWorksheet('Instrucciones').getCell('B2').value).toBe(resource);
             expect(workbook.getWorksheet('Instrucciones').getCell('B3').value).toBe(mode);
-            const columns = getImportConfig(resource, mode).columns;
+            expect(workbook.getWorksheet('Instrucciones').getCell('B6').value).toContain('500 filas');
+            expect(workbook.getWorksheet('Instrucciones').getCell('B8').value).toContain('grises');
+            expect(workbook.getWorksheet('Instrucciones').getCell('B11').value).toContain('listas desplegables');
+            const config = getImportConfig(resource, mode);
+            const columns = config.columns;
             const common = ['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual', 'Stock mínimo', 'Presentación', 'Conversión', 'Unidad', 'Costo unitario']
                 .filter(header => mode !== 'adjust' || header !== 'Costo unitario');
             expect(data.getRow(1).values.slice(1, common.length + 1)).toEqual(common);
             expect(columns.some(([, key]) => key === 'operation')).toBe(false);
             const active = columns.findIndex(([, key]) => key === 'isActive') + 1;
-            if (mode !== 'adjust') expect(data.getRow(2).getCell(active).dataValidation).toMatchObject({ type: 'list', formulae: ['"SI,NO"'] });
+            if (mode !== 'adjust') {
+                expect(data.getRow(2).getCell(active).dataValidation).toMatchObject({ type: 'list', formulae: ['"SI,NO"'] });
+                expect(data.getRow(501).getCell(active).dataValidation).toMatchObject({ type: 'list', formulae: ['"SI,NO"'] });
+            }
+            config.columns.forEach(([, key], index) => {
+                expect(data.getRow(2).getCell(index + 1).fill?.fgColor?.argb === 'FFE7EDF0')
+                    .toBe(config.readonlyFields.includes(key));
+            });
             if (mode !== 'create') {
                 const id = columns.findIndex(([, key]) => key === 'id') + 1;
                 expect(data.getRow(2).getCell(id).fill.fgColor.argb).toBe('FFE7EDF0');
+                expect(data.getRow(501).getCell(id).fill.fgColor.argb).toBe('FFE7EDF0');
             }
             else {
                 const supplier = columns.findIndex(([, key]) => key === 'supplierCode') + 1;

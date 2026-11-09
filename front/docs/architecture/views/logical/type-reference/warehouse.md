@@ -138,7 +138,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `suppliers` | `suppliers: LookupState;` |
 | `supplierId` | `supplierId: string;` |
 | `search` | `search: string;` |
-| `templatePage` | `templatePage: number;` |
 | `canReadSuppliers` | `canReadSuppliers: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
@@ -151,7 +150,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryImportDialog.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 39, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 38, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -166,7 +165,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `errors` | `errors: [];` |
 | `supplier` | `supplier: [value: string];` |
 | `search` | `search: [value: string];` |
-| `templatePage` | `templatePage: [value: number];` |
 | `searchSuppliers` | `searchSuppliers: [value: string];` |
 | `moreSuppliers` | `moreSuppliers: [];` |
 | `retrySuppliers` | `retrySuppliers: [];` |

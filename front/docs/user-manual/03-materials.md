@@ -11,7 +11,7 @@ Busque y filtre para localizar el registro correcto.
 <!-- manual:any materials:write materials:adjust-stock -->
 ## Importar materiales o consumibles desde Excel
 
-Use **Importar Excel** para trabajar por lotes de hasta **100 filas y 2 MiB**.
+Use **Importar Excel** para trabajar por lotes de hasta **500 filas y 2 MiB**.
 El archivo representa una sola operación. El selector muestra las opciones permitidas
 para su cuenta; no se elige una operación diferente en cada fila.
 
@@ -33,9 +33,9 @@ existencia anterior.
 
 1. Abra el inventario correspondiente y pulse **Importar Excel**.
 2. En **Operación del archivo**, elija la operación que realizará todo el archivo.
-3. Filtre proveedor/nombre y página; pulse **Descargar plantilla**. Cada página contiene hasta 100 registros existentes.
+3. En edición o ajuste, deje vacíos los filtros para descargar todos los registros coincidentes o filtre por proveedor/nombre para acotar. La plantilla contiene hasta 500 registros; si hay más, descargue grupos filtrados.
 4. Guarde una copia del archivo descargado y complete únicamente las columnas de captura de esa operación.
-5. Conserve las hojas **Datos**, **Instrucciones** y **Catalogos**, sus encabezados y las columnas grises de referencia.
+5. Conserve las hojas **Datos**, **Instrucciones** y **Catalogos**, sus encabezados y las columnas grises de referencia. Capture sólo en las columnas blancas.
 6. Seleccione la misma operación, elija el `.xlsx` y pulse **Validar archivo**.
 7. Revise todas las páginas de la vista previa: filas nuevas, cambios, datos anteriores/finales, advertencias y errores. Validar todavía no modifica inventario.
 8. Si hay errores, use **Descargar errores**, corrija el archivo de captura, pulse **Descartar borrador** y vuelva a validarlo. El informe de errores sirve para revisar; no se vuelve a importar.
@@ -47,12 +47,15 @@ IDs/versiones y campos de captura. El ajuste omite el costo. El Excel obtenido c
 Los consumibles mantienen Base y Altura como referencias vacías; no capture dimensiones.
 
 En **Activo**, use **SI** o **NO**. Capture números con punto decimal y sin símbolos
-de moneda; no cambie IDs ni versiones. Si supera 100 filas, prepare archivos separados
-y revise que los grupos no repitan registros.
+de moneda; no cambie IDs ni versiones. Cada archivo admite hasta 500 filas. Para
+trabajar más registros, aplique filtros, descargue grupos de hasta 500 y evite
+repetir registros entre archivos.
 
 Los IDs/versiones se incluyen automáticamente para quien tiene el permiso operativo;
-consérvelos aunque cambie el nombre. No dependen de ser administrador. Use las opciones
-completas de los catálogos, incluido el código del proveedor. Retire de **Datos** las
+consérvelos aunque cambie el nombre. No dependen de ser administrador. La hoja
+**Catalogos** contiene opciones válidas para las listas desplegables; no son los
+registros que se importan. Seleccione el valor completo tal como aparece, incluido
+el código de proveedor o el ID cuando formen parte de la opción. Retire de **Datos** las
 filas que no quiera procesar, sin borrar ni renombrar encabezados.
 
 <!-- manual:all materials:write inventory:costs-read -->
