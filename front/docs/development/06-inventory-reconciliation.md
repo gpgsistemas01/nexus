@@ -22,10 +22,12 @@ antiguos sobre saldos actuales sin conciliar los movimientos posteriores.
 
 1. Conciliar primero el inventario mediante el conteo físico actual.
 2. En **Salidas → Materiales, Consumibles o Mermas**, abrir **Registrar entregas históricas**.
-3. Indicar fecha/hora de corte en Ciudad de México y buscar por folio o proyecto.
+3. Indicar fecha/hora de corte en Ciudad de México y cargar el listado de salidas pendientes
+   y parcialmente surtidas anteriores al corte.
 4. Revisar lo ya registrado/devuelto y las cantidades pendientes por registrar.
-5. Seleccionar las salidas entregadas completamente; se pueden seleccionar hasta
-   100 de la página. Cambiar de corte, búsqueda o página limpia la selección.
+5. Seleccionar las salidas cuyas partidas pendientes ya se entregaron por completo.
+   **Seleccionar todo** abarca todas las páginas si hay hasta 100 salidas; si hay más,
+   selecciona manualmente hasta 100 por lote. Cambiar el corte limpia la selección.
 6. Capturar motivo/evidencia; fecha real de entrega sólo si se conoce.
 7. Declarar expresamente que todas las partidas pendientes se entregaron antes del
    corte y pulsar **Registrar entregas seleccionadas**.

@@ -129,9 +129,14 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 
 1. Conciliar primero el inventario mediante un conteo físico actual en Almacén.
 2. Pulsar **Registrar entregas históricas** en el inventario de salidas correspondiente.
-3. Capturar fecha/hora de corte (Ciudad de México) y buscar folio o proyecto.
-4. Revisar cantidades ya registradas/devueltas y pendientes por registrar. Seleccionar
-   sólo documentos entregados completamente; hasta 100 por página y lote.
+3. Capturar fecha/hora de corte (Ciudad de México) y cargar las salidas pendientes y
+   parcialmente surtidas anteriores al corte.
+4. Revisar la tabla de salidas pendientes y parcialmente surtidas, con cantidades ya
+   registradas/devueltas.
+   **Seleccionar todo** carga y marca los resultados de todas las páginas; la selección se
+   conserva al navegar. También puede marcar filas individuales y quitar la selección con
+   **Deseleccionar todo**. Seleccione sólo documentos entregados completamente. Cada lote admite
+   hasta 100 salidas; si hay más, seleccione manualmente hasta 100 por lote.
 5. Capturar motivo/evidencia y, sólo si se conoce, fecha real de entrega.
 6. Declarar que todas las partidas pendientes seleccionadas se entregaron antes del corte.
 7. Pulsar **Registrar entregas seleccionadas** y conservar el recibo.

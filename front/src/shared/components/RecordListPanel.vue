@@ -100,7 +100,7 @@ const search = defineModel<string>('search', { required: true });
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.75rem;
 }
 .record-heading {
     justify-content: space-between;

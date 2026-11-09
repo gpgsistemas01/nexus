@@ -29,9 +29,25 @@ for (const width of [1280, 390]) {
     let dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
     await dialog.getByLabel('Fecha y hora de corte', { exact: true }).fill('2026-10-31T12:00');
     await dialog
-      .getByRole('button', { name: 'Buscar salidas pendientes al corte', exact: true })
+      .getByRole('button', {
+        name: 'Cargar salidas pendientes y parcialmente surtidas',
+        exact: true,
+      })
       .click();
+    await expect(dialog.getByLabel('Buscar folio o proyecto')).toHaveCount(0);
     await expect(dialog.getByText(/Lona: 3 por registrar/)).toBeVisible();
+    await expect(
+      dialog.getByRole('table', { name: 'Salidas pendientes y parcialmente surtidas' }),
+    ).toBeVisible();
+    await dialog.getByRole('button', { name: 'Seleccionar todo', exact: true }).click();
+    const rowCheckbox = dialog.getByRole('checkbox', {
+      name: 'Seleccionar salida SMA-HIST-001',
+      exact: true,
+    });
+    await expect(rowCheckbox).toBeChecked();
+    await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Deseleccionar todo', exact: true }).click();
+    await expect(rowCheckbox).not.toBeChecked();
     await dialog.getByRole('checkbox', { name: /SMA-HIST-001/ }).check();
     await dialog
       .getByLabel('Motivo y evidencia de la entrega histórica', { exact: true })
@@ -71,6 +87,70 @@ for (const width of [1280, 390]) {
     });
   });
 }
+
+test('seleccionar todo abarca todas las páginas y conserva selecciones al navegar', async ({
+  page,
+}) => {
+  await mockIssues(page, [...issuePermissions, 'issues:reconcile']);
+  const firstPage = { ...historicalPreview(), hasMore: true };
+  const secondPage = {
+    ...historicalPreview(),
+    page: 2,
+    hasMore: false,
+    documents: [
+      {
+        ...historicalPreview().documents[0]!,
+        id: ids.material,
+        revision: 'b'.repeat(64),
+        referenceNumber: 'SMA-HIST-002',
+      },
+    ],
+  };
+  await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
+    const requestUrl = new URL(route.request().url());
+    const requestedPage = Number(requestUrl.searchParams.get('page') ?? 1);
+    return route.fulfill({
+      json: { preview: requestedPage === 1 ? firstPage : secondPage },
+    });
+  });
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+  await dialog.getByLabel('Fecha y hora de corte', { exact: true }).fill('2026-10-31T12:00');
+  await dialog
+    .getByRole('button', {
+      name: 'Cargar salidas pendientes y parcialmente surtidas',
+      exact: true,
+    })
+    .click();
+  await dialog.getByRole('button', { name: 'Seleccionar todo', exact: true }).click();
+  await expect(dialog.getByText('2 salidas seleccionadas en todas las páginas')).toBeVisible();
+  await expect(
+    dialog.getByRole('checkbox', { name: 'Seleccionar salida SMA-HIST-001', exact: true }),
+  ).toBeChecked();
+  await dialog.getByRole('button', { name: 'Página siguiente', exact: true }).click();
+  const secondRow = dialog.getByRole('checkbox', {
+    name: 'Seleccionar salida SMA-HIST-002',
+    exact: true,
+  });
+  await expect(secondRow).toBeChecked();
+  await dialog.getByRole('button', { name: 'Deseleccionar todo', exact: true }).click();
+  await expect(secondRow).not.toBeChecked();
+  await expect(dialog.getByText('0 salidas seleccionadas en todas las páginas')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Página anterior', exact: true }).click();
+  const firstRow = dialog.getByRole('checkbox', {
+    name: 'Seleccionar salida SMA-HIST-001',
+    exact: true,
+  });
+  await firstRow.check();
+  await dialog.getByRole('button', { name: 'Página siguiente', exact: true }).click();
+  await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
+  await expect(secondRow).not.toBeChecked();
+  await secondRow.check();
+  await dialog.getByRole('button', { name: 'Página anterior', exact: true }).click();
+  await expect(firstRow).toBeChecked();
+  await expect(dialog.getByText('2 salidas seleccionadas en todas las páginas')).toBeVisible();
+});
 
 test('surtir no concede el permiso de regularización histórica', async ({ page }) => {
   await mockIssues(page);

@@ -55,6 +55,22 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     await historicalDeliveryService.confirm('materials', command, new AbortController().signal);
     expect(JSON.parse(transport.mock.calls[0]![0].data as string)).toEqual(command);
   });
+  it('carga las salidas del corte sin aplicar filtros de texto', async () => {
+    let url = '';
+    apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
+      url = config.url ?? '';
+      return { data: { preview: historicalPreview() } };
+    });
+    await historicalDeliveryService.preview(
+      'materials',
+      { cutoffDate: historicalPreview().cutoffDate, page: 1 },
+      new AbortController().signal,
+    );
+    const query = new URL(url, 'http://localhost').searchParams;
+    expect(query.get('cutoffDate')).toBe(historicalPreview().cutoffDate);
+    expect(query.get('page')).toBe('1');
+    expect(query.has('search')).toBe(false);
+  });
   it('la pérdida de respuesta y la recarga reintentan la misma captura y clave', async () => {
     const send = vi
       .spyOn(historicalDeliveryService, 'confirm')
@@ -64,7 +80,7 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     mounted.value.values.cutoffDate = '2026-10-31T12:00';
     await nextTick();
     mounted.value.preview.value = historicalPreview();
-    mounted.value.selectAll();
+    await mounted.value.selectAll();
     mounted.value.values.reason = 'Entrega física comprobada';
     expect(mounted.value.canConfirm.value).toBe(false);
     mounted.value.values.declaredDelivered = true;
@@ -81,16 +97,16 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     expect(localStorage.length).toBe(0);
     mounted.wrapper.unmount();
   });
-  it('cambiar corte o búsqueda invalida la selección y un conflicto definitivo exige volver a leer', async () => {
+  it('cambiar el corte invalida la selección y un conflicto definitivo exige volver a leer', async () => {
     const mounted = mount();
     mounted.value.preview.value = historicalPreview();
-    mounted.value.selectAll();
-    mounted.value.values.search = 'otro folio';
+    await mounted.value.selectAll();
+    mounted.value.values.cutoffDate = '2026-10-30T12:00';
     await nextTick();
     expect(mounted.value.preview.value).toBeNull();
     expect(mounted.value.selected.value).toEqual([]);
     mounted.value.preview.value = historicalPreview();
-    mounted.value.selectAll();
+    await mounted.value.selectAll();
     mounted.value.values.reason = 'Entregado';
     mounted.value.values.declaredDelivered = true;
     vi.spyOn(historicalDeliveryService, 'confirm').mockRejectedValue(
@@ -99,6 +115,63 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     await mounted.value.confirm();
     expect(mounted.value.preview.value).toBeNull();
     expect(mounted.value.recoveryRequired.value).toBe(false);
+    mounted.wrapper.unmount();
+  });
+  it('seleccionar todo carga todas las páginas y conserva las revisiones seleccionadas', async () => {
+    const mounted = mount();
+    mounted.value.values.cutoffDate = '2026-10-31T12:00';
+    mounted.value.preview.value = { ...historicalPreview(), hasMore: true };
+    const secondPage = {
+      ...historicalPreview(),
+      page: 2,
+      documents: [
+        {
+          ...historicalPreview().documents[0]!,
+          id: ids.material,
+          revision: 'b'.repeat(64),
+          referenceNumber: 'SMA-HIST-002',
+        },
+      ],
+    };
+    const preview = vi.spyOn(historicalDeliveryService, 'preview').mockResolvedValue(secondPage);
+    await mounted.value.selectAll();
+    expect(preview).toHaveBeenCalledWith(
+      'materials',
+      {
+        cutoffDate: '2026-10-31T18:00:00.000Z',
+        page: 2,
+      },
+      expect.any(AbortSignal),
+    );
+    expect(mounted.value.selected.value).toEqual([
+      historicalPreview().documents[0]!.id,
+      ids.material,
+    ]);
+    expect(mounted.value.allSelected.value).toBe(true);
+    mounted.value.toggle(historicalPreview().documents[0]!.id);
+    expect(mounted.value.selected.value).toEqual([ids.material]);
+    expect(mounted.value.allSelected.value).toBe(false);
+    mounted.wrapper.unmount();
+  });
+  it('no selecciona resultados globales que exceden el límite de un lote', async () => {
+    const mounted = mount();
+    mounted.value.preview.value = {
+      ...historicalPreview(),
+      hasMore: true,
+      documents: Array.from({ length: 100 }, (_, index) => ({
+        ...historicalPreview().documents[0]!,
+        id: `document-${index}`,
+      })),
+    };
+    vi.spyOn(historicalDeliveryService, 'preview').mockResolvedValue({
+      ...historicalPreview(),
+      page: 2,
+      documents: [{ ...historicalPreview().documents[0]!, id: 'document-101' }],
+    });
+    await mounted.value.selectAll();
+    expect(mounted.value.selected.value).toEqual([]);
+    expect(mounted.value.allSelected.value).toBe(false);
+    expect(mounted.value.error.value).toContain('más de 100 salidas');
     mounted.wrapper.unmount();
   });
   it('rechaza respuestas incompletas o de otro recurso aunque el HTTP sea 200', async () => {

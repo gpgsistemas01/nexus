@@ -2,10 +2,12 @@
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
+import { VTable } from 'vuetify/components/VTable';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { HISTORICAL_DELIVERY_LIMITS as limits } from '@nexus/historical-deliveries';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
+import TableFrame from '../../../shared/components/TableFrame.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
 import type {
     HistoricalDeliveryPreview,
@@ -18,22 +20,23 @@ defineProps<{
         deliveredAt: string;
         reason: string;
         declaredDelivered: boolean;
-        search: string;
     };
     preview: HistoricalDeliveryPreview | null;
     receipt: HistoricalDeliveryReceipt | null;
     selected: string[];
+    allSelected: boolean;
     isWorking: boolean;
+    isSelectingAll: boolean;
     recoveryRequired: boolean;
     canConfirm: boolean;
     error: string;
 }>();
 const emit = defineEmits<{
-    update: [field: 'cutoffDate' | 'deliveredAt' | 'reason' | 'search', value: string];
+    update: [field: 'cutoffDate' | 'deliveredAt' | 'reason', value: string];
     declare: [value: boolean];
     select: [id: string];
-    selectAll: [];
-    load: [page?: number];
+    selectAll: [selected: boolean];
+    load: [page?: number, preserveSelection?: boolean];
     confirm: [];
     recover: [];
     close: [];
@@ -106,78 +109,134 @@ const emit = defineEmits<{
                 :disabled="isWorking"
                 @update:model-value="emit('update', 'cutoffDate', $event ?? '')"
             />
-            <VTextField
-                :model-value="values.search"
-                label="Buscar folio o proyecto"
-                :maxlength="limits.maxSearchLength"
-                :disabled="isWorking"
-                @update:model-value="emit('update', 'search', $event ?? '')"
-            />
-            <VBtn
-                variant="outlined"
-                :disabled="isWorking || !values.cutoffDate"
-                class="mb-4"
-                @click="emit('load')"
-            >
-                Buscar salidas pendientes al corte
-            </VBtn>
+            <div class="historical-actions mb-4">
+                <VBtn
+                    variant="outlined"
+                    :disabled="isWorking || !values.cutoffDate"
+                    @click="emit('load')"
+                >
+                    Cargar salidas pendientes y parcialmente surtidas
+                </VBtn>
+            </div>
             <template v-if="preview">
                 <p>
                     Revisa las partidas pendientes y selecciona sólo las salidas entregadas por
-                    completo. Cambiar de página limpia la selección.
+                    completo. La selección se conserva al cambiar de página.
                 </p>
-                <VBtn
-                    v-if="preview.documents.length"
-                    variant="text"
-                    :disabled="isWorking"
-                    @click="emit('selectAll')"
-                >
-                    Seleccionar las {{ preview.documents.length }} salidas de esta página
-                </VBtn>
                 <p
-                    v-else
+                    v-if="!preview.documents.length && !preview.hasMore"
                     role="status"
                 >
-                    No hay salidas pendientes para este corte y búsqueda.
+                    No hay salidas pendientes ni parcialmente surtidas para este corte.
                 </p>
-                <div
-                    v-for="item in preview.documents"
-                    :key="item.id"
-                    class="historical-candidate"
+                <p
+                    v-else-if="!preview.documents.length"
+                    role="status"
                 >
-                    <VCheckbox
-                        :model-value="selected.includes(item.id)"
-                        :label="`${item.referenceNumber} · ${item.departmentName} · ${item.projectNumber}`"
-                        :disabled="isWorking"
-                        hide-details
-                        @update:model-value="emit('select', item.id)"
-                    />
-                    <ul>
-                        <li
-                            v-for="detail in item.details"
-                            :key="detail.id"
+                    No hay salidas pendientes ni parcialmente surtidas en esta página. Puedes
+                    avanzar o seleccionar los resultados de todas las páginas.
+                </p>
+                <template v-if="preview.documents.length || preview.hasMore">
+                    <div class="historical-actions my-4">
+                        <VBtn
+                            variant="outlined"
+                            :disabled="isWorking"
+                            :loading="isSelectingAll"
+                            @click="emit('selectAll', !allSelected)"
                         >
-                            {{ detail.name }}: {{ numberText(detail.pendingQuantity) }} por
-                            registrar; {{ numberText(detail.suppliedQuantity) }} ya registradas y
-                            {{ numberText(detail.returnedQuantity) }} devueltas.
-                        </li>
-                    </ul>
-                </div>
-                <div class="d-flex ga-2 my-4">
+                            {{
+                                isSelectingAll
+                                    ? 'Cargando todas las páginas…'
+                                    : allSelected
+                                      ? 'Deseleccionar todo'
+                                      : 'Seleccionar todo'
+                            }}
+                        </VBtn>
+                        <span>
+                            {{ selected.length }}
+                            {{
+                                selected.length === 1
+                                    ? 'salida seleccionada'
+                                    : 'salidas seleccionadas'
+                            }}
+                            en todas las páginas (máximo {{ limits.maxDocuments }} por lote).
+                        </span>
+                    </div>
+                </template>
+                <template v-if="preview.documents.length">
+                    <TableFrame>
+                        <VTable
+                            density="compact"
+                            aria-label="Salidas pendientes y parcialmente surtidas"
+                        >
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        <VCheckbox
+                                            :model-value="allSelected"
+                                            :indeterminate="selected.length > 0 && !allSelected"
+                                            aria-label="Seleccionar todas las salidas de todas las páginas"
+                                            :disabled="isWorking"
+                                            hide-details
+                                            @update:model-value="emit('selectAll', $event === true)"
+                                        />
+                                    </th>
+                                    <th scope="col">Folio</th>
+                                    <th scope="col">Área</th>
+                                    <th scope="col">Proyecto</th>
+                                    <th scope="col">Partidas pendientes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="item in preview.documents"
+                                    :key="item.id"
+                                >
+                                    <td>
+                                        <VCheckbox
+                                            :model-value="selected.includes(item.id)"
+                                            :aria-label="`Seleccionar salida ${item.referenceNumber}`"
+                                            :disabled="isWorking"
+                                            hide-details
+                                            @update:model-value="emit('select', item.id)"
+                                        />
+                                    </td>
+                                    <td>{{ item.referenceNumber }}</td>
+                                    <td>{{ item.departmentName }}</td>
+                                    <td>{{ item.projectNumber }}</td>
+                                    <td class="text-start">
+                                        <ul class="historical-details">
+                                            <li
+                                                v-for="detail in item.details"
+                                                :key="detail.id"
+                                            >
+                                                {{ detail.name }}:
+                                                {{ numberText(detail.pendingQuantity) }} por
+                                                registrar; {{ numberText(detail.suppliedQuantity) }}
+                                                ya registradas y
+                                                {{ numberText(detail.returnedQuantity) }} devueltas.
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </VTable>
+                    </TableFrame>
+                </template>
+                <div class="historical-pagination">
                     <VBtn
                         :disabled="isWorking || preview.page <= 1"
-                        @click="emit('load', preview.page - 1)"
+                        @click="emit('load', preview.page - 1, true)"
                     >
                         Página anterior
                     </VBtn>
                     <VBtn
                         :disabled="isWorking || !preview.hasMore || preview.page >= limits.maxPage"
-                        @click="emit('load', preview.page + 1)"
+                        @click="emit('load', preview.page + 1, true)"
                     >
                         Página siguiente
                     </VBtn>
                 </div>
-                <p>{{ selected.length }} salidas seleccionadas.</p>
                 <VTextarea
                     :model-value="values.reason"
                     label="Motivo y evidencia de la entrega histórica"
@@ -206,11 +265,18 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.historical-candidate {
-    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.15);
-    padding-block: 0.75rem;
+.historical-actions,
+.historical-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
 }
-.historical-candidate ul {
-    padding-inline-start: 2rem;
+.historical-details {
+    min-width: 16rem;
+    padding-inline-start: 1rem;
+}
+.historical-pagination {
+    margin-block: 1rem;
 }
 </style>

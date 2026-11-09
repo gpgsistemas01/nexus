@@ -55,10 +55,13 @@ export const readHistoricalDeliveryCommand = (value: unknown): HistoricalDeliver
 export const historicalDeliveryService = {
     async preview(
         resource: IssueResource,
-        query: { cutoffDate: string; search: string; page: number },
+        query: { cutoffDate: string; page: number },
         signal: AbortSignal,
     ): Promise<HistoricalDeliveryPreview> {
-        const params = new URLSearchParams({ ...query, page: String(query.page) });
+        const params = new URLSearchParams({
+            cutoffDate: query.cutoffDate,
+            page: String(query.page),
+        });
         const data = await apiClient.request<Record<string, unknown>>(
             `${API_PATHS.historicalDeliveries}/${resource}/preview?${params}`,
             { signal },

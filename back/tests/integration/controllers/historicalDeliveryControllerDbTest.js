@@ -10,8 +10,8 @@ import { ROLE_KEYS } from '../../../src/constants/roles.js';
 let prisma, fixture, app, cookie, deniedCookie, previousSecret;
 const ids = {}, statuses = {};
 const cutoffDate = '2026-10-31T23:00:00.000Z';
-const preview = async (resource, search = '') => (await request(app).get(`/historical/${resource}/preview`)
-  .query({ cutoffDate, search }).set('Cookie', cookie).expect(200)).body.preview;
+const preview = async (resource, page = 1) => (await request(app).get(`/historical/${resource}/preview`)
+  .query({ cutoffDate, page }).set('Cookie', cookie).expect(200)).body.preview;
 const capture = documents => ({ operationId: randomUUID(), cutoffDate, deliveredAt: null, reason: 'Entregas físicas verificadas con almacén',
   declaredDelivered: true, documents: documents.map(({ id, revision }) => ({ id, revision })) });
 const confirm = (resource, command) => request(app).post(`/historical/${resource}/confirm`).set('Cookie', cookie).send(command)
@@ -87,7 +87,9 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
   it.each(['materials', 'consumables', 'wastes'])('reconoce pendientes y parciales de %s con stock cero; conserva devoluciones y valores desconocidos', async resource => {
     const issues = [await seedIssue(resource), await seedIssue(resource, { supplied: 2, returned: 1 })];
     const read = await preview(resource);
-    const command = capture(read.documents.filter(item => issues.some(issue => issue.id === item.id)));
+    const candidates = read.documents.filter(item => issues.some(issue => issue.id === item.id));
+    expect(candidates.map(item => item.details[0].suppliedQuantity)).toEqual(expect.arrayContaining([0, 2]));
+    const command = capture(candidates);
     const before = await stockSnapshot();
     const response = await confirm(resource, { ...command, currentStock: 999, costsVerified: true, role: 'admin' }).expect(200);
     expect(response.body.receipt).toMatchObject({ costsVerified: false, deliveredAt: null, declaredDelivered: true });
@@ -220,10 +222,19 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
   });
 
   it('resuelve cien pendientes en un lote y rechaza el límite excedido sin nuevos efectos', async () => {
-    await Promise.all(Array.from({ length: 100 }, () => seedIssue('wastes', { projectNumber: 'BATCH-100' })));
-    const read = await preview('wastes', 'BATCH-100');
-    expect(read.documents).toHaveLength(100); expect(read.hasMore).toBe(false);
-    const command = capture(read.documents);
+    const issues = await Promise.all(Array.from({ length: 100 }, () => seedIssue('wastes', { projectNumber: 'BATCH-100' })));
+    const issueIds = new Set(issues.map(issue => issue.id));
+    const documents = [];
+    let page = 1;
+    let hasMore = true;
+    while (hasMore && documents.length < issues.length) {
+      const read = await preview('wastes', page);
+      documents.push(...read.documents.filter(item => issueIds.has(item.id)));
+      hasMore = read.hasMore;
+      page += 1;
+    }
+    expect(documents).toHaveLength(100);
+    const command = capture(documents);
     const before = await stockSnapshot();
     const completed = await confirm('wastes', command).expect(200);
     expect(completed.body.receipt.documents).toHaveLength(100);

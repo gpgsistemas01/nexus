@@ -63,12 +63,10 @@ export const previewHistoricalDeliveries = async ({ user, resource, query = {} }
     authorize(user, resource);
     const cutoffDate = cutoff(query.cutoffDate);
     const page = Number(query.page ?? 1);
-    const search = query.search ?? '';
-    if (!Number.isInteger(page) || page < 1 || page > limits.maxPage || typeof search !== 'string' || search.length > limits.maxSearchLength) throw invalid('Revisa la búsqueda y la página.');
+    if (!Number.isInteger(page) || page < 1 || page > limits.maxPage) throw invalid('Revisa la página.');
     const issues = await model(getDb(), resource).findMany({ where: { ...contextWhere(resource, user),
         historicalDeliveryBatchId: null, requestDate: { lte: cutoffDate },
         status: { name: { not: GOODS_ISSUE_STATUS_NAMES.CANCELED } }, fulfillmentStatus: { name: { in: pendingStatuses } },
-        ...(search && { OR: [{ referenceNumber: { contains: search, mode: 'insensitive' } }, { projectNumber: { contains: search, mode: 'insensitive' } }] })
     }, include, orderBy: [{ requestDate: 'asc' }, { id: 'asc' }], skip: (page - 1) * limits.maxDocuments, take: limits.maxDocuments + 1 });
     return { resource, cutoffDate, page, hasMore: issues.length > limits.maxDocuments,
         documents: issues.slice(0, limits.maxDocuments).filter(issue => pendingDetails(issue).length).map(candidate) };

@@ -6,15 +6,17 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineProps
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 15, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 17, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `values` | `values: { cutoffDate: string; deliveredAt: string; reason: string; declaredDelivered: boolean; search: string; };` |
+| `values` | `values: { cutoffDate: string; deliveredAt: string; reason: string; declaredDelivered: boolean; };` |
 | `preview` | `preview: HistoricalDeliveryPreview \| null;` |
 | `receipt` | `receipt: HistoricalDeliveryReceipt \| null;` |
 | `selected` | `selected: string[];` |
+| `allSelected` | `allSelected: boolean;` |
 | `isWorking` | `isWorking: boolean;` |
+| `isSelectingAll` | `isSelectingAll: boolean;` |
 | `recoveryRequired` | `recoveryRequired: boolean;` |
 | `canConfirm` | `canConfirm: boolean;` |
 | `error` | `error: string;` |
@@ -26,15 +28,15 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineEmits
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 31, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 34, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `update` | `update: [field: 'cutoffDate' \| 'deliveredAt' \| 'reason' \| 'search', value: string];` |
+| `update` | `update: [field: 'cutoffDate' \| 'deliveredAt' \| 'reason', value: string];` |
 | `declare` | `declare: [value: boolean];` |
 | `select` | `select: [id: string];` |
-| `selectAll` | `selectAll: [];` |
-| `load` | `load: [page?: number];` |
+| `selectAll` | `selectAll: [selected: boolean];` |
+| `load` | `load: [page?: number, preserveSelection?: boolean];` |
 | `confirm` | `confirm: [];` |
 | `recover` | `recover: [];` |
 | `close` | `close: [];` |
