@@ -1,6 +1,6 @@
 import { lockWasteIssue } from '../../../../repository/warehouse/documentLockRepository.js';
 import { assertHistoricalPhysicalReturn } from '../../issues/historicalReturnRules.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../shared/constants/fulfillmentStatuses.js';
 import {
     WasteIssueDetailNotFound,
     WasteIssueReturnDatabaseError,

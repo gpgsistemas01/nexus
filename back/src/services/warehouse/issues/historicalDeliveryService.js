@@ -11,7 +11,7 @@ import { OperationKeyConflictError, RecordVersionConflictError } from '../../../
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { isDateTime } from '../../../shared/validation/baseValidations.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { lockHistoricalDeliveryDocuments, lockHistoricalDeliveryOperation } from '../../../repository/warehouse/historicalDeliveryRepository.js';
 import { updateGoodsIssueDetails, updateWasteIssueDetails } from '../../../repository/warehouse/issueDetailRepository.js';

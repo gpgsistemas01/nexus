@@ -1,5 +1,5 @@
 import { formatDateLongWithTime, toNumber } from '../../../utils/formattersUtils.js';
-import { GOODS_RECEIPT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { GOODS_RECEIPT_STATUS_NAMES } from '../../../shared/constants/goodsReceiptStatuses.js';
 import { GOODS_RECEIPT_DETAIL_STATUSES } from '../../../shared/constants/goodsReceiptStatuses.js';
 import { QUERY_BATCH_SIZES } from '../../../constants/pagination.js';
 import { findBatches } from '../../../repository/paginationRepository.js';

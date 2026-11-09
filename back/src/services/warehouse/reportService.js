@@ -2,7 +2,7 @@ import { formatDateLongWithTime, toNumber } from '../../utils/formattersUtils.js
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
-import { FULFILLMENT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../shared/constants/fulfillmentStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { findBatches } from '../../repository/paginationRepository.js';
 import { QUERY_BATCH_SIZES } from '../../constants/pagination.js';

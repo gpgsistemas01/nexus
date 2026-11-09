@@ -7,7 +7,7 @@ import {
     WasteIssueRequesterNotFound,
     WasteIssueWasteUnavailableConflict
 } from '../../../errors/warehouse/wasteIssueError.js';
-import { GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { GOODS_ISSUE_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { HISTORICAL_DELIVERY_SELECT } from '../issues/historicalDeliverySelect.js';
 import { resolveIssueHeaderData } from '../issues/issueHeaderService.js';
 import { assertPieceQuantity, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';

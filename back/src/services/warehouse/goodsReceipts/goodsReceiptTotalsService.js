@@ -1,5 +1,5 @@
 import { GoodsReceiptDetailAlreadyCanceled } from '../../../errors/warehouse/goodsReceiptError.js';
-import { GOODS_RECEIPT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { GOODS_RECEIPT_STATUS_NAMES } from '../../../shared/constants/goodsReceiptStatuses.js';
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from './goodsReceiptHelpers.js';
 
 const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, detailId, detailData }) => {

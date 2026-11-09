@@ -1,4 +1,4 @@
-import { FULFILLMENT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { WasteIssueFulfillmentStatusNotFound } from '../../../errors/warehouse/wasteIssueError.js';
 import { findFulfillmentStatusIdsByName } from '../fulfillmentStatusService.js';
 

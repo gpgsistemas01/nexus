@@ -27,9 +27,10 @@ catálogos y tiempo del worker pertenecen a `back/src/constants/inventoryImport.
 los límites que comunica y utiliza la captura permanecen compartidos.
 
 Los estados de almacén y los valores de captura del encabezado de Salidas tienen
-una sola definición pública. `back/src/constants/warehouseStatuses.js` y
-`back/src/constants/issueHeaderRules.js` reexportan esas definiciones para conservar
-los imports del servidor; no mantienen copias de sus valores.
+una sola definición pública. Express y Vue consumen directamente los módulos
+propietarios en `shared/constants` y `shared/inventory/issueHeaderRules.js`.
+No se conservan archivos intermediarios que sólo reexportan símbolos o cambian sus
+nombres para mantener una ruta anterior.
 
 La presentación pertenece a `front/src`. Reutiliza componentes y composables del
 cliente y conserva autorización, transacciones y acceso a datos en Express. Las

@@ -1,4 +1,4 @@
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { IssueCanceledConflict } from '../../../errors/inventory/issueError.js';
 
 const FLOAT_EPSILON = 0.000001;

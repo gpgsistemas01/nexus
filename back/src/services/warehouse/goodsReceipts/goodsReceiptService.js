@@ -30,7 +30,7 @@ import {
 } from "./goodsReceiptHelpers.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { GOODS_RECEIPT_STATUS_NAMES } from "../../../shared/constants/goodsReceiptStatuses.js";
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";

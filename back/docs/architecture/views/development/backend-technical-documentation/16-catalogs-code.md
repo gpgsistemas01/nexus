@@ -73,7 +73,8 @@ en el servicio, sin confundirlos con unidades UTF-16.
 
 Los nombres de roles y áreas participan en `constants/permissions.js`; crear o renombrar
 un registro no modifica esas políticas. Los nombres de estados se usan mediante
-`constants/warehouseStatuses.js` y consultas de cumplimiento: administrar filas tampoco
+`shared/constants/fulfillmentStatuses.js`, `shared/constants/goodsReceiptStatuses.js`
+y consultas de cumplimiento: administrar filas tampoco
 crea transiciones nuevas. El módulo común no aplica una regla específica que proteja
 esos nombres de edición. Son dependencias de código que deben revisarse al mantener
 estos catálogos, no capacidades de configuración dinámica de permisos o estados.

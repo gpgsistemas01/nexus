@@ -2,18 +2,18 @@ import { findPersonById } from '../../admin/person/personService.js';
 import { isValidInternalClientAdvisor } from '../../admin/person/personRules.js';
 import { findDepartmentById } from '../../admin/departmentService.js';
 import { findClientById } from '../../sales/clientService.js';
-import { INTERNAL_CLIENT_NAME, PROJECT_NUMBER_BY_DEPARTMENT } from '../../../constants/issueHeaderRules.js';
+import { internalClientName, projectNumberByDepartment } from '../../../shared/inventory/issueHeaderRules.js';
 import { normalizeText } from '../../../utils/formattersUtils.js';
 
 const isInternalClient = client => (
-    normalizeText(client?.name || '') === normalizeText(INTERNAL_CLIENT_NAME)
+    normalizeText(client?.name || '') === normalizeText(internalClientName)
 );
 
 const isValidProjectNumber = ({ client, department, projectNumber = '' }) => {
 
     if (!isInternalClient(client)) return true;
 
-    const expectedProjectNumber = PROJECT_NUMBER_BY_DEPARTMENT.get(department?.name || '');
+    const expectedProjectNumber = projectNumberByDepartment.get(department?.name || '');
 
     return Boolean(expectedProjectNumber) && expectedProjectNumber === projectNumber;
 };

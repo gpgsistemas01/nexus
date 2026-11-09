@@ -1,7 +1,7 @@
 import { findPage } from '../../../repository/paginationRepository.js';
 import { DOCUMENT_REFERENCE_TYPES } from '../../../constants/documentReferenceTypes.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
-import { FULFILLMENT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import {
     WasteIssueAlreadySuppliedConflict,
     WasteIssueNotFound,

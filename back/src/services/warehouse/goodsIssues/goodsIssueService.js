@@ -24,7 +24,7 @@ import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssu
 import { handleServiceError } from "../../serviceErrorHandler.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { assertIssueDepartmentAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../shared/constants/fulfillmentStatuses.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
