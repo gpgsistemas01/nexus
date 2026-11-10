@@ -45,8 +45,10 @@ podrá surtirse hasta configurarlo.
    filtra filas de inventario. En altas de Materiales/Consumibles, el proveedor
    limita las opciones del catálogo de esa columna, no las filas nuevas.
 3. Completar las columnas blancas de captura, conservando sin cambios las columnas
-   grises, IDs/versiones, hojas y encabezados. En **Catalogos**, elegir la opción
-   completa de las listas desplegables; no es una lista de inventario para importar.
+   grises, IDs/versiones, hojas y encabezados. **Catalogos** muestra sólo las listas
+   aplicables: en altas, proveedor y las opciones de presentación/unidad o material
+   de referencia según el módulo; en ajustes, motivos; en edición no hay catálogos.
+   Elegir la opción completa de cada lista; no son registros de inventario para importar.
 4. Seleccionar la misma operación al subir el `.xlsx` y pulsar **Validar archivo**.
 5. Revisar diez filas por página, sus datos anteriores/finales, diferencias y errores.
 6. Si hay errores, descargarlos, descartar el borrador, corregir el archivo y validarlo.

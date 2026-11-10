@@ -52,11 +52,12 @@ trabajar más registros, aplique filtros, descargue grupos de hasta 500 y evite
 repetir registros entre archivos.
 
 Los IDs/versiones se incluyen automáticamente para quien tiene el permiso operativo;
-consérvelos aunque cambie el nombre. No dependen de ser administrador. La hoja
-**Catalogos** contiene opciones válidas para las listas desplegables; no son los
-registros que se importan. Seleccione el valor completo tal como aparece, incluido
-el código de proveedor o el ID cuando formen parte de la opción. Retire de **Datos** las
-filas que no quiera procesar, sin borrar ni renombrar encabezados.
+consérvelos aunque cambie el nombre. No dependen de ser administrador. **Catalogos**
+incluye sólo opciones de la operación: en Alta, proveedores, presentaciones y unidades;
+en Ajustar existencias, motivos de ajuste; Editar datos no necesita catálogos.
+No son registros que se importen. Seleccione el valor completo tal como aparece,
+incluido el código o ID cuando forme parte de la opción. Retire de **Datos** las filas
+que no quiera procesar, sin borrar ni renombrar encabezados.
 
 <!-- manual:all materials:write inventory:costs-read -->
 Las altas llevan **Cantidad inicial**. Nombre y mínimo se comparten entre proveedores;

@@ -95,7 +95,10 @@ const cardValue = (item: PurchaseDetail, key: string) => {
 </script>
 
 <template>
-    <TableFrame>
+    <TableFrame
+        fit-columns
+        mobile-cards
+    >
         <VDataTable
             v-model:sort-by="sortBy"
             :headers="headers"

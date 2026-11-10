@@ -51,14 +51,16 @@ todas sus asignaciones activas.
 6. Use **Limpiar filtros** para regresar a la consulta general.
 
 Pulse un encabezado habilitado para ordenar y cambie el tamaño de página para ver
-más registros. En el teléfono, use el selector de columna y el control de dirección
-para ordenar las fichas.
-En el teléfono, cada registro aparece como una ficha con sus campos identificados.
-Al final de las fichas se indica cuántos registros contiene la página actual; el
+más registros. En teléfonos, cada registro se presenta como ficha con sus campos
+identificados. En tabletas y ventanas compactas se conserva la tabla: las columnas
+ajustan su ancho y los encabezados y valores pueden ocupar varias líneas para evitar
+el desplazamiento horizontal; los textos largos se muestran en varias líneas sin
+recortarse. Use los encabezados o el selector de columna para ordenar, según la
+presentación.
+Al final de las fichas o la tabla se indica cuántos registros contiene la página actual; el
 selector **Registros por página** permite cambiar ese límite.
-Las tablas de detalle también muestran sus datos y acciones en fichas; no es necesario
-desplazarse hasta una barra horizontal al pie. Los formularios distribuyen los campos
-según el ancho disponible.
+Las tablas de detalle también usan fichas en teléfonos y mantienen sus acciones e inputs.
+Los formularios distribuyen los campos según el ancho disponible.
 
 Si falta un registro, limpie los filtros. La actualización automática los conserva
 y espera mientras tiene una captura abierta. Ante un fallo, use **Actualizar** o

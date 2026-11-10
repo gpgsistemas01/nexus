@@ -119,17 +119,23 @@ const cellText = (row: Row, key: string) => {
             :class="rowClass?.(row)"
         >
             <h3 v-if="columns[0]">
-                <slot
-                    :name="`item.${columns[0].key}`"
-                    :item="row"
-                >
-                    {{ cellText(row, columns[0].key) }}
-                </slot>
+                <span class="responsive-table-card__title-label">
+                    {{ columns[0].title }}
+                </span>
+                <span class="responsive-table-card__title-value">
+                    <slot
+                        :name="`item.${columns[0].key}`"
+                        :item="row"
+                    >
+                        {{ cellText(row, columns[0].key) }}
+                    </slot>
+                </span>
             </h3>
             <dl>
                 <div
                     v-for="column in columns.slice(1)"
                     :key="column.key"
+                    class="responsive-table-card__field"
                 >
                     <dt>{{ column.title }}</dt>
                     <dd>
@@ -178,6 +184,7 @@ const cellText = (row: Row, key: string) => {
         gap: 0.5rem;
     }
     .responsive-table-card {
+        container-type: inline-size;
         min-width: 0;
         overflow-wrap: anywhere;
         border: 1px solid rgb(var(--v-theme-table-border));
@@ -191,32 +198,62 @@ const cellText = (row: Row, key: string) => {
         background: rgb(var(--v-theme-table-stock-warning));
     }
     .responsive-table-card h3 {
+        display: grid;
+        min-width: 0;
+        gap: 0.15rem;
         margin: 0 0 0.65rem;
         border-bottom: 1px solid rgba(var(--v-theme-primary), 0.2);
         padding-bottom: 0.55rem;
-        color: rgb(var(--v-theme-primary));
-        font-size: 1.05rem;
-        font-weight: 700;
         line-height: 1.35;
+        overflow-wrap: anywhere;
+        text-wrap: wrap;
+    }
+    .responsive-table-card__title-label {
+        min-width: 0;
+        color: rgb(var(--v-theme-muted));
+        font-size: clamp(0.68rem, calc(0.68rem + 0.15cqi), 0.78rem);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        overflow-wrap: anywhere;
+    }
+    .responsive-table-card__title-value {
+        min-width: 0;
+        color: rgb(var(--v-theme-primary));
+        font-size: clamp(0.9rem, calc(0.9rem + 0.15cqi), 1.05rem);
+        font-weight: 700;
+        overflow-wrap: anywhere;
     }
     .responsive-table-card dl {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
-        gap: 0.6rem 0.75rem;
         margin: 0;
     }
+    .responsive-table-card__field {
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+        min-width: 0;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.35);
+        padding: 0.45rem 0.35rem;
+        overflow-wrap: anywhere;
+    }
+    .responsive-table-card__field:nth-child(even) {
+        background: rgba(var(--v-theme-table-alt), 0.45);
+    }
     .responsive-table-card dt {
-        width: fit-content;
-        border-bottom: 1px solid rgba(var(--v-theme-primary), 0.2);
-        padding-bottom: 0.1rem;
-        color: rgb(var(--v-theme-primary));
-        font-size: 0.75rem;
-        font-weight: 700;
+        min-width: 0;
+        color: rgb(var(--v-theme-muted));
+        font-size: clamp(0.68rem, calc(0.68rem + 0.15cqi), 0.78rem);
+        font-weight: 600;
+        overflow-wrap: anywhere;
     }
     .responsive-table-card dd {
-        margin: 0.12rem 0 0;
-        font-size: 0.85rem;
-        font-weight: 500;
+        min-width: 0;
+        margin: 0;
+        overflow-wrap: anywhere;
+        font-size: clamp(0.78rem, calc(0.78rem + 0.15cqi), 0.9rem);
+        font-weight: 600;
+        text-align: right;
     }
     .responsive-table-card__actions {
         display: flex;

@@ -350,7 +350,9 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `isLoading` | `isLoading?: boolean` |
+| `isLoading` | `isLoading?: boolean;` |
+| `fitColumns` | `fitColumns?: boolean;` |
+| `mobileCards` | `mobileCards?: boolean` |
 
 ## FileExportOptions
 

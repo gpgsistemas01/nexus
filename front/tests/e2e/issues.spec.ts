@@ -5,28 +5,33 @@ import { issuePermissions, issueDetailId, departmentId, issueFor } from '../fixt
 import { ids, pageOf, user } from '../fixtures/inventory.js';
 import { clientData, personData } from '../fixtures/records.js';
 
-test('salidas: los detalles se muestran en fichas etiquetadas en móvil', async ({ page }) => {
+test('salidas: conserva fichas en móvil y ajusta la tabla en tableta', async ({ page }) => {
   await mockIssues(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/salidas/materiales');
 
   const listCard = page.locator('.responsive-table-card').filter({ hasText: 'SAL-001' }).first();
-  await expect(
-    listCard.getByRole('button', { name: 'Surtir detalle', exact: true }),
-  ).toHaveClass(/bg-primary/);
-  await expect(
-    listCard.getByRole('button', { name: 'Consultar salida', exact: true }),
-  ).toHaveClass(/bg-filter-clear/);
+  await expect(listCard.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveClass(
+    /bg-primary/,
+  );
   await listCard.getByRole('button', { name: 'Consultar salida', exact: true }).click();
   const dialog = page.getByRole('dialog', {
     name: 'Consultar salida - Folio SAL-001',
     exact: true,
   });
-  const details = dialog.locator('.responsive-table-cards');
-  await expect(details).toBeVisible();
-  await expect(details.locator('dt', { hasText: 'Salida' })).toBeVisible();
-  await expect(details.getByText('Lona', { exact: true })).toBeVisible();
+  const detailCards = dialog.locator('.responsive-table-cards');
+  await expect(detailCards).toBeVisible();
+  await expect(detailCards.locator('dt', { hasText: 'Salida' })).toBeVisible();
+  await expect(detailCards.getByText('Lona', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+
+  await page.setViewportSize({ width: 768, height: 844 });
+  const details = dialog.locator('.table-frame--fit-columns .v-table__wrapper');
+  await expect(details).toBeVisible();
+  await expect(detailCards).toBeHidden();
+  await expect(dialog.getByRole('table')).toBeVisible();
+  await expect(details).toHaveCSS('overflow-x', 'hidden');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
 });
 
 for (const [path, resource] of [
@@ -374,6 +379,7 @@ for (const [path, label, name] of [
 ] as const) {
   test(`salidas ${path}: edición pendiente, surtido y devolución`, async ({ page }) => {
     const { writes } = await mockIssues(page);
+    await page.setViewportSize({ width: 768, height: 844 });
     await page.goto(`/salidas/${path}`);
     const row = page.getByRole('row').filter({
       has: page.getByRole('cell', { name: 'SAL-001', exact: true }),
@@ -411,6 +417,10 @@ for (const [path, label, name] of [
       'Cantidad',
       'Unidad',
     ]);
+    await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toHaveCSS(
+      'overflow-x',
+      'hidden',
+    );
     await expect(dialog.getByLabel('Cliente', { exact: true })).toBeDisabled();
     await dialog.getByRole('checkbox', { name: `Surtir: ${name}`, exact: true }).check();
     await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();

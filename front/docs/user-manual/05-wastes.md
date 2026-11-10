@@ -56,10 +56,11 @@ Si una fila está repetida o es inválida, **no se aplica ninguna fila**. Descar
 los errores, corrija o retire los repetidos y vuelva a validar. Un alta repetida no suma stock.
 
 Conserve **Datos**, **Instrucciones**, **Catalogos**, los encabezados y las columnas
-grises de referencia. **Catalogos** contiene opciones de las listas desplegables; no
-son registros de inventario. Elija los valores completos tal como aparecen, incluido
-el ID cuando venga integrado en la opción. Complete sólo la captura de la operación
-seleccionada y retire las filas que no quiera procesar.
+grises de referencia. **Catalogos** muestra sólo las opciones aplicables: en Alta,
+proveedores y materiales de referencia; en Ajustar existencias, motivos; Editar datos
+no requiere catálogos. No son registros de inventario. Elija la opción completa tal
+como aparece, incluido el ID cuando venga integrado. Complete sólo la captura de la
+operación seleccionada y retire las filas que no quiera procesar.
 
 Suba el `.xlsx` directamente, sin otro ZIP, fórmulas, macros ni enlaces externos.
 El archivo de **Exportar Excel** sirve para consultar; descargue una plantilla

@@ -93,22 +93,73 @@ const template = async ({ config, rows = [], catalogs }) => {
     workbook.newSheet('Instrucciones');
     workbook.setColWidth('Instrucciones', 'A', 32);
     workbook.setColWidth('Instrucciones', 'B', 110);
+    const isWaste = config.resource === 'wastes';
+    const applicableCatalogs = [];
+    if (config.mode === 'create') {
+        applicableCatalogs.push({
+            key: 'supplierCode',
+            header: 'Proveedor (código | nombre)',
+            values: (catalogs.suppliers ?? []).map(item => `${item.code} | ${item.tradeName}`)
+        });
+        if (isWaste) {
+            applicableCatalogs.push({ key: 'materialId', header: 'Material de referencia', values: catalogs.materials ?? [] });
+        } else {
+            applicableCatalogs.push(
+                { key: 'presentationName', header: 'Presentación', values: (catalogs.presentations ?? []).map(item => item.name) },
+                { key: 'unitLabel', header: 'Unidad', values: catalogs.units ?? [] }
+            );
+        }
+    } else if (config.mode === 'adjust') {
+        applicableCatalogs.push({ key: 'reasonId', header: 'Motivo', values: catalogs.reasons ?? [] });
+    }
+    const operationDescription = config.mode === 'create'
+        ? `Alta crea registros nuevos. ${isWaste
+            ? 'Completa proveedor, material de referencia, mínimo, costo, activo, cantidad inicial y observaciones; captura medidas o pesos según la presentación.'
+            : 'Completa proveedor, material, presentación, unidad, mínimo, costo, activo, cantidad inicial y observaciones.'}`
+        : config.mode === 'update'
+            ? 'Editar datos modifica nombre, mínimo, costo y activo. No modifica las existencias; conserva el proveedor y los demás datos del registro.'
+            : 'Ajustar existencias reemplaza el saldo con el conteo físico final. Captura stock contado, motivo activo y observaciones en cada fila.';
+    const limitDescription = config.mode === 'create'
+        ? `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. Conserva hojas y encabezados; retira filas vacías que no quieras importar.`
+        : `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. La plantilla incluye registros coincidentes; si hay más, filtra por proveedor o nombre y procesa grupos de hasta ${limits.maxRows}. Conserva hojas y encabezados.`;
+    const referenceDescription = config.mode === 'create'
+        ? 'Las columnas grises son datos de consulta, como stock actual y conversión. No las edites; captura sólo en las columnas blancas.'
+        : 'Las columnas grises son datos de consulta e identificadores/versiones del destino. No las edites: consérvalos para identificar el registro y sus datos actuales.';
+    const captureDescription = config.mode === 'adjust'
+        ? 'Una fila por registro. Captura el saldo como número; no uses fórmulas.'
+        : 'Una fila por registro. Usa números sin signo de moneda. Activo: SI o NO. No uses fórmulas.';
+    const catalogCaptureInstructions = [
+        ...(applicableCatalogs.some(({ key }) => key === 'supplierCode')
+            ? ['Proveedor: elige la opción completa con código y nombre.'] : []),
+        ...(applicableCatalogs.some(({ key }) => key === 'presentationName' || key === 'unitLabel')
+            ? ['Presentación y unidad: elige la opción completa tal como aparece.'] : []),
+        ...(applicableCatalogs.some(({ key }) => key === 'materialId')
+            ? ['Material de referencia: conserva el ID incluido en la opción completa.'] : []),
+        ...(applicableCatalogs.some(({ key }) => key === 'reasonId')
+            ? ['Motivo: usa el valor completo con formato UUID | nombre.'] : [])
+    ];
     const instructions = [
         ['Formato', INVENTORY_IMPORT_FORMAT], ['Recurso', config.resource], ['Operacion', config.mode],
         ['Operación del archivo', `${INVENTORY_IMPORT_MODE_LABELS[config.mode]}. Todas las filas realizan esta operación. Selecciona la misma operación al importar; para otra operación descarga otra plantilla.`],
-        ['Estructura de inventario', 'Las primeras columnas siguen el orden del reporte: Proveedor, Material, Base, Altura, Stock actual, Stock mínimo, Presentación, Conversión, Unidad y Costo unitario. En ajuste se omite el costo. Después se agregan Activo, IDs/versiones y los campos de la operación.'],
-        ['Límites', `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. La plantilla incluye todos los registros coincidentes; si hay más, filtra por proveedor o nombre y procesa grupos de hasta ${limits.maxRows}. Conserva hojas y encabezados.`],
+        ['Qué hacer', operationDescription],
+        ['Límites', limitDescription],
         ['Columnas editables', `Para esta operación captura sólo: ${config.columns.filter(([, key]) => !config.readonlyFields.includes(key)).map(([header]) => header).join(', ')}.`],
-        ['Columnas grises', 'Las columnas grises son referencias de consulta o identificadores/versiones del destino. No las edites: consérvalas para identificar el registro y sus datos actuales. Las columnas blancas son las de captura indicadas para esta operación.'],
-        ['Identificadores', 'Altas: el sistema genera los IDs nuevos. Edición y ajuste: los IDs y versiones del destino se incluyen automáticamente según tu permiso operativo; no los escribas ni cambies. El nombre no identifica el destino.'],
-        ['Captura', 'Una fila por registro. Usa números sin signo de moneda. Activo: SI o NO. No uses fórmulas.'],
-        ['Catálogos', 'La hoja Catalogos contiene opciones para las listas desplegables; no son registros de inventario para importar. Elige el valor completo tal como aparece. En Material de referencia y Motivo, el ID viene incluido en la opción: no lo escribas por separado. Conserva la hoja.'],
+        ['Columnas grises', `${referenceDescription} Las columnas blancas son las de captura indicadas para esta operación.`],
+        ['Identificadores', config.mode === 'create'
+            ? 'El sistema genera los IDs de los registros nuevos.'
+            : 'Los IDs y versiones del destino se incluyen automáticamente; no los escribas ni cambies. El nombre no identifica el destino.'],
+        ['Captura', captureDescription],
+        ...(applicableCatalogs.length ? [['Catálogos', `Catalogos incluye sólo: ${applicableCatalogs.map(({ header }) => header).join(', ')}. ${catalogCaptureInstructions.join(' ')} No son registros de inventario para importar.`]] : []),
         ['Duplicados', 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
-        ['Cantidad inicial', 'Sólo en altas. Es cantidad por presentación, no área ni peso. Pieza exige enteros.'],
-        ['Conteo físico', 'En ajuste, Stock contado es el saldo final contado por presentación; cero es válido y vacío se rechaza. Captura Motivo y Observaciones en cada fila. Stock actual y Conversión son referencias y no se suman.'],
-        ['Corte del conteo', 'Usa un conteo físico actual y evita movimientos mientras capturas. Si cambió una versión, descarga una plantilla nueva y vuelve a verificar el conteo; no copies saldos antiguos sin conciliarlos.'],
-        ['Medidas', 'Base y altura en metros. Consumibles no tienen dimensiones. En Rollo de merma deja ambas vacías: el servidor las calcula con los tres pesos en kg.'],
-        ['Actualización', 'Nombre y mínimo se comparten entre proveedores. Costo y activo corresponden a cada proveedor. Un vacío no borra datos.'],
+        ...(config.mode === 'create' ? [['Cantidad inicial', 'Es cantidad por presentación, no área ni peso. Pieza exige enteros.']] : []),
+        ...(config.mode === 'adjust' ? [
+            ['Conteo físico', 'Stock contado es el saldo final en la unidad del registro; cero es válido y vacío se rechaza. Stock actual y Conversión son referencias y no se suman.'],
+            ['Corte del conteo', 'Usa un conteo físico actual y evita movimientos mientras capturas. Si cambió una versión, descarga una plantilla nueva y vuelve a verificar el conteo.']
+        ] : []),
+        ...(config.mode === 'create' && isWaste ? [['Medidas', 'Base y altura en metros. En Rollo deja ambas vacías: el servidor las calcula con los tres pesos en kg.']] : []),
+        ...(config.mode === 'update' ? [['Actualización', isWaste
+            ? 'Material, mínimo, costo y activo corresponden a la merma. Un vacío no borra datos.'
+            : 'Nombre y mínimo se comparten entre proveedores. Costo y activo corresponden a cada proveedor. Un vacío no borra datos.']] : []),
         ['Confirmación', 'Validar sólo genera una vista previa. Confirmar aplica todas las filas válidas juntas; si alguna falla, no se aplica ninguna.'],
         ['Archivos', 'El servidor descarta el XLSX después del análisis. El original de tu equipo permanece bajo tu control.']
     ];
@@ -119,17 +170,19 @@ const template = async ({ config, rows = [], catalogs }) => {
         for (const column of ['A', 'B']) workbook.setCellStyle('Instrucciones', `${column}${index + 1}`, textStyle);
     });
     workbook.newSheet('Catalogos');
-    catalogs.reasons ??= [];
-    workbook.setRowValues('Catalogos', 1, 'A', ['Proveedor (código | nombre)', 'Proveedor', 'Presentación', 'Unidad', 'Material de referencia', 'Motivo']);
-    [20, 45, 25, 35, 100, 65].forEach((width, index) => workbook.setColWidth('Catalogos', spreadsheetColumn(index + 1), width));
-    const count = Math.max(catalogs.suppliers.length, catalogs.presentations.length, catalogs.units.length, catalogs.materials.length, catalogs.reasons.length);
-    for (let index = 0; index < count; index++) workbook.setRowValues('Catalogos', index + 2, 'A', [
-        catalogs.suppliers[index] ? `${catalogs.suppliers[index].code} | ${catalogs.suppliers[index].tradeName}` : null,
-        catalogs.suppliers[index]?.tradeName,
-        catalogs.presentations[index]?.name, catalogs.units[index], catalogs.materials[index], catalogs.reasons[index]
-    ].map(value => value ?? null));
-    const lists = { supplierCode: ['A', catalogs.suppliers.length], presentationName: ['C', catalogs.presentations.length],
-        unitLabel: ['D', catalogs.units.length], materialId: ['E', catalogs.materials.length], reasonId: ['F', catalogs.reasons.length] };
+    workbook.setRowValues('Catalogos', 1, 'A', applicableCatalogs.length
+        ? applicableCatalogs.map(({ header }) => header)
+        : ['Sin catálogos aplicables']);
+    applicableCatalogs.forEach(({ key }, index) => {
+        workbook.setColWidth('Catalogos', spreadsheetColumn(index + 1), key === 'materialId' ? 100 : key === 'reasonId' ? 65 : 45);
+    });
+    const count = Math.max(0, ...applicableCatalogs.map(({ values }) => values.length));
+    for (let index = 0; index < count; index++) {
+        workbook.setRowValues('Catalogos', index + 2, 'A', applicableCatalogs.map(({ values }) => values[index] ?? null));
+    }
+    const lists = Object.fromEntries(applicableCatalogs.map(({ key, values }, index) => [
+        key, [spreadsheetColumn(index + 1), values.length]
+    ]));
     const identityStyle = workbook.addStyle({ fill: { pattern: 'solid', fgColor: '#E7EDF0' } });
     for (let index = 0; index < config.columns.length; index++) {
         const key = config.columns[index][1];

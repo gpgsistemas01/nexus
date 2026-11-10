@@ -5,7 +5,7 @@ import { ids } from '../fixtures/inventory.js';
 import { personData } from '../fixtures/records.js';
 import { purchaseItem } from '../fixtures/purchases.js';
 
-test('compras: los detalles se muestran en fichas etiquetadas en móvil', async ({ page }) => {
+test('compras: conserva fichas en móvil y ajusta la tabla en tableta', async ({ page }) => {
   await mockPurchases(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/compras/materiales');
@@ -23,6 +23,14 @@ test('compras: los detalles se muestran en fichas etiquetadas en móvil', async 
     /bg-error/,
   );
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+
+  await page.setViewportSize({ width: 768, height: 844 });
+  const table = dialog.locator('.table-frame--fit-columns .v-table__wrapper');
+  await expect(table).toBeVisible();
+  await expect(details).toBeHidden();
+  await expect(dialog.getByRole('table')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
+  await expect(table).toHaveCSS('overflow-x', 'hidden');
 });
 
 test('compras: corregir PIEZA valida cantidad entera y límite sin cerrar la consulta tras guardar', async ({

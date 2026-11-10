@@ -22,10 +22,11 @@ al desmontar, descarga con el nombre común `reporte_<recurso>_MM_AAAA.xlsx` y l
 el recurso temporal. `requestExcel` valida el Blob; la sesión y errores siguen en HTTP.
 `reportParams` comparte filtros, periodos, orden y eliminación de paginación.
 
-`ServerTable` conserva la tabla paginada en escritorio y presenta fichas rotuladas
-en móvil; `ResponsiveTableCards` reutiliza los slots de las celdas y las acciones.
-En móvil, las fichas permiten elegir la columna y dirección del ordenamiento.
-Las tablas de detalle usan fichas para mostrar sus campos, entradas y acciones.
+`ServerTable` presenta fichas rotuladas en teléfonos y permite elegir la columna y
+dirección del ordenamiento. Desde tabletas conserva la tabla; `TableFrame` ajusta
+columnas y permite que encabezados y valores ocupen varias líneas para evitar el
+desplazamiento horizontal. Las tablas de detalle aplican el mismo cambio y conservan
+sus entradas y acciones.
 `TableAction` ofrece un área táctil de 2.75 rem por lado en móvil. `EditorDialog`
 aprovecha el ancho disponible y distribuye campos mediante la cuadrícula compartida.
 

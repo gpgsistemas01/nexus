@@ -240,8 +240,7 @@ test('catálogos: búsqueda, paginación, recuperación de lectura y vista móvi
   await expect(cardHeading).toHaveCSS('border-bottom-width', '1px');
   const fieldHeading = page.locator('.responsive-table-card dt').first();
   await expect(fieldHeading).toBeVisible();
-  await expect(fieldHeading).toHaveCSS('font-weight', '700');
-  await expect(fieldHeading).toHaveCSS('border-bottom-width', '1px');
+  await expect(fieldHeading).toHaveCSS('font-weight', '600');
   await expect(page.locator('.server-table__count')).toHaveText('1 registro en esta página');
   await page.setViewportSize({ width: 1440, height: 900 });
   expect(reads.at(-1)?.searchParams.get('start')).toBe('0');

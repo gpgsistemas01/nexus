@@ -125,7 +125,10 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
 </script>
 
 <template>
-    <TableFrame>
+    <TableFrame
+        fit-columns
+        mobile-cards
+    >
         <VDataTable
             v-model:sort-by="sortBy"
             :headers="headers"

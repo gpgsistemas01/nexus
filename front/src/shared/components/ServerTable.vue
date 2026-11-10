@@ -42,7 +42,11 @@ const updateCardSort = (sortBy: DataTableSortItem[]) =>
 </script>
 
 <template>
-    <TableFrame :is-loading="isLoading">
+    <TableFrame
+        :is-loading="isLoading"
+        fit-columns
+        mobile-cards
+    >
         <VDataTableServer
             :headers="headers"
             :items="rows"

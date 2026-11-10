@@ -94,8 +94,9 @@ test('movimientos: las fichas móviles etiquetan los datos y permiten ordenar po
   await expect(card).toBeVisible();
   await expect(card.getByText('Folio', { exact: true })).toBeVisible();
   await expect(card.getByText('Proveedor', { exact: true })).toBeVisible();
-  const sortBy = page.getByRole('combobox', { name: 'Ordenar por', exact: true });
-  await sortBy.click();
+  await page.locator('.responsive-table-cards__sorting .v-field').click();
+  await expect(page.getByRole('listbox')).toBeVisible();
+  await expect(page.getByRole('option', { name: 'Folio', exact: true })).toBeVisible();
   await page.getByRole('option', { name: 'Folio', exact: true }).click();
   await expect.poll(() => reads.at(-1)?.searchParams.get('order[0][column]')).toBe('2');
   await page.getByRole('button', { name: 'Cambiar a orden ascendente' }).click();
