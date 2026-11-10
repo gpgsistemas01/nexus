@@ -23,9 +23,11 @@ const emit = defineEmits<{
     options: [options: TableOptions];
 }>();
 const headers = computed(() =>
-    props.headers.map((header) =>
-        header.key === 'actions' ? { ...header, fixed: 'end' as const } : header,
-    ),
+    props.headers.map((header, index) => {
+        if (header.key === 'actions') return { ...header, fixed: 'end' as const };
+
+        return index === 0 ? { ...header, fixed: 'start' as const } : header;
+    }),
 );
 </script>
 

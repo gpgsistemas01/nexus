@@ -262,6 +262,11 @@ for (const [path, label] of [
       const dialog = page.getByRole('dialog', {
         name: /^Surtir salida( de merma)? - Folio SAL-001$/,
       });
+      await expect(dialog.getByRole('columnheader').first()).toHaveCSS('position', 'sticky');
+      await expect(dialog.locator('tbody tr').first().locator('td').first()).toHaveCSS(
+        'position',
+        'sticky',
+      );
       await dialog.getByRole('checkbox', { name: `Surtir: ${label}`, exact: true }).check();
       await dialog
         .getByRole('spinbutton', { name: `Cantidad de proyecto: ${label}`, exact: true })

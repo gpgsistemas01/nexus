@@ -31,7 +31,7 @@ const money = [
     'grossPurchaseAmount',
 ] as const;
 const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
-    { title: 'Material', key: 'name', nowrap: true },
+    { title: 'Material', key: 'name', nowrap: true, fixed: 'start' },
     {
         title: 'Medidas',
         children: [

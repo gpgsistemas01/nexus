@@ -91,6 +91,14 @@ for (const [path, title, item] of [
     await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     await expect(dialog.getByLabel('Presentación', { exact: true })).toHaveValue('');
     await expect(dialog.getByRole('cell', { name: 'Lona', exact: true })).toBeVisible();
+    await expect(dialog.getByRole('columnheader', { name: 'Material', exact: true })).toHaveCSS(
+      'position',
+      'sticky',
+    );
+    await expect(dialog.locator('tbody tr').first().locator('td').first()).toHaveCSS(
+      'position',
+      'sticky',
+    );
     await expect(dialog.getByRole('columnheader')).toHaveText([
       'Material',
       'Medidas',

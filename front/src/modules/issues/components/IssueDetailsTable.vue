@@ -28,7 +28,7 @@ const emit = defineEmits<{
     return: [row: IssueDetail];
 }>();
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
-    { title: props.itemLabel, key: 'name', nowrap: true },
+    { title: props.itemLabel, key: 'name', nowrap: true, fixed: 'start' },
     ...(props.mode === 'view' ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus' }] : []),
     {
         title: 'Medidas',

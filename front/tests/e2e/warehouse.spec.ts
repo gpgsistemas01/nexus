@@ -95,6 +95,14 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
     page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Lona Proveedor Central' })).toBeVisible();
+  await expect(page.getByRole('columnheader', { name: 'Material', exact: true })).toHaveCSS(
+    'position',
+    'sticky',
+  );
+  await expect(page.locator('tbody tr').first().locator('td').first()).toHaveCSS(
+    'position',
+    'sticky',
+  );
   for (const label of [
     'Medidas',
     'Base',
