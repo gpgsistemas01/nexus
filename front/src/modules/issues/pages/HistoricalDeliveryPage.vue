@@ -10,8 +10,18 @@ const state = useHistoricalDelivery({
     onSaved: () => emit('saved'),
     onUnauthorized: () => emit('unauthorized'),
 });
-const { values, preview, receipt, selected, isWorking, error, recoveryRequired, canConfirm } =
-    state;
+const {
+    values,
+    preview,
+    receipt,
+    selected,
+    allSelected,
+    isWorking,
+    isSelectingAll,
+    error,
+    recoveryRequired,
+    canConfirm,
+} = state;
 </script>
 
 <template>
@@ -20,7 +30,9 @@ const { values, preview, receipt, selected, isWorking, error, recoveryRequired, 
         :preview="preview"
         :receipt="receipt"
         :selected="selected"
+        :all-selected="allSelected"
         :is-working="isWorking"
+        :is-selecting-all="isSelectingAll"
         :error="error"
         :recovery-required="recoveryRequired"
         :can-confirm="canConfirm"

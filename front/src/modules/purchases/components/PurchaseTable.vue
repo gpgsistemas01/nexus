@@ -67,6 +67,9 @@ const displayDate = (value: string) =>
         <template #[`item.invoice`]="{ item }">
             {{ item.isInvoiced ? item.invoice : 'Sin factura' }}
         </template>
+        <template #[`item.status`]="{ item }">
+            {{ item.status || '—' }}
+        </template>
         <template #[`item.actions`]="{ item }">
             <TableAction
                 v-if="canEditPurchase(item)"
@@ -76,6 +79,7 @@ const displayDate = (value: string) =>
                 @click="emit('open', item, 'edit')"
             />
             <TableAction
+                color="filter-clear"
                 label="Ver compra"
                 :icon="`svg:${mdiEyeOutline}`"
                 :is-disabled="isReading"

@@ -6,15 +6,17 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineProps
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 15, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 16, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `values` | `values: { cutoffDate: string; deliveredAt: string; reason: string; declaredDelivered: boolean; search: string; };` |
+| `values` | `values: { reason: string; declaredDelivered: boolean; };` |
 | `preview` | `preview: HistoricalDeliveryPreview \| null;` |
 | `receipt` | `receipt: HistoricalDeliveryReceipt \| null;` |
 | `selected` | `selected: string[];` |
+| `allSelected` | `allSelected: boolean;` |
 | `isWorking` | `isWorking: boolean;` |
+| `isSelectingAll` | `isSelectingAll: boolean;` |
 | `recoveryRequired` | `recoveryRequired: boolean;` |
 | `canConfirm` | `canConfirm: boolean;` |
 | `error` | `error: string;` |
@@ -30,18 +32,18 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `update` | `update: [field: 'cutoffDate' \| 'deliveredAt' \| 'reason' \| 'search', value: string];` |
+| `update` | `update: [field: 'reason', value: string];` |
 | `declare` | `declare: [value: boolean];` |
 | `select` | `select: [id: string];` |
-| `selectAll` | `selectAll: [];` |
-| `load` | `load: [page?: number];` |
+| `selectAll` | `selectAll: [selected: boolean];` |
+| `load` | `load: [page?: number, preserveSelection?: boolean];` |
 | `confirm` | `confirm: [];` |
 | `recover` | `recover: [];` |
 | `close` | `close: [];` |
 
 ## IssueDetailsTable.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 19, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 18, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -57,7 +59,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 24, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -231,6 +233,32 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |
 | `confirmPhysicalReturn` | `confirmPhysicalReturn: [value: boolean];` |
+
+## IssueSupplyField.defineProps
+
+**Fuente:** [src/modules/issues/components/IssueSupplyField.vue](../../../../../src/modules/issues/components/IssueSupplyField.vue) · línea 10, columna 27. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `field` | `field: 'quantityToSupply' \| 'projectConvertedQuantity' \| 'supply';` |
+| `item` | `item: IssueDetail;` |
+| `isDisabled` | `isDisabled: boolean;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `item` |
+
+## IssueSupplyField.defineEmits
+
+**Fuente:** [src/modules/issues/components/IssueSupplyField.vue](../../../../../src/modules/issues/components/IssueSupplyField.vue) · línea 15, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `supply` | `supply: [changes: IssueSupplyChanges]` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [IssueSupplyChanges](../../../../../src/modules/issues/issue.ts) | `supply` |
 
 ## IssueTable.defineProps
 

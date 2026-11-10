@@ -290,7 +290,6 @@ const findInventoryMovements = async ({
             ...(stockAdjustmentId && { stockAdjustmentId }),
             ...getMovementDateFilter({ startDate, endDate })
         };
-
         const where = {
 
             material: { type },

@@ -42,6 +42,7 @@ export const findAllCatalogEntries = async (catalogName, { skip = 0, take = 10, 
     const catalog = getCatalog(catalogName);
     const model = getDb()[catalog.model];
     const where = search ? { name: { contains: search, mode: 'insensitive' } } : {};
+
     const page = await findPage({
         model: model,
         hasFilters: Boolean(search),

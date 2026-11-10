@@ -23,7 +23,8 @@ su registro permanece aunque después cierre la salida.
 ## Consulta independiente
 
 Abra **Directorio comercial → Clientes** y utilice
-**Buscar por nombre** y **Buscar**. La tabla permite comprobar nombre y disponibilidad.
+**Buscar por nombre** y **Buscar**. Use **Filtrar por columna** para limitar por
+nombre o disponibilidad. La tabla permite comprobar ambos datos.
 <!-- manual:end -->
 
 <!-- manual:all clients:page-view clients:create -->

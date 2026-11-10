@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { VDataTable } from 'vuetify/components/VDataTable';
-import { VCheckbox } from 'vuetify/components/VCheckbox';
-import { VTextField } from 'vuetify/components/VTextField';
 import { mdiUndoVariant } from '@mdi/js';
-import { isPiecePresentation } from '@nexus/piece-quantity';
-import type { DataTableHeader } from 'vuetify';
+import type { DataTableHeader, DataTableSortItem } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
+import ResponsiveTableCards from '../../../shared/components/ResponsiveTableCards.vue';
+import IssueSupplyField from './IssueSupplyField.vue';
 import {
     numberText,
     currencyText,
@@ -28,7 +27,7 @@ const emit = defineEmits<{
     return: [row: IssueDetail];
 }>();
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
-    { title: props.itemLabel, key: 'name', nowrap: true },
+    { title: props.itemLabel, key: 'name', nowrap: true, fixed: 'start' },
     ...(props.mode === 'view' ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus' }] : []),
     {
         title: 'Medidas',
@@ -64,7 +63,7 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
               { title: 'Cantidad a surtir', key: 'quantityToSupply', minWidth: 160 },
               { title: 'Cantidad de proyecto', key: 'projectConvertedQuantity' },
               { title: 'Diferencia', key: 'difference' },
-              { title: 'Surtir', key: 'supply' },
+              { title: 'Surtir', key: 'supply', sortable: false },
           ]
         : []),
     ...(['create', 'edit', 'return'].includes(props.mode)
@@ -72,6 +71,7 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
         : []),
 ]);
 const numeric = ['base', 'height', 'quantity', 'suppliedQuantity', 'returnedQuantity'] as const;
+const sortBy = ref<DataTableSortItem[]>([]);
 
 const projectValue = (item: IssueDetail) =>
     item.isOriginallySupplied && item.projectConvertedQuantity !== ''
@@ -79,11 +79,58 @@ const projectValue = (item: IssueDetail) =>
               useGrouping: false,
           })
         : item.projectConvertedQuantity;
+
+const cardValue = (item: IssueDetail, key: string) => {
+    if (['base', 'height', 'quantity', 'suppliedQuantity', 'returnedQuantity'].includes(key))
+        return numberText(item[key as keyof IssueDetail] as number | null);
+
+    if (key === 'convertedQuantity')
+        return convertedQuantityText(item.convertedQuantity, item.unitMeasure);
+
+    if (key === 'maxUnitCost')
+        return item.maxUnitCost == null ? '—' : currencyText(item.maxUnitCost);
+
+    if (key === 'pendingQuantity') return numberText(getIssuePendingQuantity(item));
+
+    if (key === 'deliveredQuantity') return numberText(getIssueReturnableQuantity(item));
+
+    if (key === 'difference')
+        return item.projectConvertedQuantity
+            ? convertedQuantityText(
+                  item.convertedQuantity - Number(item.projectConvertedQuantity),
+                  item.unitMeasure,
+              )
+            : '—';
+
+    if (key === 'projectConvertedQuantity') return projectValue(item);
+
+    if (key === 'isSupplied') return item.isSupplied ? 'Sí' : 'No';
+
+    const value = item[key as keyof IssueDetail];
+    return value == null || value === '' ? '—' : String(value);
+};
+
+const sortValue = (item: IssueDetail, key: string): unknown => {
+    if (key === 'pendingQuantity') return getIssuePendingQuantity(item);
+
+    if (key === 'deliveredQuantity') return getIssueReturnableQuantity(item);
+
+    if (key === 'difference')
+        return item.projectConvertedQuantity
+            ? item.convertedQuantity - Number(item.projectConvertedQuantity)
+            : null;
+
+    return item[key as keyof IssueDetail];
+};
 </script>
 
 <template>
-    <TableFrame>
+    <TableFrame
+        fit-columns
+        mobile-cards
+    >
         <VDataTable
+            v-model:sort-by="sortBy"
             :headers="headers"
             :items="rows"
             item-value="id"
@@ -118,43 +165,19 @@ const projectValue = (item: IssueDetail) =>
                 {{ item.maxUnitCost == null ? '—' : currencyText(item.maxUnitCost) }}
             </template>
             <template #[`item.quantityToSupply`]="{ item }">
-                <VTextField
-                    :aria-label="`Cantidad a surtir: ${item.name}`"
-                    type="number"
-                    :min="isPiecePresentation(item.presentation) ? 1 : 0.01"
-                    :step="isPiecePresentation(item.presentation) ? 1 : 0.01"
-                    :max="getIssuePendingQuantity(item)"
-                    :model-value="item.quantityToSupply"
-                    :hint="`Pendiente: ${numberText(getIssuePendingQuantity(item))} ${item.presentation}`"
-                    persistent-hint
-                    :disabled="
-                        isDisabled ||
-                        item.isOriginallySupplied ||
-                        item.isCanceled ||
-                        !item.isSupplied
-                    "
-                    @update:model-value="
-                        emit('supply', item.id, { quantityToSupply: $event ?? '' })
-                    "
+                <IssueSupplyField
+                    field="quantityToSupply"
+                    :item="item"
+                    :is-disabled="isDisabled"
+                    @supply="emit('supply', item.id, $event)"
                 />
             </template>
             <template #[`item.projectConvertedQuantity`]="{ item }">
-                <VTextField
-                    :aria-label="`Cantidad de proyecto: ${item.name}`"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    :model-value="projectValue(item)"
-                    :disabled="
-                        isDisabled ||
-                        item.isOriginallySupplied ||
-                        item.isCanceled ||
-                        !item.isSupplied
-                    "
-                    hide-details
-                    @update:model-value="
-                        emit('supply', item.id, { projectConvertedQuantity: $event ?? '' })
-                    "
+                <IssueSupplyField
+                    field="projectConvertedQuantity"
+                    :item="item"
+                    :is-disabled="isDisabled"
+                    @supply="emit('supply', item.id, $event)"
                 />
             </template>
             <template #[`item.difference`]="{ item }">
@@ -168,12 +191,11 @@ const projectValue = (item: IssueDetail) =>
                 }}
             </template>
             <template #[`item.supply`]="{ item }">
-                <VCheckbox
-                    :aria-label="`Surtir: ${item.name}`"
-                    :model-value="item.isSupplied"
-                    :disabled="isDisabled || item.isOriginallySupplied || item.isCanceled"
-                    hide-details
-                    @update:model-value="emit('supply', item.id, { isSupplied: $event === true })"
+                <IssueSupplyField
+                    field="supply"
+                    :item="item"
+                    :is-disabled="isDisabled"
+                    @supply="emit('supply', item.id, $event)"
                 />
             </template>
             <template #[`item.actions`]="{ item }">
@@ -185,6 +207,7 @@ const projectValue = (item: IssueDetail) =>
                     "
                     label="Devolver detalle de salida"
                     :icon="`svg:${mdiUndoVariant}`"
+                    color="accent"
                     :is-disabled="isDisabled"
                     @click="emit('return', item)"
                 />
@@ -192,10 +215,71 @@ const projectValue = (item: IssueDetail) =>
                     v-else-if="(mode === 'create' || mode === 'edit') && !item.isCanceled"
                     label="Eliminar detalle"
                     icon="$delete"
+                    color="error"
                     :is-disabled="isDisabled || item.isOriginallySupplied"
                     @click="emit('remove', item.id)"
                 />
             </template>
         </VDataTable>
+        <ResponsiveTableCards
+            :headers="headers"
+            :rows="rows"
+            :format-value="cardValue"
+            :sort-by="sortBy"
+            sort-rows
+            :sort-value="sortValue"
+            @sort-by="sortBy = $event"
+        >
+            <template #[`item.name`]="{ item }">{{ item.name }}</template>
+            <template #[`item.fulfillmentStatus`]="{ item }">
+                {{ item.fulfillmentStatus || '—' }}
+            </template>
+            <template #[`item.quantityToSupply`]="{ item }">
+                <IssueSupplyField
+                    field="quantityToSupply"
+                    :item="item"
+                    :is-disabled="isDisabled"
+                    @supply="emit('supply', item.id, $event)"
+                />
+            </template>
+            <template #[`item.projectConvertedQuantity`]="{ item }">
+                <IssueSupplyField
+                    field="projectConvertedQuantity"
+                    :item="item"
+                    :is-disabled="isDisabled"
+                    @supply="emit('supply', item.id, $event)"
+                />
+            </template>
+            <template #[`item.supply`]="{ item }">
+                <IssueSupplyField
+                    field="supply"
+                    :item="item"
+                    :is-disabled="isDisabled"
+                    @supply="emit('supply', item.id, $event)"
+                />
+            </template>
+            <template #[`item.actions`]="{ item }">
+                <TableAction
+                    v-if="
+                        mode === 'return' &&
+                        !item.isCanceled &&
+                        getIssueReturnableQuantity(item) > 0
+                    "
+                    label="Devolver detalle de salida"
+                    :icon="`svg:${mdiUndoVariant}`"
+                    color="accent"
+                    :is-disabled="isDisabled"
+                    @click="emit('return', item)"
+                />
+                <TableAction
+                    v-else-if="(mode === 'create' || mode === 'edit') && !item.isCanceled"
+                    label="Eliminar detalle"
+                    icon="$delete"
+                    color="error"
+                    :is-disabled="isDisabled || item.isOriginallySupplied"
+                    @click="emit('remove', item.id)"
+                />
+            </template>
+        </ResponsiveTableCards>
     </TableFrame>
 </template>

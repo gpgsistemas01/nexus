@@ -6,7 +6,7 @@
 
 | Criterio | Condición y resultado esperado |
 | --- | --- |
-| `CA-RF-VUE-015-1` | Elegir una operación permitida para todo el XLSX y descargar su plantilla con columnas del reporte y referencias técnicas. Cambiar la selección retira el archivo; un XLSX de otro modo se rechaza. Validar hasta 100 filas/2 MiB y confirmar todas o ninguna. Editar conserva stock; Ajustar conserva las versiones originales, muestra saldo anterior/final y exige motivo/observaciones. Cero válido, vacío rechazado. La vista no desborda a 320 px. |
+| `CA-RF-VUE-015-1` | Elegir una operación permitida para todo el XLSX y descargar su plantilla con columnas del reporte y referencias técnicas. Edición/ajuste incluyen todos los registros coincidentes, hasta 500; superar el límite requiere filtrar por proveedor/nombre, sin entregar una plantilla parcial. La interfaz aclara columnas grises y hoja Catalogos. Cambiar la selección retira el archivo; un XLSX de otro modo se rechaza. Validar hasta 500 filas/2 MiB y confirmar todas o ninguna. Editar conserva stock; Ajustar conserva las versiones originales, muestra saldo anterior/final y exige motivo/observaciones. Cero válido, vacío rechazado. La vista no desborda a 320 px. |
 | `CA-RF-VUE-015-2` | Perder la respuesta y recargar conserva sólo la referencia por cuenta/recurso. Recuperar devuelve el recibo o repite la misma clave sin otra alta. Una respuesta incompleta con HTTP 200 no anuncia éxito. |
 
 Estas condiciones concretan los [requisitos del cliente](client-specification.md).

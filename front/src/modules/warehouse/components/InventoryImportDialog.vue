@@ -33,7 +33,6 @@ const props = defineProps<{
     suppliers: LookupState;
     supplierId: string;
     search: string;
-    templatePage: number;
     canReadSuppliers: boolean;
 }>();
 const emit = defineEmits<{
@@ -48,7 +47,6 @@ const emit = defineEmits<{
     errors: [];
     supplier: [value: string];
     search: [value: string];
-    templatePage: [value: number];
     searchSuppliers: [value: string];
     moreSuppliers: [];
     retrySuppliers: [];
@@ -68,6 +66,29 @@ const modeOptions = computed(() =>
     })),
 );
 const modeLabel = computed(() => INVENTORY_IMPORT_MODE_LABELS[props.mode]);
+const supplierLabel = computed(() =>
+    props.mode === modes.CREATE
+        ? 'Limitar proveedores disponibles'
+        : 'Filtrar registros por proveedor',
+);
+const supplierHint = computed(() =>
+    props.mode === modes.CREATE
+        ? props.resource === 'wastes'
+            ? 'Obligatorio para Alta de merma; determina qué materiales aparecen como referencia en Catalogos.'
+            : 'En Alta limita las opciones del desplegable Proveedor; no filtra filas de inventario.'
+        : 'La plantilla incluirá sólo los registros asociados a este proveedor. Déjalo vacío para incluir todos.',
+);
+const showSearch = computed(() => props.mode !== modes.CREATE || props.resource === 'wastes');
+const searchLabel = computed(() =>
+    props.mode === modes.CREATE
+        ? 'Buscar material de referencia por nombre'
+        : `Filtrar ${props.resource === 'wastes' ? 'mermas' : props.resource === 'materials' ? 'materiales' : 'consumibles'} por nombre`,
+);
+const searchHint = computed(() =>
+    props.mode === modes.CREATE
+        ? 'Reduce las opciones de Material de referencia en Catalogos para el proveedor elegido; no filtra filas de merma.'
+        : 'Incluye sólo registros cuyo nombre contenga este texto. Déjalo vacío para incluir todos; combinado con proveedor ayuda a acotar plantillas de más de 500 filas.',
+);
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
 );
@@ -107,7 +128,7 @@ const selectMode = (value: unknown) => {
         :show-submit="!batch && !recoveryRequired"
         :is-submit-disabled="!file"
         submit-label="Validar archivo"
-        note="Hasta 100 filas y 2 MiB. La confirmación aplica todo el lote."
+        :note="`Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB. La confirmación aplica todo el lote.`"
         @close="emit('close')"
         @submit="emit('prepare')"
     >
@@ -149,7 +170,7 @@ const selectMode = (value: unknown) => {
             <p class="mb-4">
                 {{
                     mode === modes.CREATE
-                        ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
+                        ? 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.'
                         : mode === modes.ADJUST
                           ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
                           : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
@@ -160,73 +181,87 @@ const selectMode = (value: unknown) => {
                 selecciona esa misma operación al cargarla. Un duplicado o error bloquea todo el
                 archivo. Cambiar la operación retira el archivo seleccionado.
             </p>
-            <div class="template-fields">
-                <RemoteSelect
-                    v-if="canReadSuppliers"
-                    label="Proveedor de la plantilla"
-                    :model-value="supplierId"
-                    :state="suppliers"
-                    :is-disabled="locked"
-                    @update:model-value="emit('supplier', $event)"
-                    @search="emit('searchSuppliers', $event)"
-                    @more="emit('moreSuppliers')"
-                    @retry="emit('retrySuppliers')"
-                />
-                <VTextField
-                    :model-value="search"
-                    label="Buscar registros de la plantilla"
+            <VAlert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+            >
+                Las columnas grises son referencias que debes conservar sin editar; las blancas son
+                los campos que puedes capturar para esta operación. La hoja
+                <strong>Catalogos</strong>
+                contiene opciones para las listas desplegables, no registros de inventario. Elige la
+                opción completa tal como aparece; si incluye un ID, no lo escribas por separado.
+                <template v-if="mode === modes.CREATE">
+                    En Alta de Materiales/Consumibles, Proveedor sólo limita las opciones de esa
+                    lista y no las filas nuevas. En Alta de Mermas, es obligatorio y determina los
+                    materiales disponibles como referencia.
+                </template>
+            </VAlert>
+            <VAlert
+                v-if="mode !== modes.CREATE"
+                type="info"
+                variant="tonal"
+                class="mb-4"
+            >
+                En edición y ajuste, Proveedor y Nombre determinan qué registros entran en la
+                plantilla; no cambian los datos. Déjalos vacíos para incluir todos. Se incluyen
+                hasta {{ limits.maxRows }} filas; si hay más, acota con esos filtros y descarga
+                grupos separados. No se entrega una plantilla parcial. Cada archivo también debe
+                pesar como máximo {{ limits.maxBytes / (1024 * 1024) }} MiB.
+            </VAlert>
+            <div class="template-controls">
+                <div class="template-fields">
+                    <RemoteSelect
+                        v-if="canReadSuppliers"
+                        :label="supplierLabel"
+                        :model-value="supplierId"
+                        :state="suppliers"
+                        :is-disabled="locked"
+                        :hint="supplierHint"
+                        persistent-hint
+                        @update:model-value="emit('supplier', $event)"
+                        @search="emit('searchSuppliers', $event)"
+                        @more="emit('moreSuppliers')"
+                        @retry="emit('retrySuppliers')"
+                    />
+                    <VTextField
+                        v-if="showSearch"
+                        :model-value="search"
+                        :label="searchLabel"
+                        :hint="searchHint"
+                        persistent-hint
+                        :disabled="locked"
+                        :maxlength="limits.maxSearchLength"
+                        @update:model-value="emit('search', $event)"
+                    />
+                </div>
+                <VBtn
+                    variant="outlined"
+                    :disabled="
+                        locked || (resource === 'wastes' && mode === modes.CREATE && !supplierId)
+                    "
+                    :loading="isDownloading"
+                    @click="emit('template')"
+                >
+                    Descargar plantilla
+                </VBtn>
+                <VFileInput
+                    :model-value="file"
+                    label="Archivo Excel (.xlsx)"
+                    accept=".xlsx"
                     :disabled="locked"
-                    :maxlength="limits.maxSearchLength"
-                    @update:model-value="emit('search', $event)"
+                    show-size
+                    clearable
+                    @update:model-value="
+                        emit('file', Array.isArray($event) ? ($event[0] ?? null) : $event)
+                    "
                 />
-                <VTextField
-                    v-if="mode !== modes.CREATE"
-                    :model-value="templatePage"
-                    label="Página de la plantilla (100 filas)"
-                    type="number"
-                    min="1"
-                    :max="limits.maxTemplatePage"
-                    :disabled="locked"
-                    @update:model-value="emit('templatePage', Number($event))"
-                />
+                <p class="retention-note">
+                    El servidor descarta el archivo después del análisis. El borrador vence en
+                    {{ limits.draftHours }} horas. El original de tu equipo permanece bajo tu
+                    control.
+                </p>
             </div>
-            <p
-                v-if="resource === 'wastes' && mode === modes.CREATE"
-                class="mb-3"
-            >
-                Selecciona el proveedor para incluir sus materiales de referencia en m². En el
-                Excel, elige la opción completa de la lista sin escribir el ID manualmente.
-            </p>
-            <VBtn
-                variant="outlined"
-                class="mb-5"
-                :disabled="
-                    locked ||
-                    (resource === 'wastes' && mode === modes.CREATE && !supplierId) ||
-                    !Number.isInteger(templatePage) ||
-                    templatePage < 1 ||
-                    templatePage > limits.maxTemplatePage
-                "
-                :loading="isDownloading"
-                @click="emit('template')"
-            >
-                Descargar plantilla
-            </VBtn>
-            <VFileInput
-                :model-value="file"
-                label="Archivo Excel (.xlsx)"
-                accept=".xlsx"
-                :disabled="locked"
-                show-size
-                clearable
-                @update:model-value="
-                    emit('file', Array.isArray($event) ? ($event[0] ?? null) : $event)
-                "
-            />
-            <p class="retention-note">
-                El servidor descarta el archivo después del análisis. El borrador vence en
-                {{ limits.draftHours }} horas. El original de tu equipo permanece bajo tu control.
-            </p>
         </template>
         <template v-if="batch">
             <p class="mb-2">
@@ -375,6 +410,13 @@ const selectMode = (value: unknown) => {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     gap: 1rem;
 }
+.template-controls {
+    display: grid;
+    gap: 1rem;
+}
+.template-controls > .v-btn {
+    justify-self: start;
+}
 .preview-rows {
     list-style: none;
     padding: 0;
@@ -403,5 +445,6 @@ const selectMode = (value: unknown) => {
 .retention-note {
     color: rgb(var(--v-theme-muted));
     font-size: 0.8rem;
+    margin: 0;
 }
 </style>

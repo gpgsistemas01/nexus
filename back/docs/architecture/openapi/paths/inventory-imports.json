@@ -6,7 +6,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Descargar plantilla de una operación con estructura de inventario",
-      "description": "Una operación para todo el archivo: create (Alta), update (Editar datos) o adjust (Ajustar existencias). Columnas iniciales y orden del reporte de inventario; después Activo, IDs/versiones y campos de captura. Ajuste omite costos. IDs/versiones incluidos automáticamente para toda cuenta con permiso operativo, sin exigir administrador. Alta genera IDs y captura Cantidad inicial; edición conserva stock; ajuste usa Stock contado final con motivo/observaciones, cero válido y vacío rechazado. Hasta 100 filas/2 MiB y catálogos de 500 opciones. La plantilla identifica módulo y operación; se rechaza una selección incompatible. Merma usa referencia existente y proveedor filtrado.",
+      "description": "Una operación para todo el archivo: create (Alta), update (Editar datos) o adjust (Ajustar existencias). Columnas iniciales y orden del reporte de inventario; después Activo, IDs/versiones y campos de captura. Ajuste omite costos. IDs/versiones incluidos automáticamente para toda cuenta con permiso operativo, sin exigir administrador. Alta genera IDs y captura Cantidad inicial; edición conserva stock; ajuste usa Stock contado final con motivo/observaciones, cero válido y vacío rechazado. Hasta 500 filas/2 MiB y catálogos de 500 opciones. Edición/ajuste incluyen todos los registros que coinciden con proveedor/nombre, sin paginación; una consulta mayor a 500 se rechaza. La plantilla identifica módulo y operación; se rechaza una selección incompatible. Merma usa referencia existente y proveedor filtrado.",
       "security": [
         {
           "cookieAuth": []
@@ -46,7 +46,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "description": "Obligatorio para la plantilla de alta de mermas. En actualización delimita las relaciones del proveedor."
+          "description": "Obligatorio para la plantilla de alta de mermas. En edición o ajuste filtra las relaciones del proveedor."
         },
         {
           "name": "search",
@@ -54,18 +54,8 @@
           "schema": {
             "type": "string",
             "maxLength": 200
-          }
-        },
-        {
-          "name": "page",
-          "in": "query",
-          "schema": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 999,
-            "default": 1
           },
-          "description": "Edición o ajuste: 100 filas por página, orden estable por nombre e identificador."
+          "description": "En edición/ajuste filtra registros por nombre; en alta de mermas limita las opciones de material de referencia."
         }
       ],
       "responses": {
@@ -121,7 +111,7 @@
           }
         },
         "413": {
-          "description": "Se excedió un límite de archivo, filas o tiempo de análisis.",
+          "description": "Se excedió un límite de archivo, filas, registros coincidentes de la plantilla o tiempo de análisis.",
           "content": {
             "application/json": {
               "schema": {
@@ -162,7 +152,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Validar archivo sin cambiar el inventario",
-      "description": "Autoriza la operación seleccionada para todo el archivo antes del multipart. Analiza un único XLSX con SheetKit en worker y comprueba formato V2, módulo, operación, encabezados, permisos, duplicados, versiones, identidad y conteo final. No deduce la operación por fila o por nombre. Un error bloquea todo el archivo sin modificar inventario. Hasta 100 filas/2 MiB.",
+      "description": "Autoriza la operación seleccionada para todo el archivo antes del multipart. Analiza un único XLSX con SheetKit en worker y comprueba formato V2, módulo, operación, encabezados, permisos, duplicados, versiones, identidad y conteo final. No deduce la operación por fila o por nombre. Un error bloquea todo el archivo sin modificar inventario. Hasta 500 filas/2 MiB.",
       "security": [
         {
           "cookieAuth": []

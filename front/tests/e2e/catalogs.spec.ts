@@ -231,10 +231,25 @@ test('catálogos: búsqueda, paginación, recuperación de lectura y vista móvi
   await page.getByRole('textbox', { name: 'Buscar por nombre', exact: true }).fill('Rol 21');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
   await expect(page.getByRole('cell', { name: 'Rol 21', exact: true })).toBeVisible();
+  await expect(page.locator('.v-data-table-footer')).toContainText(/1\s*[–-]\s*1 de 1/);
+  await expect(page.locator('.server-table__count')).toHaveText('1 registro en esta página');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const cardHeading = page.locator('.responsive-table-card h3').first();
+  await expect(cardHeading).toBeVisible();
+  await expect(cardHeading).toHaveCSS('font-weight', '700');
+  await expect(cardHeading).toHaveCSS('border-bottom-width', '1px');
+  const fieldHeading = page.locator('.responsive-table-card dt').first();
+  await expect(fieldHeading).toBeVisible();
+  await expect(fieldHeading).toHaveCSS('font-weight', '600');
+  await expect(page.locator('.server-table__count')).toHaveText('1 registro en esta página');
+  await page.setViewportSize({ width: 1440, height: 900 });
   expect(reads.at(-1)?.searchParams.get('start')).toBe('0');
   expect(reads.at(-1)?.searchParams.get('search')).toBe('Rol 21');
   await page.getByRole('button', { name: 'Limpiar filtros', exact: true }).click();
   await expect(page.getByRole('cell', { name: 'Rol 01', exact: true })).toBeVisible();
+  await expect(page.locator('.server-table__count')).toHaveText('10 registros en esta página');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('.server-table__count')).toHaveText('10 registros en esta página');
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await page.getByRole('button', { name: 'Nuevo rol', exact: true }).click();

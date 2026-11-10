@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { INVENTORY_IMPORT_MODES as modes } from '@nexus/inventory-imports';
 import InventoryImportDialog from '../components/InventoryImportDialog.vue';
 import { useInventoryImport } from '../composables/useInventoryImport.js';
@@ -18,7 +18,6 @@ const props = defineProps<{
 const emit = defineEmits<{ close: []; saved: []; unauthorized: [] }>();
 const supplierId = ref(props.initialSupplierId);
 const search = ref(props.initialSearch);
-const templatePage = ref(1);
 const suppliers = useRemoteOptions(
     'suppliers',
     computed(() => props.canReadSuppliers),
@@ -34,9 +33,6 @@ const state = useInventoryImport({
     onUnauthorized: () => emit('unauthorized'),
 });
 const { mode, batch, file, isWorking, error, recoveryRequired, canConfirm } = state;
-watch(mode, () => {
-    templatePage.value = 1;
-});
 const isDownloading = computed(
     () => state.template.isExporting.value || state.errors.isExporting.value,
 );
@@ -48,7 +44,6 @@ const download = () =>
     state.template.exportReport({
         supplierId: supplierId.value,
         search: search.value,
-        page: templatePage.value,
     });
 </script>
 
@@ -67,7 +62,6 @@ const download = () =>
         :download-error="downloadError"
         :supplier-id="supplierId"
         :search="search"
-        :template-page="templatePage"
         :suppliers="suppliers.state.value"
         :can-read-suppliers="canReadSuppliers"
         @file="state.selectFile"
@@ -80,7 +74,6 @@ const download = () =>
         @errors="state.errors.exportReport(undefined)"
         @supplier="supplierId = $event"
         @search="search = $event"
-        @template-page="templatePage = $event"
         @search-suppliers="suppliers.updateSearch"
         @more-suppliers="suppliers.loadMore"
         @retry-suppliers="suppliers.retry"

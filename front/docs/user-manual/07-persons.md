@@ -4,6 +4,8 @@
 
 Abra **Identidad y acceso → Personas**. La **Tabla de Personas** muestra el nombre
 y las responsabilidades de cada persona. Registrar una persona no crea una cuenta de ingreso.
+Use **Filtrar por columna** para localizar por nombre o por el texto de sus responsabilidades;
+puede combinarlo con los filtros de área y rol.
 
 <!-- manual:any persons:write -->
 ## Registrar una persona

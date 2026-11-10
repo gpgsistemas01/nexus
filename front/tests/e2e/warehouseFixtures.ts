@@ -1,7 +1,11 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { ids, material, pageOf, template, user, waste } from '../fixtures/inventory.js';
 
-export const mockWarehouse = async (page: Page, permissions = user.permissions) => {
+export const mockWarehouse = async (
+  page: Page,
+  permissions = user.permissions,
+  options: { materialName?: string } = {},
+) => {
   await page.route('**/api/auth/me', (route) =>
     route.fulfill({ json: { user: { ...user, permissions } } }),
   );
@@ -12,7 +16,11 @@ export const mockWarehouse = async (page: Page, permissions = user.permissions) 
     const data = path.endsWith('/material-templates')
       ? [template]
       : path.endsWith('/materials') || path.endsWith('/consumables')
-        ? [material]
+        ? [
+            options.materialName
+              ? { ...material, material: { ...material.material, name: options.materialName } }
+              : material,
+          ]
         : path.endsWith('/wastes')
           ? [waste]
           : path.endsWith('/suppliers')

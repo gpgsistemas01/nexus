@@ -11,7 +11,7 @@ export const errorMessages = {
     HISTORICAL_DELIVERY_BUSY: 'Otra operación está modificando estas salidas. Reintenta conservando la misma clave.',
     HISTORICAL_PHYSICAL_RETURN_REQUIRED: 'Confirma que la devolución corresponde a material que está entrando físicamente al almacén ahora.',
     INVENTORY_IMPORT_FILE: 'Utiliza una plantilla XLSX válida del módulo y operación seleccionados, sin fórmulas ni macros.',
-    INVENTORY_IMPORT_LIMIT: `El archivo admite hasta ${INVENTORY_IMPORT_LIMITS.maxRows} filas, ${INVENTORY_IMPORT_LIMITS.maxBytes / (1024 * 1024)} MiB y celdas de ${INVENTORY_IMPORT_LIMITS.maxCellLength} caracteres. Divide la carga si supera los límites.`,
+    INVENTORY_IMPORT_LIMIT: `Se admiten hasta ${INVENTORY_IMPORT_LIMITS.maxRows} filas y ${INVENTORY_IMPORT_LIMITS.maxBytes / (1024 * 1024)} MiB por archivo. Si la plantilla supera ese límite, filtra por proveedor o nombre; para importar más registros, divide la carga en archivos de hasta ${INVENTORY_IMPORT_LIMITS.maxRows} filas. Las celdas admiten ${INVENTORY_IMPORT_LIMITS.maxCellLength} caracteres.`,
     INVENTORY_IMPORT_BUSY: 'Se está procesando otra importación. Espera un momento y vuelve a intentar.',
     INVENTORY_IMPORT_VALIDATION: 'Corrige las filas señaladas antes de confirmar la importación.',
     INVENTORY_IMPORT_EXPIRED: 'La vista previa venció. Vuelve a cargar el archivo para validarlo.',

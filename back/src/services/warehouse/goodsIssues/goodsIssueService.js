@@ -64,7 +64,6 @@ export const findAllGoodsIssues = async ({
 }) => {
 
     const db = getDb();
-
     const where = {
         ...(id && { id }),
         ...buildGoodsIssueContextWhere(type),

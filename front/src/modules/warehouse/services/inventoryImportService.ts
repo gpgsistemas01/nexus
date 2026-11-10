@@ -109,13 +109,12 @@ export const inventoryImportService = {
     template(
         resource: InventoryResource,
         mode: InventoryImportMode,
-        query: { supplierId: string; search: string; page: number },
+        query: { supplierId: string; search: string },
         signal: AbortSignal,
     ) {
         const params = new URLSearchParams({
             mode,
             search: query.search,
-            page: String(query.page),
         });
         if (query.supplierId) params.set('supplierId', query.supplierId);
 

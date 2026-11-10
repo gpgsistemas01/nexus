@@ -16,6 +16,9 @@ en los selectores de Nexus.
 
 ![Consulta de un catálogo de unidades de medida.](images/11-catalog-list.png)
 
+En **Filtrar por columna**, busque por **Nombre**, **Activo** y, cuando se muestre,
+por **Símbolo**. Los filtros se aplican al catálogo completo y pueden combinarse.
+
 ## Crear un registro
 
 1. Busque primero el nombre para evitar duplicados.

@@ -163,7 +163,7 @@ const titleId = useId();
 .editor-actions {
     padding: 1rem 1.25rem;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.75rem;
     background: rgb(var(--v-theme-surface));
     border-top: 1px solid rgba(var(--v-theme-primary), 0.15);
 }

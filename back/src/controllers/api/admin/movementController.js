@@ -11,7 +11,6 @@ const getMovementListParams = (req) => {
         columns: MOVEMENT_COLUMNS,
         defaultDirection: 'desc'
     });
-
     return {
         skip,
         take,

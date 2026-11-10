@@ -44,6 +44,8 @@ permanece aunque después cierre esa captura.
 
 Abra **Directorio comercial → Proveedores**. Use
 **Buscar por nombre** y **Buscar** para distinguir razón social y nombre comercial.
+Use **Filtrar por columna** para buscar específicamente por nombre comercial,
+razón social o, si está disponible para su cuenta, estado.
 <!-- manual:end -->
 
 <!-- manual:all suppliers:page-view suppliers:manage -->

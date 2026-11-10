@@ -21,7 +21,6 @@ const getMovementReportParams = (query) => {
     const { orderBy, orderDir } = getDataTableOrder({ query, columns, defaultDirection: 'desc' });
     const monthlyReport = isMonthlyReportQuery(query);
     const monthDateRange = monthlyReport ? getReportMonthDateRange(query.reportMonth) : {};
-
     return {
         startDate: monthlyReport ? monthDateRange.startDate : query.startDate || '',
         endDate: monthlyReport ? monthDateRange.endDate : query.endDate || '',
@@ -90,7 +89,6 @@ export const exportUserReport = async (req, res) => {
         query: req.query,
         columns
     });
-
     const rows = findUserReportRows({
         search: getDataTableSearch(req.query),
         orderBy,
@@ -118,7 +116,6 @@ export const exportPersonReport = async (req, res) => {
         query: req.query,
         columns
     });
-
     const rows = findPersonReportRows({
         departments,
         search: getDataTableSearch(req.query),

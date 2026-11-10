@@ -49,7 +49,7 @@ Las altas usan los catálogos y reglas vigentes; merma necesita una referencia y
 ## Registro histórico por lote
 
 Prefijo `/api/warehouse/historical-deliveries`, recursos `materials`, `consumables`,
-`wastes`. `GET /:resource/preview` recibe corte ISO con zona horaria, búsqueda y página;
+`wastes`. `GET /:resource/preview` recibe corte ISO con zona horaria y página;
 consulta hasta 100 folios pendientes/parciales anteriores al corte y devuelve su revisión.
 `POST /:resource/confirm` recibe selección de IDs/revisiones originales, `operationId`,
 corte, motivo, declaración de entrega física completa y fecha real opcional.
@@ -84,7 +84,7 @@ Fuentes ejecutables: `inventoryImportControllerDbTest.js`, `historicalDeliveryCo
 importación y entregas históricas. Cubren saldo cero, Pieza fraccionaria, vacío,
 repetidos, operación/archivo incompatibles, versión vieja, fallo tardío, repetición y carreras con surtido.
 
-Las constantes compartidas de regularización reúnen límites de documentos, búsqueda,
+Las constantes compartidas de regularización reúnen límites de documentos,
 página, motivo, revisión y códigos de error. Se reutiliza el límite de observaciones
 del formulario. `HistoricalDeliveryError` sigue el patrón de errores de dominio y
 la detección de contención de Prisma/PostgreSQL es común con importaciones. Los

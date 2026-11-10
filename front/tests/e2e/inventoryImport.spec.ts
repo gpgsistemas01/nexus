@@ -152,16 +152,39 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
   ] as const) {
     await page.goto(`/almacen/${path}`);
     await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
-    await chooseOption(page, 'Proveedor de la plantilla', 'Proveedor Central');
+    await chooseOption(page, 'Limitar proveedores disponibles', 'Proveedor Central');
     if (update) {
       await selectOperation(page, 'Editar datos');
+      await expect(page.getByRole('spinbutton')).toHaveCount(0);
+      await expect(
+        page.getByText(/Proveedor y Nombre determinan qué registros entran en la plantilla/),
+      ).toBeVisible();
+      await expect(
+        page.getByText(/La plantilla incluirá sólo los registros asociados a este proveedor/),
+      ).toBeVisible();
+      await expect(
+        page.getByText(/Incluye sólo registros cuyo nombre contenga este texto/),
+      ).toBeVisible();
       await page
-        .getByRole('spinbutton', { name: 'Página de la plantilla (100 filas)', exact: true })
-        .fill('2');
-      await page
-        .getByRole('textbox', { name: 'Buscar registros de la plantilla', exact: true })
+        .getByRole('textbox', { name: 'Filtrar consumibles por nombre', exact: true })
         .fill('Lona');
+    } else {
+      await expect(
+        page.getByText(/Obligatorio para Alta de merma; determina qué materiales aparecen/),
+      ).toBeVisible();
+      await page
+        .getByRole('textbox', { name: 'Buscar material de referencia por nombre', exact: true })
+        .fill('Manta');
+      await expect(
+        page.getByText(/Reduce las opciones de Material de referencia en Catalogos/),
+      ).toBeVisible();
     }
+    await expect(
+      page.getByText(/La hoja Catalogos contiene opciones para las listas desplegables/),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Las columnas grises son referencias que debes conservar sin editar/),
+    ).toBeVisible();
     const requested = page.waitForRequest((request) =>
       request.url().includes(`/inventory-imports/${resource}/template`),
     );
@@ -175,10 +198,24 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
       `plantilla_${resource}_${update ? 'update' : 'create'}_`,
     );
     expect(params.get('supplierId')).toBe(ids.supplier);
-    expect(params.get('page')).toBe(update ? '2' : '1');
+    expect(params.has('page')).toBe(false);
     if (update) expect(params.get('search')).toBe('Lona');
+    else expect(params.get('search')).toBe('Manta');
     await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
   }
+});
+
+test('en Alta de materiales, Proveedor limita el catálogo y no las filas nuevas', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Importar Excel de materiales', exact: true });
+  await expect(
+    dialog.getByText(/En Alta de Materiales\/Consumibles, Proveedor sólo limita las opciones/),
+  ).toBeVisible();
+  await expect(dialog.getByRole('textbox', { name: /por nombre/, exact: true })).toHaveCount(0);
 });
 
 test('importación: revisa el stock y confirma en escritorio y móvil', async ({ page }) => {

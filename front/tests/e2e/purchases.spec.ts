@@ -5,6 +5,34 @@ import { ids } from '../fixtures/inventory.js';
 import { personData } from '../fixtures/records.js';
 import { purchaseItem } from '../fixtures/purchases.js';
 
+test('compras: conserva fichas en móvil y ajusta la tabla en tableta', async ({ page }) => {
+  await mockPurchases(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/compras/materiales');
+  await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+
+  const dialog = page.getByRole('dialog', { name: 'Ver compra - Folio COM-001', exact: true });
+  const details = dialog.locator('.responsive-table-cards');
+  await expect(details).toBeVisible();
+  await expect(details.locator('dt', { hasText: 'Compra' })).toBeVisible();
+  await expect(details.getByText('Lona', { exact: true })).toBeVisible();
+  await expect(details.getByRole('button', { name: 'Corregir detalle', exact: true })).toHaveClass(
+    /bg-filter-action/,
+  );
+  await expect(details.getByRole('button', { name: 'Cancelar detalle', exact: true })).toHaveClass(
+    /bg-error/,
+  );
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+
+  await page.setViewportSize({ width: 768, height: 844 });
+  const table = dialog.locator('.table-frame--fit-columns .v-table__wrapper');
+  await expect(table).toBeVisible();
+  await expect(details).toBeHidden();
+  await expect(dialog.getByRole('table')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
+  await expect(table).toHaveCSS('overflow-x', 'hidden');
+});
+
 test('compras: corregir PIEZA valida cantidad entera y límite sin cerrar la consulta tras guardar', async ({
   page,
 }) => {
@@ -91,6 +119,14 @@ for (const [path, title, item] of [
     await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     await expect(dialog.getByLabel('Presentación', { exact: true })).toHaveValue('');
     await expect(dialog.getByRole('cell', { name: 'Lona', exact: true })).toBeVisible();
+    await expect(dialog.getByRole('columnheader', { name: 'Material', exact: true })).toHaveCSS(
+      'position',
+      'sticky',
+    );
+    await expect(dialog.locator('tbody tr').first().locator('td').first()).toHaveCSS(
+      'position',
+      'sticky',
+    );
     await expect(dialog.getByRole('columnheader')).toHaveText([
       'Material',
       'Medidas',

@@ -92,7 +92,7 @@ export const buildDateRangeFilter = ({
             ...(endDate && (() => {
 
                 const nextDay = new Date(endDate);
-                nextDay.setDate(nextDay.getDate() + 1);
+                nextDay.setUTCDate(nextDay.getUTCDate() + 1);
 
                 return {
                     lt: nextDay

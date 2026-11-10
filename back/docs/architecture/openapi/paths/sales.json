@@ -44,7 +44,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name, 1=isActive. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name, 1=isActive. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -100,6 +100,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -111,9 +114,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -155,23 +155,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -179,6 +173,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -258,7 +258,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [

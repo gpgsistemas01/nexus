@@ -7,16 +7,24 @@ const original = apiClient.http.defaults.adapter;
 afterEach(() => {
   apiClient.http.defaults.adapter = original;
 });
-it('el contrato paginado conserva filtro/página y no publica claves internas', async () => {
+it('el contrato paginado conserva búsqueda/página y no publica claves internas', async () => {
   apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
     const query = new URL(config.url!, 'http://front.test').searchParams;
     expect(config.url).toContain('/api/admin/catalogs/roles?');
-    expect(Object.fromEntries(query)).toEqual({ start: '20', length: '20', search: 'Opera' });
+    expect(Object.fromEntries(query)).toEqual({
+      start: '20',
+      length: '20',
+      search: 'Opera',
+    });
     return {
       data: { data: [{ ...entry, key: 'ADMINISTRATOR' }], recordsTotal: 21, recordsFiltered: 21 },
     };
   });
-  const result = await catalogService.list('roles', { page: 2, length: 20, search: 'Opera' });
+  const result = await catalogService.list('roles', {
+    page: 2,
+    length: 20,
+    search: 'Opera',
+  });
   expect(result.data).toEqual([{ ...entry, symbol: '' }]);
 });
 it('editar usa PUT y expectedVersion sin cambiar la versión original', async () => {

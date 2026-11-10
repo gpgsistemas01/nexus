@@ -39,7 +39,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -82,6 +82,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -93,9 +96,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -154,7 +154,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name, 1=base, 2=height, 4=minStock. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name, 1=base, 2=height, 4=minStock. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -200,6 +200,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -211,9 +214,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -251,23 +251,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -275,6 +269,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -325,20 +325,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -346,6 +343,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -388,23 +388,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -412,6 +406,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -538,7 +538,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -565,7 +565,7 @@
     },
     "post": {
       "operationId": "postWarehouseWastes",
-      "description": "Crea la merma con initialQuantity; con cantidad inicial positiva genera una entrada EME y un movimiento ENTRY en la misma transacci\u00f3n. Cantidad cero no genera documento, movimiento ni folio; no requiere motivo de ajuste. minStock e isActive se conservan seg\u00fan la captura. Exige operationId; el recibo, la merma, la entrada y sus movimientos se confirman juntos. Repetir clave/captura recupera la respuesta original; otra captura con esa clave responde 409.",
+      "description": "Crea la merma con initialQuantity; con cantidad inicial positiva genera una entrada EME y un movimiento ENTRY en la misma transacción. Cantidad cero no genera documento, movimiento ni folio; no requiere motivo de ajuste. minStock e isActive se conservan según la captura. Exige operationId; el recibo, la merma, la entrada y sus movimientos se confirman juntos. Repetir clave/captura recupera la respuesta original; otra captura con esa clave responde 409.",
       "security": [
         {
           "cookieAuth": []
@@ -582,23 +582,23 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
         "409": {
           "$ref": "../openapi.json#/components/responses/WriteConflict"
         },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -636,23 +636,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -660,6 +654,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -703,7 +703,7 @@
       ],
       "responses": {
         "200": {
-          "description": "Ajuste confirmado. La respuesta contiene s\u00f3lo code; consulte el listado para obtener la existencia vigente.",
+          "description": "Ajuste confirmado. La respuesta contiene sólo code; consulte el listado para obtener la existencia vigente.",
           "content": {
             "application/json": {
               "schema": {
@@ -721,23 +721,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -745,6 +739,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -820,7 +820,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName, 6=observations. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName, 6=observations. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -886,6 +886,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -897,9 +900,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -937,20 +937,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -958,6 +955,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -1009,7 +1009,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y área que su listado. Un id fuera de contexto responde 404.",
       "responses": {
         "200": {
           "description": "Documento completo.",
@@ -1070,20 +1070,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1091,6 +1088,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -1143,20 +1143,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1164,6 +1161,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -1216,20 +1216,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1237,6 +1234,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -1320,7 +1320,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=tradeName, 1=legalName, 2=isActive. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=tradeName, 1=legalName, 2=isActive. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -1365,6 +1365,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -1376,9 +1379,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -1416,23 +1416,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1440,6 +1434,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -1505,7 +1505,7 @@
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
       "tags": [
         "Salidas de materiales"
       ],
@@ -1514,7 +1514,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -1579,6 +1579,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -1590,9 +1593,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -1605,7 +1605,7 @@
           }
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de materiales"
       ],
@@ -1644,7 +1644,7 @@
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
       "tags": [
         "Salidas de consumibles"
       ],
@@ -1653,7 +1653,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -1718,6 +1718,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -1729,9 +1732,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -1744,7 +1744,7 @@
           }
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de consumibles"
       ],
@@ -1770,20 +1770,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1791,6 +1788,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -1818,7 +1818,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de materiales"
       ],
@@ -1843,7 +1843,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y área que su listado. Un id fuera de contexto responde 404.",
       "responses": {
         "200": {
           "description": "Documento completo.",
@@ -1904,20 +1904,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1925,6 +1922,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -1952,7 +1952,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de consumibles"
       ],
@@ -1977,7 +1977,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y área que su listado. Un id fuera de contexto responde 404.",
       "responses": {
         "200": {
           "description": "Documento completo.",
@@ -2038,20 +2038,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2059,6 +2056,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -2086,7 +2086,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de materiales"
       ],
@@ -2112,20 +2112,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2133,6 +2130,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -2160,7 +2160,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de consumibles"
       ],
@@ -2186,20 +2186,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2207,6 +2204,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -2234,7 +2234,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de materiales"
       ],
@@ -2260,20 +2260,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2281,6 +2278,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -2308,7 +2308,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de consumibles"
       ],
@@ -2334,20 +2334,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2355,6 +2352,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -2392,7 +2392,7 @@
           "description": "UUID del detalle."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de materiales"
       ],
@@ -2418,20 +2418,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2439,6 +2436,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -2476,7 +2476,7 @@
           "description": "UUID del detalle."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de consumibles"
       ],
@@ -2524,7 +2524,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name, 1=base, 2=height, 4=minStock. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name, 1=base, 2=height, 4=minStock. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -2583,7 +2583,7 @@
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de materiales"
       ],
@@ -2592,7 +2592,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -2673,7 +2673,7 @@
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
       "tags": [
         "Salidas de consumibles"
       ],
@@ -2682,7 +2682,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -2771,7 +2771,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -2860,7 +2860,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -2924,7 +2924,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=tradeName, 1=legalName. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=tradeName, 1=legalName. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -2975,14 +2975,14 @@
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Consultar registros de cat\u00e1logo",
+      "summary": "Consultar registros de catálogo",
       "parameters": [
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -3038,14 +3038,14 @@
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Consultar registros de cat\u00e1logo",
+      "summary": "Consultar registros de catálogo",
       "parameters": [
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -3101,14 +3101,14 @@
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Consultar registros de cat\u00e1logo",
+      "summary": "Consultar registros de catálogo",
       "parameters": [
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -3164,14 +3164,14 @@
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Consultar registros de cat\u00e1logo",
+      "summary": "Consultar registros de catálogo",
       "parameters": [
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -3222,14 +3222,8 @@
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3237,6 +3231,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -3290,23 +3290,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3314,6 +3308,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -3364,20 +3364,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3385,6 +3382,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -3427,23 +3427,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3451,6 +3445,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -3525,7 +3525,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -3580,6 +3580,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -3591,9 +3594,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -3653,7 +3653,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -3708,6 +3708,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -3719,9 +3722,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -3759,20 +3759,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3780,6 +3777,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -3831,7 +3831,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y área que su listado. Un id fuera de contexto responde 404.",
       "responses": {
         "200": {
           "description": "Documento completo.",
@@ -3892,20 +3892,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3913,6 +3910,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -3964,7 +3964,7 @@
           "description": "UUID del registro."
         }
       ],
-      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y área que su listado. Un id fuera de contexto responde 404.",
       "responses": {
         "200": {
           "description": "Documento completo.",
@@ -4025,20 +4025,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -4046,6 +4043,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -4108,20 +4108,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -4129,6 +4126,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -4191,20 +4191,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -4212,6 +4209,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -4264,20 +4264,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -4285,6 +4282,9 @@
               }
             }
           }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -4359,7 +4359,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -4438,7 +4438,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [

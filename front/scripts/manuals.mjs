@@ -22,53 +22,80 @@ const runManuals = async () => {
     const accounts = configuration.accounts;
     const requested = accounts.filter((profile) => values.all || profile.id === values.profile);
     if (!requested.length) throw new Error('La cuenta solicitada no está configurada.');
-    const envFile = path.resolve(frontRoot, values['env-file']);
-    const selection =
-        values.mode === 'dev'
-            ? await selectAccountsWithCredentials(requested, envFile)
-            : { accounts: requested, omitted: [] };
-    for (const id of selection.omitted)
-        console.log(`Cuenta omitida: ${id} (falta usuario o contraseña).`);
-    const selected = selection.accounts;
-    if (!selected.length) {
+    if (values.command === 'capture') {
+        const envFile = path.resolve(frontRoot, values['env-file']);
+        const selection =
+            values.mode === 'dev'
+                ? await selectAccountsWithCredentials(requested, envFile)
+                : { accounts: requested, omitted: [] };
+        for (const id of selection.omitted)
+            console.log(`Cuenta omitida: ${id} (falta usuario o contraseña).`);
+        const selected = selection.accounts;
+        if (!selected.length) {
+            console.log('No hay cuentas con credenciales completas. No se generaron capturas.');
+            return;
+        }
         console.log(
-            'No hay cuentas con credenciales completas. No se generaron capturas ni manuales en esta ejecución.',
+            `Capturas de desarrollo en ${configuration.baseUrl} (${selected.length} cuentas).`,
         );
+        const result = spawnSync(
+            process.execPath,
+            [
+                'node_modules/@playwright/test/cli.js',
+                'test',
+                '--config',
+                'playwright.manualProfiles.config.ts',
+            ],
+            {
+                cwd: frontRoot,
+                stdio: 'inherit',
+                env: {
+                    ...process.env,
+                    FRONT_MANUAL_MODE: values.mode,
+                    FRONT_MANUAL_BASE_URL: configuration.baseUrl,
+                    FRONT_MANUAL_IDS: selected.map(({ id }) => id).join(','),
+                    FRONT_MANUAL_ACCOUNTS: path.resolve(frontRoot, values.accounts),
+                    FRONT_MANUAL_ENV_FILE: envFile,
+                    FRONT_MANUAL_MISSING: String(values.missing),
+                },
+            },
+        );
+        if (result.error || result.status !== 0)
+            throw new Error('La captura por cuenta no terminó. Revise el estado de cada manual.');
+        for (const profile of selected) {
+            await loadManualPublication(frontRoot, profile.id, { mode: values.mode });
+            console.log(
+                `Capturas de ${profile.id}: ${path.join(manualAccountDirectory(frontRoot, profile.id), 'images')}`,
+            );
+        }
         return;
     }
-    console.log(`Capturas de desarrollo en ${configuration.baseUrl} (${selected.length} cuentas).`);
-    const result = spawnSync(
-        process.execPath,
-        [
-            'node_modules/@playwright/test/cli.js',
-            'test',
-            '--config',
-            'playwright.manualProfiles.config.ts',
-        ],
-        {
-            cwd: frontRoot,
-            stdio: 'inherit',
-            env: {
-                ...process.env,
-                FRONT_MANUAL_MODE: values.mode,
-                FRONT_MANUAL_BASE_URL: configuration.baseUrl,
-                FRONT_MANUAL_IDS: selected.map(({ id }) => id).join(','),
-                FRONT_MANUAL_ACCOUNTS: path.resolve(frontRoot, values.accounts),
-                FRONT_MANUAL_ENV_FILE: envFile,
-                FRONT_MANUAL_MISSING: String(values.missing),
-            },
-        },
-    );
-    if (result.error || result.status !== 0)
-        throw new Error(
-            'La captura por cuenta no terminó. Revise el estado de cada manual; no se publicaron resultados incompletos.',
-        );
+    const selected = [];
+    for (const profile of requested) {
+        try {
+            await loadManualPublication(frontRoot, profile.id, { mode: values.mode });
+            selected.push(profile);
+        } catch (cause) {
+            const manifest = path.join(
+                manualAccountDirectory(frontRoot, profile.id),
+                'manifest.json',
+            );
+            if (values.all && cause.code === 'ENOENT' && cause.path === manifest) {
+                console.log(`Cuenta omitida: ${profile.id} (sin capturas generadas).`);
+                continue;
+            }
+            throw new Error(
+                `No se pudo preparar ${profile.id}: ${cause.message} ` +
+                    `Ejecute npm run docs:screenshots -- --mode ${values.mode} --profile ${profile.id}.`,
+                { cause },
+            );
+        }
+    }
+    if (!selected.length) {
+        console.log('No hay manuales con capturas disponibles. Ejecute primero docs:screenshots.');
+        return;
+    }
     for (const profile of selected) {
-        await loadManualPublication(frontRoot, profile.id);
-        console.log(
-            `Capturas de ${profile.id}: ${path.join(manualAccountDirectory(frontRoot, profile.id), 'images')}`,
-        );
-        if (values['capture-only']) continue;
         const output = spawnSync(
             process.execPath,
             ['scripts/exportDocs.js', 'manual-vue', `manual-${profile.id}`, values.format],

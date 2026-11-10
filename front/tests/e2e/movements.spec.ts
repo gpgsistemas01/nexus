@@ -83,6 +83,27 @@ test('movimientos: menú exclusivo, enlaces Vue, acceso directo y móvil', async
   await expect(page).toHaveURL(/\/movimientos\/materiales$/);
 });
 
+test('movimientos: las fichas móviles etiquetan los datos y permiten ordenar por columna', async ({
+  page,
+}) => {
+  const { reads } = await mockMovements(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/movimientos/materiales');
+
+  const card = page.locator('.responsive-table-card').filter({ hasText: 'SAL-001' }).first();
+  await expect(card).toBeVisible();
+  await expect(card.getByText('Folio', { exact: true })).toBeVisible();
+  await expect(card.getByText('Proveedor', { exact: true })).toBeVisible();
+  await page.locator('.responsive-table-cards__sorting .v-field').click();
+  await expect(page.getByRole('listbox')).toBeVisible();
+  await expect(page.getByRole('option', { name: 'Folio', exact: true })).toBeVisible();
+  await page.getByRole('option', { name: 'Folio', exact: true }).click();
+  await expect.poll(() => reads.at(-1)?.searchParams.get('order[0][column]')).toBe('2');
+  await page.getByRole('button', { name: 'Cambiar a orden ascendente' }).click();
+  await expect.poll(() => reads.at(-1)?.searchParams.get('order[0][dir]')).toBe('asc');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
 test('movimientos: proveedor primero, identidad del material, filtros aplicados, paginación y limpieza', async ({
   page,
 }) => {

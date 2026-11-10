@@ -53,7 +53,8 @@ Ante un conflicto o rechazo, siga [Errores y recuperación](15-errors-and-recove
 
 ## Consultar y reportar
 
-Busque por nombre y pulse **Buscar**. La tabla no muestra contraseñas.
+Busque por nombre y pulse **Buscar**. Use **Filtrar por columna** para limitar por
+usuario o persona vinculada. La tabla no muestra contraseñas.
 
 <!-- manual:any admin:reports-read -->
 **Exportar Excel** descarga todos los resultados de la consulta.

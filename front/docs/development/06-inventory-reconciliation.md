@@ -22,11 +22,14 @@ antiguos sobre saldos actuales sin conciliar los movimientos posteriores.
 
 1. Conciliar primero el inventario mediante el conteo físico actual.
 2. En **Salidas → Materiales, Consumibles o Mermas**, abrir **Registrar entregas históricas**.
-3. Indicar fecha/hora de corte en Ciudad de México y buscar por folio o proyecto.
+3. Al abrir el registro, la tabla carga las salidas pendientes y parcialmente surtidas
+   con la hora actual como corte; no se requiere capturar una fecha.
 4. Revisar lo ya registrado/devuelto y las cantidades pendientes por registrar.
-5. Seleccionar las salidas entregadas completamente; se pueden seleccionar hasta
-   100 de la página. Cambiar de corte, búsqueda o página limpia la selección.
-6. Capturar motivo/evidencia; fecha real de entrega sólo si se conoce.
+5. Seleccionar las salidas cuyas partidas pendientes ya se entregaron por completo.
+   La casilla del encabezado selecciona todas las páginas si hay hasta 100 salidas; si hay
+   más, selecciona manualmente hasta 100 por lote.
+6. Capturar motivo/evidencia. No se asigna una fecha real común porque las salidas pueden
+   haberse entregado en momentos distintos; el sistema guarda la fecha de regularización.
 7. Declarar expresamente que todas las partidas pendientes se entregaron antes del
    corte y pulsar **Registrar entregas seleccionadas**.
 8. Conservar el recibo y comprobar la marca **Regularizada por entrega histórica**.

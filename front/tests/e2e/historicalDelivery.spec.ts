@@ -11,9 +11,14 @@ for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await mockIssues(page, [...issuePermissions, 'issues:reconcile']);
     const writes: Record<string, unknown>[] = [];
+    let previewCutoffDate = '';
     await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
-      if (route.request().method() === 'GET')
-        return route.fulfill({ json: { preview: historicalPreview() } });
+      if (route.request().method() === 'GET') {
+        previewCutoffDate = new URL(route.request().url()).searchParams.get('cutoffDate') ?? '';
+        return route.fulfill({
+          json: { preview: { ...historicalPreview(), cutoffDate: previewCutoffDate } },
+        });
+      }
       writes.push(route.request().postDataJSON());
       if (writes.length === 1) return route.abort('failed');
       return route.fulfill({
@@ -27,11 +32,29 @@ for (const width of [1280, 390]) {
     await page.goto('/salidas/materiales');
     await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
     let dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
-    await dialog.getByLabel('Fecha y hora de corte', { exact: true }).fill('2026-10-31T12:00');
-    await dialog
-      .getByRole('button', { name: 'Buscar salidas pendientes al corte', exact: true })
-      .click();
+    await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
+    await expect(dialog.getByLabel('Fecha real de entrega (opcional)')).toHaveCount(0);
+    await expect(
+      dialog.getByRole('checkbox', {
+        name: 'Seleccionar todas las salidas de todas las páginas',
+      }),
+    ).toHaveCount(1);
     await expect(dialog.getByText(/Lona: 3 por registrar/)).toBeVisible();
+    await expect(
+      dialog.getByRole('table', { name: 'Salidas pendientes y parcialmente surtidas' }),
+    ).toBeVisible();
+    const selectAll = dialog.getByRole('checkbox', {
+      name: 'Seleccionar todas las salidas de todas las páginas',
+    });
+    await selectAll.check();
+    const rowCheckbox = dialog.getByRole('checkbox', {
+      name: 'Seleccionar salida SMA-HIST-001',
+      exact: true,
+    });
+    await expect(rowCheckbox).toBeChecked();
+    await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
+    await selectAll.uncheck();
+    await expect(rowCheckbox).not.toBeChecked();
     await dialog.getByRole('checkbox', { name: /SMA-HIST-001/ }).check();
     await dialog
       .getByLabel('Motivo y evidencia de la entrega histórica', { exact: true })
@@ -64,13 +87,81 @@ for (const width of [1280, 390]) {
     expect(writes).toHaveLength(2);
     expect(writes[1]).toEqual(writes[0]);
     expect(writes[0]).toMatchObject({
-      cutoffDate: historicalPreview().cutoffDate,
+      cutoffDate: previewCutoffDate,
       deliveredAt: null,
       declaredDelivered: true,
       documents: [{ id: historicalPreview().documents[0]!.id, revision: 'a'.repeat(64) }],
     });
   });
 }
+
+test('seleccionar todo abarca todas las páginas y conserva selecciones al navegar', async ({
+  page,
+}) => {
+  await mockIssues(page, [...issuePermissions, 'issues:reconcile']);
+  const firstPage = { ...historicalPreview(), hasMore: true };
+  const secondPage = {
+    ...historicalPreview(),
+    page: 2,
+    hasMore: false,
+    documents: [
+      {
+        ...historicalPreview().documents[0]!,
+        id: ids.material,
+        revision: 'b'.repeat(64),
+        referenceNumber: 'SMA-HIST-002',
+      },
+    ],
+  };
+  await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
+    const requestUrl = new URL(route.request().url());
+    const requestedPage = Number(requestUrl.searchParams.get('page') ?? 1);
+    const cutoffDate = requestUrl.searchParams.get('cutoffDate') ?? '';
+    return route.fulfill({
+      json: {
+        preview: {
+          ...(requestedPage === 1 ? firstPage : secondPage),
+          cutoffDate,
+        },
+      },
+    });
+  });
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+  await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
+  const selectAll = dialog.getByRole('checkbox', {
+    name: 'Seleccionar todas las salidas de todas las páginas',
+  });
+  await expect(selectAll).toHaveCount(1);
+  await selectAll.check();
+  await expect(dialog.getByText('2 salidas seleccionadas en todas las páginas')).toBeVisible();
+  await expect(
+    dialog.getByRole('checkbox', { name: 'Seleccionar salida SMA-HIST-001', exact: true }),
+  ).toBeChecked();
+  await dialog.getByRole('button', { name: 'Página siguiente', exact: true }).click();
+  const secondRow = dialog.getByRole('checkbox', {
+    name: 'Seleccionar salida SMA-HIST-002',
+    exact: true,
+  });
+  await expect(secondRow).toBeChecked();
+  await selectAll.uncheck();
+  await expect(secondRow).not.toBeChecked();
+  await expect(dialog.getByText('0 salidas seleccionadas en todas las páginas')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Página anterior', exact: true }).click();
+  const firstRow = dialog.getByRole('checkbox', {
+    name: 'Seleccionar salida SMA-HIST-001',
+    exact: true,
+  });
+  await firstRow.check();
+  await dialog.getByRole('button', { name: 'Página siguiente', exact: true }).click();
+  await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
+  await expect(secondRow).not.toBeChecked();
+  await secondRow.check();
+  await dialog.getByRole('button', { name: 'Página anterior', exact: true }).click();
+  await expect(firstRow).toBeChecked();
+  await expect(dialog.getByText('2 salidas seleccionadas en todas las páginas')).toBeVisible();
+});
 
 test('surtir no concede el permiso de regularización histórica', async ({ page }) => {
   await mockIssues(page);

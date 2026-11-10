@@ -83,6 +83,7 @@ const dateText = (value: string) =>
             />
             <TableAction
                 v-if="canSupply && canSupplyIssue(item)"
+                color="primary"
                 label="Surtir detalle"
                 :icon="`svg:${mdiPackageUp}`"
                 :is-disabled="isReading"
@@ -90,12 +91,14 @@ const dateText = (value: string) =>
             />
             <TableAction
                 v-if="canSupply && canReturnIssue(item)"
+                color="accent"
                 label="Devolver material surtido"
                 :icon="`svg:${mdiUndoVariant}`"
                 :is-disabled="isReading"
                 @click="emit('open', item, 'return')"
             />
             <TableAction
+                color="filter-clear"
                 label="Consultar salida"
                 :icon="`svg:${mdiEyeOutline}`"
                 :is-disabled="isReading"

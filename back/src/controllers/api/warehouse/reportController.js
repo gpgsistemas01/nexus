@@ -58,7 +58,6 @@ export const exportWarehouseReportExcel = async (req, res) => {
         query: req.query,
         columns
     });
-
     const rows = findWarehouseReportRows({
         search: getDataTableSearch(req.query),
         inventoryScope: req.query.inventoryScope,
@@ -141,7 +140,6 @@ export const exportWasteReportExcel = async (req, res) => {
         query: req.query,
         columns
     });
-
     const rows = await findWasteReportRows({
         search: getDataTableSearch(req.query),
         supplierId: req.query.supplierId || null,
@@ -165,7 +163,6 @@ export const exportSupplierReportExcel = async (req, res) => {
         query: req.query,
         columns
     });
-
     const rows = await findSupplierReportRows({
         search: getDataTableSearch(req.query),
         orderBy,

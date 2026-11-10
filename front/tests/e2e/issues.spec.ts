@@ -5,6 +5,35 @@ import { issuePermissions, issueDetailId, departmentId, issueFor } from '../fixt
 import { ids, pageOf, user } from '../fixtures/inventory.js';
 import { clientData, personData } from '../fixtures/records.js';
 
+test('salidas: conserva fichas en móvil y ajusta la tabla en tableta', async ({ page }) => {
+  await mockIssues(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/salidas/materiales');
+
+  const listCard = page.locator('.responsive-table-card').filter({ hasText: 'SAL-001' }).first();
+  await expect(listCard.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveClass(
+    /bg-primary/,
+  );
+  await listCard.getByRole('button', { name: 'Consultar salida', exact: true }).click();
+  const dialog = page.getByRole('dialog', {
+    name: 'Consultar salida - Folio SAL-001',
+    exact: true,
+  });
+  const detailCards = dialog.locator('.responsive-table-cards');
+  await expect(detailCards).toBeVisible();
+  await expect(detailCards.locator('dt', { hasText: 'Salida' })).toBeVisible();
+  await expect(detailCards.getByText('Lona', { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+
+  await page.setViewportSize({ width: 768, height: 844 });
+  const details = dialog.locator('.table-frame--fit-columns .v-table__wrapper');
+  await expect(details).toBeVisible();
+  await expect(detailCards).toBeHidden();
+  await expect(dialog.getByRole('table')).toBeVisible();
+  await expect(details).toHaveCSS('overflow-x', 'hidden');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
+});
+
 for (const [path, resource] of [
   ['materiales', 'materials'],
   ['consumibles', 'consumables'],
@@ -19,7 +48,12 @@ for (const [path, resource] of [
     if (line.material) line.material.presentation.name = 'PIEZA';
     else if ('waste' in line) line.waste.presentation.name = 'PIEZA';
     await page.goto(`/salidas/${path}`);
-    await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
+    const returnAction = page.getByRole('button', {
+      name: 'Devolver material surtido',
+      exact: true,
+    });
+    await expect(returnAction).toHaveClass(/bg-accent/);
+    await returnAction.click();
     const main = page.getByRole('dialog', {
       name: /^Devolver salida( de merma)? - Folio SAL-001$/,
     });
@@ -218,6 +252,31 @@ for (const [path, resource, title, label] of [
   });
 }
 
+for (const [path, resource, label] of [
+  ['materiales', 'materials', 'Lona'],
+  ['consumibles', 'consumables', 'Lona'],
+  ['mermas', 'wastes', 'Sobrante de lona'],
+] as const) {
+  test(`salidas ${path}: oculta la cantidad a surtir de un detalle completo`, async ({ page }) => {
+    const { docs } = await mockIssues(page, undefined, 'Surtido parcial');
+    const doc = docs[resource];
+    const completed = doc.details[0]!;
+    completed.suppliedQuantity = '2';
+    completed.isSupplied = true;
+    completed.fulfillmentStatus.name = 'Surtido';
+
+    await page.goto(`/salidas/${path}`);
+    await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+    const dialog = page.getByRole('dialog', {
+      name: /^Surtir salida( de merma)? - Folio SAL-001$/,
+    });
+    await expect(dialog.getByText('Completamente surtido', { exact: true })).toBeVisible();
+    await expect(
+      dialog.getByRole('spinbutton', { name: `Cantidad a surtir: ${label}`, exact: true }),
+    ).toHaveCount(0);
+  });
+}
+
 for (const [path, label] of [
   ['materiales', 'Lona'],
   ['consumibles', 'Lona'],
@@ -237,6 +296,11 @@ for (const [path, label] of [
       const dialog = page.getByRole('dialog', {
         name: /^Surtir salida( de merma)? - Folio SAL-001$/,
       });
+      await expect(dialog.getByRole('columnheader').first()).toHaveCSS('position', 'sticky');
+      await expect(dialog.locator('tbody tr').first().locator('td').first()).toHaveCSS(
+        'position',
+        'sticky',
+      );
       await dialog.getByRole('checkbox', { name: `Surtir: ${label}`, exact: true }).check();
       await dialog
         .getByRole('spinbutton', { name: `Cantidad de proyecto: ${label}`, exact: true })
@@ -315,6 +379,7 @@ for (const [path, label, name] of [
 ] as const) {
   test(`salidas ${path}: edición pendiente, surtido y devolución`, async ({ page }) => {
     const { writes } = await mockIssues(page);
+    await page.setViewportSize({ width: 768, height: 844 });
     await page.goto(`/salidas/${path}`);
     const row = page.getByRole('row').filter({
       has: page.getByRole('cell', { name: 'SAL-001', exact: true }),
@@ -352,6 +417,10 @@ for (const [path, label, name] of [
       'Cantidad',
       'Unidad',
     ]);
+    await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toHaveCSS(
+      'overflow-x',
+      'hidden',
+    );
     await expect(dialog.getByLabel('Cliente', { exact: true })).toBeDisabled();
     await dialog.getByRole('checkbox', { name: `Surtir: ${name}`, exact: true }).check();
     await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();

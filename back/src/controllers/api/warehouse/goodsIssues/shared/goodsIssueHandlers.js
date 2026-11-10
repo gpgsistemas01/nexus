@@ -18,7 +18,6 @@ export const buildReadHandler = findDocuments => buildDocumentReadHandler({ find
 const DATATABLE_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
 
 export const buildListHandler = findAllGoodsIssues => async (req, res) => {
-
     const query = getIssueDataTableQuery({
         query: req.query,
         columns: DATATABLE_COLUMNS

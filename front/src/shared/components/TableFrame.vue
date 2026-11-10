@@ -1,10 +1,18 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ isLoading?: boolean }>(), { isLoading: false });
+withDefaults(defineProps<{ isLoading?: boolean; fitColumns?: boolean; mobileCards?: boolean }>(), {
+    isLoading: false,
+    fitColumns: false,
+    mobileCards: false,
+});
 </script>
 
 <template>
     <div
         class="table-frame"
+        :class="{
+            'table-frame--fit-columns': fitColumns,
+            'table-frame--mobile-cards': mobileCards,
+        }"
         :aria-busy="isLoading"
     >
         <slot />
@@ -86,5 +94,75 @@ withDefaults(defineProps<{ isLoading?: boolean }>(), { isLoading: false });
 .table-frame :deep(.v-data-table-footer__pagination .v-btn:disabled) {
     opacity: 0.4;
     box-shadow: none;
+}
+@media (max-width: 1599px) {
+    .table-frame--fit-columns :deep(.v-table__wrapper) {
+        overflow-x: hidden;
+        container-type: inline-size;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper > table) {
+        width: calc(100% - 1px) !important;
+        min-width: 0 !important;
+        table-layout: fixed;
+        box-sizing: border-box;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper th),
+    .table-frame--fit-columns :deep(.v-table__wrapper td) {
+        min-width: 0 !important;
+        white-space: normal !important;
+        text-wrap: wrap !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
+        overflow-wrap: anywhere;
+        padding: 0.35rem 0.25rem;
+        font-size: clamp(0.62rem, calc(0.62rem + 0.25cqi), 0.8rem);
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper th) {
+        line-height: 1.2;
+    }
+    .table-frame--fit-columns :deep(.v-data-table-header__content) {
+        display: flex !important;
+        min-width: 0;
+        white-space: normal;
+        text-wrap: wrap;
+        overflow-wrap: anywhere;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper td > *) {
+        min-width: 0;
+        max-width: 100%;
+        white-space: normal !important;
+        text-wrap: wrap !important;
+        overflow-wrap: anywhere;
+    }
+    .table-frame--fit-columns :deep(.v-data-table-column--fixed),
+    .table-frame--fit-columns :deep(.v-data-table-column--fixed-end) {
+        position: static !important;
+        inset-inline: auto !important;
+    }
+    .table-frame--fit-columns :deep(.v-input),
+    .table-frame--fit-columns :deep(.v-field),
+    .table-frame--fit-columns :deep(.inventory-actions) {
+        min-width: 0;
+        max-width: 100%;
+    }
+    .table-frame--fit-columns :deep(th:last-child),
+    .table-frame--fit-columns :deep(td:last-child) {
+        width: 3rem;
+    }
+}
+@media (max-width: 599px) {
+    .table-frame--mobile-cards :deep(.v-table__wrapper) {
+        display: none;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper th),
+    .table-frame--fit-columns :deep(.v-table__wrapper td) {
+        padding: 0.25rem 0.15rem;
+        font-size: clamp(0.62rem, calc(0.62rem + 0.25cqi), 0.8rem);
+    }
+    .table-frame--fit-columns :deep(button.table-action) {
+        width: 2.75rem !important;
+        min-width: 2.75rem !important;
+        height: 2.75rem !important;
+    }
 }
 </style>
