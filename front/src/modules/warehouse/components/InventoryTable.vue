@@ -46,6 +46,26 @@ const canViewWeightDetails = computed(
         (props.permissions.canWrite || props.permissions.canAdjust || props.permissions.canAdd),
 );
 
+const cardValue = (row: InventoryRow, key: string) => {
+    if (['base', 'height', 'currentStock', 'minStock'].includes(key))
+        return numberText(row[key as 'base' | 'height' | 'currentStock' | 'minStock']);
+
+    if (key === 'convertedQuantity')
+        return convertedQuantityText(row.convertedQuantity, row.unitMeasure);
+
+    if (key === 'maxUnitCost') return currencyText(row.maxUnitCost);
+
+    if (key === 'isActive') return row.isActive ? 'Activo' : 'Inactivo';
+
+    if (['coneWeightKg', 'totalWeightKg', 'weightKg'].includes(key))
+        return row.presentation.toUpperCase() === 'ROLLO'
+            ? numberText(row[key as 'coneWeightKg' | 'totalWeightKg' | 'weightKg'])
+            : '—';
+
+    const value = row[key as keyof InventoryRow];
+    return value == null || value === '' ? '—' : String(value);
+};
+
 const rowProps = ({ item }: { item: InventoryRow }) => ({
     class: Number(item.currentStock) < Number(item.minStock) ? 'low-stock' : '',
 });
@@ -65,6 +85,7 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
             :sort-by="sortBy"
             :row-props="rowProps"
             :is-loading="isLoading"
+            :format-value="cardValue"
             must-sort
             @options="emit('query', changesFromOptions($event))"
         >

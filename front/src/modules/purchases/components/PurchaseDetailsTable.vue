@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { VDataTable } from 'vuetify/components/VDataTable';
-import type { DataTableHeader } from 'vuetify';
+import type { DataTableHeader, DataTableSortItem } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
+import ResponsiveTableCards from '../../../shared/components/ResponsiveTableCards.vue';
 import {
     currencyText,
     numberText,
@@ -56,6 +57,42 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
         ? [{ title: 'Acciones', key: 'actions', sortable: false }]
         : []),
 ]);
+const sortBy = ref<DataTableSortItem[]>([]);
+
+const cardValue = (item: PurchaseDetail, key: string) => {
+    if (['base', 'height', 'quantity'].includes(key))
+        return numberText(item[key as 'base' | 'height' | 'quantity']);
+
+    if (key === 'convertedQuantity')
+        return convertedQuantityText(item.convertedQuantity, item.unitMeasure);
+
+    if (
+        [
+            'conversionUnitCost',
+            'costPerUnitType',
+            'netPurchaseAmount',
+            'grossPurchaseAmount',
+        ].includes(key)
+    )
+        return currencyText(
+            item[
+                key as
+                    | 'conversionUnitCost'
+                    | 'costPerUnitType'
+                    | 'netPurchaseAmount'
+                    | 'grossPurchaseAmount'
+            ],
+        );
+
+    if (key === 'name')
+        return item.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED
+            ? `${item.name} Cancelado`
+            : item.name;
+
+    const value = item[key as keyof PurchaseDetail];
+    return value == null || value === '' ? '—' : String(value);
+};
+
 </script>
 
 <template>
@@ -64,6 +101,7 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
             :headers="headers"
             :items="rows"
             item-value="id"
+            v-model:sort-by="sortBy"
             :items-per-page="10"
             :items-per-page-options="[10, 20, 50]"
             :mobile="false"
@@ -133,5 +171,51 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
                 </template>
             </template>
         </VDataTable>
+        <ResponsiveTableCards
+            :headers="headers"
+            :rows="rows"
+            :format-value="cardValue"
+            :sort-by="sortBy"
+            sort-rows
+            @sort-by="sortBy = $event"
+        >
+            <template #[`item.name`]="{ item }">
+                {{ cardValue(item, 'name') }}
+            </template>
+            <template #[`item.actions`]="{ item }">
+                <TableAction
+                    v-if="
+                        item.status === GOODS_RECEIPT_DETAIL_STATUSES.ACTIVE &&
+                        item.isNew &&
+                        canRemove
+                    "
+                    label="Quitar detalle nuevo"
+                    icon="$delete"
+                    :is-disabled="isDisabled"
+                    @click="emit('remove', item.id)"
+                />
+                <template
+                    v-if="
+                        canChange &&
+                        !item.isNew &&
+                        item.status === GOODS_RECEIPT_DETAIL_STATUSES.ACTIVE
+                    "
+                >
+                    <TableAction
+                        label="Corregir detalle"
+                        icon="$edit"
+                        :is-disabled="isDisabled"
+                        @click="emit('correct', item)"
+                    />
+                    <TableAction
+                        label="Cancelar detalle"
+                        icon="$delete"
+                        color="error"
+                        :is-disabled="isDisabled"
+                        @click="emit('cancel', item)"
+                    />
+                </template>
+            </template>
+        </ResponsiveTableCards>
     </TableFrame>
 </template>

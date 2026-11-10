@@ -18,9 +18,9 @@ PT/TRÁFICO, Instalaciones o Acabados trabajan sólo en **Almacén** y **Salidas
 Esto aplica también a sus coordinadores; ser coordinador de un área operativa
 no concede las funciones de Almacén.
 
-| Sección | Qué puede hacer el área operativa |
-| --- | --- |
-| Almacén: Materiales, Consumibles y Mermas | Consultar la tabla, buscar, filtrar, ordenar, recorrer páginas y actualizar la consulta. |
+| Sección                                   | Qué puede hacer el área operativa                                                                |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Almacén: Materiales, Consumibles y Mermas | Consultar la tabla, buscar, filtrar, ordenar, recorrer páginas y actualizar la consulta.         |
 | Salidas: Materiales, Consumibles y Mermas | Consultar, registrar y editar solicitudes de sus áreas asignadas, según el estado del documento. |
 
 En Almacén no hay acciones de alta, edición, eliminación, entrada o ajuste de
@@ -42,16 +42,23 @@ todas sus asignaciones activas.
 ## Buscar y recorrer una tabla
 
 1. Abra el módulo y espere a que termine la carga.
-2. Capture el texto o seleccione los filtros necesarios.
+2. Capture el texto o seleccione los filtros generales disponibles.
 3. Pulse **Buscar** para aplicar la captura a la consulta.
-4. Revise los resultados y utilice los controles de página para recorrerlos.
-5. Use **Limpiar filtros** para regresar a la consulta general.
+4. Si aparece **Filtrar por columna**, abra el panel, complete uno o varios campos y
+   pulse **Aplicar filtros**. En Solicitud y Recepción puede buscar el nombre de la
+   persona o escribir una fecha `AAAA-MM-DD`.
+5. Revise los resultados y utilice los controles de página para recorrerlos.
+6. Use **Limpiar filtros** para regresar a la consulta general.
 
 Pulse un encabezado habilitado para ordenar y cambie el tamaño de página para ver
-más registros. El total de resultados se conserva.
-En el teléfono, cada registro muestra sus campos apilados. En las tablas de
-detalle extensas, deslice horizontalmente dentro de la tabla para consultar las
-demás columnas. Los formularios distribuyen los campos según el ancho disponible.
+más registros. En el teléfono, use el selector de columna y el control de dirección
+para ordenar las fichas.
+En el teléfono, cada registro aparece como una ficha con sus campos identificados.
+Al final de las fichas se indica cuántos registros contiene la página actual; el
+selector **Registros por página** permite cambiar ese límite.
+Las tablas de detalle también muestran sus datos y acciones en fichas; no es necesario
+desplazarse hasta una barra horizontal al pie. Los formularios distribuyen los campos
+según el ancho disponible.
 
 Si falta un registro, limpie los filtros. La actualización automática los conserva
 y espera mientras tiene una captura abierta. Ante un fallo, use **Actualizar** o
@@ -61,11 +68,11 @@ y espera mientras tiene una captura abierta. Ante un fallo, use **Actualizar** o
 
 Al abrir un documento, una ventana muestra su carga e impide usar los controles del fondo.
 
-| Situación | Qué hacer |
-| --- | --- |
-| La consulta está cargando | Espere, o pulse **Cancelar consulta** para detenerla. |
+| Situación                    | Qué hacer                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------- |
+| La consulta está cargando    | Espere, o pulse **Cancelar consulta** para detenerla.                         |
 | La consulta informa un error | Si aparece **Reintentar consulta**, púlselo para volver a abrir el documento. |
-| Quiere dejar de intentar | Pulse **Cancelar consulta**; podrá continuar usando la página. |
+| Quiere dejar de intentar     | Pulse **Cancelar consulta**; podrá continuar usando la página.                |
 
 Cancelar una lectura no guarda ni modifica registros.
 
@@ -87,6 +94,7 @@ Desplácese al final de la lista para cargar más opciones. Ante un fallo, pulse
 **Reintentar catálogo**.
 
 <!-- manual:any suppliers:manage clients:create materials:write persons:write -->
+
 Cuando aparezca una acción **Registrar…** junto al selector:
 
 1. Abra esa acción sin cerrar el formulario principal.

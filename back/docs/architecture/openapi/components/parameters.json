@@ -2,7 +2,7 @@
   "Start": {
     "name": "start",
     "in": "query",
-    "description": "Desplazamiento. Fuera de 0..2147483647 o formato inv\u00e1lido usa 0.",
+    "description": "Desplazamiento. Fuera de 0..2147483647 o formato inválido usa 0.",
     "required": false,
     "schema": {
       "type": "integer",
@@ -14,7 +14,7 @@
   "Length": {
     "name": "length",
     "in": "query",
-    "description": "Filas por p\u00e1gina: por defecto 10, m\u00e1ximo efectivo 100. Negativo usa 0; inv\u00e1lido usa 10. Cero devuelve s\u00f3lo conteos.",
+    "description": "Filas por página: por defecto 10, máximo efectivo 100. Negativo usa 0; inválido usa 10. Cero devuelve sólo conteos.",
     "required": false,
     "schema": {
       "type": "integer",
@@ -26,7 +26,7 @@
   "Search": {
     "name": "search",
     "in": "query",
-    "description": "Texto de b\u00fasqueda. Tambi\u00e9n admite search[value] por compatibilidad con DataTables.",
+    "description": "Texto de búsqueda. También admite search[value] por compatibilidad con DataTables.",
     "required": false,
     "schema": {
       "type": "string"
@@ -69,7 +69,7 @@
   "DepartmentId": {
     "name": "departmentId",
     "in": "query",
-    "description": "\u00c1rea autorizada de destino; no ampl\u00eda el alcance de la sesi\u00f3n.",
+    "description": "Área autorizada de destino; no amplía el alcance de la sesión.",
     "required": false,
     "schema": {
       "type": "string",
@@ -159,7 +159,7 @@
   "StartDate": {
     "name": "startDate",
     "in": "query",
-    "description": "Fecha inicial del intervalo; la fecha final incluye todo ese d\u00eda.",
+    "description": "Fecha inicial del intervalo; la fecha final incluye todo ese día.",
     "required": false,
     "schema": {
       "type": "string",
@@ -169,7 +169,7 @@
   "EndDate": {
     "name": "endDate",
     "in": "query",
-    "description": "Fecha final del intervalo; la fecha final incluye todo ese d\u00eda.",
+    "description": "Fecha final del intervalo; la fecha final incluye todo ese día.",
     "required": false,
     "schema": {
       "type": "string",
@@ -217,7 +217,7 @@
   "ReportMonth": {
     "name": "reportMonth",
     "in": "query",
-    "description": "Mes AAAA-MM para el modo mensual; ausente o inv\u00e1lido usa el mes actual de Ciudad de M\u00e9xico.",
+    "description": "Mes AAAA-MM para el modo mensual; ausente o inválido usa el mes actual de Ciudad de México.",
     "required": false,
     "schema": {
       "type": "string",
@@ -256,7 +256,7 @@
   "DepartmentContext": {
     "name": "context",
     "in": "query",
-    "description": "issues devuelve s\u00f3lo las \u00e1reas disponibles para salidas seg\u00fan la sesi\u00f3n.",
+    "description": "issues devuelve sólo las áreas disponibles para salidas según la sesión.",
     "required": false,
     "schema": {
       "type": "string",
@@ -268,7 +268,7 @@
   "Departments": {
     "name": "department",
     "in": "query",
-    "description": "Nombres de \u00e1reas. Repetir el par\u00e1metro para varias; tambi\u00e9n admite department[].",
+    "description": "Nombres de áreas. Repetir el parámetro para varias; también admite department[].",
     "required": false,
     "schema": {
       "type": "array",
@@ -282,7 +282,7 @@
   "Roles": {
     "name": "role",
     "in": "query",
-    "description": "Nombres de roles. Repetir para varios; tambi\u00e9n admite role[].",
+    "description": "Nombres de roles. Repetir para varios; también admite role[].",
     "required": false,
     "schema": {
       "type": "array",
@@ -296,7 +296,7 @@
   "StrictDepartmentFilter": {
     "name": "strictDepartmentFilter",
     "in": "query",
-    "description": "true utiliza s\u00f3lo las \u00e1reas recibidas, sin inferirlas de la sesi\u00f3n.",
+    "description": "true utiliza sólo las áreas recibidas, sin inferirlas de la sesión.",
     "required": false,
     "schema": {
       "type": "boolean",
@@ -306,7 +306,7 @@
   "IncludeAccesses": {
     "name": "includeAccesses",
     "in": "query",
-    "description": "true incluye las responsabilidades por \u00e1rea de cada persona.",
+    "description": "true incluye las responsabilidades por área de cada persona.",
     "required": false,
     "schema": {
       "type": "boolean",

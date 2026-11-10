@@ -43,7 +43,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 19, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 18, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -59,7 +59,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 24, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -233,6 +233,32 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |
 | `confirmPhysicalReturn` | `confirmPhysicalReturn: [value: boolean];` |
+
+## IssueSupplyField.defineProps
+
+**Fuente:** [src/modules/issues/components/IssueSupplyField.vue](../../../../../src/modules/issues/components/IssueSupplyField.vue) · línea 10, columna 27. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `field` | `field: 'quantityToSupply' \| 'projectConvertedQuantity' \| 'supply';` |
+| `item` | `item: IssueDetail;` |
+| `isDisabled` | `isDisabled: boolean;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `item` |
+
+## IssueSupplyField.defineEmits
+
+**Fuente:** [src/modules/issues/components/IssueSupplyField.vue](../../../../../src/modules/issues/components/IssueSupplyField.vue) · línea 15, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `supply` | `supply: [changes: IssueSupplyChanges]` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [IssueSupplyChanges](../../../../../src/modules/issues/issue.ts) | `supply` |
 
 ## IssueTable.defineProps
 

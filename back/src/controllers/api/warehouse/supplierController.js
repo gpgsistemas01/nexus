@@ -9,7 +9,6 @@ export const getAllSuppliers = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
     const onlyActive = req.query.onlyActive === 'true';
-
     const columns = ['tradeName', 'legalName', 'isActive', null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,

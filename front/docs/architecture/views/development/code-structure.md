@@ -22,11 +22,11 @@ al desmontar, descarga con el nombre común `reporte_<recurso>_MM_AAAA.xlsx` y l
 el recurso temporal. `requestExcel` valida el Blob; la sesión y errores siguen en HTTP.
 `reportParams` comparte filtros, periodos, orden y eliminación de paginación.
 
-`ServerTable` activa la presentación móvil de Vuetify por debajo de `sm`: cada fila
-apila sus campos. Las columnas de acciones permanecen fijas a la derecha durante el desplazamiento
-horizontal. `TableAction` ofrece un área táctil de 2.75 rem por lado en móvil.
-`TableFrame` contiene los listados y las tablas de detalle conservan
-su desplazamiento horizontal para revisar y capturar partidas. `EditorDialog`
+`ServerTable` conserva la tabla paginada en escritorio y presenta fichas rotuladas
+en móvil; `ResponsiveTableCards` reutiliza los slots de las celdas y las acciones.
+En móvil, las fichas permiten elegir la columna y dirección del ordenamiento.
+Las tablas de detalle usan fichas para mostrar sus campos, entradas y acciones.
+`TableAction` ofrece un área táctil de 2.75 rem por lado en móvil. `EditorDialog`
 aprovecha el ancho disponible y distribuye campos mediante la cuadrícula compartida.
 
 ## Organización del código
@@ -66,11 +66,11 @@ una capa ejecutable.
 
 ## Unidades de construcción
 
-| Unidad | Organización concreta |
-| --- | --- |
-| `main.ts` y `app` | El arranque inicia la aplicación; el Router carga sus páginas. Los Workspaces integran dominios: `PurchaseWorkspace` compone Compras, Directorio e Inventario. |
+| Unidad              | Organización concreta                                                                                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `main.ts` y `app`   | El arranque inicia la aplicación; el Router carga sus páginas. Los Workspaces integran dominios: `PurchaseWorkspace` compone Compras, Directorio e Inventario.                                                |
 | `modules/<dominio>` | El archivo del dominio, como `purchase.ts`, declara contratos; `*Config.ts`, etiquetas y descriptores. `pages` conecta presentación y composables; `services` y `mappers` conservan sus adaptaciones propias. |
-| `shared` | Controles, contratos y funciones usados por distintos módulos. `usePagedList` recibe la consulta por callback y `ServerTable` recibe datos/slots; ninguno importa el servicio de un dominio. |
+| `shared`            | Controles, contratos y funciones usados por distintos módulos. `usePagedList` recibe la consulta por callback y `ServerTable` recibe datos/slots; ninguno importa el servicio de un dominio.                  |
 
 `useRecordForm` compone interacción y guardado para Catálogos, Directorio, Identidad,
 Compras y Salidas. Cada editor conserva sus reglas, valores iniciales y payloads.

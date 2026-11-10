@@ -36,7 +36,7 @@ servidor no demuestra credenciales inválidas.
 | Formatos inválidos | Arrays, objetos, fracciones, `25abc` o enteros no seguros usan el valor predeterminado. |
 
 La respuesta incluye `data`, `recordsTotal` y `recordsFiltered`. Avance según las
-filas recibidas. OpenAPI declara búsqueda, orden y filtros de cada ruta. Los XLSX
+filas recibidas. OpenAPI declara búsqueda y orden de cada ruta. Los XLSX
 recorren todos los resultados admitidos, sin el límite de una página.
 
 ### Errores globales y códigos públicos

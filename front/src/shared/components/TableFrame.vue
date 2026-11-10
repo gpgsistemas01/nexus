@@ -87,4 +87,9 @@ withDefaults(defineProps<{ isLoading?: boolean }>(), { isLoading: false });
     opacity: 0.4;
     box-shadow: none;
 }
+@media (max-width: 599px) {
+    .table-frame :deep(.v-table__wrapper) {
+        display: none;
+    }
+}
 </style>

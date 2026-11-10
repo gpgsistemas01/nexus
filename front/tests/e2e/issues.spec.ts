@@ -5,6 +5,24 @@ import { issuePermissions, issueDetailId, departmentId, issueFor } from '../fixt
 import { ids, pageOf, user } from '../fixtures/inventory.js';
 import { clientData, personData } from '../fixtures/records.js';
 
+test('salidas: los detalles se muestran en fichas etiquetadas en móvil', async ({ page }) => {
+  await mockIssues(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/salidas/materiales');
+
+  const listCard = page.locator('.responsive-table-card').filter({ hasText: 'SAL-001' }).first();
+  await listCard.getByRole('button', { name: 'Consultar salida', exact: true }).click();
+  const dialog = page.getByRole('dialog', {
+    name: 'Consultar salida - Folio SAL-001',
+    exact: true,
+  });
+  const details = dialog.locator('.responsive-table-cards');
+  await expect(details).toBeVisible();
+  await expect(details.locator('dt', { hasText: 'Salida' })).toBeVisible();
+  await expect(details.getByText('Lona', { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
 for (const [path, resource] of [
   ['materiales', 'materials'],
   ['consumibles', 'consumables'],

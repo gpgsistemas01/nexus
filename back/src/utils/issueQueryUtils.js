@@ -11,7 +11,6 @@ export const getIssueDataTableQuery = ({ query = {}, columns }) => {
         columns,
         defaultDirection: 'desc'
     });
-
     return {
         skip,
         take,

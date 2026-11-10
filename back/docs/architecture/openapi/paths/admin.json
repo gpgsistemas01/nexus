@@ -39,7 +39,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -79,6 +79,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -90,9 +93,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -130,23 +130,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -154,6 +148,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -206,23 +206,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -230,6 +224,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -260,7 +260,7 @@
       "tags": [
         "Usuarios"
       ],
-      "summary": "Cambiar contrase\u00f1a de usuario"
+      "summary": "Cambiar contraseña de usuario"
     }
   },
   "/api/admin/roles": {
@@ -296,14 +296,14 @@
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Consultar registros de cat\u00e1logo",
+      "summary": "Consultar registros de catálogo",
       "parameters": [
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -363,7 +363,7 @@
           "name": "context",
           "in": "query",
           "required": false,
-          "description": "issues devuelve s\u00f3lo las \u00e1reas autorizadas para consultar y registrar Salidas. Auxiliar/Coordinador de Almac\u00e9n y Administrador del sistema tienen alcance de todas las \u00e1reas. Sin este contexto se conserva el selector general.",
+          "description": "issues devuelve sólo las áreas autorizadas para consultar y registrar Salidas. Auxiliar/Coordinador de Almacén y Administrador del sistema tienen alcance de todas las áreas. Sin este contexto se conserva el selector general.",
           "schema": {
             "type": "string",
             "enum": [
@@ -374,7 +374,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -396,9 +396,9 @@
         }
       ],
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Consultar registros de cat\u00e1logo"
+      "summary": "Consultar registros de catálogo"
     }
   },
   "/api/admin/persons": {
@@ -441,7 +441,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=fullName. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=fullName. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -493,6 +493,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -504,9 +507,6 @@
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -544,23 +544,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -568,6 +562,12 @@
               }
             }
           }
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
         },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
@@ -641,7 +641,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=date, 1=type, 2=referenceNumber. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -724,7 +724,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=date, 1=type, 2=referenceNumber. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -808,7 +808,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=date, 1=type, 2=referenceNumber. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -901,7 +901,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=date, 1=type, 2=referenceNumber. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -985,7 +985,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=name. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -1026,13 +1026,13 @@
               "fulfillment-statuses"
             ]
           },
-          "description": "Cat\u00e1logo permitido."
+          "description": "Catálogo permitido."
         },
         {
           "name": "start",
           "in": "query",
           "required": false,
-          "description": "Desplazamiento entero. Inv\u00e1lido o fuera de rango se normaliza a 0.",
+          "description": "Desplazamiento entero. Inválido o fuera de rango se normaliza a 0.",
           "schema": {
             "type": "integer",
             "minimum": 0,
@@ -1044,7 +1044,7 @@
           "name": "length",
           "in": "query",
           "required": false,
-          "description": "Tama\u00f1o de p\u00e1gina; valores superiores se limitan a 100. Cero devuelve s\u00f3lo conteos. Inv\u00e1lido usa 10; negativo se normaliza a 0.",
+          "description": "Tamaño de página; valores superiores se limitan a 100. Cero devuelve sólo conteos. Inválido usa 10; negativo se normaliza a 0.",
           "schema": {
             "type": "integer",
             "minimum": 0,
@@ -1110,9 +1110,9 @@
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Consultar registros de cat\u00e1logo"
+      "summary": "Consultar registros de catálogo"
     },
     "post": {
       "operationId": "postManagedCatalog",
@@ -1137,7 +1137,7 @@
               "fulfillment-statuses"
             ]
           },
-          "description": "Cat\u00e1logo permitido."
+          "description": "Catálogo permitido."
         }
       ],
       "requestBody": {
@@ -1147,7 +1147,7 @@
             "schema": {
               "oneOf": [
                 {
-                  "title": "\u00c1reas",
+                  "title": "Áreas",
                   "type": "object",
                   "properties": {
                     "name": {
@@ -1274,6 +1274,9 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -1283,17 +1286,14 @@
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Crear registro de cat\u00e1logo"
+      "summary": "Crear registro de catálogo"
     }
   },
   "/api/admin/catalogs/{catalog}/{id}": {
@@ -1320,7 +1320,7 @@
               "fulfillment-statuses"
             ]
           },
-          "description": "Cat\u00e1logo permitido."
+          "description": "Catálogo permitido."
         },
         {
           "name": "id",
@@ -1340,7 +1340,7 @@
             "schema": {
               "oneOf": [
                 {
-                  "title": "\u00c1reas",
+                  "title": "Áreas",
                   "type": "object",
                   "properties": {
                     "name": {
@@ -1352,7 +1352,7 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 2147483647,
-                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+                      "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
                     }
                   },
                   "required": [
@@ -1374,7 +1374,7 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 2147483647,
-                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+                      "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
                     }
                   },
                   "required": [
@@ -1396,7 +1396,7 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 2147483647,
-                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+                      "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
                     }
                   },
                   "required": [
@@ -1423,7 +1423,7 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 2147483647,
-                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+                      "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
                     }
                   },
                   "required": [
@@ -1449,7 +1449,7 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 2147483647,
-                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+                      "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
                     }
                   },
                   "required": [
@@ -1472,7 +1472,7 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 2147483647,
-                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+                      "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
                     }
                   },
                   "required": [
@@ -1509,23 +1509,17 @@
             }
           }
         },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
         },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        },
-        "400": {
-          "$ref": "../openapi.json#/components/responses/ValidationError"
-        },
-        "409": {
-          "$ref": "../openapi.json#/components/responses/WriteConflict"
-        },
         "404": {
-          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1534,14 +1528,20 @@
             }
           }
         },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "tags": [
-        "Cat\u00e1logos"
+        "Catálogos"
       ],
-      "summary": "Editar registro de cat\u00e1logo"
+      "summary": "Editar registro de catálogo"
     }
   },
   "/api/admin/reports/persons/excel": {
@@ -1578,7 +1578,7 @@
         }
       },
       "summary": "Exportar personas a Excel",
-      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con b\u00fasqueda y \u00e1reas; no pagina la exportaci\u00f3n.",
+      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con búsqueda y áreas; no pagina la exportación.",
       "parameters": [
         {
           "name": "department",
@@ -1586,7 +1586,7 @@
           "required": false,
           "style": "form",
           "explode": true,
-          "description": "Identificadores de \u00e1reas. Tambi\u00e9n se admite el alias department[].",
+          "description": "Identificadores de áreas. También se admite el alias department[].",
           "schema": {
             "type": "array",
             "items": {
@@ -1599,7 +1599,7 @@
           "name": "search[value]",
           "in": "query",
           "required": false,
-          "description": "B\u00fasqueda por nombre de persona.",
+          "description": "Búsqueda por nombre de persona.",
           "schema": {
             "type": "string"
           }
@@ -1608,7 +1608,7 @@
           "name": "order[0][column]",
           "in": "query",
           "required": false,
-          "description": "\u00cdndice de columna: 0 corresponde a fullName.",
+          "description": "Índice de columna: 0 corresponde a fullName.",
           "schema": {
             "type": "integer",
             "minimum": 0
@@ -1669,7 +1669,7 @@
         }
       },
       "summary": "Exportar personas a Excel",
-      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con b\u00fasqueda y \u00e1reas; no pagina la exportaci\u00f3n. Alias de compatibilidad de /api/admin/reports/persons/excel, registrado con el mismo controlador y permiso.",
+      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con búsqueda y áreas; no pagina la exportación. Alias de compatibilidad de /api/admin/reports/persons/excel, registrado con el mismo controlador y permiso.",
       "parameters": [
         {
           "name": "department",
@@ -1677,7 +1677,7 @@
           "required": false,
           "style": "form",
           "explode": true,
-          "description": "Identificadores de \u00e1reas. Tambi\u00e9n se admite el alias department[].",
+          "description": "Identificadores de áreas. También se admite el alias department[].",
           "schema": {
             "type": "array",
             "items": {
@@ -1690,7 +1690,7 @@
           "name": "search[value]",
           "in": "query",
           "required": false,
-          "description": "B\u00fasqueda por nombre de persona.",
+          "description": "Búsqueda por nombre de persona.",
           "schema": {
             "type": "string"
           }
@@ -1699,7 +1699,7 @@
           "name": "order[0][column]",
           "in": "query",
           "required": false,
-          "description": "\u00cdndice de columna: 0 corresponde a fullName.",
+          "description": "Índice de columna: 0 corresponde a fullName.",
           "schema": {
             "type": "integer",
             "minimum": 0
@@ -1767,7 +1767,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=date, 1=type, 2=referenceNumber. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -1852,7 +1852,7 @@
         {
           "name": "order[0][column]",
           "in": "query",
-          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "description": "Índice de orden: 0=date, 1=type, 2=referenceNumber. Otros índices usan la primera columna admitida.",
           "schema": {
             "type": "integer",
             "enum": [

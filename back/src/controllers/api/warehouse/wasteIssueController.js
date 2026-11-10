@@ -35,7 +35,6 @@ const DATATABLE_COLUMNS = [
 ];
 
 export const getAllWasteIssues = async (req, res) => {
-
     const query = getIssueDataTableQuery({
         query: req.query,
         columns: DATATABLE_COLUMNS

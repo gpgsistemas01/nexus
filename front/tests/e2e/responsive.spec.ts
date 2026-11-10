@@ -37,7 +37,8 @@ for (const width of [320, 390, 768, 1440]) {
       await prepare(page, permissions);
       await page.goto(route);
       await expect(page.locator('main h1'), route).toBeVisible({ timeout: 30_000 });
-      await expect(page.getByRole('table')).toBeVisible();
+      if (width < 600) await expect(page.locator('.responsive-table-cards')).toBeVisible();
+      else await expect(page.getByRole('table')).toBeVisible();
       await expect(page.locator('.v-data-table__progress .v-progress-linear')).toHaveCount(0);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth),

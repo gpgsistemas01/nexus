@@ -266,9 +266,31 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | dependency | [ReportScope](../../../../../src/shared/report.ts) | `mode` |
 | dependency | [ReportScope](../../../../../src/shared/report.ts) | `inventory` |
 
+## ResponsiveTableCards.defineProps
+
+**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 8, columna 17. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `headers` | `headers: DataTableHeader<Row>[];` |
+| `rows` | `rows: Row[];` |
+| `rowClass` | `rowClass?: (row: Row) => string;` |
+| `formatValue` | `formatValue?: (row: Row, key: string) => string;` |
+| `sortBy` | `sortBy?: DataTableSortItem[];` |
+| `sortRows` | `sortRows?: boolean;` |
+| `sortValue` | `sortValue?: (row: Row, key: string) => unknown;` |
+
+## ResponsiveTableCards.defineEmits
+
+**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `sortBy` | `sortBy: [sortBy: DataTableSortItem[]]` |
+
 ## ServerTable.defineProps
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 9, columna 17. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 10, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -281,10 +303,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `sortBy` | `sortBy?: DataTableSortItem[];` |
 | `mustSort` | `mustSort?: boolean;` |
 | `rowProps` | `rowProps?: (data: { item: Row }) => { class: string };` |
+| `formatValue` | `formatValue?: (row: Row, key: string) => string;` |
 
 ## ServerTable.defineEmits
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 22, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 29, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

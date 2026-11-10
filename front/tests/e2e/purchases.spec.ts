@@ -5,6 +5,20 @@ import { ids } from '../fixtures/inventory.js';
 import { personData } from '../fixtures/records.js';
 import { purchaseItem } from '../fixtures/purchases.js';
 
+test('compras: los detalles se muestran en fichas etiquetadas en móvil', async ({ page }) => {
+  await mockPurchases(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/compras/materiales');
+  await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+
+  const dialog = page.getByRole('dialog', { name: 'Ver compra - Folio COM-001', exact: true });
+  const details = dialog.locator('.responsive-table-cards');
+  await expect(details).toBeVisible();
+  await expect(details.locator('dt', { hasText: 'Compra' })).toBeVisible();
+  await expect(details.getByText('Lona', { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
 test('compras: corregir PIEZA valida cantidad entera y límite sin cerrar la consulta tras guardar', async ({
   page,
 }) => {
