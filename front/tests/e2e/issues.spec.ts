@@ -11,6 +11,12 @@ test('salidas: los detalles se muestran en fichas etiquetadas en móvil', async 
   await page.goto('/salidas/materiales');
 
   const listCard = page.locator('.responsive-table-card').filter({ hasText: 'SAL-001' }).first();
+  await expect(
+    listCard.getByRole('button', { name: 'Surtir detalle', exact: true }),
+  ).toHaveClass(/bg-primary/);
+  await expect(
+    listCard.getByRole('button', { name: 'Consultar salida', exact: true }),
+  ).toHaveClass(/bg-filter-clear/);
   await listCard.getByRole('button', { name: 'Consultar salida', exact: true }).click();
   const dialog = page.getByRole('dialog', {
     name: 'Consultar salida - Folio SAL-001',
@@ -37,7 +43,12 @@ for (const [path, resource] of [
     if (line.material) line.material.presentation.name = 'PIEZA';
     else if ('waste' in line) line.waste.presentation.name = 'PIEZA';
     await page.goto(`/salidas/${path}`);
-    await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
+    const returnAction = page.getByRole('button', {
+      name: 'Devolver material surtido',
+      exact: true,
+    });
+    await expect(returnAction).toHaveClass(/bg-accent/);
+    await returnAction.click();
     const main = page.getByRole('dialog', {
       name: /^Devolver salida( de merma)? - Folio SAL-001$/,
     });

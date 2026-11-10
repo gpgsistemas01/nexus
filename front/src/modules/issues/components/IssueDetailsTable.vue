@@ -112,11 +112,14 @@ const cardValue = (item: IssueDetail, key: string) => {
 
 const sortValue = (item: IssueDetail, key: string): unknown => {
     if (key === 'pendingQuantity') return getIssuePendingQuantity(item);
+
     if (key === 'deliveredQuantity') return getIssueReturnableQuantity(item);
+
     if (key === 'difference')
         return item.projectConvertedQuantity
             ? item.convertedQuantity - Number(item.projectConvertedQuantity)
             : null;
+
     return item[key as keyof IssueDetail];
 };
 </script>
@@ -124,10 +127,10 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
 <template>
     <TableFrame>
         <VDataTable
+            v-model:sort-by="sortBy"
             :headers="headers"
             :items="rows"
             item-value="id"
-            v-model:sort-by="sortBy"
             :items-per-page="10"
             :items-per-page-options="[10, 20, 50]"
             :mobile="false"
@@ -201,6 +204,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                     "
                     label="Devolver detalle de salida"
                     :icon="`svg:${mdiUndoVariant}`"
+                    color="accent"
                     :is-disabled="isDisabled"
                     @click="emit('return', item)"
                 />
@@ -208,6 +212,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                     v-else-if="(mode === 'create' || mode === 'edit') && !item.isCanceled"
                     label="Eliminar detalle"
                     icon="$delete"
+                    color="error"
                     :is-disabled="isDisabled || item.isOriginallySupplied"
                     @click="emit('remove', item.id)"
                 />
@@ -259,6 +264,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                     "
                     label="Devolver detalle de salida"
                     :icon="`svg:${mdiUndoVariant}`"
+                    color="accent"
                     :is-disabled="isDisabled"
                     @click="emit('return', item)"
                 />
@@ -266,6 +272,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                     v-else-if="(mode === 'create' || mode === 'edit') && !item.isCanceled"
                     label="Eliminar detalle"
                     icon="$delete"
+                    color="error"
                     :is-disabled="isDisabled || item.isOriginallySupplied"
                     @click="emit('remove', item.id)"
                 />

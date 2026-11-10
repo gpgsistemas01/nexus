@@ -79,6 +79,7 @@ const displayDate = (value: string) =>
                 @click="emit('open', item, 'edit')"
             />
             <TableAction
+                color="filter-clear"
                 label="Ver compra"
                 :icon="`svg:${mdiEyeOutline}`"
                 :is-disabled="isReading"

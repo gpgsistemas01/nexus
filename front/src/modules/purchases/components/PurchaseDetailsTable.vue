@@ -92,16 +92,15 @@ const cardValue = (item: PurchaseDetail, key: string) => {
     const value = item[key as keyof PurchaseDetail];
     return value == null || value === '' ? '—' : String(value);
 };
-
 </script>
 
 <template>
     <TableFrame>
         <VDataTable
+            v-model:sort-by="sortBy"
             :headers="headers"
             :items="rows"
             item-value="id"
-            v-model:sort-by="sortBy"
             :items-per-page="10"
             :items-per-page-options="[10, 20, 50]"
             :mobile="false"
@@ -145,6 +144,7 @@ const cardValue = (item: PurchaseDetail, key: string) => {
                     "
                     label="Quitar detalle nuevo"
                     icon="$delete"
+                    color="error"
                     :is-disabled="isDisabled"
                     @click="emit('remove', item.id)"
                 />
@@ -191,6 +191,7 @@ const cardValue = (item: PurchaseDetail, key: string) => {
                     "
                     label="Quitar detalle nuevo"
                     icon="$delete"
+                    color="error"
                     :is-disabled="isDisabled"
                     @click="emit('remove', item.id)"
                 />

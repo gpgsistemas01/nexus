@@ -16,6 +16,12 @@ test('compras: los detalles se muestran en fichas etiquetadas en móvil', async 
   await expect(details).toBeVisible();
   await expect(details.locator('dt', { hasText: 'Compra' })).toBeVisible();
   await expect(details.getByText('Lona', { exact: true })).toBeVisible();
+  await expect(details.getByRole('button', { name: 'Corregir detalle', exact: true })).toHaveClass(
+    /bg-filter-action/,
+  );
+  await expect(details.getByRole('button', { name: 'Cancelar detalle', exact: true })).toHaveClass(
+    /bg-error/,
+  );
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
 

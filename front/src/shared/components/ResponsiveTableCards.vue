@@ -220,7 +220,9 @@ const cellText = (row: Row, key: string) => {
     }
     .responsive-table-card__actions {
         display: flex;
+        align-items: center;
         flex-wrap: wrap;
+        justify-content: center;
         gap: 0.4rem;
         margin-top: 0.7rem;
         border-top: 1px solid rgba(var(--v-theme-table-border), 0.6);
