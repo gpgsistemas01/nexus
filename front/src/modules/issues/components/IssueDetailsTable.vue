@@ -119,6 +119,7 @@ const projectValue = (item: IssueDetail) =>
             </template>
             <template #[`item.quantityToSupply`]="{ item }">
                 <VTextField
+                    v-if="getIssuePendingQuantity(item) > 0"
                     :aria-label="`Cantidad a surtir: ${item.name}`"
                     type="number"
                     :min="isPiecePresentation(item.presentation) ? 1 : 0.01"
@@ -137,6 +138,7 @@ const projectValue = (item: IssueDetail) =>
                         emit('supply', item.id, { quantityToSupply: $event ?? '' })
                     "
                 />
+                <span v-else>Completamente surtido</span>
             </template>
             <template #[`item.projectConvertedQuantity`]="{ item }">
                 <VTextField

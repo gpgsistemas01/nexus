@@ -218,6 +218,31 @@ for (const [path, resource, title, label] of [
   });
 }
 
+for (const [path, resource, label] of [
+  ['materiales', 'materials', 'Lona'],
+  ['consumibles', 'consumables', 'Lona'],
+  ['mermas', 'wastes', 'Sobrante de lona'],
+] as const) {
+  test(`salidas ${path}: oculta la cantidad a surtir de un detalle completo`, async ({ page }) => {
+    const { docs } = await mockIssues(page, undefined, 'Surtido parcial');
+    const doc = docs[resource];
+    const completed = doc.details[0]!;
+    completed.suppliedQuantity = '2';
+    completed.isSupplied = true;
+    completed.fulfillmentStatus.name = 'Surtido';
+
+    await page.goto(`/salidas/${path}`);
+    await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+    const dialog = page.getByRole('dialog', {
+      name: /^Surtir salida( de merma)? - Folio SAL-001$/,
+    });
+    await expect(dialog.getByText('Completamente surtido', { exact: true })).toBeVisible();
+    await expect(
+      dialog.getByRole('spinbutton', { name: `Cantidad a surtir: ${label}`, exact: true }),
+    ).toHaveCount(0);
+  });
+}
+
 for (const [path, label] of [
   ['materiales', 'Lona'],
   ['consumibles', 'Lona'],
