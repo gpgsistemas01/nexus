@@ -192,8 +192,12 @@ const cellText = (row: Row, key: string) => {
     }
     .responsive-table-card h3 {
         margin: 0 0 0.65rem;
+        border-bottom: 1px solid rgba(var(--v-theme-primary), 0.2);
+        padding-bottom: 0.55rem;
         color: rgb(var(--v-theme-primary));
-        font-size: 1rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+        line-height: 1.35;
     }
     .responsive-table-card dl {
         display: grid;
@@ -202,9 +206,12 @@ const cellText = (row: Row, key: string) => {
         margin: 0;
     }
     .responsive-table-card dt {
-        color: rgb(var(--v-theme-muted));
-        font-size: 0.72rem;
-        font-weight: 600;
+        width: fit-content;
+        border-bottom: 1px solid rgba(var(--v-theme-primary), 0.2);
+        padding-bottom: 0.1rem;
+        color: rgb(var(--v-theme-primary));
+        font-size: 0.75rem;
+        font-weight: 700;
     }
     .responsive-table-card dd {
         margin: 0.12rem 0 0;
