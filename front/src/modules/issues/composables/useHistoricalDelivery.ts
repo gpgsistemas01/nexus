@@ -1,5 +1,4 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue';
-import { zonedDateTimeToUtcIso } from '@nexus/date-time';
 import { createUuid } from '../../../shared/utils/createUuid.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import {
@@ -22,7 +21,6 @@ export const useHistoricalDelivery = (options: {
     onUnauthorized: () => void;
 }) => {
     const values = reactive({
-        deliveredAt: '',
         reason: '',
         declaredDelivered: false,
     });
@@ -51,8 +49,6 @@ export const useHistoricalDelivery = (options: {
         error.value =
             'No se pudo leer la regularización pendiente. Contacta al administrador antes de registrar otra.';
     }
-
-    const utc = (value: string) => zonedDateTimeToUtcIso(new Date(value));
 
     const canConfirm = computed(
         () =>
@@ -148,7 +144,7 @@ export const useHistoricalDelivery = (options: {
             const command: HistoricalDeliveryCommand = {
                 operationId: createUuid(),
                 cutoffDate: preview.value!.cutoffDate,
-                deliveredAt: values.deliveredAt ? utc(values.deliveredAt) : null,
+                deliveredAt: null,
                 reason: values.reason.trim(),
                 declaredDelivered: true,
                 documents: selected.value.map((id) => {

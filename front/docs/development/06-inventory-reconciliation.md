@@ -28,7 +28,8 @@ antiguos sobre saldos actuales sin conciliar los movimientos posteriores.
 5. Seleccionar las salidas cuyas partidas pendientes ya se entregaron por completo.
    La casilla del encabezado selecciona todas las páginas si hay hasta 100 salidas; si hay
    más, selecciona manualmente hasta 100 por lote.
-6. Capturar motivo/evidencia; fecha real de entrega sólo si se conoce.
+6. Capturar motivo/evidencia. No se asigna una fecha real común porque las salidas pueden
+   haberse entregado en momentos distintos; el sistema guarda la fecha de regularización.
 7. Declarar expresamente que todas las partidas pendientes se entregaron antes del
    corte y pulsar **Registrar entregas seleccionadas**.
 8. Conservar el recibo y comprobar la marca **Regularizada por entrega histórica**.

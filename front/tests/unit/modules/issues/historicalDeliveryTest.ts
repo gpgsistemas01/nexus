@@ -103,6 +103,7 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     await mounted.value.confirm();
     expect(mounted.value.recoveryRequired.value).toBe(true);
     const original = send.mock.calls[0]![1];
+    expect(original.deliveredAt).toBeNull();
     mounted.wrapper.unmount();
     mounted = await mount();
     expect(mounted.value.recoveryRequired.value).toBe(true);

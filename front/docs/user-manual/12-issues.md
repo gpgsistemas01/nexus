@@ -138,7 +138,8 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
    también puede marcar filas individuales. Seleccione sólo documentos entregados completamente.
    Cada lote admite
    hasta 100 salidas; si hay más, seleccione manualmente hasta 100 por lote.
-5. Capturar motivo/evidencia y, sólo si se conoce, fecha real de entrega.
+5. Capturar motivo/evidencia. No capturar una fecha real común: cada salida puede haberse
+   entregado en un momento distinto; el sistema guarda la fecha de regularización.
 6. Declarar que todas las partidas pendientes seleccionadas se entregaron antes del corte.
 7. Pulsar **Registrar entregas seleccionadas** y conservar el recibo.
 

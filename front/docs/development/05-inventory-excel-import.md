@@ -36,10 +36,14 @@ podrá surtirse hasta configurarlo.
 ## Recorrido
 
 1. Abrir **Importar Excel** y elegir Alta, Editar datos o Ajustar existencias.
-2. En edición o ajuste, filtrar por proveedor/nombre si se necesita acotar los
-   registros; sin filtros, descargar todos los registros coincidentes, hasta 500.
-   Si hay más, filtrar y trabajar cada grupo. Para altas de merma, seleccionar
-   proveedor para obtener sus referencias en m²; la búsqueda acota esa lista.
+2. En edición o ajuste, **Proveedor** limita las relaciones de inventario a ese
+   proveedor y **Nombre** busca materiales, consumibles o mermas por su nombre;
+   juntos determinan qué filas entran a la plantilla. Déjalos vacíos para incluir
+   todos los registros. Si hay más de 500, acota uno o ambos filtros y descarga
+   grupos separados. Para altas de merma, el proveedor es obligatorio y Nombre sólo
+   reduce las referencias de materiales disponibles en la hoja **Catalogos**; no
+   filtra filas de inventario. En altas de Materiales/Consumibles, el proveedor
+   limita las opciones del catálogo de esa columna, no las filas nuevas.
 3. Completar las columnas blancas de captura, conservando sin cambios las columnas
    grises, IDs/versiones, hojas y encabezados. En **Catalogos**, elegir la opción
    completa de las listas desplegables; no es una lista de inventario para importar.

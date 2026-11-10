@@ -33,6 +33,7 @@ for (const width of [1280, 390]) {
     await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
     let dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
     await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
+    await expect(dialog.getByLabel('Fecha real de entrega (opcional)')).toHaveCount(0);
     await expect(
       dialog.getByRole('checkbox', {
         name: 'Seleccionar todas las salidas de todas las páginas',

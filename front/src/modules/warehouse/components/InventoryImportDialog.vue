@@ -73,17 +73,21 @@ const supplierLabel = computed(() =>
 );
 const supplierHint = computed(() =>
     props.mode === modes.CREATE
-        ? 'En Alta limita las opciones del desplegable Proveedor; no filtra filas existentes.'
-        : 'Déjalo vacío para incluir todos los proveedores que coincidan con el nombre.',
+        ? props.resource === 'wastes'
+            ? 'Obligatorio para Alta de merma; determina qué materiales aparecen como referencia en Catalogos.'
+            : 'En Alta limita las opciones del desplegable Proveedor; no filtra filas de inventario.'
+        : 'La plantilla incluirá sólo los registros asociados a este proveedor. Déjalo vacío para incluir todos.',
 );
 const showSearch = computed(() => props.mode !== modes.CREATE || props.resource === 'wastes');
 const searchLabel = computed(() =>
-    props.mode === modes.CREATE ? 'Buscar material de referencia' : 'Filtrar registros por nombre',
+    props.mode === modes.CREATE
+        ? 'Buscar material de referencia por nombre'
+        : `Filtrar ${props.resource === 'wastes' ? 'mermas' : props.resource === 'materials' ? 'materiales' : 'consumibles'} por nombre`,
 );
 const searchHint = computed(() =>
     props.mode === modes.CREATE
-        ? 'Limita las opciones de Material de referencia en la hoja Catalogos.'
-        : 'Déjalo vacío para incluir todos los registros que coincidan con el proveedor.',
+        ? 'Reduce las opciones de Material de referencia en Catalogos para el proveedor elegido; no filtra filas de merma.'
+        : 'Incluye sólo registros cuyo nombre contenga este texto. Déjalo vacío para incluir todos; combinado con proveedor ayuda a acotar plantillas de más de 500 filas.',
 );
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
@@ -187,68 +191,77 @@ const selectMode = (value: unknown) => {
                 <strong>Catalogos</strong>
                 contiene opciones para las listas desplegables, no registros de inventario. Elige la
                 opción completa tal como aparece; si incluye un ID, no lo escribas por separado.
+                <template v-if="mode === modes.CREATE">
+                    En Alta de Materiales/Consumibles, Proveedor sólo limita las opciones de esa
+                    lista y no las filas nuevas. En Alta de Mermas, es obligatorio y determina los
+                    materiales disponibles como referencia.
+                </template>
             </VAlert>
             <VAlert
+                v-if="mode !== modes.CREATE"
                 type="info"
                 variant="tonal"
                 class="mb-4"
             >
-                En edición y ajuste, la plantilla incluye todos los registros que coincidan con los
-                filtros, hasta {{ limits.maxRows }} filas. Si hay más, filtra por proveedor o nombre
-                y procesa grupos de hasta {{ limits.maxRows }} filas. Cada archivo también debe
+                En edición y ajuste, Proveedor y Nombre determinan qué registros entran en la
+                plantilla; no cambian los datos. Déjalos vacíos para incluir todos. Se incluyen
+                hasta {{ limits.maxRows }} filas; si hay más, acota con esos filtros y descarga
+                grupos separados. No se entrega una plantilla parcial. Cada archivo también debe
                 pesar como máximo {{ limits.maxBytes / (1024 * 1024) }} MiB.
             </VAlert>
-            <div class="template-fields">
-                <RemoteSelect
-                    v-if="canReadSuppliers"
-                    :label="supplierLabel"
-                    :model-value="supplierId"
-                    :state="suppliers"
-                    :is-disabled="locked"
-                    :hint="supplierHint"
-                    persistent-hint
-                    @update:model-value="emit('supplier', $event)"
-                    @search="emit('searchSuppliers', $event)"
-                    @more="emit('moreSuppliers')"
-                    @retry="emit('retrySuppliers')"
-                />
-                <VTextField
-                    v-if="showSearch"
-                    :model-value="search"
-                    :label="searchLabel"
-                    :hint="searchHint"
-                    persistent-hint
+            <div class="template-controls">
+                <div class="template-fields">
+                    <RemoteSelect
+                        v-if="canReadSuppliers"
+                        :label="supplierLabel"
+                        :model-value="supplierId"
+                        :state="suppliers"
+                        :is-disabled="locked"
+                        :hint="supplierHint"
+                        persistent-hint
+                        @update:model-value="emit('supplier', $event)"
+                        @search="emit('searchSuppliers', $event)"
+                        @more="emit('moreSuppliers')"
+                        @retry="emit('retrySuppliers')"
+                    />
+                    <VTextField
+                        v-if="showSearch"
+                        :model-value="search"
+                        :label="searchLabel"
+                        :hint="searchHint"
+                        persistent-hint
+                        :disabled="locked"
+                        :maxlength="limits.maxSearchLength"
+                        @update:model-value="emit('search', $event)"
+                    />
+                </div>
+                <VBtn
+                    variant="outlined"
+                    :disabled="
+                        locked || (resource === 'wastes' && mode === modes.CREATE && !supplierId)
+                    "
+                    :loading="isDownloading"
+                    @click="emit('template')"
+                >
+                    Descargar plantilla
+                </VBtn>
+                <VFileInput
+                    :model-value="file"
+                    label="Archivo Excel (.xlsx)"
+                    accept=".xlsx"
                     :disabled="locked"
-                    :maxlength="limits.maxSearchLength"
-                    @update:model-value="emit('search', $event)"
+                    show-size
+                    clearable
+                    @update:model-value="
+                        emit('file', Array.isArray($event) ? ($event[0] ?? null) : $event)
+                    "
                 />
+                <p class="retention-note">
+                    El servidor descarta el archivo después del análisis. El borrador vence en
+                    {{ limits.draftHours }} horas. El original de tu equipo permanece bajo tu
+                    control.
+                </p>
             </div>
-            <VBtn
-                variant="outlined"
-                class="mb-5"
-                :disabled="
-                    locked || (resource === 'wastes' && mode === modes.CREATE && !supplierId)
-                "
-                :loading="isDownloading"
-                @click="emit('template')"
-            >
-                Descargar plantilla
-            </VBtn>
-            <VFileInput
-                :model-value="file"
-                label="Archivo Excel (.xlsx)"
-                accept=".xlsx"
-                :disabled="locked"
-                show-size
-                clearable
-                @update:model-value="
-                    emit('file', Array.isArray($event) ? ($event[0] ?? null) : $event)
-                "
-            />
-            <p class="retention-note">
-                El servidor descarta el archivo después del análisis. El borrador vence en
-                {{ limits.draftHours }} horas. El original de tu equipo permanece bajo tu control.
-            </p>
         </template>
         <template v-if="batch">
             <p class="mb-2">
@@ -397,6 +410,13 @@ const selectMode = (value: unknown) => {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     gap: 1rem;
 }
+.template-controls {
+    display: grid;
+    gap: 1rem;
+}
+.template-controls > .v-btn {
+    justify-self: start;
+}
 .preview-rows {
     list-style: none;
     padding: 0;
@@ -425,5 +445,6 @@ const selectMode = (value: unknown) => {
 .retention-note {
     color: rgb(var(--v-theme-muted));
     font-size: 0.8rem;
+    margin: 0;
 }
 </style>

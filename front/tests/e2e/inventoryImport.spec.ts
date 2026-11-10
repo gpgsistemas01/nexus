@@ -156,13 +156,28 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
     if (update) {
       await selectOperation(page, 'Editar datos');
       await expect(page.getByRole('spinbutton')).toHaveCount(0);
+      await expect(
+        page.getByText(/Proveedor y Nombre determinan qué registros entran en la plantilla/),
+      ).toBeVisible();
+      await expect(
+        page.getByText(/La plantilla incluirá sólo los registros asociados a este proveedor/),
+      ).toBeVisible();
+      await expect(
+        page.getByText(/Incluye sólo registros cuyo nombre contenga este texto/),
+      ).toBeVisible();
       await page
-        .getByRole('textbox', { name: 'Filtrar registros por nombre', exact: true })
+        .getByRole('textbox', { name: 'Filtrar consumibles por nombre', exact: true })
         .fill('Lona');
     } else {
+      await expect(
+        page.getByText(/Obligatorio para Alta de merma; determina qué materiales aparecen/),
+      ).toBeVisible();
       await page
-        .getByRole('textbox', { name: 'Buscar material de referencia', exact: true })
+        .getByRole('textbox', { name: 'Buscar material de referencia por nombre', exact: true })
         .fill('Manta');
+      await expect(
+        page.getByText(/Reduce las opciones de Material de referencia en Catalogos/),
+      ).toBeVisible();
     }
     await expect(
       page.getByText(/La hoja Catalogos contiene opciones para las listas desplegables/),
@@ -188,6 +203,19 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
     else expect(params.get('search')).toBe('Manta');
     await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
   }
+});
+
+test('en Alta de materiales, Proveedor limita el catálogo y no las filas nuevas', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Importar Excel de materiales', exact: true });
+  await expect(
+    dialog.getByText(/En Alta de Materiales\/Consumibles, Proveedor sólo limita las opciones/),
+  ).toBeVisible();
+  await expect(dialog.getByRole('textbox', { name: /por nombre/, exact: true })).toHaveCount(0);
 });
 
 test('importación: revisa el stock y confirma en escritorio y móvil', async ({ page }) => {

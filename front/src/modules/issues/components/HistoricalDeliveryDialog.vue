@@ -3,7 +3,6 @@ import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VTable } from 'vuetify/components/VTable';
-import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { HISTORICAL_DELIVERY_LIMITS as limits } from '@nexus/historical-deliveries';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
@@ -16,7 +15,6 @@ import type {
 
 defineProps<{
     values: {
-        deliveredAt: string;
         reason: string;
         declaredDelivered: boolean;
     };
@@ -31,7 +29,7 @@ defineProps<{
     error: string;
 }>();
 const emit = defineEmits<{
-    update: [field: 'deliveredAt' | 'reason', value: string];
+    update: [field: 'reason', value: string];
     declare: [value: boolean];
     select: [id: string];
     selectAll: [selected: boolean];
@@ -63,7 +61,9 @@ const emit = defineEmits<{
             hora actual. Usa este registro sólo para entregas físicas ya realizadas. Primero
             concilia el inventario con un conteo físico actual. Esta operación completa el registro
             pendiente sin descontar stock. Los costos y cantidades de proyecto históricos permanecen
-            sin verificar.
+            sin verificar. No se captura una fecha real única porque las salidas pueden haberse
+            entregado en momentos distintos; el sistema registra cuándo se realiza esta
+            regularización.
         </VAlert>
         <VAlert
             v-if="recoveryRequired"
@@ -212,28 +212,21 @@ const emit = defineEmits<{
                         Página siguiente
                     </VBtn>
                 </div>
-                <VTextarea
-                    :model-value="values.reason"
-                    label="Motivo y evidencia de la entrega histórica"
-                    :maxlength="limits.maxReasonLength"
-                    :disabled="isWorking"
-                    @update:model-value="emit('update', 'reason', $event ?? '')"
-                />
-                <VTextField
-                    :model-value="values.deliveredAt"
-                    type="datetime-local"
-                    label="Fecha real de entrega (opcional)"
-                    hint="Hora de Ciudad de México. Déjala vacía si no se conoce; el servidor registra la regularización."
-                    persistent-hint
-                    :disabled="isWorking"
-                    @update:model-value="emit('update', 'deliveredAt', $event ?? '')"
-                />
-                <VCheckbox
-                    :model-value="values.declaredDelivered"
-                    label="Confirmo que todas las partidas pendientes seleccionadas ya se entregaron físicamente antes del corte."
-                    :disabled="isWorking"
-                    @update:model-value="emit('declare', $event === true)"
-                />
+                <div class="historical-fields">
+                    <VTextarea
+                        :model-value="values.reason"
+                        label="Motivo y evidencia de la entrega histórica"
+                        :maxlength="limits.maxReasonLength"
+                        :disabled="isWorking"
+                        @update:model-value="emit('update', 'reason', $event ?? '')"
+                    />
+                    <VCheckbox
+                        :model-value="values.declaredDelivered"
+                        label="Confirmo que todas las partidas pendientes seleccionadas ya se entregaron físicamente antes del corte."
+                        :disabled="isWorking"
+                        @update:model-value="emit('declare', $event === true)"
+                    />
+                </div>
             </template>
         </template>
     </EditorDialog>
@@ -245,12 +238,14 @@ const emit = defineEmits<{
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
+    margin-block: 1rem;
+}
+.historical-fields {
+    display: grid;
+    gap: 1rem;
 }
 .historical-details {
     min-width: 16rem;
     padding-inline-start: 1rem;
-}
-.historical-pagination {
-    margin-block: 1rem;
 }
 </style>

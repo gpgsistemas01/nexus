@@ -6,11 +6,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineProps
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 17, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 16, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `values` | `values: { deliveredAt: string; reason: string; declaredDelivered: boolean; };` |
+| `values` | `values: { reason: string; declaredDelivered: boolean; };` |
 | `preview` | `preview: HistoricalDeliveryPreview \| null;` |
 | `receipt` | `receipt: HistoricalDeliveryReceipt \| null;` |
 | `selected` | `selected: string[];` |
@@ -28,11 +28,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineEmits
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 31, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `update` | `update: [field: 'deliveredAt' \| 'reason', value: string];` |
+| `update` | `update: [field: 'reason', value: string];` |
 | `declare` | `declare: [value: boolean];` |
 | `select` | `select: [id: string];` |
 | `selectAll` | `selectAll: [selected: boolean];` |
