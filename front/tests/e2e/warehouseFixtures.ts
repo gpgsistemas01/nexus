@@ -48,5 +48,8 @@ export const chooseOption = async (
     return;
   }
   await field.click();
-  await page.getByRole('option', { name: option, exact: true }).click();
+  await page
+    .getByRole('listbox', { name: label })
+    .getByRole('option', { name: option, exact: true })
+    .click();
 };

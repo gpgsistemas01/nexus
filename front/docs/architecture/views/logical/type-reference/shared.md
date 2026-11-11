@@ -279,10 +279,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `sortBy` | `sortBy?: DataTableSortItem[];` |
 | `sortRows` | `sortRows?: boolean;` |
 | `sortValue` | `sortValue?: (row: Row, key: string) => unknown;` |
+| `emptyText` | `emptyText?: string;` |
 
 ## ResponsiveTableCards.defineEmits
 
-**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 27, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -346,13 +347,13 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## TableFrame.defineProps
 
-**Fuente:** [src/shared/components/TableFrame.vue](../../../../../src/shared/components/TableFrame.vue) · línea 2, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/TableFrame.vue](../../../../../src/shared/components/TableFrame.vue) · línea 7, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `isLoading` | `isLoading?: boolean;` |
 | `fitColumns` | `fitColumns?: boolean;` |
-| `mobileCards` | `mobileCards?: boolean` |
+| `mobileCards` | `mobileCards?: boolean;` |
 
 ## FileExportOptions
 

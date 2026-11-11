@@ -4,7 +4,7 @@ import { issuePermissions } from '../fixtures/issues.js';
 import { ids } from '../fixtures/inventory.js';
 import { historicalPreview, historicalReceipt } from '../fixtures/historicalDelivery.js';
 
-for (const width of [1280, 390]) {
+for (const width of [1280, 600, 599, 390]) {
   test(`entregas históricas: selección, declaración y recuperación a ${width}px`, async ({
     page,
   }) => {
@@ -39,10 +39,25 @@ for (const width of [1280, 390]) {
         name: 'Seleccionar todas las salidas de todas las páginas',
       }),
     ).toHaveCount(1);
-    await expect(dialog.getByText(/Lona: 3 por registrar/)).toBeVisible();
-    await expect(
-      dialog.getByRole('table', { name: 'Salidas pendientes y parcialmente surtidas' }),
-    ).toBeVisible();
+    if (width < 600) {
+      const cards = dialog.locator('.responsive-table-cards');
+      await expect(cards).toBeVisible();
+      await expect(dialog.getByRole('table')).toBeHidden();
+      await expect(cards.getByText(/Lona: 3 por registrar/)).toBeVisible();
+    } else {
+      const table = dialog.getByRole('table', {
+        name: 'Salidas pendientes y parcialmente surtidas',
+      });
+      await expect(table).toBeVisible();
+      await expect(dialog.locator('.responsive-table-cards')).toBeHidden();
+      await expect(table.getByText(/Lona: 3 por registrar/)).toBeVisible();
+      if (width < 900) {
+        await expect(
+          dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' }),
+        ).toBeVisible();
+        await expect(dialog.locator('.table-frame__scroll-controls')).toBeVisible();
+      }
+    }
     const selectAll = dialog.getByRole('checkbox', {
       name: 'Seleccionar todas las salidas de todas las páginas',
     });

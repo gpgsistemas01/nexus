@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VTable } from 'vuetify/components/VTable';
 import { VAlert } from 'vuetify/components/VAlert';
+import type { DataTableHeader } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
+import ResponsiveTableCards from '../../../shared/components/ResponsiveTableCards.vue';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import OrganizationFields from '../../../shared/components/OrganizationFields.vue';
 import type { OrganizationState, OrganizationResource } from '../../../shared/lookup.js';
-import type { PersonValues } from '../identity.js';
+import type { PersonAccess, PersonValues } from '../identity.js';
 
-defineProps<{
+const props = defineProps<{
     title: string;
     values: PersonValues;
     errors: { fullName?: string; accesses?: string };
@@ -36,6 +39,15 @@ const emit = defineEmits<{
     close: [];
     reload: [];
 }>();
+type PersonAccessRow = PersonAccess & { id: string };
+const accessRows = computed<PersonAccessRow[]>(() =>
+    props.values.accesses.map((access) => ({ ...access, id: access.departmentId })),
+);
+const accessHeaders: DataTableHeader<PersonAccessRow>[] = [
+    { title: 'Área', key: 'departmentName', sortable: false },
+    { title: 'Rol', key: 'roleName', sortable: false },
+    { title: 'Acciones', key: 'actions', sortable: false },
+];
 </script>
 
 <template>
@@ -91,7 +103,7 @@ const emit = defineEmits<{
         >
             {{ accessError || errors.accesses }}
         </VAlert>
-        <TableFrame>
+        <TableFrame mobile-cards>
             <VTable
                 density="compact"
                 aria-label="Responsabilidades de la persona"
@@ -125,6 +137,21 @@ const emit = defineEmits<{
                     </tr>
                 </tbody>
             </VTable>
+            <ResponsiveTableCards
+                :headers="accessHeaders"
+                :rows="accessRows"
+                empty-text="Agrega al menos un área y un rol."
+            >
+                <template #[`item.actions`]="{ item }">
+                    <TableAction
+                        :label="`Quitar asignación de ${item.departmentName}`"
+                        icon="$delete"
+                        color="error"
+                        :is-disabled="isSubmitting || isConflicted"
+                        @click="emit('remove', item.departmentId)"
+                    />
+                </template>
+            </ResponsiveTableCards>
         </TableFrame>
     </RecordEditorDialog>
 </template>

@@ -5,7 +5,7 @@ import { issuePermissions, issueDetailId, departmentId, issueFor } from '../fixt
 import { ids, pageOf, user } from '../fixtures/inventory.js';
 import { clientData, personData } from '../fixtures/records.js';
 
-test('salidas: conserva fichas en móvil y ajusta la tabla en tableta', async ({ page }) => {
+test('salidas: muestra fichas en móvil y tabla desplazable desde 600 px', async ({ page }) => {
   await mockIssues(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/salidas/materiales');
@@ -25,13 +25,53 @@ test('salidas: conserva fichas en móvil y ajusta la tabla en tableta', async ({
   await expect(detailCards.getByText('Lona', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 
-  await page.setViewportSize({ width: 768, height: 844 });
+  await page.setViewportSize({ width: 599, height: 844 });
+  await expect(detailCards).toBeVisible();
+  await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(599);
+
+  await page.setViewportSize({ width: 600, height: 844 });
   const details = dialog.locator('.table-frame--fit-columns .v-table__wrapper');
   await expect(details).toBeVisible();
   await expect(detailCards).toBeHidden();
   await expect(dialog.getByRole('table')).toBeVisible();
+  await expect(details).toHaveCSS('overflow-x', 'auto');
+  await expect(dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(600);
+
+  await page.setViewportSize({ width: 900, height: 844 });
   await expect(details).toHaveCSS('overflow-x', 'hidden');
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(900);
+});
+
+test('salidas: mantiene accesibles los inputs en fichas móviles y tabla desde 600 px', async ({
+  page,
+}) => {
+  await mockIssues(page);
+  await page.setViewportSize({ width: 599, height: 844 });
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+
+  const dialog = page.getByRole('dialog', {
+    name: /^Surtir salida - Folio SAL-001$/,
+  });
+  const details = dialog.locator('.responsive-table-cards');
+  await expect(details).toBeVisible();
+  await expect(details.getByRole('checkbox', { name: 'Surtir: Lona', exact: true })).toBeVisible();
+  await expect(
+    details.getByRole('spinbutton', { name: 'Cantidad de proyecto: Lona', exact: true }),
+  ).toBeVisible();
+  await expect(
+    details.getByRole('spinbutton', { name: 'Cantidad a surtir: Lona', exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(599);
+
+  await page.setViewportSize({ width: 600, height: 844 });
+  await expect(dialog.locator('.responsive-table-cards')).toBeHidden();
+  await expect(
+    dialog.getByRole('spinbutton', { name: 'Cantidad de proyecto: Lona' }),
+  ).toBeVisible();
+  await expect(dialog.getByRole('spinbutton', { name: 'Cantidad a surtir: Lona' })).toBeVisible();
 });
 
 for (const [path, resource] of [
@@ -270,7 +310,9 @@ for (const [path, resource, label] of [
     const dialog = page.getByRole('dialog', {
       name: /^Surtir salida( de merma)? - Folio SAL-001$/,
     });
-    await expect(dialog.getByText('Completamente surtido', { exact: true })).toBeVisible();
+    await expect(
+      dialog.locator('.v-table__wrapper').getByText('Completamente surtido', { exact: true }),
+    ).toBeVisible();
     await expect(
       dialog.getByRole('spinbutton', { name: `Cantidad a surtir: ${label}`, exact: true }),
     ).toHaveCount(0);
@@ -286,6 +328,7 @@ for (const [path, label] of [
     page,
   }) => {
     const { writes } = await mockIssues(page);
+    await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto(`/salidas/${path}`);
     for (const [quantity, expected] of [
       [0.5, 0],
@@ -379,7 +422,7 @@ for (const [path, label, name] of [
 ] as const) {
   test(`salidas ${path}: edición pendiente, surtido y devolución`, async ({ page }) => {
     const { writes } = await mockIssues(page);
-    await page.setViewportSize({ width: 768, height: 844 });
+    await page.setViewportSize({ width: 900, height: 844 });
     await page.goto(`/salidas/${path}`);
     const row = page.getByRole('row').filter({
       has: page.getByRole('cell', { name: 'SAL-001', exact: true }),

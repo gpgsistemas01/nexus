@@ -1,13 +1,38 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ isLoading?: boolean; fitColumns?: boolean; mobileCards?: boolean }>(), {
-    isLoading: false,
-    fitColumns: false,
-    mobileCards: false,
-});
+import { ref } from 'vue';
+import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
+import { VBtn } from 'vuetify/components/VBtn';
+
+withDefaults(
+    defineProps<{
+        isLoading?: boolean;
+        fitColumns?: boolean;
+        mobileCards?: boolean;
+    }>(),
+    {
+        isLoading: false,
+        fitColumns: false,
+        mobileCards: false,
+    },
+);
+const frame = ref<HTMLDivElement | null>(null);
+
+const scrollTable = (direction: -1 | 1) => {
+    const wrapper = frame.value?.querySelector<HTMLElement>('.v-table__wrapper');
+    if (!wrapper) return;
+
+    wrapper.scrollBy({
+        left: direction * Math.max(wrapper.clientWidth * 0.75, 180),
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'instant'
+            : 'smooth',
+    });
+};
 </script>
 
 <template>
     <div
+        ref="frame"
         class="table-frame"
         :class="{
             'table-frame--fit-columns': fitColumns,
@@ -15,6 +40,28 @@ withDefaults(defineProps<{ isLoading?: boolean; fitColumns?: boolean; mobileCard
         }"
         :aria-busy="isLoading"
     >
+        <div
+            v-if="fitColumns"
+            class="table-frame__scroll-controls"
+            role="group"
+            aria-label="Desplazamiento horizontal de la tabla"
+        >
+            <span>Desplazar columnas</span>
+            <VBtn
+                size="small"
+                variant="outlined"
+                :icon="`svg:${mdiChevronLeft}`"
+                aria-label="Desplazar tabla a la izquierda"
+                @click="scrollTable(-1)"
+            />
+            <VBtn
+                size="small"
+                variant="outlined"
+                :icon="`svg:${mdiChevronRight}`"
+                aria-label="Desplazar tabla a la derecha"
+                @click="scrollTable(1)"
+            />
+        </div>
         <slot />
     </div>
 </template>
@@ -26,6 +73,9 @@ withDefaults(defineProps<{ isLoading?: boolean; fitColumns?: boolean; mobileCard
     border-radius: 0.75rem;
     background: rgb(var(--v-theme-surface));
     overflow: hidden;
+}
+.table-frame__scroll-controls {
+    display: none;
 }
 .table-frame :deep(.v-table .v-table__wrapper th) {
     color: var(--table-header-text, white);
@@ -152,6 +202,97 @@ withDefaults(defineProps<{ isLoading?: boolean; fitColumns?: boolean; mobileCard
 }
 @media (max-width: 599px) {
     .table-frame--mobile-cards :deep(.v-table__wrapper) {
+        display: none;
+    }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+    .table-frame__scroll-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.6);
+        padding: 0.35rem 0.65rem;
+        color: rgb(var(--v-theme-muted));
+        font-size: 0.75rem;
+    }
+    .table-frame--fit-columns .table-frame__scroll-controls {
+        display: flex;
+    }
+    .table-frame:not(.table-frame--fit-columns) .table-frame__scroll-controls {
+        display: none;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper) {
+        overflow-x: auto !important;
+        overscroll-behavior-x: contain;
+        scrollbar-color: rgb(var(--v-theme-primary)) rgb(var(--v-theme-table-alt));
+        scrollbar-width: auto;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper > table) {
+        width: max-content !important;
+        min-width: 100% !important;
+        table-layout: auto;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper th),
+    .table-frame--fit-columns :deep(.v-table__wrapper td) {
+        min-width: 7rem !important;
+        max-width: 16rem;
+        padding: 0.5rem 0.65rem;
+        font-size: 0.8rem;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper th:first-child),
+    .table-frame--fit-columns :deep(.v-table__wrapper td:first-child) {
+        min-width: 10rem !important;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper th:last-child),
+    .table-frame--fit-columns :deep(.v-table__wrapper td:last-child) {
+        min-width: 4rem !important;
+    }
+    .table-frame--fit-columns :deep(.v-data-table-column--fixed),
+    .table-frame--fit-columns :deep(.v-data-table-column--fixed-end) {
+        position: sticky !important;
+    }
+    .table-frame--fit-columns :deep(.v-data-table-column--fixed) {
+        inset-inline-start: 0 !important;
+        z-index: 2;
+        background: rgb(var(--v-theme-surface));
+    }
+    .table-frame--fit-columns :deep(.v-data-table-column--fixed-end) {
+        inset-inline-end: 0 !important;
+        z-index: 2;
+        background: rgb(var(--v-theme-surface));
+    }
+    .table-frame--fit-columns :deep(thead .v-data-table-column--fixed),
+    .table-frame--fit-columns :deep(thead .v-data-table-column--fixed-end) {
+        z-index: 4;
+    }
+    .table-frame--fit-columns
+        :deep(.v-table__wrapper th:first-child:not(.v-data-table-column--fixed)),
+    .table-frame--fit-columns
+        :deep(.v-table__wrapper td:first-child:not(.v-data-table-column--fixed)) {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: rgb(var(--v-theme-surface));
+    }
+    .table-frame--fit-columns :deep(thead th:first-child:not(.v-data-table-column--fixed)) {
+        z-index: 4;
+        background: rgb(var(--v-theme-table-header)) !important;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper::-webkit-scrollbar) {
+        height: 0.85rem;
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper::-webkit-scrollbar-thumb) {
+        border: 2px solid rgb(var(--v-theme-table-alt));
+        border-radius: 1rem;
+        background: rgb(var(--v-theme-primary));
+    }
+    .table-frame--fit-columns :deep(.v-table__wrapper::-webkit-scrollbar-track) {
+        background: rgb(var(--v-theme-table-alt));
+    }
+}
+@media (max-width: 599px) {
+    .table-frame__scroll-controls {
         display: none;
     }
     .table-frame--fit-columns :deep(.v-table__wrapper th),

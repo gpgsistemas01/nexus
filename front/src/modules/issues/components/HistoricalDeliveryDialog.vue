@@ -4,12 +4,15 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VTable } from 'vuetify/components/VTable';
 import { VTextarea } from 'vuetify/components/VTextarea';
+import type { DataTableHeader } from 'vuetify';
 import { HISTORICAL_DELIVERY_LIMITS as limits } from '@nexus/historical-deliveries';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import TableFrame from '../../../shared/components/TableFrame.vue';
+import ResponsiveTableCards from '../../../shared/components/ResponsiveTableCards.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
 import type {
     HistoricalDeliveryPreview,
+    HistoricalDeliveryCandidate,
     HistoricalDeliveryReceipt,
 } from '../historicalDelivery.js';
 
@@ -38,6 +41,13 @@ const emit = defineEmits<{
     recover: [];
     close: [];
 }>();
+const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
+    { title: 'Folio', key: 'referenceNumber', sortable: false },
+    { title: 'Área', key: 'departmentName', sortable: false },
+    { title: 'Proyecto', key: 'projectNumber', sortable: false },
+    { title: 'Partidas pendientes', key: 'details', sortable: false },
+    { title: 'Acciones', key: 'actions', sortable: false },
+];
 </script>
 
 <template>
@@ -138,7 +148,21 @@ const emit = defineEmits<{
                     </div>
                 </template>
                 <template v-if="preview.documents.length">
-                    <TableFrame>
+                    <div class="historical-select-all-cards">
+                        <VCheckbox
+                            :model-value="allSelected"
+                            :indeterminate="selected.length > 0 && !allSelected"
+                            aria-label="Seleccionar todas las salidas de todas las páginas"
+                            :disabled="isWorking || isSelectingAll"
+                            :loading="isSelectingAll"
+                            hide-details
+                            @update:model-value="emit('selectAll', $event === true)"
+                        />
+                    </div>
+                    <TableFrame
+                        fit-columns
+                        mobile-cards
+                    >
                         <VTable
                             density="compact"
                             aria-label="Salidas pendientes y parcialmente surtidas"
@@ -196,6 +220,34 @@ const emit = defineEmits<{
                                 </tr>
                             </tbody>
                         </VTable>
+                        <ResponsiveTableCards
+                            :headers="deliveryHeaders"
+                            :rows="preview.documents"
+                            empty-text="No hay salidas pendientes ni parcialmente surtidas para este corte."
+                        >
+                            <template #[`item.details`]="{ item }">
+                                <ul class="historical-details historical-details--card">
+                                    <li
+                                        v-for="detail in item.details"
+                                        :key="detail.id"
+                                    >
+                                        {{ detail.name }}: {{ numberText(detail.pendingQuantity) }}
+                                        por registrar;
+                                        {{ numberText(detail.suppliedQuantity) }} ya registradas y
+                                        {{ numberText(detail.returnedQuantity) }} devueltas.
+                                    </li>
+                                </ul>
+                            </template>
+                            <template #[`item.actions`]="{ item }">
+                                <VCheckbox
+                                    :model-value="selected.includes(item.id)"
+                                    :aria-label="`Seleccionar salida ${item.referenceNumber}`"
+                                    :disabled="isWorking"
+                                    hide-details
+                                    @update:model-value="emit('select', item.id)"
+                                />
+                            </template>
+                        </ResponsiveTableCards>
                     </TableFrame>
                 </template>
                 <div class="historical-pagination">
@@ -240,6 +292,9 @@ const emit = defineEmits<{
     gap: 0.75rem;
     margin-block: 1rem;
 }
+.historical-select-all-cards {
+    display: none;
+}
 .historical-fields {
     display: grid;
     gap: 1rem;
@@ -247,5 +302,13 @@ const emit = defineEmits<{
 .historical-details {
     min-width: 16rem;
     padding-inline-start: 1rem;
+}
+.historical-details--card {
+    min-width: 0;
+}
+@media (max-width: 599px) {
+    .historical-select-all-cards {
+        display: block;
+    }
 }
 </style>

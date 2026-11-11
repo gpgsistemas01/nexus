@@ -13,6 +13,7 @@ const props = withDefaults(
         sortBy?: DataTableSortItem[];
         sortRows?: boolean;
         sortValue?: (row: Row, key: string) => unknown;
+        emptyText?: string;
     }>(),
     {
         rowClass: undefined,
@@ -20,6 +21,7 @@ const props = withDefaults(
         sortBy: () => [],
         sortRows: false,
         sortValue: undefined,
+        emptyText: 'No hay registros para mostrar.',
     },
 );
 const emit = defineEmits<{ sortBy: [sortBy: DataTableSortItem[]] }>();
@@ -162,7 +164,7 @@ const cellText = (row: Row, key: string) => {
             v-if="!rows.length"
             class="responsive-table-cards__empty"
         >
-            No hay registros para mostrar.
+            {{ emptyText }}
         </p>
     </div>
 </template>
@@ -170,105 +172,105 @@ const cellText = (row: Row, key: string) => {
 <style scoped>
 .responsive-table-cards {
     display: none;
+    gap: 0.75rem;
+    padding: 0.75rem;
+}
+.responsive-table-cards__sorting {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+}
+.responsive-table-card {
+    container-type: inline-size;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    border: 1px solid rgb(var(--v-theme-table-border));
+    border-radius: 0.65rem;
+    background: rgb(var(--v-theme-surface));
+    padding: 0.85rem;
+    box-shadow: 0 0.2rem 0.5rem rgba(var(--v-theme-on-surface), 0.08);
+}
+.responsive-table-card.low-stock {
+    border-color: rgb(var(--v-theme-warning));
+    background: rgb(var(--v-theme-table-stock-warning));
+}
+.responsive-table-card h3 {
+    display: grid;
+    min-width: 0;
+    gap: 0.15rem;
+    margin: 0 0 0.65rem;
+    border-bottom: 1px solid rgba(var(--v-theme-primary), 0.2);
+    padding-bottom: 0.55rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    text-wrap: wrap;
+}
+.responsive-table-card__title-label {
+    min-width: 0;
+    color: rgb(var(--v-theme-muted));
+    font-size: clamp(0.68rem, calc(0.68rem + 0.15cqi), 0.78rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    overflow-wrap: anywhere;
+}
+.responsive-table-card__title-value {
+    min-width: 0;
+    color: rgb(var(--v-theme-primary));
+    font-size: clamp(0.9rem, calc(0.9rem + 0.15cqi), 1.05rem);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+.responsive-table-card dl {
+    margin: 0;
+}
+.responsive-table-card__field {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    min-width: 0;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.35);
+    padding: 0.45rem 0.35rem;
+    overflow-wrap: anywhere;
+}
+.responsive-table-card__field:nth-child(even) {
+    background: rgba(var(--v-theme-table-alt), 0.45);
+}
+.responsive-table-card dt {
+    min-width: 0;
+    color: rgb(var(--v-theme-muted));
+    font-size: clamp(0.68rem, calc(0.68rem + 0.15cqi), 0.78rem);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.responsive-table-card dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: clamp(0.78rem, calc(0.78rem + 0.15cqi), 0.9rem);
+    font-weight: 600;
+    text-align: right;
+}
+.responsive-table-card__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+    border-top: 1px solid rgba(var(--v-theme-table-border), 0.6);
+    padding-top: 0.55rem;
+}
+.responsive-table-cards__empty {
+    margin: 0;
+    padding: 1rem;
+    text-align: center;
 }
 @media (max-width: 599px) {
     .responsive-table-cards {
         display: grid;
-        gap: 0.75rem;
-        padding: 0.75rem;
-    }
-    .responsive-table-cards__sorting {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .responsive-table-card {
-        container-type: inline-size;
-        min-width: 0;
-        overflow-wrap: anywhere;
-        border: 1px solid rgb(var(--v-theme-table-border));
-        border-radius: 0.65rem;
-        background: rgb(var(--v-theme-surface));
-        padding: 0.85rem;
-        box-shadow: 0 0.2rem 0.5rem rgba(var(--v-theme-on-surface), 0.08);
-    }
-    .responsive-table-card.low-stock {
-        border-color: rgb(var(--v-theme-warning));
-        background: rgb(var(--v-theme-table-stock-warning));
-    }
-    .responsive-table-card h3 {
-        display: grid;
-        min-width: 0;
-        gap: 0.15rem;
-        margin: 0 0 0.65rem;
-        border-bottom: 1px solid rgba(var(--v-theme-primary), 0.2);
-        padding-bottom: 0.55rem;
-        line-height: 1.35;
-        overflow-wrap: anywhere;
-        text-wrap: wrap;
-    }
-    .responsive-table-card__title-label {
-        min-width: 0;
-        color: rgb(var(--v-theme-muted));
-        font-size: clamp(0.68rem, calc(0.68rem + 0.15cqi), 0.78rem);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        overflow-wrap: anywhere;
-    }
-    .responsive-table-card__title-value {
-        min-width: 0;
-        color: rgb(var(--v-theme-primary));
-        font-size: clamp(0.9rem, calc(0.9rem + 0.15cqi), 1.05rem);
-        font-weight: 700;
-        overflow-wrap: anywhere;
-    }
-    .responsive-table-card dl {
-        margin: 0;
-    }
-    .responsive-table-card__field {
-        display: grid;
-        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-        min-width: 0;
-        align-items: center;
-        gap: 0.75rem;
-        border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.35);
-        padding: 0.45rem 0.35rem;
-        overflow-wrap: anywhere;
-    }
-    .responsive-table-card__field:nth-child(even) {
-        background: rgba(var(--v-theme-table-alt), 0.45);
-    }
-    .responsive-table-card dt {
-        min-width: 0;
-        color: rgb(var(--v-theme-muted));
-        font-size: clamp(0.68rem, calc(0.68rem + 0.15cqi), 0.78rem);
-        font-weight: 600;
-        overflow-wrap: anywhere;
-    }
-    .responsive-table-card dd {
-        min-width: 0;
-        margin: 0;
-        overflow-wrap: anywhere;
-        font-size: clamp(0.78rem, calc(0.78rem + 0.15cqi), 0.9rem);
-        font-weight: 600;
-        text-align: right;
-    }
-    .responsive-table-card__actions {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.4rem;
-        margin-top: 0.7rem;
-        border-top: 1px solid rgba(var(--v-theme-table-border), 0.6);
-        padding-top: 0.55rem;
-    }
-    .responsive-table-cards__empty {
-        margin: 0;
-        padding: 1rem;
-        text-align: center;
     }
 }
 </style>
