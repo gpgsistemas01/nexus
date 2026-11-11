@@ -107,6 +107,11 @@ const scrollTable = (direction: -1 | 1) => {
     --table-header-background: rgb(var(--v-theme-table-child-header));
     --table-header-border: rgb(var(--v-theme-table-child-border));
 }
+.table-frame :deep(.v-table .v-table__wrapper thead tr:not(:first-child) th) {
+    color: var(--table-header-text) !important;
+    background: var(--table-header-background) !important;
+    border-bottom-color: var(--table-header-border) !important;
+}
 .table-frame :deep(.v-table td) {
     background: var(--table-row-highlight, rgb(var(--v-theme-surface)));
     color: rgb(var(--v-theme-on-surface));

@@ -7,7 +7,7 @@ secciones permitidas para su cuenta.
 
 En pantallas grandes, el panel comienza como una columna de iconos. Al navegar,
 hacer clic fuera del panel o pulsar **Escape**, vuelve al estado compacto. En un
-teléfono, también puede cerrarlo con **Cerrar menú**.
+teléfono, use **Menú** para abrirlo o cerrarlo, o seleccione una sección.
 
 Puede guardar la dirección de una página como favorito.
 

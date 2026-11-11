@@ -261,7 +261,13 @@ test('catálogos: búsqueda, paginación, recuperación de lectura y vista móvi
     await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
     await page.getByRole('button', { name: 'Menú', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Catálogos', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Cerrar menú', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Cerrar menú', exact: true })).toHaveCount(0);
+    const menuButton = page.getByRole('button', { name: 'Menú', exact: true });
+    await menuButton.click();
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('.v-navigation-drawer')).not.toHaveClass(
+      /v-navigation-drawer--active/,
+    );
   }
 });
 

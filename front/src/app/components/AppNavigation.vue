@@ -14,7 +14,6 @@ const props = defineProps<{
     groups: readonly NavigationGroup[];
     activeGroup: string;
     isCompact: boolean;
-    isTemporary: boolean;
 }>();
 const emit = defineEmits<{ navigate: []; expand: [] }>();
 const openedGroups = ref([props.activeGroup]);
@@ -58,15 +57,6 @@ const expandNavigation = (group: string) => {
             </VAvatar>
             <strong v-if="!isCompact">Nexus</strong>
         </RouterLink>
-        <VBtn
-            v-if="isTemporary"
-            class="close-navigation"
-            variant="text"
-            size="small"
-            @click="emit('navigate')"
-        >
-            Cerrar menú
-        </VBtn>
         <VList
             v-if="groups.length"
             :opened="isCompact ? [] : openedGroups"

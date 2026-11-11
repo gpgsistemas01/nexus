@@ -34,9 +34,20 @@ const sortableColumns = computed(() =>
 );
 const columns = computed(() =>
     props.headers
-        .flatMap((header) => (header.children?.length ? header.children : [header]))
+        .flatMap((header) =>
+            header.children?.length
+                ? header.children.map((child) => ({
+                      ...child,
+                      groupTitle: String(header.title ?? ''),
+                  }))
+                : [header],
+        )
         .filter((header) => header.key && header.key !== 'actions')
-        .map((header) => ({ key: String(header.key), title: String(header.title ?? header.key) })),
+        .map((header) => ({
+            key: String(header.key),
+            title: String(header.title ?? header.key),
+            groupTitle: 'groupTitle' in header ? header.groupTitle : '',
+        })),
 );
 const selectedSortKey = computed(
     () =>
@@ -138,8 +149,17 @@ const cellText = (row: Row, key: string) => {
                     v-for="column in columns.slice(1)"
                     :key="column.key"
                     class="responsive-table-card__field"
+                    :class="{ 'responsive-table-card__field--subcolumn': column.groupTitle }"
                 >
-                    <dt>{{ column.title }}</dt>
+                    <dt>
+                        <span
+                            v-if="column.groupTitle"
+                            class="responsive-table-card__group"
+                        >
+                            {{ column.groupTitle }}
+                        </span>
+                        <span>{{ column.title }}</span>
+                    </dt>
                     <dd>
                         <slot
                             :name="`item.${column.key}`"
@@ -237,6 +257,24 @@ const cellText = (row: Row, key: string) => {
 }
 .responsive-table-card__field:nth-child(even) {
     background: rgba(var(--v-theme-table-alt), 0.45);
+}
+.responsive-table-card__field--subcolumn {
+    border-left: 3px solid rgb(var(--v-theme-table-child-border));
+    border-radius: 0.25rem;
+    background: rgb(var(--v-theme-table-child-header));
+}
+.responsive-table-card__field--subcolumn:nth-child(even) {
+    background: rgb(var(--v-theme-table-child-header));
+}
+.responsive-table-card__group {
+    display: block;
+    margin-bottom: 0.15rem;
+    color: rgb(var(--v-theme-table-child-text));
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 .responsive-table-card dt {
     min-width: 0;

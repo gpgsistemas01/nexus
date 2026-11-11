@@ -131,6 +131,31 @@ test('inventario desde 900 px muestra todas las columnas sin desplazamiento hori
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(900);
 });
 
+test('mantiene la agrupación y el estilo de subcolumnas en tabla y fichas', async ({ page }) => {
+  await mockWarehouse(page, permissions);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/almacen/materiales');
+
+  const cards = page.locator('.responsive-table-card').first();
+  const groupedFields = cards.locator('.responsive-table-card__field--subcolumn');
+  await expect(cards).toBeVisible();
+  await expect(groupedFields.filter({ hasText: 'Medidas' })).toHaveCount(2);
+  await expect(groupedFields.first()).toHaveCSS('background-color', 'rgb(255, 243, 217)');
+  await expect(groupedFields.first().locator('.responsive-table-card__group')).toHaveText(
+    'Medidas',
+  );
+
+  for (const width of [600, 768, 900, 1024, 1599, 1600, 1920]) {
+    await page.setViewportSize({ width, height: 844 });
+    const table = page.getByRole('table').first();
+    const subcolumn = table.locator('thead tr').nth(1).locator('th').filter({ hasText: 'Base' });
+    await expect(table).toBeVisible();
+    await expect(subcolumn).toHaveCSS('background-color', 'rgb(255, 243, 217)');
+    await expect(subcolumn).toHaveCSS('color', 'rgb(51, 45, 45)');
+    await expect(subcolumn).toHaveCSS('border-bottom-color', 'rgb(216, 133, 0)');
+  }
+});
+
 test('el texto largo se ajusta al ancho de su celda en tabla y ficha móvil', async ({ page }) => {
   const longName = 'MaterialConNombreMuyLargoSinEspaciosParaProbarElAjuste';
   await mockWarehouse(page, permissions, { materialName: longName });

@@ -51,7 +51,6 @@ const groups = computed(() =>
                     :groups="groups"
                     :active-group="activeGroup"
                     :is-compact="!mobile && !isNavigationOpen"
-                    :is-temporary="mobile"
                     @expand="isNavigationOpen = true"
                     @navigate="isNavigationOpen = false"
                 />
@@ -60,6 +59,7 @@ const groups = computed(() =>
                 flat
                 height="48"
                 class="app-bar"
+                :style="{ zIndex: mobile ? 1100 : undefined }"
             >
                 <VBtn
                     icon="$menu"

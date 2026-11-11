@@ -6,7 +6,7 @@ Se inspeccionan 196 archivos TS/SFC y se describen 257 contratos declarados.
 
 | Ámbito | Contratos | Miembros directos |
 | --- | --- | --- |
-| [app](app.md) | 11 | 26 |
+| [app](app.md) | 11 | 25 |
 | [auth](auth.md) | 11 | 21 |
 | [catalogs](catalogs.md) | 13 | 37 |
 | [directory](directory.md) | 12 | 35 |

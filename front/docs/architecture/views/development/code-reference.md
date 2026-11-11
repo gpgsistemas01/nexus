@@ -22,7 +22,7 @@ No incluye secretos, dependencias instaladas, archivos compilados ni código pri
 
 | Archivo | Declaraciones y dependencias |
 | --- | --- |
-| [AppNavigation.vue](../../../../src/app/components/AppNavigation.vue) | **Exports:** —<br>**Contratos SFC:** `defineEmits: navigate, expand`<br>`defineProps: userName, groups, activeGroup, isCompact, isTemporary`<br>**Imports:** `../icons.js`<br>`../navigation.js (tipo)`<br>`vue`<br>`vue-router`<br>`vuetify/components/VAvatar`<br>`vuetify/components/VBtn`<br>`vuetify/components/VIcon`<br>`vuetify/components/VList`<br>`vuetify/components/VTooltip` |
+| [AppNavigation.vue](../../../../src/app/components/AppNavigation.vue) | **Exports:** —<br>**Contratos SFC:** `defineEmits: navigate, expand`<br>`defineProps: userName, groups, activeGroup, isCompact`<br>**Imports:** `../icons.js`<br>`../navigation.js (tipo)`<br>`vue`<br>`vue-router`<br>`vuetify/components/VAvatar`<br>`vuetify/components/VBtn`<br>`vuetify/components/VIcon`<br>`vuetify/components/VList`<br>`vuetify/components/VTooltip` |
 | [AppStatusPage.vue](../../../../src/app/components/AppStatusPage.vue) | **Exports:** —<br>**Contratos SFC:** `defineProps: code, icon, title, description, notice`<br>**Imports:** — |
 | [usePageAccess.ts](../../../../src/app/composables/usePageAccess.ts) | **Exports:** `usePageAccess`<br>**Contratos SFC:** —<br>**Imports:** `../../modules/auth/session.js`<br>`../../shared/http/apiError.js`<br>`vue-router` |
 | [icons.ts](../../../../src/app/icons.ts) | **Exports:** `APP_ICONS`<br>**Contratos SFC:** —<br>**Imports:** `@mdi/js` |
