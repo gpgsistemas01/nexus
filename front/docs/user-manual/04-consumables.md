@@ -40,6 +40,14 @@ consumible. Compruebe que el registro no exista con los mismos datos.
 4. Capture **Cantidad inicial** y las **Observaciones** de esa existencia.
 5. Pulse **Guardar** y compruebe el registro y su saldo en el listado.
 
+<!-- manual:all suppliers:manage suppliers:read -->
+Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
+y espere la búsqueda. Si ya existe, selecciónelo; si falta, pulse
+**Registrar proveedor «texto escrito»** al final de la lista. Abrir el selector
+vacío no muestra el botón. Complete **Razón social**, revise **Nombre comercial**,
+guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
+<!-- manual:end -->
+
 ![Formulario de alta de un consumible.](images/07-consumable-create.png)
 
 Compruebe presentación y unidad antes de guardar. Desde una compra, la existencia

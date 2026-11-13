@@ -422,7 +422,7 @@ it.each(
       expect(content).not.toContain('24-issue-supply.png');
       expect(content).not.toContain('25-issue-return.png');
       expect(content).not.toContain('utilice la devolución');
-      expect(content).not.toContain('**Registrar cliente «nombre»**');
+      expect(content).not.toContain('**Registrar cliente «Cliente nuevo»**');
       expect(content).not.toContain('**Detalles de peso**');
     }
   },
@@ -434,7 +434,7 @@ it('Almacén conserva surtido y devolución, mientras sólo administración reci
   const issues = await readFile(path.resolve('docs/user-manual/12-issues.md'), 'utf8');
   expect(filterManualContent(issues, warehouse.permissions)).toContain('## Devolver una entrega');
   expect(filterManualContent(issues, warehouse.permissions)).toContain(
-    '**Registrar cliente «nombre»**',
+    '**Registrar cliente «Cliente nuevo»**',
   );
   for (const permission of ['clients:create', 'clients:read']) {
     expect(
@@ -442,7 +442,7 @@ it('Almacén conserva surtido y devolución, mientras sólo administración reci
         issues,
         warehouse.permissions.filter((value) => value !== permission),
       ),
-    ).not.toContain('**Registrar cliente «nombre»**');
+    ).not.toContain('**Registrar cliente «Cliente nuevo»**');
   }
   const glossary = await readFile(path.resolve('docs/user-manual/16-glossary.md'), 'utf8');
   expect(filterManualContent(glossary, warehouse.permissions)).toContain(

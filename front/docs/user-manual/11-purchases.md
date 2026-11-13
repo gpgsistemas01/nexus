@@ -43,9 +43,43 @@ Abra **Compras → Consumibles**. Busque por folio, factura, proveedor, persona 
 Capture el costo por presentación; el servidor calcula los importes definitivos.
 Las compras no actualizan el costo máximo del inventario: se configura en **Almacén**.
 
-<!-- manual:any suppliers:manage materials:write -->
-Si falta un proveedor o artículo, use **Registrar «nombre»** en el selector.
-Guarde el alta auxiliar y continúe la compra con el registro seleccionado.
+<!-- manual:all suppliers:manage suppliers:read -->
+### Registrar un proveedor durante la compra
+
+En **Proveedor**, escriba el **nombre comercial completo** del proveedor nuevo y
+espere a que termine la búsqueda. Si ya existe, selecciónelo. Si falta, pulse
+**Registrar proveedor «texto escrito»** al final de la lista. Con el campo vacío
+no aparece el botón. Complete **Razón social**, revise **Nombre comercial** y
+**Activo**, guarde y compruebe que el proveedor queda seleccionado en la compra.
+<!-- manual:end -->
+
+<!-- manual:all materials:read materials:write presentations:read unit:measures-read -->
+### Registrar un artículo durante la compra
+
+Seleccione primero el proveedor de la compra.
+
+<!-- module:any reference compras-materiales -->
+
+En **Material**, **escriba el nombre completo** del artículo que falta, espere la
+búsqueda y revise las opciones. Si necesita el alta, pulse
+**Registrar material «texto escrito»** al final de la lista. Con el selector vacío
+no aparece el botón.
+
+<!-- module:end -->
+
+<!-- module:any reference compras-consumibles -->
+
+En **Consumible**, **escriba el nombre completo** del artículo que falta, espere
+la búsqueda y revise las opciones. Si necesita el alta, pulse
+**Registrar consumible «texto escrito»** al final de la lista. Con el selector vacío
+no aparece el botón.
+
+<!-- module:end -->
+
+Complete el formulario auxiliar y guarde. El artículo nuevo queda seleccionado;
+todavía debe capturar **Cantidad** y **Costo por Presentación**,
+pulsar **Agregar** y guardar la compra. El alta auxiliar no recibe la mercancía:
+la existencia de esta recepción se registra al guardar la compra.
 <!-- manual:end -->
 
 ## Editar o corregir

@@ -3,15 +3,25 @@
 <!-- manual:all clients:create clients:read -->
 ## Registrar un cliente desde el selector
 
-Si falta el cliente de una salida, regístrelo desde su selector.
+Si falta el cliente de una salida, puede registrarlo desde **Cliente**, cuando su
+cuenta tiene permiso. Primero debe **escribir el nombre del cliente nuevo dentro
+del selector**; el nombre no tiene que existir previamente en el catálogo.
 
-1. Abra **Cliente** y busque el nombre. Si ya existe, selecciónelo y continúe la salida.
-2. Si no existe y aparece **Registrar cliente**, pulse esa acción.
-3. En el modal **Registrar cliente**, revise el nombre precargado y complete **Nombre**.
-4. Mantenga **Activo** marcado para poder utilizarlo en la operación.
+1. En el formulario de la salida, abra **Cliente** y escriba el nombre completo
+   del cliente que desea registrar; por ejemplo, **Cliente nuevo**.
+2. Espere a que termine la búsqueda. Si el cliente ya aparece, seleccione esa opción
+   y continúe la salida.
+3. Si falta, al final de la lista aparecerá **Registrar cliente «Cliente nuevo»**.
+   Pulse ese botón. El texto entre comillas es el que escribió en el selector.
+4. En el modal **Registrar cliente**, revise **Nombre**, precargado con ese texto,
+   y corríjalo si es necesario. Mantenga **Activo** marcado para utilizarlo en la salida.
 5. Pulse **Guardar** una sola vez y espere la confirmación.
-6. Compruebe que se cierra el alta y vuelve a la salida con el cliente nuevo seleccionado.
+6. Compruebe que vuelve a la salida con el cliente nuevo seleccionado.
 7. Continúe la captura y confirme la salida cuando haya revisado sus datos y detalles.
+
+**Si no aparece el botón:** compruebe que escribió un nombre, que la búsqueda
+terminó sin error y que no hay una opción con ese mismo nombre. Con el selector
+vacío, bloqueado o sin permiso de alta no aparece **Registrar cliente**.
 
 ![Formulario para registrar un cliente.](images/16-client-form.png)
 

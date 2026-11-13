@@ -55,7 +55,20 @@ a un área operativa y falta un registro, solicite el alta al responsable de Alm
 Salidas no ofrece alta de proveedores.
 
 <!-- manual:all clients:create clients:read -->
-Si falta un cliente, use **Registrar cliente «nombre»** en el selector y continúe después del alta.
+### Registrar un cliente sin salir de la solicitud
+
+1. Abra **Cliente** y **escriba el nombre completo del cliente nuevo en el selector**.
+   Por ejemplo, escriba **Cliente nuevo**; el cliente todavía no tiene que estar registrado.
+2. Espere a que termine la búsqueda. Si ya existe, seleccione el registro encontrado.
+3. Si falta, pulse **Registrar cliente «Cliente nuevo»**, al final de la lista.
+   Ese botón aparece después de escribir el nombre, no al abrir el selector vacío.
+4. Revise el **Nombre** precargado, mantenga **Activo** marcado y pulse **Guardar**.
+5. Compruebe que regresa a la salida con el cliente seleccionado y continúe su captura.
+
+Si no ve la acción, compruebe que el campo tenga texto, esté habilitado y la búsqueda
+haya terminado sin error. Una coincidencia exacta o la falta de permiso también
+impiden mostrar el botón. Crear el cliente no guarda la salida; si luego cierra
+la solicitud, el cliente guardado permanece en el catálogo.
 <!-- manual:end -->
 
 ## Editar

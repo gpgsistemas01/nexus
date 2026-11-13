@@ -96,15 +96,30 @@ proveedor y después el material de referencia. Revise el artículo si cambia de
 Desplácese al final de la lista para cargar más opciones. Ante un fallo, pulse
 **Reintentar catálogo**.
 
-<!-- manual:any suppliers:manage clients:create materials:write persons:write -->
+<!-- manual:any suppliers:manage clients:create materials:write -->
 
-Cuando aparezca una acción **Registrar…** junto al selector:
+### Registrar un dato nuevo desde un selector
 
-1. Abra esa acción sin cerrar el formulario principal.
-2. Complete el formulario secundario y guárdelo.
-3. Compruebe que regresa al formulario principal y que el nuevo registro queda
-   seleccionado.
-4. Continúe y guarde la operación principal.
+En los selectores que permiten altas, el botón se ofrece **después de escribir**
+el nombre que desea registrar. Abrir el selector vacío no muestra esa acción.
+
+1. Abra el selector y escriba el nombre completo del registro nuevo. En **Proveedor**,
+   escriba su **nombre comercial**.
+2. Espere a que termine la búsqueda y revise las opciones. Si encuentra el registro,
+   selecciónelo; no lo vuelva a crear.
+3. Si falta y tiene permiso, busque al final de la lista el botón
+   **Registrar cliente «texto escrito»**, **Registrar proveedor «texto escrito»**,
+   **Registrar material «texto escrito»** o **Registrar consumible «texto escrito»**, según el campo.
+4. Pulse el botón sin cerrar la captura principal. El texto escrito se precarga
+   en el formulario secundario; complete sus demás campos y pulse **Guardar**.
+5. Compruebe que vuelve al formulario principal con el registro nuevo seleccionado.
+   Continúe la captura y guarde la operación principal cuando esté completa.
+
+El botón no aparece si el texto está vacío, coincide exactamente con una opción
+disponible, el campo está bloqueado, la búsqueda sigue cargando o falló, o no tiene
+permiso para esa alta. Si hay un error de consulta, use **Reintentar catálogo**.
+Escribir texto **no selecciona ni registra** un dato: para usar uno existente debe
+elegir la opción; para crear uno nuevo debe abrir su alta y guardarla.
 
 El registro creado permanece aunque cierre la operación principal. Cerrar el
 formulario secundario sin guardar conserva la captura principal.

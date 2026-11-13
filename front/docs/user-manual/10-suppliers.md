@@ -19,13 +19,20 @@ requiere permiso para registrar y consultar proveedores; no aparece en todos los
 En Mermas, el proveedor debe tener un material de origen válido. Si falta, prepare
 primero ese material y su proveedor; después registre la merma.
 
-1. Abra **Proveedor** y busque su nombre comercial. Si ya existe, selecciónelo.
-2. Si falta y aparece **Registrar proveedor**, pulse esa acción sin cerrar la captura principal.
+1. Abra **Proveedor** y **escriba el nombre comercial completo** que desea registrar;
+   por ejemplo, **Proveedor nuevo**. Abrir el selector vacío no muestra el botón.
+2. Espere a que termine la búsqueda. Si el proveedor ya aparece, selecciónelo.
+   Si falta, pulse **Registrar proveedor «Proveedor nuevo»** al final de la lista,
+   sin cerrar la captura principal. El nombre del botón corresponde al texto escrito.
 3. En el modal **Registrar proveedor**, complete **Razón social** y revise el **Nombre comercial** precargado.
 4. Mantenga **Activo** marcado si utilizará el proveedor en la operación.
 5. Pulse **Guardar** y espere la confirmación.
 6. Compruebe que vuelve al formulario principal y que el proveedor nuevo queda seleccionado.
 7. Continúe y guarde el artículo o la compra cuando haya revisado la captura completa.
+
+Si no aparece la acción, revise que haya texto escrito, que la búsqueda termine
+sin error y que no exista una opción con el mismo nombre comercial. El botón
+requiere un selector habilitado y los permisos de consulta y registro.
 
 ![Datos del proveedor: razón social, nombre comercial y disponibilidad.](images/17-supplier-form.png)
 

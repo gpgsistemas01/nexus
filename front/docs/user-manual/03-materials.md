@@ -133,6 +133,14 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 | Cantidad inicial | Capture la existencia con la que comienza este registro. |
 | Observaciones | Explique la captura inicial cuando corresponda. |
 
+<!-- manual:all suppliers:manage suppliers:read -->
+Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
+y espere la búsqueda. Si ya existe, selecciónelo; si falta, pulse
+**Registrar proveedor «texto escrito»** al final de la lista. Abrir el selector
+vacío no muestra el botón. Complete **Razón social**, revise **Nombre comercial**,
+guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
+<!-- manual:end -->
+
 ![Formulario para crear un material.](images/04-material-create.png)
 
 Desde una compra se omiten cantidad inicial y costo máximo. La recepción registra
