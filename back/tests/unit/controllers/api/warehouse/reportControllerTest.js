@@ -25,6 +25,7 @@ const {
   buildWasteReportSummary: vi.fn(),
   createFormulaCell: vi.fn((formula, value) => ({ formula: formula, result: value })),
   sendExcelReport: vi.fn(async options => {
+    if (options.sheets) { options.data = []; for await (const sheet of options.sheets(new AbortController().signal)) options.data.push(...await Array.fromAsync(sheet.data)); }
     if (options.data?.[Symbol.asyncIterator]) options.data = await Array.fromAsync(options.data);
   }),
   getReportMonthDateRange: vi.fn()
@@ -64,7 +65,7 @@ vi.mock('../../../../../src/utils/formattersUtils.js', () => ({
   getReportMonthDateRange
 }));
 
-vi.mock('../../../../../src/utils/reportExcelUtils.js', () => ({ createFormulaCell, sendExcelReport }));
+vi.mock('../../../../../src/utils/reportExcelUtils.js', async importOriginal => ({ ...await importOriginal(), createFormulaCell, sendExcelReport }));
 
 import {
   exportWasteReportExcel
@@ -193,7 +194,7 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
       filename: 'reporte_compras_consumibles',
       data: expect.arrayContaining([
         expect.arrayContaining(['Consumible']),
-        ['Resumen del reporte por consumible']
+        ['Resumen mensual por consumible']
       ])
     }));
   });

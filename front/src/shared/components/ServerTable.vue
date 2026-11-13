@@ -14,12 +14,16 @@ const props = withDefaults(
         page: number;
         pageSize: number;
         isLoading: boolean;
+        pageSizeOptions?: number[];
+        tableLabel?: string;
         sortBy?: DataTableSortItem[];
         mustSort?: boolean;
         rowProps?: (data: { item: Row }) => { class: string };
         formatValue?: (row: Row, key: string) => string;
     }>(),
     {
+        pageSizeOptions: () => [10, 20, 50],
+        tableLabel: undefined,
         sortBy: () => [],
         mustSort: false,
         rowProps: undefined,
@@ -49,6 +53,7 @@ const updateCardSort = (sortBy: DataTableSortItem[]) =>
     >
         <VDataTableServer
             :headers="headers"
+            :aria-label="tableLabel"
             :items="rows"
             :items-length="total"
             item-value="id"
@@ -61,7 +66,7 @@ const updateCardSort = (sortBy: DataTableSortItem[]) =>
             sort-by-text="Ordenar por"
             density="compact"
             :must-sort="mustSort"
-            :items-per-page-options="[10, 20, 50]"
+            :items-per-page-options="pageSizeOptions"
             items-per-page-text="Registros por página:"
             page-text="Registros {0}–{1} de {2}"
             first-page-label="Primera página"

@@ -2,6 +2,7 @@ import { FORM_FIELD_LIMITS } from './inputValidation.js';
 
 export const HISTORICAL_DELIVERY_LIMITS = Object.freeze({
     maxDocuments: 100,
+    pageSize: 100,
     maxPage: 999,
     maxReasonLength: FORM_FIELD_LIMITS.OBSERVATIONS
 });

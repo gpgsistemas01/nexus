@@ -7,15 +7,15 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { DatabaseTableMissing } from '../../../src/errors/databaseError.js';
-import { createFormulaCell, sendExcelReport } from '../../../src/utils/reportExcelUtils.js';
+import { createFormulaCell, sendExcelReport, buildMonthlyReportSheets } from '../../../src/utils/reportExcelUtils.js';
 
 const paths = vi.hoisted(() => ({ root: null }));
 vi.mock('node:os', () => ({ tmpdir: () => paths.root }));
 
-const exportData = async data => {
+const exportData = async (data, sheets) => {
   let operation;
   const app = createControllerTestApp({ registerRoutes: app => app.get('/report', (_req, res) => {
-    operation = sendExcelReport({ res, data, sheetName: 'Reporte', filename: 'inventario' });
+    operation = sendExcelReport({ res, data, sheets, sheetName: 'Reporte', filename: 'inventario' });
     return operation;
   }) });
   const response = await request(app).get('/report').buffer(true).parse((res, callback) => {
@@ -116,5 +116,82 @@ describe('generación progresiva de reportes Excel', () => {
     expect(readRows).toBe(10);
     expect(res.download).not.toHaveBeenCalled();
     expect(await readdir(paths.root)).toEqual([]);
+  });
+});
+
+
+describe('hojas mensuales', () => {
+  beforeAll(async () => { paths.root = await mkdtemp(join(process.env.TMPDIR || '/tmp', 'nexus-monthly-test-')); });
+  afterAll(async () => { await rm(paths.root, { recursive: true, force: true }); });
+  it('separa años y meses aunque las filas lleguen desordenadas, y reinicia fórmulas', async () => {
+    const buildData = async function* (rows) {
+      yield ['Folio', 'Valor', 'Total'];
+      let index = 2;
+      for await (const row of rows) { yield [row.id, row.value, createFormulaCell(`B${index}`, row.value)]; index++; }
+    };
+    const rows = [
+      { reportMonth: '2026-02', id: 'febrero', value: 4 },
+      { reportMonth: '2025-01', id: 'enero-anterior', value: 2 },
+      { reportMonth: '2026-01', id: 'enero', value: 3 },
+      { reportMonth: '2026-02', id: 'febrero-2', value: 5 }
+    ];
+    const { response, operation } = await exportData(undefined, signal => buildMonthlyReportSheets(rows, { buildData, sheetName: 'Reporte', signal }));
+    await operation;
+    const { workbook } = await readExcelReport(response.body);
+    expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(['2025-01', '2026-01', '2026-02']);
+    expect(workbook.getWorksheet('2026-02').getCell('C2').formula).toBe('B2');
+    expect(workbook.getWorksheet('2026-02').getCell('C3').formula).toBe('B3');
+    expect(workbook.getWorksheet('2025-01').getCell('A2').value).toBe('enero-anterior');
+    expect(await readdir(paths.root)).toEqual([]);
+  });
+});
+
+describe('totales mensuales de compras', () => {
+  beforeAll(async () => { paths.root = await mkdtemp(join(process.env.TMPDIR || '/tmp', 'nexus-monthly-purchase-')); });
+  afterAll(async () => { await rm(paths.root, { recursive: true, force: true }); });
+  it('mantiene totales y fórmulas de compras independientes por hoja', async () => {
+    const { buildGoodsReceiptReportData } = await import('../../../src/utils/reports/warehouseReportExcel.js');
+    const rows = [2, 3].map((quantity, index) => ({ reportMonth: `2026-0${index + 1}`, referenceNumber: `COMP-${index}`, supplierName: 'Proveedor', materialId: 'material', materialName: 'Artículo', quantity, convertedQuantity: quantity, conversionUnitCost: 10, costPerUnitType: 10, netPurchaseAmount: quantity * 10, grossPurchaseAmount: quantity * 11.6 }));
+    const { response, operation } = await exportData(undefined, signal => buildMonthlyReportSheets(rows, { signal, sheetName: 'Compras', buildData: data => buildGoodsReceiptReportData(data, { monthlyReport: true }) }));
+    await operation;
+    for (const [index, month] of ['2026-01', '2026-02'].entries()) {
+      const { sheet } = await readExcelReport(response.body, month);
+      expect(sheet.getCell('I2').value).toBe(index + 2);
+      expect(sheet.getCell('B6').value).toBe((index + 2) * 10);
+      expect(sheet.getCell('O2').formula).toBe('I2*N2');
+    }
+    expect(await readdir(paths.root)).toEqual([]);
+  });
+  it('retira los temporales si falla la consulta antes de terminar la agrupación', async () => {
+    const rows = async function* () { yield { reportMonth: '2026-01' }; throw new Error('Consulta fallida'); };
+    await expect(Array.fromAsync(buildMonthlyReportSheets(rows(), { sheetName: 'Reporte', buildData: rows => rows }))).rejects.toThrow('Consulta fallida');
+    expect(await readdir(paths.root)).toEqual([]);
+  });
+  it('reinicia las fórmulas de Salidas en cada mes y conserva todas las filas', async () => {
+    const { buildIssueReportData } = await import('../../../src/utils/reports/warehouseReportExcel.js');
+    const rows = ['2026-01', '2026-02', '2026-01'].map((reportMonth, index) => ({ reportMonth, referenceNumber: `SAL-${index}`, convertedQuantity: 10, projectConvertedQuantity: 8, convertedQuantityDifference: 2 }));
+    const { response, operation } = await exportData(undefined, signal => buildMonthlyReportSheets(rows, { signal, sheetName: 'Salidas', buildData: buildIssueReportData }));
+    await operation;
+    const { workbook } = await readExcelReport(response.body);
+    expect(workbook.getWorksheet('2026-01').rowCount).toBe(3);
+    expect(workbook.getWorksheet('2026-02').rowCount).toBe(2);
+    for (const sheet of workbook.worksheets) expect(sheet.getCell('R2').formula).toBe('O2-Q2');
+    expect(workbook.getWorksheet('2026-01').getCell('R3').formula).toBe('O3-Q3');
+    expect(await readdir(paths.root)).toEqual([]);
+  });
+  it('mantiene una hoja con encabezados para una consulta sin salidas', async () => {
+    const { buildIssueReportData } = await import('../../../src/utils/reports/warehouseReportExcel.js');
+    const { response, operation } = await exportData(undefined, signal => buildMonthlyReportSheets([], { signal, sheetName: 'Salidas', buildData: buildIssueReportData }));
+    await operation;
+    const { workbook, rows } = await readExcelReport(response.body, 'Salidas');
+    expect(workbook.worksheets).toHaveLength(1);
+    expect(rows).toHaveLength(1);
+    expect(rows[0][0]).toBe('Folio');
+    expect(await readdir(paths.root)).toEqual([]);
+  });
+  it('clasifica el límite de mes con la fecha local de México', async () => {
+    const { getReportMonthKey } = await import('../../../src/utils/formattersUtils.js');
+    expect(getReportMonthKey('2026-01-01T05:59:59Z')).toBe('2025-12');
+    expect(getReportMonthKey('2026-01-01T06:00:00Z')).toBe('2026-01');
   });
 });

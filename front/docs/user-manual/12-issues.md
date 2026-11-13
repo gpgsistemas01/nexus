@@ -132,7 +132,9 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 3. La tabla carga automáticamente las salidas pendientes y parcialmente surtidas, usando
    la hora actual como corte; no se necesita capturar una fecha.
 4. Revisar la tabla de salidas pendientes y parcialmente surtidas, con cantidades ya
-   registradas/devueltas.
+   registradas/devueltas. La tabla usa el mismo diseño que los listados del sistema, con
+   **100 registros por página**, rango visible y total de salidas elegibles. La última página
+   puede contener menos registros. El contador de seleccionadas es independiente del total.
    **Seleccionar todo** carga y marca los resultados de todas las páginas; la selección se
    conserva al navegar. Use la casilla del encabezado para seleccionar o deseleccionar todo;
    también puede marcar filas individuales. Seleccione sólo documentos entregados completamente.

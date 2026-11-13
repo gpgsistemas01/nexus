@@ -3,7 +3,7 @@
     "get": {
       "operationId": "previewHistoricalDeliveryBatch",
       "summary": "Revisar entregas históricas pendientes por corte",
-      "description": "Requiere issues:reconcile para Administrador en Sistemas o Coordinador en Almacén. Conserva alcance de área y tipo. Excluye canceladas, ya conciliadas y solicitudes posteriores al corte. Devuelve revisiones originales para selección explícita. No cambia existencias.",
+      "description": "Requiere issues:reconcile para Administrador en Sistemas o Coordinador en Almacén. Conserva alcance de área y tipo. Excluye canceladas, ya conciliadas y solicitudes posteriores al corte. Devuelve el total de salidas con partidas realmente pendientes, en páginas de 100 registros, y revisiones originales para selección explícita. No cambia existencias.",
       "security": [
         {
           "cookieAuth": []

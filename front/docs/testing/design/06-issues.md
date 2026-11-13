@@ -25,3 +25,9 @@ conserva el historial y el documento original.
 | Diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |
 | --- | --- | --- | --- | --- |
 | `DP-VUE-ISS-006` | `RF-VUE-010`, `RF-ISS-009`: duplicación por desconexión o declarar una entrega sin revisión | Unitario/transporte y Chromium; decisiones de permiso/declaración y transición selección → confirmación incierta → recarga → recibo | Pendientes y parcialmente surtidas cargan automáticamente con hora actual como corte, sin captura de fecha ni filtro de folio/proyecto. Hasta 100 seleccionadas con revisión original; la casilla global única del encabezado carga todas las páginas y conserva selección al navegar. Más de 100 requiere selección manual de hasta 100. Filas alternables individualmente. Declaración obligatoria; sin permiso no hay acción. Reintento conserva comando/clave y recupera recibo. Procedencia visible y devolución histórica exige entrada física actual. | [CP-VUE-ISS-006-01](../cases/cp-vue-iss-006-01.md) |
+
+La paginación histórica usa la tabla compartida y 100 registros por página: con 101
+salidas se ven 100 y 1, con rango y total visibles en escritorio y móvil. La selección
+se conserva al navegar. El total cuenta sólo salidas con partidas realmente pendientes,
+antes de paginar; se excluyen detalles cancelados, completos o marcados surtidos.
+La integración HTTP cubre los tres recursos y el saldo suministrado nulo.

@@ -179,3 +179,18 @@ El orden de escritura/rollback pertenece a las secuencias de procesos.
 Las tablas son evidencia de composición: no contienen un orden de llamadas ni estados
 funcionales. Cambiar un import exige revisar los mapas afectados y su contrato; cambiar
 el comportamiento exige revisar el recorrido propietario en procesos/requisitos.
+
+
+## Reportes documentales por mes
+
+Compras y Salidas (materiales, consumibles y mermas) usan hojas `AAAA-MM` en orden
+cronológico. `getReportMonthKey` clasifica la fecha original en Ciudad de México:
+recepción para compras y solicitud para salidas. Los filtros y el alcance autorizado
+se aplican antes de agrupar; no se analiza el texto de fecha formateado.
+
+`buildMonthlyReportSheets` agrupa en temporales por mes con lotes de 250 filas
+en memoria, incluso con filas desordenadas. El escritor consume cada hoja
+secuencialmente, conservando encabezados, estilos y resultados de fórmulas.
+Cada hoja reinicia las referencias de fila y los acumuladores de Compras.
+Cancelación o fallo retiran los temporales. Una consulta vacía conserva la hoja
+habitual con encabezados.

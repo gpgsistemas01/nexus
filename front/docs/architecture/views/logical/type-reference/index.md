@@ -11,11 +11,11 @@ Se inspeccionan 196 archivos TS/SFC y se describen 257 contratos declarados.
 | [catalogs](catalogs.md) | 13 | 37 |
 | [directory](directory.md) | 12 | 35 |
 | [identity](identity.md) | 21 | 82 |
-| [issues](issues.md) | 50 | 230 |
+| [issues](issues.md) | 50 | 231 |
 | [movements](movements.md) | 10 | 38 |
 | [purchases](purchases.md) | 37 | 164 |
 | [warehouse](warehouse.md) | 40 | 213 |
-| [shared](shared.md) | 52 | 183 |
+| [shared](shared.md) | 52 | 185 |
 
 ## Alcance y notación
 

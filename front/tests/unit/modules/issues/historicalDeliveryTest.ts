@@ -80,6 +80,21 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     expect(query.get('page')).toBe('1');
     expect(query.has('search')).toBe(false);
   });
+  it.each([undefined, -1, 1.5, '1'])(
+    'rechaza un total de registros inválido: %s',
+    async (total) => {
+      apiClient.http.defaults.adapter = mockHttpAdapter(() => ({
+        data: { preview: { ...historicalPreview(), total } },
+      }));
+      await expect(
+        historicalDeliveryService.preview(
+          'materials',
+          { cutoffDate: historicalPreview().cutoffDate, page: 1 },
+          new AbortController().signal,
+        ),
+      ).rejects.toThrow('incompleta');
+    },
+  );
   it('carga automáticamente las salidas usando la hora actual como corte', async () => {
     const mounted = await mount();
     const [resource, query] = mounted.preview.mock.calls[0]!;

@@ -20,6 +20,7 @@ export interface HistoricalDeliveryPreview {
     resource: IssueResource;
     cutoffDate: string;
     page: number;
+    total: number;
     hasMore: boolean;
     documents: HistoricalDeliveryCandidate[];
 }

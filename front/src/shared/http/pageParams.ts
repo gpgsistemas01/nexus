@@ -11,7 +11,7 @@ export const pageParams = (
                   start: String((query.page - 1) * query.length),
                   length: String(query.length),
               }
-            : {            }),
+            : {}),
         search: query.search,
     });
 

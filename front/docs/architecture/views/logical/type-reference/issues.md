@@ -6,7 +6,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineProps
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 19, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 17, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -28,7 +28,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineEmits
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 34, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 32, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -333,6 +333,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `resource` | `resource: IssueResource;` |
 | `cutoffDate` | `cutoffDate: string;` |
 | `page` | `page: number;` |
+| `total` | `total: number;` |
 | `hasMore` | `hasMore: boolean;` |
 | `documents` | `documents: HistoricalDeliveryCandidate[];` |
 
@@ -343,7 +344,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryCommand
 
-**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 26, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 27, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -356,7 +357,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryReceipt
 
-**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 34, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 35, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -370,7 +371,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryEvidence
 
-**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 39, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/historicalDelivery.ts](../../../../../src/modules/issues/historicalDelivery.ts) · línea 40, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

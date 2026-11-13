@@ -301,6 +301,8 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `page` | `page: number;` |
 | `pageSize` | `pageSize: number;` |
 | `isLoading` | `isLoading: boolean;` |
+| `pageSizeOptions` | `pageSizeOptions?: number[];` |
+| `tableLabel` | `tableLabel?: string;` |
 | `sortBy` | `sortBy?: DataTableSortItem[];` |
 | `mustSort` | `mustSort?: boolean;` |
 | `rowProps` | `rowProps?: (data: { item: Row }) => { class: string };` |
@@ -308,7 +310,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ServerTable.defineEmits
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 33, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

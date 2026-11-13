@@ -36,10 +36,7 @@ const projectValue = computed(() =>
             :hint="`Pendiente: ${numberText(pendingQuantity)} ${item.presentation}`"
             persistent-hint
             :disabled="
-                isDisabled ||
-                item.isOriginallySupplied ||
-                item.isCanceled ||
-                !item.isSupplied
+                isDisabled || item.isOriginallySupplied || item.isCanceled || !item.isSupplied
             "
             @update:model-value="emit('supply', { quantityToSupply: $event ?? '' })"
         />
@@ -52,12 +49,7 @@ const projectValue = computed(() =>
         min="0.01"
         step="0.01"
         :model-value="projectValue"
-        :disabled="
-            isDisabled ||
-            item.isOriginallySupplied ||
-            item.isCanceled ||
-            !item.isSupplied
-        "
+        :disabled="isDisabled || item.isOriginallySupplied || item.isCanceled || !item.isSupplied"
         hide-details
         @update:model-value="emit('supply', { projectConvertedQuantity: $event ?? '' })"
     />

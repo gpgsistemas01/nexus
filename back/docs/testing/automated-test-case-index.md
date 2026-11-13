@@ -328,3 +328,18 @@ ni un recorrido completo de navegador; la integración HTTP/Prisma conserva su s
 Fuentes: `tests/integration/controllers/historicalDeliveryControllerDbTest.js`,
 `tests/unit/constants/permissionsTest.js`, `tests/unit/services/warehouse/inventoryStockCountTest.js`
 y `tests/unit/services/warehouse/inventoryImportPolicyTest.js`.
+
+
+## Reportes de Compras y Salidas por mes
+
+`DP-REP-MON-001`: evitar mezclar meses, años o acumulados. Particiones de mes/año,
+filas desordenadas, consulta vacía y fallida; frontera de medianoche en México.
+`reportExcelUtilsTest.js` verifica el XLSX con lectores independientes: hojas
+cronológicas, filas del mes, fórmulas reiniciadas, totales locales a cada hoja y
+eliminación de temporales. `reportControllerTest.js` conserva cobertura de filtros
+y contexto de inventario.
+
+`DP-ISS-HIST-PAGE-001`: histórico de Materiales, Consumibles y Mermas, frontera
+100/101; total y páginas sin duplicados ni huecos. Se excluyen documentos sin partidas
+pendientes antes de paginar y se acepta suministrado nulo como cero. Evidencia:
+`tests/integration/controllers/historicalDeliveryControllerDbTest.js`.

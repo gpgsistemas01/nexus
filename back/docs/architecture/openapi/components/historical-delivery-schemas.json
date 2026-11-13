@@ -188,7 +188,8 @@
           "cutoffDate",
           "page",
           "hasMore",
-          "documents"
+          "documents",
+          "total"
         ],
         "properties": {
           "resource": {
@@ -215,6 +216,11 @@
             "items": {
               "$ref": "../openapi.json#/components/schemas/HistoricalDeliveryCandidate"
             }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total de salidas elegibles; páginas de 100 registros."
           }
         }
       }

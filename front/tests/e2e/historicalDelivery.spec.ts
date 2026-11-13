@@ -32,6 +32,8 @@ for (const width of [1280, 600, 599, 390]) {
     await page.goto('/salidas/materiales');
     await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
     let dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+    await expect(dialog.getByText('Registros 1–1 de 1', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('1 registro en esta página', { exact: true })).toBeVisible();
     await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
     await expect(dialog.getByLabel('Fecha real de entrega (opcional)')).toHaveCount(0);
     await expect(
@@ -114,10 +116,11 @@ test('seleccionar todo abarca todas las páginas y conserva selecciones al naveg
   page,
 }) => {
   await mockIssues(page, [...issuePermissions, 'issues:reconcile']);
-  const firstPage = { ...historicalPreview(), hasMore: true };
+  const firstPage = { ...historicalPreview(), total: 101, hasMore: true };
   const secondPage = {
     ...historicalPreview(),
     page: 2,
+    total: 101,
     hasMore: false,
     documents: [
       {
@@ -154,7 +157,7 @@ test('seleccionar todo abarca todas las páginas y conserva selecciones al naveg
   await expect(
     dialog.getByRole('checkbox', { name: 'Seleccionar salida SMA-HIST-001', exact: true }),
   ).toBeChecked();
-  await dialog.getByRole('button', { name: 'Página siguiente', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Siguiente', exact: true }).click();
   const secondRow = dialog.getByRole('checkbox', {
     name: 'Seleccionar salida SMA-HIST-002',
     exact: true,
@@ -163,20 +166,86 @@ test('seleccionar todo abarca todas las páginas y conserva selecciones al naveg
   await selectAll.uncheck();
   await expect(secondRow).not.toBeChecked();
   await expect(dialog.getByText('0 salidas seleccionadas en todas las páginas')).toBeVisible();
-  await dialog.getByRole('button', { name: 'Página anterior', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Anterior', exact: true }).click();
   const firstRow = dialog.getByRole('checkbox', {
     name: 'Seleccionar salida SMA-HIST-001',
     exact: true,
   });
   await firstRow.check();
-  await dialog.getByRole('button', { name: 'Página siguiente', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Siguiente', exact: true }).click();
   await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
   await expect(secondRow).not.toBeChecked();
   await secondRow.check();
-  await dialog.getByRole('button', { name: 'Página anterior', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Anterior', exact: true }).click();
   await expect(firstRow).toBeChecked();
   await expect(dialog.getByText('2 salidas seleccionadas en todas las páginas')).toBeVisible();
 });
+
+for (const width of [1280, 390]) {
+  test(`histórico pagina 101 salidas en bloques de 100 y muestra sus contadores a ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await mockIssues(page, [...issuePermissions, 'issues:reconcile']);
+    const documents = Array.from({ length: 101 }, (_, index) => ({
+      ...historicalPreview().documents[0]!,
+      id: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`,
+      referenceNumber: `HIST-${index + 1}`,
+    }));
+    await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
+      const query = new URL(route.request().url()).searchParams;
+      const currentPage = Number(query.get('page'));
+      await route.fulfill({
+        json: {
+          preview: {
+            ...historicalPreview(),
+            cutoffDate: query.get('cutoffDate'),
+            page: currentPage,
+            total: 101,
+            hasMore: currentPage === 1,
+            documents: documents.slice((currentPage - 1) * 100, currentPage * 100),
+          },
+        },
+      });
+    });
+    await page.goto('/salidas/materiales');
+    await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+    await expect(dialog.getByText('Registros 1–100 de 101', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('100 registros en esta página', { exact: true })).toBeVisible();
+    await expect(dialog.getByRole('checkbox', { name: /^Seleccionar salida HIST-/ })).toHaveCount(
+      100,
+    );
+    await dialog.getByRole('checkbox', { name: 'Seleccionar salida HIST-1', exact: true }).check();
+    await dialog.getByRole('button', { name: 'Siguiente', exact: true }).click();
+    await expect(dialog.getByText('Registros 101–101 de 101', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('1 registro en esta página', { exact: true })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: 'Siguiente', exact: true })).toBeDisabled();
+    await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Anterior', exact: true }).click();
+    await expect(
+      dialog.getByRole('checkbox', { name: 'Seleccionar salida HIST-1', exact: true }),
+    ).toBeChecked();
+    await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
+    await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
+      const query = new URL(route.request().url()).searchParams;
+      await route.fulfill({
+        json: {
+          preview: {
+            ...historicalPreview(),
+            cutoffDate: query.get('cutoffDate'),
+            total: 0,
+            documents: [],
+          },
+        },
+      });
+    });
+    await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
+    await expect(dialog.getByText('Registros 0–0 de 0', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('0 registros en esta página', { exact: true })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: 'Siguiente', exact: true })).toBeDisabled();
+  });
+}
 
 test('surtir no concede el permiso de regularización histórica', async ({ page }) => {
   await mockIssues(page);

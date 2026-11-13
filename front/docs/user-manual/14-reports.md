@@ -32,6 +32,14 @@ En **Alcance del reporte**, elija:
 
 Los alcances mensuales omiten los filtros de la tabla.
 
+En Compras y Salidas, el Excel separa los registros en hojas por mes y año, por
+ejemplo **2026-01** y **2026-02**, en orden cronológico. Compras usa la fecha de
+recepción; Salidas de materiales, consumibles y mermas usa la fecha de solicitud,
+según el horario de Ciudad de México. Cada hoja de Compras calcula sus propios
+totales y resúmenes, sin incluir registros de otros meses. Los filtros siguen
+delimitando qué registros se exportan. Si no hay registros, se conserva una hoja
+con los encabezados del reporte.
+
 ![Selección del alcance y periodo de la exportación.](images/27-report.png)
 <!-- manual:end -->
 <!-- manual:end -->

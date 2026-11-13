@@ -2,13 +2,11 @@
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
-import { VTable } from 'vuetify/components/VTable';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import type { DataTableHeader } from 'vuetify';
 import { HISTORICAL_DELIVERY_LIMITS as limits } from '@nexus/historical-deliveries';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
-import TableFrame from '../../../shared/components/TableFrame.vue';
-import ResponsiveTableCards from '../../../shared/components/ResponsiveTableCards.vue';
+import ServerTable from '../../../shared/components/ServerTable.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
 import type {
     HistoricalDeliveryPreview,
@@ -122,7 +120,7 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                     completo. La selección se conserva al cambiar de página.
                 </p>
                 <p
-                    v-if="!preview.documents.length && !preview.hasMore"
+                    v-if="preview.total === 0"
                     role="status"
                 >
                     No hay salidas pendientes ni parcialmente surtidas para este corte.
@@ -147,8 +145,37 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                         </span>
                     </div>
                 </template>
-                <template v-if="preview.documents.length">
-                    <div class="historical-select-all-cards">
+                <div
+                    v-if="preview.documents.length"
+                    class="historical-select-all-cards"
+                >
+                    <VCheckbox
+                        :model-value="allSelected"
+                        :indeterminate="selected.length > 0 && !allSelected"
+                        aria-label="Seleccionar todas las salidas de todas las páginas"
+                        :disabled="isWorking || isSelectingAll"
+                        :loading="isSelectingAll"
+                        hide-details
+                        @update:model-value="emit('selectAll', $event === true)"
+                    />
+                </div>
+                <ServerTable
+                    :headers="deliveryHeaders"
+                    :rows="preview.documents"
+                    :total="preview.total"
+                    :page="preview.page"
+                    :page-size="limits.pageSize"
+                    :page-size-options="[limits.pageSize]"
+                    :is-loading="isWorking"
+                    table-label="Salidas pendientes y parcialmente surtidas"
+                    @options="
+                        $event.page !== preview.page &&
+                        $event.page <= limits.maxPage &&
+                        !isWorking &&
+                        emit('load', $event.page, true)
+                    "
+                >
+                    <template #[`header.actions`]>
                         <VCheckbox
                             :model-value="allSelected"
                             :indeterminate="selected.length > 0 && !allSelected"
@@ -158,112 +185,29 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                             hide-details
                             @update:model-value="emit('selectAll', $event === true)"
                         />
-                    </div>
-                    <TableFrame
-                        fit-columns
-                        mobile-cards
-                    >
-                        <VTable
-                            density="compact"
-                            aria-label="Salidas pendientes y parcialmente surtidas"
-                        >
-                            <thead>
-                                <tr>
-                                    <th scope="col">
-                                        <VCheckbox
-                                            :model-value="allSelected"
-                                            :indeterminate="selected.length > 0 && !allSelected"
-                                            aria-label="Seleccionar todas las salidas de todas las páginas"
-                                            :disabled="isWorking || isSelectingAll"
-                                            :loading="isSelectingAll"
-                                            hide-details
-                                            @update:model-value="emit('selectAll', $event === true)"
-                                        />
-                                    </th>
-                                    <th scope="col">Folio</th>
-                                    <th scope="col">Área</th>
-                                    <th scope="col">Proyecto</th>
-                                    <th scope="col">Partidas pendientes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr
-                                    v-for="item in preview.documents"
-                                    :key="item.id"
-                                >
-                                    <td>
-                                        <VCheckbox
-                                            :model-value="selected.includes(item.id)"
-                                            :aria-label="`Seleccionar salida ${item.referenceNumber}`"
-                                            :disabled="isWorking"
-                                            hide-details
-                                            @update:model-value="emit('select', item.id)"
-                                        />
-                                    </td>
-                                    <td>{{ item.referenceNumber }}</td>
-                                    <td>{{ item.departmentName }}</td>
-                                    <td>{{ item.projectNumber }}</td>
-                                    <td class="text-start">
-                                        <ul class="historical-details">
-                                            <li
-                                                v-for="detail in item.details"
-                                                :key="detail.id"
-                                            >
-                                                {{ detail.name }}:
-                                                {{ numberText(detail.pendingQuantity) }} por
-                                                registrar; {{ numberText(detail.suppliedQuantity) }}
-                                                ya registradas y
-                                                {{ numberText(detail.returnedQuantity) }} devueltas.
-                                            </li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </VTable>
-                        <ResponsiveTableCards
-                            :headers="deliveryHeaders"
-                            :rows="preview.documents"
-                            empty-text="No hay salidas pendientes ni parcialmente surtidas para este corte."
-                        >
-                            <template #[`item.details`]="{ item }">
-                                <ul class="historical-details historical-details--card">
-                                    <li
-                                        v-for="detail in item.details"
-                                        :key="detail.id"
-                                    >
-                                        {{ detail.name }}: {{ numberText(detail.pendingQuantity) }}
-                                        por registrar;
-                                        {{ numberText(detail.suppliedQuantity) }} ya registradas y
-                                        {{ numberText(detail.returnedQuantity) }} devueltas.
-                                    </li>
-                                </ul>
-                            </template>
-                            <template #[`item.actions`]="{ item }">
-                                <VCheckbox
-                                    :model-value="selected.includes(item.id)"
-                                    :aria-label="`Seleccionar salida ${item.referenceNumber}`"
-                                    :disabled="isWorking"
-                                    hide-details
-                                    @update:model-value="emit('select', item.id)"
-                                />
-                            </template>
-                        </ResponsiveTableCards>
-                    </TableFrame>
-                </template>
-                <div class="historical-pagination">
-                    <VBtn
-                        :disabled="isWorking || preview.page <= 1"
-                        @click="emit('load', preview.page - 1, true)"
-                    >
-                        Página anterior
-                    </VBtn>
-                    <VBtn
-                        :disabled="isWorking || !preview.hasMore || preview.page >= limits.maxPage"
-                        @click="emit('load', preview.page + 1, true)"
-                    >
-                        Página siguiente
-                    </VBtn>
-                </div>
+                    </template>
+                    <template #[`item.details`]="{ item }">
+                        <ul class="historical-details">
+                            <li
+                                v-for="detail in item.details"
+                                :key="detail.id"
+                            >
+                                {{ detail.name }}: {{ numberText(detail.pendingQuantity) }} por
+                                registrar; {{ numberText(detail.suppliedQuantity) }} ya registradas
+                                y {{ numberText(detail.returnedQuantity) }} devueltas.
+                            </li>
+                        </ul>
+                    </template>
+                    <template #[`item.actions`]="{ item }">
+                        <VCheckbox
+                            :model-value="selected.includes(item.id)"
+                            :aria-label="`Seleccionar salida ${item.referenceNumber}`"
+                            :disabled="isWorking"
+                            hide-details
+                            @update:model-value="emit('select', item.id)"
+                        />
+                    </template>
+                </ServerTable>
                 <div class="historical-fields">
                     <VTextarea
                         :model-value="values.reason"
@@ -285,13 +229,6 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
 </template>
 
 <style scoped>
-.historical-pagination {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-    margin-block: 1rem;
-}
 .historical-select-all-cards {
     display: none;
 }
@@ -303,10 +240,10 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
     min-width: 16rem;
     padding-inline-start: 1rem;
 }
-.historical-details--card {
-    min-width: 0;
-}
 @media (max-width: 599px) {
+    .historical-details {
+        min-width: 0;
+    }
     .historical-select-all-cards {
         display: block;
     }
