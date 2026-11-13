@@ -1,5 +1,6 @@
 :root {
     --v-font-body: 'Montserrat Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --v-font-table: 'Inter Variable', 'Segoe UI', Arial, sans-serif;
     --v-font-heading: var(--v-font-body);
     font-family: var(--v-font-body);
     color: #1f3028;

@@ -8,11 +8,13 @@ withDefaults(
         isLoading?: boolean;
         fitColumns?: boolean;
         mobileCards?: boolean;
+        details?: boolean;
     }>(),
     {
         isLoading: false,
         fitColumns: false,
         mobileCards: false,
+        details: false,
     },
 );
 const frame = ref<HTMLDivElement | null>(null);
@@ -37,6 +39,7 @@ const scrollTable = (direction: -1 | 1) => {
         :class="{
             'table-frame--fit-columns': fitColumns,
             'table-frame--mobile-cards': mobileCards,
+            'table-frame--details': details,
         }"
         :aria-busy="isLoading"
     >
@@ -76,6 +79,13 @@ const scrollTable = (direction: -1 | 1) => {
 }
 .table-frame__scroll-controls {
     display: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.6);
+    padding: 0.35rem 0.65rem;
+    color: rgb(var(--v-theme-muted));
+    font-size: 0.75rem;
 }
 .table-frame :deep(.v-table .v-table__wrapper th) {
     color: var(--table-header-text, white);
@@ -213,13 +223,6 @@ const scrollTable = (direction: -1 | 1) => {
 @media (min-width: 600px) and (max-width: 899px) {
     .table-frame__scroll-controls {
         display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 0.5rem;
-        border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.6);
-        padding: 0.35rem 0.65rem;
-        color: rgb(var(--v-theme-muted));
-        font-size: 0.75rem;
     }
     .table-frame--fit-columns .table-frame__scroll-controls {
         display: flex;
@@ -309,6 +312,106 @@ const scrollTable = (direction: -1 | 1) => {
         width: 2.75rem !important;
         min-width: 2.75rem !important;
         height: 2.75rem !important;
+    }
+}
+/* Las partidas conservan anchos legibles; el desplazamiento queda dentro del marco. */
+.table-frame--details {
+    font-family: var(--v-font-table);
+}
+@media (min-width: 600px) {
+    .table-frame--details .table-frame__scroll-controls {
+        display: flex;
+    }
+    .table-frame--details :deep(.v-table__wrapper) {
+        overflow-x: auto !important;
+        overscroll-behavior-x: contain;
+        scroll-padding-inline: 20rem 7rem;
+    }
+    .table-frame--details :deep(.v-table__wrapper > table) {
+        width: max-content !important;
+        min-width: 100% !important;
+        table-layout: auto;
+    }
+    .table-frame--details :deep(.v-table .v-table__wrapper th),
+    .table-frame--details :deep(.v-table__wrapper td) {
+        min-width: 6.5rem !important;
+        max-width: 14rem;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.45;
+        overflow-wrap: normal;
+        word-break: normal;
+        white-space: normal !important;
+        text-align: start;
+    }
+    .table-frame--details :deep(.v-table__wrapper th[colspan]:not([colspan='1'])) {
+        text-align: center;
+        max-width: none;
+    }
+    .table-frame--details :deep(thead tr:first-child th:first-child),
+    .table-frame--details :deep(.v-table__wrapper td:first-child) {
+        min-width: 16rem !important;
+        max-width: 20rem;
+        overflow-wrap: break-word;
+    }
+    .table-frame--details :deep(.v-table__wrapper th:last-child),
+    .table-frame--details :deep(.v-table__wrapper td:last-child) {
+        width: auto;
+    }
+    .table-frame--details :deep(th .v-data-table-header__content) {
+        justify-content: flex-start;
+        overflow-wrap: normal;
+    }
+    .table-frame--details :deep(th[colspan]:not([colspan='1']) .v-data-table-header__content),
+    .table-frame--details
+        :deep(th.v-data-table-column--align-center .v-data-table-header__content) {
+        justify-content: center;
+    }
+    .table-frame--details :deep(th.v-data-table-column--align-end .v-data-table-header__content) {
+        justify-content: flex-end;
+    }
+    .table-frame--details :deep(.v-table__wrapper .v-data-table-column--align-end) {
+        text-align: end;
+        font-variant-numeric: tabular-nums lining-nums slashed-zero;
+    }
+    .table-frame--details :deep(td.v-data-table-column--align-end) {
+        white-space: nowrap !important;
+        overflow-wrap: normal;
+    }
+    .table-frame--details :deep(.v-table__wrapper .v-data-table-column--align-center) {
+        text-align: center;
+    }
+    .table-frame--details :deep(.v-table__wrapper td .v-input) {
+        min-width: 9rem;
+    }
+    .table-frame--details :deep(input[type='number']) {
+        text-align: end;
+        font-variant-numeric: tabular-nums lining-nums slashed-zero;
+    }
+    .table-frame--details :deep(.v-data-table-column--fixed),
+    .table-frame--details :deep(.v-data-table-column--fixed-end) {
+        position: sticky !important;
+        z-index: 2;
+    }
+    .table-frame--details :deep(.v-data-table-column--fixed) {
+        inset-inline-start: 0 !important;
+    }
+    .table-frame--details :deep(.v-data-table-column--fixed-end) {
+        inset-inline-end: 0 !important;
+    }
+    .table-frame--details :deep(thead .v-data-table-column--fixed),
+    .table-frame--details :deep(thead .v-data-table-column--fixed-end) {
+        z-index: 4;
+    }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+    .table-frame--details :deep(thead tr:first-child th:first-child),
+    .table-frame--details :deep(.v-table__wrapper td:first-child) {
+        min-width: 12rem !important;
+        max-width: 14rem;
+    }
+    .table-frame--details :deep(.v-table__wrapper) {
+        scroll-padding-inline: 14rem 7rem;
     }
 }
 </style>

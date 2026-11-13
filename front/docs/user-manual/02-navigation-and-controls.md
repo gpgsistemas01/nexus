@@ -163,3 +163,16 @@ Conserve las copias necesarias para comprobar el trabajo y elimine las restantes
 cuando ya no se necesiten, según el procedimiento de su organización. Los archivos
 pueden contener cantidades, costos y datos de otras personas; compártalos sólo con
 quienes deban utilizarlos y no incluya contraseñas en ellos.
+
+
+<!-- manual:any goods:receipts-page-view goods:issues-page-view waste:issues-page-view -->
+## Leer las tablas de partidas
+
+En los detalles de **Compras** y **Salidas**, los nombres se leen desde la izquierda
+y las cantidades e importes se alinean a la derecha. Los encabezados **Medidas** y
+**Conversión** agrupan sus columnas. La letra conserva un tamaño legible.
+Si faltan columnas en pantalla, use **Desplazar tabla a la izquierda** o
+**Desplazar tabla a la derecha**, sobre la tabla, o la barra horizontal. El nombre
+del artículo y las acciones permanecen a los extremos para identificar la partida.
+
+<!-- manual:end -->

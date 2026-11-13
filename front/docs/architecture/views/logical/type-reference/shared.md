@@ -356,6 +356,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `isLoading` | `isLoading?: boolean;` |
 | `fitColumns` | `fitColumns?: boolean;` |
 | `mobileCards` | `mobileCards?: boolean;` |
+| `details` | `details?: boolean;` |
 
 ## FileExportOptions
 

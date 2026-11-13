@@ -192,3 +192,86 @@ test('el texto largo se ajusta al ancho de su celda en tabla y ficha móvil', as
   expect(cardText.clientHeight).toBeGreaterThan(cardText.lineHeight);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
+
+for (const width of [600, 768, 900, 1024, 1440]) {
+  for (const resource of ['compras', 'salidas']) {
+    test(`partidas de ${resource} legibles a ${width} px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 1100 });
+      const name = 'Lona translúcida para impresión y montaje · referencia Il1 O0';
+      if (resource === 'compras') {
+        const fixture = await mockPurchases(page);
+        Object.assign(fixture.document.details[0]!, {
+          materialName: name,
+          quantity: '123456.5',
+          convertedQuantity: '12345650',
+          costPerUnitType: '100',
+          conversionUnitCost: '1',
+          netPurchaseAmount: '12345650',
+          grossPurchaseAmount: '14320954',
+        });
+        await page.goto('/compras/materiales');
+        await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+      } else {
+        const fixture = await mockIssues(page);
+        Object.assign(fixture.docs.materials.details[0]!, {
+          materialName: name,
+          quantity: '123456.5',
+          convertedQuantity: '12345650',
+        });
+        await page.goto('/salidas/materiales');
+        await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+      }
+      const dialog = page.getByRole('dialog').last();
+      const table = dialog.getByRole('table');
+      const row = table
+        .getByRole('row')
+        .filter({ has: page.getByRole('cell', { name, exact: true }) });
+      await expect(row).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      await dialog.screenshot({
+        path: test.info().outputPath('partidas.png'),
+        animations: 'disabled',
+      });
+      const dimensions = await row.getByRole('cell', { name, exact: true }).evaluate((element) => ({
+        width: element.getBoundingClientRect().width,
+        fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+      }));
+      expect(dimensions.width).toBeGreaterThanOrEqual(width < 900 ? 180 : 220);
+      expect(dimensions.fontSize).toBeGreaterThanOrEqual(14);
+      const headerFontSize = await table
+        .getByRole('columnheader')
+        .first()
+        .evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+      expect(headerFontSize).toBeGreaterThanOrEqual(14);
+      const quantity = row.getByRole('cell', { name: '123,456.5', exact: true });
+      const text = await quantity.evaluate((element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        return {
+          height: range.getBoundingClientRect().height,
+          lineHeight: Number.parseFloat(getComputedStyle(element).lineHeight),
+        };
+      });
+      expect(text.height).toBeLessThanOrEqual(text.lineHeight + 1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        width,
+      );
+      if (resource === 'salidas') {
+        await row.getByRole('checkbox', { name: `Surtir: ${name}`, exact: true }).check();
+        const field = row.getByRole('spinbutton', {
+          name: `Cantidad a surtir: ${name}`,
+          exact: true,
+        });
+        await field.scrollIntoViewIfNeeded();
+        await field.click();
+        await field.fill('123456.5');
+        await expect(field).toHaveValue('123456.5');
+        expect((await field.boundingBox())!.width).toBeGreaterThanOrEqual(100);
+        await dialog.screenshot({
+          path: test.info().outputPath('partidas-captura.png'),
+          animations: 'disabled',
+        });
+      }
+    });
+  }
+}

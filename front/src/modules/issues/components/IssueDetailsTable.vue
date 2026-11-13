@@ -27,47 +27,72 @@ const emit = defineEmits<{
     return: [row: IssueDetail];
 }>();
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
-    { title: props.itemLabel, key: 'name', nowrap: true, fixed: 'start' },
-    ...(props.mode === 'view' ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus' }] : []),
+    { title: props.itemLabel, key: 'name', align: 'start' as const, nowrap: true, fixed: 'start' },
+    ...(props.mode === 'view'
+        ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus', align: 'start' as const }]
+        : []),
     {
         title: 'Medidas',
         children: [
-            { title: 'Base', key: 'base' },
-            { title: 'Altura', key: 'height' },
+            { title: 'Base', key: 'base', align: 'end' as const },
+            { title: 'Altura', key: 'height', align: 'end' as const },
         ],
     },
-    { title: 'Salida', key: 'quantity' },
+    { title: 'Salida', key: 'quantity', align: 'end' as const },
     ...(['supply', 'return', 'view'].includes(props.mode)
-        ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity' }]
+        ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity', align: 'end' as const }]
         : []),
     ...(['return', 'view'].includes(props.mode)
-        ? [{ title: 'Cantidad devuelta', key: 'returnedQuantity' }]
+        ? [{ title: 'Cantidad devuelta', key: 'returnedQuantity', align: 'end' as const }]
         : []),
     ...(props.mode === 'view'
         ? [
-              { title: 'Pendiente de surtir', key: 'pendingQuantity' },
-              { title: 'Saldo entregado', key: 'deliveredQuantity' },
+              { title: 'Pendiente de surtir', key: 'pendingQuantity', align: 'end' as const },
+              { title: 'Saldo entregado', key: 'deliveredQuantity', align: 'end' as const },
           ]
         : []),
-    { title: 'Presentación', key: 'presentation' },
+    { title: 'Presentación', key: 'presentation', align: 'start' as const },
     {
         title: 'Conversión',
         children: [
-            { title: 'Cantidad', key: 'convertedQuantity' },
-            { title: 'Unidad', key: 'unitMeasure' },
+            { title: 'Cantidad', key: 'convertedQuantity', align: 'end' as const },
+            { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
         ],
     },
     ...(props.mode === 'supply'
         ? [
-              { title: 'Costo unitario de Conversión', key: 'maxUnitCost' },
-              { title: 'Cantidad a surtir', key: 'quantityToSupply', minWidth: 160 },
-              { title: 'Cantidad de proyecto', key: 'projectConvertedQuantity' },
-              { title: 'Diferencia', key: 'difference' },
-              { title: 'Surtir', key: 'supply', sortable: false },
+              { title: 'Costo unitario de Conversión', key: 'maxUnitCost', align: 'end' as const },
+              {
+                  title: 'Cantidad a surtir',
+                  key: 'quantityToSupply',
+                  align: 'end' as const,
+                  minWidth: 160,
+              },
+              {
+                  title: 'Cantidad de proyecto',
+                  key: 'projectConvertedQuantity',
+                  align: 'end' as const,
+              },
+              { title: 'Diferencia', key: 'difference', align: 'end' as const },
+              {
+                  title: 'Surtir',
+                  key: 'supply',
+                  align: 'center' as const,
+                  fixed: 'end' as const,
+                  sortable: false,
+              },
           ]
         : []),
     ...(['create', 'edit', 'return'].includes(props.mode)
-        ? [{ title: 'Acciones', key: 'actions', sortable: false }]
+        ? [
+              {
+                  title: 'Acciones',
+                  key: 'actions',
+                  align: 'center' as const,
+                  fixed: 'end' as const,
+                  sortable: false,
+              },
+          ]
         : []),
 ]);
 const numeric = ['base', 'height', 'quantity', 'suppliedQuantity', 'returnedQuantity'] as const;
@@ -128,6 +153,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
     <TableFrame
         fit-columns
         mobile-cards
+        details
     >
         <VDataTable
             v-model:sort-by="sortBy"

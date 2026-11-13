@@ -43,7 +43,7 @@ No incluye secretos, dependencias instaladas, archivos compilados ni código pri
 
 | Archivo | Declaraciones y dependencias |
 | --- | --- |
-| [main.ts](../../../../src/main.ts) | **Exports:** —<br>**Contratos SFC:** —<br>**Imports:** `./App.vue`<br>`./app/pages/StartupErrorPage.vue`<br>`./app/plugins/vuetify.js (diferido)`<br>`./app/router/index.js`<br>`./modules/auth/session.js`<br>`./style.css`<br>`@fontsource-variable/montserrat/wght.css`<br>`vue` |
+| [main.ts](../../../../src/main.ts) | **Exports:** —<br>**Contratos SFC:** —<br>**Imports:** `./App.vue`<br>`./app/pages/StartupErrorPage.vue`<br>`./app/plugins/vuetify.js (diferido)`<br>`./app/router/index.js`<br>`./modules/auth/session.js`<br>`./style.css`<br>`@fontsource-variable/inter/wght.css`<br>`@fontsource-variable/montserrat/wght.css`<br>`vue` |
 
 ## modules/auth
 
@@ -232,7 +232,7 @@ No incluye secretos, dependencias instaladas, archivos compilados ni código pri
 | [ServerTable.vue](../../../../src/shared/components/ServerTable.vue) | **Exports:** —<br>**Contratos SFC:** `defineEmits: options`<br>`defineProps: headers, rows, total, page, pageSize, isLoading, pageSizeOptions, tableLabel, sortBy, mustSort, rowProps, formatValue`<br>**Imports:** `../composables/useTableQuery.js (tipo)`<br>`./ResponsiveTableCards.vue`<br>`./TableFrame.vue`<br>`vue`<br>`vuetify (tipo)`<br>`vuetify/components/VDataTable` |
 | [StateBadge.vue](../../../../src/shared/components/StateBadge.vue) | **Exports:** —<br>**Contratos SFC:** `defineProps: isActive`<br>**Imports:** `vuetify/components/VChip` |
 | [TableAction.vue](../../../../src/shared/components/TableAction.vue) | **Exports:** —<br>**Contratos SFC:** `defineEmits: click`<br>`defineProps: label, icon, color, isDisabled`<br>**Imports:** `vuetify/components/VBtn`<br>`vuetify/components/VIcon`<br>`vuetify/components/VTooltip` |
-| [TableFrame.vue](../../../../src/shared/components/TableFrame.vue) | **Exports:** —<br>**Contratos SFC:** `defineProps: isLoading, fitColumns, mobileCards`<br>**Imports:** `@mdi/js`<br>`vue`<br>`vuetify/components/VBtn` |
+| [TableFrame.vue](../../../../src/shared/components/TableFrame.vue) | **Exports:** —<br>**Contratos SFC:** `defineProps: isLoading, fitColumns, mobileCards, details`<br>**Imports:** `@mdi/js`<br>`vue`<br>`vuetify/components/VBtn` |
 | [useDocumentRead.ts](../../../../src/shared/composables/useDocumentRead.ts) | **Exports:** `useDocumentRead`<br>**Contratos SFC:** —<br>**Imports:** `../http/readFailure.js`<br>`vue` |
 | [useFileExport.ts](../../../../src/shared/composables/useFileExport.ts) | **Exports:** `FileExportOptions`<br>`useFileExport`<br>**Contratos SFC:** —<br>**Imports:** `../http/apiError.js`<br>`../report.js`<br>`vue` |
 | [useFormInteraction.ts](../../../../src/shared/composables/useFormInteraction.ts) | **Exports:** `InteractiveForm`<br>`useFormInteraction`<br>**Contratos SFC:** —<br>**Imports:** `vue (tipo)` |

@@ -192,3 +192,9 @@ y el histórico, con todas las escrituras bloqueadas y sin intentos de mutación
 archivos de los tres inventarios, términos propios y exclusión de contextos ajenos,
 archivos de reportes según permiso y rechazo de directivas desconocidas/incompletas.
 La exportación valida primero el manifiesto y las capturas de la misma cuenta.
+
+
+`responsive.spec.ts` cubre partidas de Compra y Surtido de Salidas a 600/768/900/1024/1440 px:
+nombre largo con espacio suficiente, texto de al menos 14 px, cifras largas sin
+salto de línea, captura numérica accesible y desplazamiento contenido en la tabla.
+Conserva la matriz existente de 320 a 1920 px para los listados y fichas.

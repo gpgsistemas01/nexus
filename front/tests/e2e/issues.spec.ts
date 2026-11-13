@@ -40,7 +40,8 @@ test('salidas: muestra fichas en móvil y tabla desplazable desde 600 px', async
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(600);
 
   await page.setViewportSize({ width: 900, height: 844 });
-  await expect(details).toHaveCSS('overflow-x', 'hidden');
+  await expect(details).toHaveCSS('overflow-x', 'auto');
+  await expect(dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(900);
 });
 
@@ -462,7 +463,7 @@ for (const [path, label, name] of [
     ]);
     await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toHaveCSS(
       'overflow-x',
-      'hidden',
+      'auto',
     );
     await expect(dialog.getByLabel('Cliente', { exact: true })).toBeDisabled();
     await dialog.getByRole('checkbox', { name: `Surtir: ${name}`, exact: true }).check();
