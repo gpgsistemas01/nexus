@@ -1,10 +1,12 @@
+import { readFile, readdir, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DEMO_PROFILES, readAccounts, selectAccountsWithCredentials } from './manual/profiles.mjs';
 import { MANUAL_HELP, parseManualOptions } from './manual/options.mjs';
 import { assertManualDevelopment } from './manual/environment.mjs';
-import { loadManualPublication } from './manual/publication.mjs';
+import { MANUAL_MODULES, selectedManualModules } from './manual/model.mjs';
+import { loadManualPublication, loadManualModulePublications } from './manual/publication.mjs';
 import { manualAccountDirectory } from './manual/paths.mjs';
 
 const frontRoot = fileURLToPath(new URL('../', import.meta.url));
@@ -73,7 +75,7 @@ const runManuals = async () => {
     const selected = [];
     for (const profile of requested) {
         try {
-            await loadManualPublication(frontRoot, profile.id, { mode: values.mode });
+            await loadManualModulePublications(frontRoot, profile.id, { mode: values.mode });
             selected.push(profile);
         } catch (cause) {
             const manifest = path.join(
@@ -98,7 +100,7 @@ const runManuals = async () => {
     for (const profile of selected) {
         const output = spawnSync(
             process.execPath,
-            ['scripts/exportDocs.js', 'manual-vue', `manual-${profile.id}`, values.format],
+            ['scripts/exportDocs.js', 'manual-vue', values.format],
             {
                 cwd: path.resolve(frontRoot, '../back'),
                 stdio: 'inherit',
@@ -107,6 +109,37 @@ const runManuals = async () => {
         );
         if (output.error || output.status !== 0)
             throw new Error(`No se pudo exportar ${profile.id}.`);
+        const manifest = JSON.parse(
+            await readFile(
+                path.join(manualAccountDirectory(frontRoot, profile.id), 'manifest.json'),
+                'utf8',
+            ),
+        );
+        const selectedNames = new Set(
+            selectedManualModules(manifest.permissions).map((module) => module.id),
+        );
+        const ownedNames = new Set([
+            ...MANUAL_MODULES.map((module) => module.id),
+            `manual-${profile.id}`,
+        ]);
+        for (const format of ['docx', 'pdf']) {
+            const directory = path.join(
+                frontRoot,
+                'build/docs',
+                format,
+                'manuales-vue',
+                profile.id,
+            );
+            const entries = await readdir(directory, { withFileTypes: true }).catch((cause) => {
+                if (cause.code === 'ENOENT') return [];
+                throw cause;
+            });
+            for (const entry of entries) {
+                const name = entry.name.replace(/\.(docx|pdf)$/, '');
+                if (entry.isFile() && ownedNames.has(name) && !selectedNames.has(name))
+                    await rm(path.join(directory, entry.name));
+            }
+        }
     }
 };
 

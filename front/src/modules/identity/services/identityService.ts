@@ -102,7 +102,7 @@ export const identityService = {
     },
     async export(resource: IdentityResource, query: IdentityQuery, signal: AbortSignal) {
         if (resource === 'persons' && query.role) {
-            throw new Error(
+            throw new ApiError(
                 'Limpia el filtro de rol para exportar las responsabilidades por área.',
             );
         }

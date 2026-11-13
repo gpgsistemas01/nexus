@@ -1,4 +1,5 @@
 import { MEXICO_TIME_ZONE } from '@nexus/date-time';
+import { ApiError } from './http/apiError.js';
 
 export interface ReportScope {
     mode: 'filtered' | 'current-month' | 'specific-month';
@@ -22,7 +23,7 @@ export const reportFilename = (name: string, date = new Date()): string => {
 
 export const reportParams = (query: URLSearchParams, scope: ReportScope): URLSearchParams => {
     const error = reportScopeError(scope);
-    if (error) throw new Error(error);
+    if (error) throw new ApiError(error);
 
     const params =
         scope.mode === 'filtered'

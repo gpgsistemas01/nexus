@@ -14,7 +14,11 @@ en los selectores de Nexus.
 | Motivos de ajuste | Explicación clasificada de las correcciones de stock. | Nuevo motivo de ajuste |
 | Estados de cumplimiento | Clasificación disponible en los flujos que la utilizan. | Nuevo estado de cumplimiento |
 
+<!-- module:any reference catalog-unit-measures -->
+
 ![Consulta de un catálogo de unidades de medida.](images/11-catalog-list.png)
+
+<!-- module:end -->
 
 En **Filtrar por columna**, busque por **Nombre**, **Activo** y, cuando se muestre,
 por **Símbolo**. Los filtros se aplican al catálogo completo y pueden combinarse.
@@ -27,7 +31,11 @@ por **Símbolo**. Los filtros se aplican al catálogo completo y pueden combinar
 4. Revise **Activo** y pulse **Guardar**.
 5. Compruebe el registro en la tabla y, cuando lo utilice, en el selector correspondiente.
 
+<!-- module:any reference catalog-unit-measures -->
+
 ![Formulario de una unidad de medida con nombre, símbolo y disponibilidad.](images/12-catalog-form.png)
+
+<!-- module:end -->
 
 Use nombres y símbolos claros. Renombrar conserva saldos y medidas existentes.
 Si aparece un duplicado, revise el registro encontrado.

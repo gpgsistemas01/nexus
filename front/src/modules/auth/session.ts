@@ -1,5 +1,6 @@
 import { inject, readonly, shallowRef } from 'vue';
 import type { InjectionKey } from 'vue';
+import { ApiError } from '../../shared/http/apiError.js';
 import { isRecord } from '../../shared/utils/isRecord.js';
 import { apiClient } from '../../shared/http/apiClient.js';
 import { API_PATHS } from '../../shared/http/apiPaths.js';
@@ -25,7 +26,7 @@ export const createAuthSession = (request = apiClient.request) => {
                     !Array.isArray(data.user.permissions) ||
                     !data.user.permissions.every((p) => typeof p === 'string')
                 ) {
-                    throw new Error('No fue posible comprobar la sesión.');
+                    throw new ApiError('No fue posible comprobar la sesión.');
                 }
 
                 user.value = {
@@ -61,7 +62,7 @@ export const authSessionKey: InjectionKey<AuthSession> = Symbol('auth-session');
 
 export const useAuthSession = () => {
     const session = inject(authSessionKey);
-    if (!session) throw new Error('La sesión no se ha configurado.');
+    if (!session) throw new ApiError('La sesión no se ha configurado.');
 
     return session;
 };

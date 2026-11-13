@@ -22,7 +22,8 @@ Las capturas y fuentes quedan en docs/user-manual/accounts/<cuenta>/.
 docs:manuals exporta las fuentes y capturas ya verificadas; no abre el navegador,
 no inicia servicios ni lee credenciales. No genera imágenes faltantes.
 Con --all informa las cuentas sin capturas; una captura pendiente o inválida bloquea
-la exportación. Word/PDF quedan en build/docs/{docx,pdf}/manuales-vue/<cuenta>/.
+la exportación. Se genera un archivo por módulo con su glosario. Word/PDF quedan en
+build/docs/{docx,pdf}/manuales-vue/<cuenta>/<modulo>.*.
 
 Opciones comunes:
   --all                     Todas las cuentas configuradas.

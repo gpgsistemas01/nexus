@@ -17,7 +17,8 @@ import {
 } from './documentExportContentUtils.js';
 import { removeDocumentOutput } from './documentOutputUtils.js';
 import { loadDocumentationCatalog } from '../../front/scripts/documentationCatalog.mjs';
-import { loadManualPublication } from '../../front/scripts/manual/publication.mjs';
+import { MANUAL_REFERENCE_CONTEXT, filterManualModule } from '../../front/scripts/manual/model.mjs';
+import { loadManualModulePublications } from '../../front/scripts/manual/publication.mjs';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
 import { getMermaidImageId, hasInvalidSvgGeometry, MERMAID_EXPORT_CONFIG, normalizeMermaidSource } from './mermaidExportUtils.js';
 import { validatePdfOutput } from './pdfExportUtils.js';
@@ -71,7 +72,7 @@ const frontendCatalog = await loadDocumentationCatalog(path.resolve(ROOT, '../fr
 const frontendManualProfile = requestedPublication === 'manual-vue'
     ? process.env.DOCS_FRONT_MANUAL_PROFILE : undefined;
 const frontendManualSources = frontendManualProfile
-    ? await loadManualPublication(path.resolve(ROOT, '../front'), frontendManualProfile) : null;
+    ? await loadManualModulePublications(path.resolve(ROOT, '../front'), frontendManualProfile) : null;
 const frontendSource = source => `../front/docs/${source}`;
 const frontendSectionParts = requestedPublication === 'arquitectura'
     && requestedDocument?.startsWith('frontend-vue-')
@@ -87,9 +88,7 @@ const PUBLICATIONS = Object.freeze({
         'manual-vue': {
             directory: frontendManualProfile ? `manuales-vue/${frontendManualProfile}` : 'manuales-vue',
             parts: {
-                ...(frontendManualProfile ? {
-                    [`manual-${frontendManualProfile}`]: frontendManualSources
-                } : {
+                ...(frontendManualProfile ? frontendManualSources : {
                     'manual-usuario': frontendCatalog.sections.manual.sources.map(frontendSource)
                 })
             }
@@ -367,6 +366,7 @@ const insertAfterDocumentData = (content, insertion) => {
 const preparePublicationSource = (content, source, output) => {
     const document = path.basename(output).replace(/\.(?:docx|pdf)$/, '');
     const section = frontendCatalog.sections[document.replace(/^frontend-vue-/, '')];
+    if (requestedPublication === 'manual-vue' && !frontendManualProfile) content = filterManualModule(content, MANUAL_REFERENCE_CONTEXT);
     const titledContent = source === '../front/docs/index.md' && section
         ? prepareSectionEntry(content, `${section.title} del frontend Vue`)
         : content;

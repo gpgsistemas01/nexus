@@ -4,6 +4,7 @@ import {
     HISTORICAL_DELIVERY_LIMITS as limits,
     HISTORICAL_DELIVERY_REVISION_PATTERN,
 } from '@nexus/historical-deliveries';
+import { ApiError } from '../../../shared/http/apiError.js';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -15,7 +16,7 @@ import type {
 } from '../historicalDelivery.js';
 
 const invalid = () =>
-    new Error(
+    new ApiError(
         'La respuesta de regularización está incompleta. Revisa el estado antes de continuar.',
     );
 

@@ -31,3 +31,7 @@ salidas se ven 100 y 1, con rango y total visibles en escritorio y móvil. La se
 se conserva al navegar. El total cuenta sólo salidas con partidas realmente pendientes,
 antes de paginar; se excluyen detalles cancelados, completos o marcados surtidos.
 La integración HTTP cubre los tres recursos y el saldo suministrado nulo.
+
+`DP-VUE-ISS-006` incluye un recibo incompleto después de confirmar: el adaptador
+lanza `ApiError` local y el coordinador conserva captura/clave; recuperar confirma
+la misma captura y limpia el pendiente únicamente al recibir un recibo válido.

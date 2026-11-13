@@ -72,11 +72,19 @@ const fixture = async (mode = 'dev') => {
     path.join(root, 'back/scripts/exportDocs.js'),
     `
     import { mkdirSync, writeFileSync } from 'node:fs';
+    import { loadManualModulePublications } from '../../front/scripts/manual/publication.mjs';
     const output = '../front/build/exports';
     mkdirSync(output, { recursive: true });
-    const format = process.argv[4];
-    for (const extension of format === 'ambos' ? ['docx', 'pdf'] : [format])
-      writeFileSync(output + '/' + process.env.DOCS_FRONT_MANUAL_PROFILE + '.' + extension, 'exported');
+    const format = process.argv[3];
+    if (!['pdf', 'docx', 'ambos'].includes(format)) throw new Error('La exportación debe pedir los módulos, sin documento general.');
+    const id = process.env.DOCS_FRONT_MANUAL_PROFILE;
+    const parts = await loadManualModulePublications('../front', id);
+    for (const extension of format === 'ambos' ? ['docx', 'pdf'] : [format]) {
+      writeFileSync(output + '/' + id + '.' + extension, 'exported');
+      const folder = '../front/build/docs/' + extension + '/manuales-vue/' + id;
+      mkdirSync(folder, { recursive: true });
+      for (const module of Object.keys(parts)) writeFileSync(folder + '/' + module + '.' + extension, 'exported');
+    }
   `,
   );
   return { root, frontRoot, manifest, profile, configFile, accounts, bytes };
@@ -197,4 +205,37 @@ it('valida todas las cuentas antes de exportar si hay una edición incompleta', 
   await expect(readFile(path.join(frontRoot, 'browser-started'))).rejects.toMatchObject({
     code: 'ENOENT',
   });
+});
+
+it('publica archivos por módulo y retira sólo resultados generados fuera del acceso actual', async () => {
+  const { frontRoot, profile, configFile } = await fixture();
+  const folder = path.join(frontRoot, 'build/docs/pdf/manuales-vue', profile.id);
+  await mkdir(folder, { recursive: true });
+  for (const name of [`manual-${profile.id}`, 'compras-materiales', 'notas'])
+    await writeFile(path.join(folder, name + '.pdf'), 'anterior');
+  const result = run(frontRoot, [
+    'export',
+    '--profile',
+    profile.id,
+    '--accounts',
+    configFile,
+    '--format',
+    'pdf',
+  ]);
+  expect(result.status, result.stderr).toBe(0);
+  for (const name of [
+    'inicio',
+    'almacen-materiales',
+    'almacen-consumibles',
+    'almacen-mermas',
+    'salidas-materiales',
+    'salidas-consumibles',
+    'salidas-mermas',
+  ])
+    expect(await readFile(path.join(folder, name + '.pdf'), 'utf8')).toBe('exported');
+  for (const name of [`manual-${profile.id}`, 'compras-materiales'])
+    await expect(readFile(path.join(folder, name + '.pdf'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
+  expect(await readFile(path.join(folder, 'notas.pdf'), 'utf8')).toBe('anterior');
 });

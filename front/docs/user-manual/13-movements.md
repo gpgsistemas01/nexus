@@ -2,8 +2,30 @@
 
 ## Consultar el historial
 
+<!-- module:any reference -->
+
 Abra **Movimientos → Materiales**, **Consumibles** o **Mermas**. El historial
 explica los cambios de existencia. Esta tabla es de consulta.
+
+<!-- module:end -->
+
+<!-- module:any movimientos-materiales -->
+
+Abra **Movimientos → Materiales**. El historial explica los cambios de existencia. Esta tabla es de consulta.
+
+<!-- module:end -->
+
+<!-- module:any movimientos-consumibles -->
+
+Abra **Movimientos → Consumibles**. El historial explica los cambios de existencia. Esta tabla es de consulta.
+
+<!-- module:end -->
+
+<!-- module:any movimientos-mermas -->
+
+Abra **Movimientos → Mermas**. El historial explica los cambios de existencia. Esta tabla es de consulta.
+
+<!-- module:end -->
 
 1. Abra el contexto que corresponde al artículo.
 2. Si necesita un artículo concreto, seleccione primero **Proveedor** y después
@@ -17,7 +39,23 @@ explica los cambios de existencia. Esta tabla es de consulta.
 6. Ordene por los encabezados disponibles o use **Limpiar filtros** para regresar
    a la consulta general.
 
+<!-- module:any reference movimientos-materiales -->
+
 ![Historial de movimientos con saldos antes y después de cada operación.](images/26-movements.png)
+
+<!-- module:end -->
+
+<!-- module:any reference movimientos-consumibles -->
+
+![Historial de movimientos de consumibles.](images/26a-movements-consumables.png)
+
+<!-- module:end -->
+
+<!-- module:any reference movimientos-mermas -->
+
+![Historial de movimientos de mermas.](images/26b-movements-wastes.png)
+
+<!-- module:end -->
 
 ## Interpretar un movimiento
 

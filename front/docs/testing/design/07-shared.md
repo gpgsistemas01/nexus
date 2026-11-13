@@ -181,3 +181,14 @@ Consumibles y Mermas. `manualProfilesTest.ts` contrasta la tabla de decisión:
 lectura/escritura/costos y lectura/ajuste permiten el procedimiento; lectura sola,
 escritura sin costos, falta de lectura o costos sin escritura lo excluyen. Son
 particiones de autorización del manual; no prueban la persistencia de una importación.
+
+Las capturas del manual se generan sólo en escritorio. `manualProfilesTest.ts`
+verifica que importación e histórico incluyan sus imágenes únicamente con permisos
+de la acción; `manualScreenshots.spec.ts` recorre los diálogos de los tres inventarios
+y el histórico, con todas las escrituras bloqueadas y sin intentos de mutación.
+
+
+`manualProfilesTest.ts` comprueba la publicación por módulo para los perfiles demo:
+archivos de los tres inventarios, términos propios y exclusión de contextos ajenos,
+archivos de reportes según permiso y rechazo de directivas desconocidas/incompletas.
+La exportación valida primero el manifiesto y las capturas de la misma cuenta.

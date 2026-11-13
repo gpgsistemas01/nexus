@@ -618,7 +618,7 @@ Record<OrganizationResource, LookupState>
 
 ## ReportScope
 
-**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 3, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 4, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -628,7 +628,7 @@ Record<OrganizationResource, LookupState>
 
 ## ReportKind
 
-**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 9, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 10, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { setImmediate } from 'node:timers/promises';
 import { createSpreadsheet } from './spreadsheetUtils.js';
 import { getMexicoMonthYearParts } from './formattersUtils.js';
+import { ReportMonthInvalid } from '../errors/reportError.js';
 
 const ROW_YIELD_INTERVAL = 250;
 
@@ -37,7 +38,7 @@ export const buildMonthlyReportSheets = async function* (rows, { buildData, shee
         for await (const row of rows) {
             signal?.throwIfAborted();
             const month = row.reportMonth ?? 'sin-fecha';
-            if (!/^(?:\d{4}-\d{2}|sin-fecha)$/.test(month)) throw new Error('Mes de reporte inválido.');
+            if (!/^(?:\d{4}-\d{2}|sin-fecha)$/.test(month)) throw new ReportMonthInvalid();
             months.add(month);
             if (!pending.has(month)) pending.set(month, []);
             pending.get(month).push(JSON.stringify(row) + '\n');

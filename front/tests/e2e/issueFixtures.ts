@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { mockWarehouse } from './warehouseFixtures.js';
 import { issueFor, issuePermissions, departmentId } from '../fixtures/issues.js';
 import { material, waste, pageOf } from '../fixtures/inventory.js';
+import { historicalPreview } from '../fixtures/historicalDelivery.js';
 import { clientData, personData } from '../fixtures/records.js';
 
 export const mockIssues = async (
@@ -133,6 +134,31 @@ export const mockIssues = async (
       return route.fulfill({ json: { code } });
     },
   );
+  for (const [resource, prefix] of [
+    ['materials', 'SMA'],
+    ['consumables', 'SCO'],
+    ['wastes', 'SME'],
+  ]) {
+    await page.route(`**/api/warehouse/historical-deliveries/${resource}/preview?**`, (route) => {
+      const query = new URL(route.request().url()).searchParams;
+      const candidate = historicalPreview();
+      return route.fulfill({
+        json: {
+          preview: {
+            ...candidate,
+            resource,
+            cutoffDate: query.get('cutoffDate'),
+            page: Number(query.get('page') ?? 1),
+            documents: candidate.documents.map((item) => ({
+              ...item,
+              referenceNumber: `${prefix}-2026-001`,
+              departmentName,
+            })),
+          },
+        },
+      });
+    });
+  }
   await page.route('**/api/warehouse/reports/**/excel?**', (route) => {
     reports.push(new URL(route.request().url()));
     return route.fulfill({

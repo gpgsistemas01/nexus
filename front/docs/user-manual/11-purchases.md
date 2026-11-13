@@ -1,9 +1,29 @@
 # 11. Compras
 
+<!-- module:any reference -->
+
 Abra **Compras → Materiales** o **Consumibles**. Busque por folio, factura,
 proveedor, persona o fecha y pulse **Buscar**.
 
+<!-- module:end -->
+
+<!-- module:any compras-materiales -->
+
+Abra **Compras → Materiales**. Busque por folio, factura, proveedor, persona o fecha y pulse **Buscar**.
+
+<!-- module:end -->
+
+<!-- module:any compras-consumibles -->
+
+Abra **Compras → Consumibles**. Busque por folio, factura, proveedor, persona o fecha y pulse **Buscar**.
+
+<!-- module:end -->
+
+<!-- module:any reference compras-materiales -->
+
 ![Listado de compras con filtros y acciones.](images/18-purchases-list.png)
+
+<!-- module:end -->
 
 <!-- manual:any goods:receipts-manage -->
 ## Registrar una compra
@@ -14,7 +34,11 @@ proveedor, persona o fecha y pulse **Buscar**.
 4. Repita para las demás partidas y revise cantidades e importes estimados.
 5. Pulse **Guardar** y compruebe el folio y la existencia recibida.
 
+<!-- module:any reference compras-materiales -->
+
 ![Compra preparada con encabezado, partidas e importes.](images/19-purchase-create.png)
+
+<!-- module:end -->
 
 Capture el costo por presentación; el servidor calcula los importes definitivos.
 Las compras no actualizan el costo máximo del inventario: se configura en **Almacén**.
@@ -44,7 +68,11 @@ atienden con **Corregir detalle** o **Cancelar detalle**, no sobrescribiendo la 
 Al elegir Remisión, no se captura número de factura. Los selectores requieren los
 permisos de consulta correspondientes.
 
+<!-- module:any reference compras-materiales -->
+
 ![Corrección de una partida registrada.](images/21-purchase-correction.png)
+
+<!-- module:end -->
 
 La corrección recalcula la compra con sus partidas activas. Cambiar sólo el costo
 conserva la existencia; reducir la cantidad ajusta la diferencia. La cantidad
@@ -67,11 +95,23 @@ no modifica datos.
 
 Las partidas canceladas se conservan sin botones de acción.
 
+<!-- module:any reference compras-materiales -->
+
 ![Consulta de una compra registrada.](images/20-purchase-view.png)
+
+<!-- module:end -->
+
+<!-- module:any reference compras-materiales -->
 
 ![Compra de materiales cancelada con totales históricos.](images/20c-purchase-canceled.png)
 
+<!-- module:end -->
+
+<!-- module:any reference compras-consumibles -->
+
 ![Compra de consumibles cancelada con totales históricos.](images/20d-purchase-canceled.png)
+
+<!-- module:end -->
 
 Los totales de una compra cancelada conservan el saldo que había inmediatamente
 antes de cancelar su última partida, sin sumar de nuevo las partidas canceladas antes.

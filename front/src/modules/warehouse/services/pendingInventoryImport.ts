@@ -1,4 +1,5 @@
 import { UUID_V4_PATTERN } from '@nexus/input-validation';
+import { ApiError } from '../../../shared/http/apiError.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { InventoryResource } from '../inventory.js';
 import type { PendingInventoryImport } from '../inventoryImport.js';
@@ -23,7 +24,7 @@ export const pendingInventoryImport = (
             !Number.isInteger(value.expectedVersion) ||
             Number(value.expectedVersion) < 0
         ) {
-            throw new Error(
+            throw new ApiError(
                 'No se pudo leer la referencia pendiente. Contacta al administrador antes de importar otro archivo.',
             );
         }

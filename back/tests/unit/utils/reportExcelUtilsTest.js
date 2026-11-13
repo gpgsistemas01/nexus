@@ -3,6 +3,9 @@ import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { ReportMonthInvalid } from '../../../src/errors/reportError.js';
+import { errorMap } from '../../../src/messages/codeMessages.js';
+import { getErrorMessage } from '../../../src/shared/messages/apiMessages.js';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { readExcelReport } from '../../helpers/readExcelReport.js';
@@ -160,6 +163,14 @@ describe('totales mensuales de compras', () => {
       expect(sheet.getCell('B6').value).toBe((index + 2) * 10);
       expect(sheet.getCell('O2').formula).toBe('I2*N2');
     }
+    expect(await readdir(paths.root)).toEqual([]);
+  });
+  it('rechaza un mes inválido con error personalizado y retira los temporales', async () => {
+    const rows = [{ reportMonth: '../../interno' }];
+    const operation = Array.fromAsync(buildMonthlyReportSheets(rows, { sheetName: 'Reporte', buildData: rows => rows }));
+    await expect(operation).rejects.toBeInstanceOf(ReportMonthInvalid);
+    await expect(operation).rejects.toMatchObject({ code: errorMap.report.INVALID_MONTH, statusCode: 500, isOperational: true });
+    await expect(operation).rejects.toThrow(getErrorMessage({ code: errorMap.report.INVALID_MONTH }));
     expect(await readdir(paths.root)).toEqual([]);
   });
   it('retira los temporales si falla la consulta antes de terminar la agrupación', async () => {

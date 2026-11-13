@@ -42,6 +42,11 @@ HTTP sea exitoso. En
 comprobación precede a normalizar y devolver el registro; el coordinador anuncia éxito
 después.
 
+Los rechazos locales de captura, respuesta inválida o recuperación también usan
+`ApiError`, con estado `0`: no simulan un rechazo HTTP definitivo. En importaciones y
+entregas históricas, un contrato inválido conserva la captura y la clave pendientes;
+sólo un rechazo HTTP definitivo permite descartarlas según la regla de la operación.
+
 ## Descargas y recursos
 
 Para Excel, comprobar respuesta y tipo antes de descargar; un HTML del proxy no es

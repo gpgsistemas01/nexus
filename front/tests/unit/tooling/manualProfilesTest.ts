@@ -12,11 +12,17 @@ import {
   selectAccountsWithCredentials,
   verifyConfiguredAccess,
 } from '../../../scripts/manual/profiles.mjs';
-import { filterManualContent, selectedChapters } from '../../../scripts/manual/model.mjs';
+import {
+  filterManualContent,
+  filterManualModule,
+  MANUAL_MODULES,
+  selectedChapters,
+} from '../../../scripts/manual/model.mjs';
 import { parseManualBaseUrl } from '../../../scripts/manual/environment.mjs';
 import {
   prepareManual,
   loadManualPublication,
+  loadManualModulePublications,
   recoverManualCaptures,
   finalizeManualSources,
 } from '../../../scripts/manual/publication.mjs';
@@ -27,12 +33,12 @@ import { APP_NAVIGATION_GROUPS } from '../../../src/app/navigation.js';
 const temporary: string[] = [];
 
 it.each([
-  ['03-materials.md', 'materials'],
-  ['04-consumables.md', 'materials'],
-  ['05-wastes.md', 'wastes'],
+  ['03-materials.md', 'materials', '03b-material-import.png'],
+  ['04-consumables.md', 'materials', '06a-consumable-import.png'],
+  ['05-wastes.md', 'wastes', '08a-waste-import.png'],
 ])(
   'la importación de %s se documenta sólo para lectura y la operación autorizada',
-  async (file, resource) => {
+  async (file, resource, image) => {
     const source = await readFile(path.resolve('docs/user-manual', file), 'utf8');
     const read = `${resource}:read`;
     const write = `${resource}:write`;
@@ -49,9 +55,22 @@ it.each([
     for (const [permissions, available] of decisions) {
       const content = filterManualContent(source, permissions);
       expect(/^## Importar/m.test(content), permissions.join(', ')).toBe(available);
+      expect(content.includes(`images/${image}`), permissions.join(', ')).toBe(available);
     }
   },
 );
+
+it('incluye la captura del histórico sólo con permiso de regularización y el manual usa escritorio', async () => {
+  const issues = await readFile(path.resolve('docs/user-manual/12-issues.md'), 'utf8');
+  expect(filterManualContent(issues, ['goods:issues-page-view', 'issues:reconcile'])).toContain(
+    'images/25g-issue-historical.png',
+  );
+  expect(filterManualContent(issues, ['goods:issues-page-view'])).not.toContain(
+    'images/25g-issue-historical.png',
+  );
+  const materials = await readFile(path.resolve('docs/user-manual/03-materials.md'), 'utf8');
+  expect(materials).not.toContain('03a-material-mobile.png');
+});
 
 it('conserva capturas posteriores completas aunque otra pendiente falle de nuevo', () => {
   const previous = {
@@ -990,6 +1009,44 @@ it.each(DEMO_PROFILES)(
           .join('/'),
       ),
     );
+    const parts = await loadManualModulePublications(root, profile.id);
+    expect(Object.keys(parts)).toEqual(
+      expect.arrayContaining([
+        'inicio',
+        'almacen-materiales',
+        'almacen-consumibles',
+        'almacen-mermas',
+      ]),
+    );
+    const readGlossary = (id: string) =>
+      readFile(path.join(manifest.root, 'modules', id, '16-glossary.md'), 'utf8');
+    const materials = await readGlossary('almacen-materiales');
+    const consumables = await readGlossary('almacen-consumibles');
+    const wastes = await readGlossary('almacen-mermas');
+    expect(materials).toContain('| Material |');
+    expect(materials).not.toContain('| Merma |');
+    expect(materials).not.toContain('| Consumible |');
+    expect(materials).not.toContain('## Compras');
+    expect(materials).not.toContain('## Salidas');
+    expect(consumables).toContain('| Consumible |');
+    expect(consumables).not.toContain('Base y Altura');
+    expect(wastes).toContain('| Merma |');
+    expect(wastes).not.toContain('| Material |');
+    expect(wastes).not.toContain('## Compras');
+    const consumableFiles = parts['almacen-consumibles'].join('\n');
+    if (materials.includes('Plantilla operativa'))
+      expect(consumableFiles).toContain('03-materials.md');
+    const issue = await readGlossary('salidas-materiales');
+    expect(issue).toContain('Cantidad solicitada');
+    expect(issue).not.toContain('## Compras');
+    expect(issue).not.toContain('Stock mínimo');
+    if (profile.departmentKey !== 'warehouse_and_supply' && profile.id !== 'sistemas-admin') {
+      expect(parts).not.toHaveProperty('compras-materiales');
+      expect(parts).not.toHaveProperty('usuarios');
+      expect(materials).not.toContain('Plantilla operativa');
+      expect(issue).not.toContain('### Referencias para surtir o devolver');
+      expect(parts['salidas-materiales'].join('\n')).not.toContain('14-reports.md');
+    }
   },
 );
 
@@ -1114,4 +1171,23 @@ it('rechaza una captura modificada después de verificarla', async () => {
   const { root, manifest } = await publicationWithoutExamples();
   await writeFile(path.join(manifest.root, 'images/20-purchase-view.png'), 'imagen posterior');
   await expect(loadManualPublication(root, 'lector')).rejects.toThrow('debe volver a verificarse');
+});
+
+it('rechaza contextos de módulo desconocidos o bloques incompletos', () => {
+  const module = MANUAL_MODULES.find((item) => item.id === 'almacen-materiales')!;
+  expect(() =>
+    filterManualModule('<!-- module:any desconocido -->\ntexto\n<!-- module:end -->', module),
+  ).toThrow('contexto desconocido');
+  expect(() => filterManualModule('<!-- module:any materials -->\ntexto', module)).toThrow(
+    'sin cerrar',
+  );
+});
+
+it('una edición anterior debe preparar las fuentes por módulo antes de publicar', async () => {
+  const { root, manifest, captures } = await publicationWithoutExamples();
+  await writeFile(
+    path.join(manifest.root, 'manifest.json'),
+    JSON.stringify({ ...manifest, status: 'ready', captures, moduleEditionVersion: 0 }),
+  );
+  await expect(loadManualModulePublications(root, manifest.id)).rejects.toThrow('docs:screenshots');
 });

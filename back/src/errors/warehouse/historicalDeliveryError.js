@@ -2,7 +2,7 @@ import { AppError } from '../AppError.js';
 import { errorMap } from '../../messages/codeMessages.js';
 import { errorMessages } from '../../shared/messages/apiMessages.js';
 
-const statuses = { VALIDATION: 400, CONFLICT: 409, BUSY: 409, PHYSICAL_RETURN_REQUIRED: 400 };
+const statuses = { NOT_FOUND: 404, VALIDATION: 400, CONFLICT: 409, BUSY: 409, PHYSICAL_RETURN_REQUIRED: 400 };
 
 export class HistoricalDeliveryError extends AppError {
     constructor(kind = 'VALIDATION', message) {

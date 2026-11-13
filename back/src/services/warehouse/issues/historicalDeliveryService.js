@@ -115,7 +115,7 @@ export const confirmHistoricalDeliveries = async ({ user, resource, command }) =
             }
             await lockHistoricalDeliveryDocuments({ tx, resource, ids: capture.documents.map(item => item.id) });
             const issues = await model(tx, resource).findMany({ where: { ...contextWhere(resource, user), id: { in: capture.documents.map(item => item.id) } }, include, orderBy: { id: 'asc' } });
-            if (issues.length !== capture.documents.length) throw new AppError('Una salida no existe o no pertenece al alcance autorizado.', 'NOT_FOUND', 404);
+            if (issues.length !== capture.documents.length) throw new HistoricalDeliveryError('NOT_FOUND');
             const statusIds = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
             if (!statusIds.get(FULFILLMENT_STATUS_NAMES.COMPLETE)) throw invalid('Falta configurar el estado Surtido.');
             const result = { id: randomUUID(), resource, cutoffDate: capture.cutoffDate, deliveredAt: capture.deliveredAt,

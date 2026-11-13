@@ -119,7 +119,8 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
     const issue = await seedIssue('consumables');
     const original = (await preview('consumables')).documents.find(item => item.id === issue.id);
     const command = capture([original]);
-    await confirm('materials', command).expect(404);
+    const outsideScope = await confirm('materials', command).expect(404);
+    expect(outsideScope.body.code).toBe('HISTORICAL_DELIVERY_NOT_FOUND');
     await confirm('consumables', { ...command, declaredDelivered: false }).expect(400);
     await confirm('consumables', { ...command, cutoffDate: '2099-01-01T00:00:00Z' }).expect(400);
     await confirm('consumables', { ...command, deliveredAt: '2026-11-01T00:00:00Z' }).expect(400);

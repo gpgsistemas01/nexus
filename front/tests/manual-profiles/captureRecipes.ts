@@ -6,6 +6,22 @@ import { PERMISSIONS as P } from '@nexus/permissions';
 import { selectWasteReference } from './selectPreparation.js';
 import { DOCUMENT_STATE_CAPTURES, openDocumentCapture } from './documentStates.js';
 
+export const INVENTORY_IMPORT_CAPTURES: Record<string, string> = {
+  '03b-material-import.png': 'materiales',
+  '06a-consumable-import.png': 'consumibles',
+  '08a-waste-import.png': 'mermas',
+};
+
+export const HISTORICAL_DELIVERY_CAPTURES: Record<string, string> = {
+  '25g-issue-historical.png': 'materiales',
+  '25h-issue-historical-consumables.png': 'consumibles',
+  '25i-issue-historical-wastes.png': 'mermas',
+};
+export const MOVEMENT_CAPTURES: Record<string, string> = {
+  '26a-movements-consumables.png': 'consumibles',
+  '26b-movements-wastes.png': 'mermas',
+};
+
 export type CaptureFamily =
   'warehouse' | 'records' | 'catalogs' | 'purchases' | 'issues' | 'movements';
 
@@ -95,11 +111,47 @@ export const captureRecipe = async (
   root: string,
   user: SessionUser,
 ) => {
-  if (filename === '03a-material-mobile.png')
-    await page.setViewportSize({ width: 390, height: 1000 });
+  await page.setViewportSize({ width: 1600, height: 1400 });
   const number = Number.parseInt(filename);
   const documentState = DOCUMENT_STATE_CAPTURES[filename];
-  if (documentState) {
+  const importResource = INVENTORY_IMPORT_CAPTURES[filename];
+  if (importResource) {
+    await go(page, `/almacen/${importResource}`);
+    await openAction(page, 'Importar Excel');
+    const dialog = page.getByRole('dialog', {
+      name: `Importar Excel de ${importResource}`,
+      exact: true,
+    });
+    await expect(
+      dialog.getByRole('combobox', { name: 'Operación del archivo', exact: true }),
+    ).not.toHaveValue('');
+    await expect(
+      dialog.getByRole('button', { name: 'Descargar plantilla', exact: true }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('button', { name: 'Validar archivo', exact: true }),
+    ).toBeDisabled();
+  } else if (HISTORICAL_DELIVERY_CAPTURES[filename]) {
+    const resource =
+      filename === '25g-issue-historical.png' &&
+      !user.permissions.includes(P.GOODS_ISSUES_PAGE_VIEW)
+        ? 'mermas'
+        : HISTORICAL_DELIVERY_CAPTURES[filename];
+    await go(page, `/salidas/${resource}`);
+    await openAction(page, 'Registrar entregas históricas');
+    const dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+    await expect(
+      dialog.getByRole('status').filter({ hasText: /registros? en esta página/ }),
+    ).toBeVisible({ timeout: 30_000 });
+    await expect(
+      dialog.getByRole('combobox', { name: 'Registros por página:', exact: true }),
+    ).toHaveValue('100');
+    await expect(
+      dialog.getByRole('button', { name: 'Registrar entregas seleccionadas', exact: true }),
+    ).toBeDisabled();
+  } else if (MOVEMENT_CAPTURES[filename]) {
+    await go(page, `/movimientos/${MOVEMENT_CAPTURES[filename]}`);
+  } else if (documentState) {
     await openDocumentCapture(page, documentState);
   } else if (number === 1) {
     await page.goto('/inicio-sesion');

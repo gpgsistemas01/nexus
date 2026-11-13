@@ -63,7 +63,7 @@
           "description": "Sin issues:reconcile."
         },
         "404": {
-          "description": "Salida fuera de alcance o contexto."
+          "description": "Salida fuera de alcance o contexto; código HISTORICAL_DELIVERY_NOT_FOUND."
         },
         "409": {
           "description": "Revisión vieja, cancelada, sin pendiente, clave distinta u operación ocupada."
@@ -132,7 +132,7 @@
           "description": "Sin issues:reconcile."
         },
         "404": {
-          "description": "Salida fuera de alcance o contexto."
+          "description": "Salida fuera de alcance o contexto; código HISTORICAL_DELIVERY_NOT_FOUND."
         },
         "409": {
           "description": "Revisión vieja, cancelada, sin pendiente, clave distinta u operación ocupada."

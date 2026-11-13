@@ -2,11 +2,13 @@ import { parentPort, workerData } from 'node:worker_threads';
 import { Workbook, isResourceLimitError } from '@sheetkit/node';
 import unzipper from 'unzipper';
 import { createSpreadsheet, spreadsheetColumn } from '../../../utils/spreadsheetUtils.js';
+import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
+import { errorMap } from '../../../messages/codeMessages.js';
 import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
 import { INVENTORY_IMPORT_LIMITS as limits,
     INVENTORY_IMPORT_MODE_LABELS } from '../../../shared/constants/inventoryImport.js';
 
-const fail = kind => { const error = new Error(kind); error.kind = kind; throw error; };
+const fail = kind => { throw new InventoryImportError(kind); };
 const scalar = value => {
     if (value === undefined || value === null) return '';
     if (!['string', 'number', 'boolean'].includes(typeof value)) fail('FILE');
@@ -217,5 +219,5 @@ try {
     const result = await actions[workerData.action](workerData);
     parentPort.postMessage({ result });
 } catch (error) {
-    parentPort.postMessage({ error: { kind: isResourceLimitError(error) ? 'LIMIT' : error.kind ?? 'FILE' } });
+    parentPort.postMessage({ error: { kind: isResourceLimitError(error) || error.code === errorMap.inventoryImport.LIMIT ? 'LIMIT' : 'FILE' } });
 }

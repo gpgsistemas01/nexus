@@ -18,6 +18,9 @@ Pulse **Importar Excel** y siga el [procedimiento de materiales y consumibles](0
 El selector asigna una sola operación a todo el archivo. Base y Altura permanecen
 como referencias vacías en la estructura de consulta; los consumibles no capturan
 dimensiones. Conserve los IDs/versiones incluidos para editar o ajustar.
+
+![Importación de consumibles con la operación y sus instrucciones.](images/06a-consumable-import.png)
+
 <!-- manual:end -->
 <!-- manual:end -->
 <!-- manual:end -->

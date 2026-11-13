@@ -129,6 +129,30 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     expect(localStorage.length).toBe(0);
     mounted.wrapper.unmount();
   });
+  it('un recibo inválido usa ApiError local y conserva la captura para recuperar la confirmación', async () => {
+    const transport = vi
+      .fn<(config: InternalAxiosRequestConfig) => { data: Record<string, unknown> }>()
+      .mockReturnValue({ data: {} });
+    apiClient.http.defaults.adapter = mockHttpAdapter(transport);
+    const mounted = await mount();
+    await mounted.value.selectAll();
+    mounted.value.values.reason = 'Entrega física comprobada';
+    mounted.value.values.declaredDelivered = true;
+    await mounted.value.confirm();
+    expect(mounted.value.error.value).toContain('incompleta');
+    expect(mounted.value.recoveryRequired.value).toBe(true);
+    const original = pendingHistoricalDelivery(ids.user, 'materials').read();
+    expect(original).not.toBeNull();
+    transport.mockReturnValue({
+      data: { code: 'HISTORICAL_DELIVERY_COMPLETED', receipt: historicalReceipt() },
+    });
+    await mounted.value.recover();
+    expect(JSON.parse(transport.mock.calls[1]![0].data as string)).toEqual(original);
+    expect(mounted.value.receipt.value).toEqual(historicalReceipt());
+    expect(mounted.value.recoveryRequired.value).toBe(false);
+    expect(localStorage.length).toBe(0);
+    mounted.wrapper.unmount();
+  });
   it('un conflicto definitivo exige volver a leer antes de confirmar', async () => {
     const mounted = await mount();
     mounted.value.preview.value = historicalPreview();

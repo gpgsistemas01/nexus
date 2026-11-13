@@ -17,6 +17,8 @@ agrupa totales. Después se añaden los IDs/versiones y los campos necesarios.
 5. Corrija los errores en el original, descarte el borrador y vuelva a validar.
 6. Pulse **Confirmar importación** y espere el recibo.
 
+![Importación de mermas: operación, plantilla y archivo Excel.](images/08a-waste-import.png)
+
 <!-- manual:all wastes:write inventory:costs-read -->
 **Alta:** capture nombre, proveedor, material de referencia, mínimo, costo, Activo,
 **Cantidad inicial** y observaciones; medidas o pesos según la presentación. El sistema

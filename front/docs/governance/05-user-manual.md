@@ -52,6 +52,12 @@ directivas existentes; las operaciones de la cuenta mantienen sus propios bloque
 Los bloques `manual:any` y `manual:all` deben abarcar título, pasos, notas e imágenes
 de la acción. Las referencias a reportes y ajustes se filtran también fuera de su capítulo.
 
+Las capturas del manual se toman sólo en escritorio. La importación de Materiales,
+Consumibles y Mermas muestra el diálogo de operación/plantilla/archivo; el histórico
+muestra la tabla y sus controles de revisión. Sus imágenes permanecen dentro del
+bloque de permisos de cada procedimiento. No se valida un archivo ni se confirma
+una entrega para preparar capturas: esos pasos crean o modifican registros.
+
 ## Generar capturas por cuenta
 
 La generación se ejecuta sólo en desarrollo local, con las dependencias de desarrollo
@@ -113,3 +119,27 @@ Contrastar pasos, etiquetas y permisos con Vue. Las capturas simuladas muestran
 la interfaz; la persistencia y los permisos efectivos se verifican en sus pruebas.
 Distribuir los documentos revisados sin datos reales ni credenciales. Fuentes,
 imágenes y resultados permanecen fuera del despliegue.
+
+
+## Archivos separados por módulo
+
+Se conserva una carpeta por cuenta. La exportación genera `inicio` y un archivo
+Word/PDF por módulo autorizado: `almacen-materiales`, `almacen-consumibles`,
+`almacen-mermas`, los contextos de Compras, Salidas y Movimientos, cada catálogo,
+Personas, Usuarios, Clientes y Proveedores, según los accesos verificados.
+Los archivos incluyen los procedimientos, capturas, reportes disponibles y glosario
+del módulo. El glosario de Consumibles omite medidas; cada inventario excluye
+los términos de los otros tipos y de Compras/Salidas. Los perfiles operativos
+conservan sólo sus módulos y la consulta de Almacén.
+
+Las fuentes preparadas se guardan en `accounts/<cuenta>/modules/<modulo>/` y los
+resultados en `build/docs/{docx,pdf}/manuales-vue/<cuenta>/<modulo>.*`.
+La importación de Consumibles reutiliza los pasos comunes de la fuente de Materiales,
+con su propia imagen y glosario. Las capturas siguen siendo sólo de escritorio.
+
+Los comandos no cambian: primero `docs:screenshots` prepara fuentes y capturas;
+después `docs:manuals` valida la edición y exporta los módulos, sin navegador.
+Una edición anterior sin selección por módulo requiere volver a preparar las fuentes
+con el comando de capturas. La exportación retira sólo los archivos generados de
+módulos ya no autorizados y el documento general anterior de esa cuenta.
+El manual de referencia completo se conserva para mantenimiento.

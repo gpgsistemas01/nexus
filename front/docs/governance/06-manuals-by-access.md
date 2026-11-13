@@ -19,7 +19,9 @@ los comandos de generación rechazan el entorno de producción.
 Cada cuenta recibe su edición, identificada con el usuario y sus áreas y roles.
 El índice agrupa inicio, tareas permitidas y ayuda. Las fuentes se comparten en
 `docs/user-manual`; no se copian para mantener una versión por rol.
-Las capturas se seleccionan desde esos mismos capítulos filtrados. Publicar exige
+Las capturas se seleccionan desde esos mismos capítulos filtrados, siempre en
+escritorio y sin imágenes de celular. Importación e histórico incluyen sus diálogos
+únicamente cuando la cuenta tiene la operación autorizada. Publicar exige
 la selección completa, sin capítulos o imágenes repetidos ni referencias retiradas.
 Los ejemplos históricos sin datos conservan su excepción documentada; una captura
 de una acción disponible sigue siendo obligatoria. El índice describe el alcance
@@ -127,3 +129,13 @@ Los ejemplos históricos son condicionales en `dev`: su ausencia se registra y s
 conserva la explicación textual del estado. Las capturas de acciones siguen siendo
 obligatorias. La preparación reutiliza las reglas de Compras y Salidas de Vue y
 no agrega campos ni modifica sus validaciones.
+
+
+## Archivos separados por módulo
+
+Cada cuenta conserva su carpeta; cada módulo tiene su archivo Word/PDF, capturas
+y glosario propios. El selector de módulos usa los permisos verificados y el catálogo
+público de navegación. Los contextos de inventario, compras, salidas y movimientos
+se publican por separado. Los archivos retirados por un cambio de acceso se limpian
+únicamente en la carpeta generada de esa cuenta. Consulte el
+[mantenimiento por módulo](05-user-manual.md#archivos-separados-por-módulo).

@@ -41,10 +41,20 @@ existencia anterior.
 8. Si hay errores, use **Descargar errores**, corrija el archivo de captura, pulse **Descartar borrador** y vuelva a validarlo. El informe de errores sirve para revisar; no se vuelve a importar.
 9. Pulse **Confirmar importación** una sola vez y espere el resultado. Conserve su referencia y compruebe el inventario. **Otro archivo** inicia una operación distinta.
 
+<!-- module:any reference almacen-materiales -->
+
+![Importación de materiales: operación única, plantilla y selección del archivo.](images/03b-material-import.png)
+
+<!-- module:end -->
+
 La plantilla mantiene las columnas y el orden del reporte de consulta y añade
 IDs/versiones y campos de captura. El ajuste omite el costo. El Excel obtenido con
 **Exportar Excel** es un reporte: para importar descargue la plantilla de la operación.
+<!-- module:any reference consumables -->
+
 Los consumibles mantienen Base y Altura como referencias vacías; no capture dimensiones.
+
+<!-- module:end -->
 
 En **Activo**, use **SI** o **NO**. Capture números con punto decimal y sin símbolos
 de moneda; no cambie IDs ni versiones. Cada archivo admite hasta 500 filas. Para
@@ -98,8 +108,6 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 <!-- manual:end -->
 
 ![Tabla de existencias de materiales con filtros y acciones.](images/03-materials-list.png)
-
-![Vista de materiales adaptada a un teléfono.](images/03a-material-mobile.png)
 
 <!-- manual:any materials:write -->
 ## Registrar un material

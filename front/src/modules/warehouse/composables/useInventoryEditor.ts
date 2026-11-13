@@ -159,7 +159,7 @@ export const useInventoryEditor = (options: {
         try {
             if (isIdempotent) {
                 if (!pending)
-                    throw new Error(
+                    throw new ApiError(
                         'Se necesita almacenamiento local disponible para recuperar esta operación.',
                     );
 

@@ -1,3 +1,4 @@
+import { ApiError } from './apiError.js';
 import { apiClient } from './apiClient.js';
 
 export const requestExcel = async (url: string, signal?: AbortSignal) => {
@@ -7,7 +8,7 @@ export const requestExcel = async (url: string, signal?: AbortSignal) => {
         !(file instanceof Blob) ||
         !file.type.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     ) {
-        throw new Error('El servidor no devolvió un archivo Excel válido.');
+        throw new ApiError('El servidor no devolvió un archivo Excel válido.');
     }
 
     return file;

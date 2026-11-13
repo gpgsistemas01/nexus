@@ -194,3 +194,7 @@ secuencialmente, conservando encabezados, estilos y resultados de fórmulas.
 Cada hoja reinicia las referencias de fila y los acumuladores de Compras.
 Cancelación o fallo retiran los temporales. Una consulta vacía conserva la hoja
 habitual con encabezados.
+
+La agrupación rechaza claves de mes inválidas mediante `ReportMonthInvalid`
+(`AppError`, código traducible `REPORT_MONTH_INVALID`, HTTP 500), sin exponer rutas
+temporales y conservando la limpieza de archivos ante el rechazo.

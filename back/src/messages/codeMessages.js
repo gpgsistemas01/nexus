@@ -1,6 +1,7 @@
 import { HISTORICAL_DELIVERY_ERROR_CODES } from '../shared/constants/historicalDelivery.js';
 
 export const errorMap = {
+    report: { INVALID_MONTH: 'REPORT_MONTH_INVALID' },
     historicalDelivery: HISTORICAL_DELIVERY_ERROR_CODES,
     inventoryImport: {
         FILE: 'INVENTORY_IMPORT_FILE',

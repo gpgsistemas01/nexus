@@ -343,3 +343,8 @@ y contexto de inventario.
 100/101; total y páginas sin duplicados ni huecos. Se excluyen documentos sin partidas
 pendientes antes de paginar y se acepta suministrado nulo como cero. Evidencia:
 `tests/integration/controllers/historicalDeliveryControllerDbTest.js`.
+
+Los rechazos de reportes por clave de mes inválida usan `ReportMonthInvalid` y
+`REPORT_MONTH_INVALID` (500), liberando temporales; ver `reportExcelUtilsTest.js`.
+El caso de aislamiento del histórico exige `HISTORICAL_DELIVERY_NOT_FOUND` (404),
+sin confirmar documentos de otro contexto; ver `historicalDeliveryControllerDbTest.js`.
