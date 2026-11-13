@@ -907,7 +907,7 @@ const publicationWithoutExamples = async (mode = 'dev') => {
       accesses: [],
     },
   );
-  const bytes = await readFile(path.resolve('docs/user-manual/images/01-login.png'));
+  const bytes = Buffer.from('capture-fixture');
   const captures: Record<string, { status: string; reason?: string; sha256?: string }> = {};
   for (const image of manifest.images) {
     if (Object.hasOwn(DOCUMENT_STATE_CAPTURES, image))
@@ -986,7 +986,7 @@ it.each(DEMO_PROFILES)(
   async (profile) => {
     const root = await manualRoot();
     const manifest = await prepareManual(root, { ...profile, mode: 'demo' }, demoSession(profile));
-    const bytes = await readFile(path.resolve('docs/user-manual/images/01-login.png'));
+    const bytes = Buffer.from('capture-fixture');
     const captures: Record<string, { status: string; sha256: string }> = {};
     for (const image of manifest.images) {
       await writeFile(path.join(manifest.root, 'images', image), bytes);

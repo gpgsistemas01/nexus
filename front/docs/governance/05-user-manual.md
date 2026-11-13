@@ -18,7 +18,7 @@ manuales, seguir el [procedimiento por cuenta](07-manual-accounts-and-files.md).
 | --- | --- |
 | `front/docs/user-manual/index.md` y capítulos numerados | Instrucciones para el usuario. |
 | [Glosario de operación](../user-manual/16-glossary.md) | Términos visibles y ejemplos de captura, contrastados con el [glosario de negocio](../requirements/business-glossary.md). |
-| `front/docs/user-manual/images/*.png` | Capturas generales de referencia, generadas y revisadas por separado; los archivos nuevos están ignorados por Git. |
+| `front/docs/user-manual/images/*.png` | Capturas generales de referencia, generadas y revisadas por separado; son archivos locales ignorados por Git. |
 | Sección `manual` de [publications.json](../publications.json) | Entrada propia, excluida del libro técnico completo. |
 | [Configuración Playwright](../../playwright.manual.config.ts) y [recorridos](../../tests/manual/manualScreenshots.spec.ts) | Generación de capturas de referencia. |
 
