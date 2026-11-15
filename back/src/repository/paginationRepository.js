@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'node:util';
 import { QUERY_BATCH_SIZES } from '../constants/pagination.js';
 
 // Recibe el modelo del cliente elegido por el servicio; no crea otro cliente ni transacción.
@@ -7,10 +8,11 @@ export const findPage = async ({ model, query, totalWhere, hasFilters = true, in
 
     // Convertir PrismaPromise en Promise permite compartir un único conteo entre ambos resultados.
     const totalQuery = Promise.resolve(totalWhere === undefined ? model.count() : model.count({ where: totalWhere }));
+    const needsFilteredCount = hasFilters && !isDeepStrictEqual(totalWhere ?? {}, query.where ?? {});
     const [data, recordsTotal, recordsFiltered] = await Promise.all([
         dataQuery,
         totalQuery,
-        hasFilters ? model.count({ where: query.where }) : totalQuery
+        needsFilteredCount ? model.count({ where: query.where }) : totalQuery
     ]);
 
     return { data, recordsTotal, recordsFiltered };

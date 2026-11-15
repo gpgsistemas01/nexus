@@ -73,7 +73,7 @@ representativos del despliegue.
 
 | Área | Decisión y motivo |
 | --- | --- |
-| Listados de administración, ventas y almacén | `paginationRepository.findPage` ejecuta filas y conteos independientes conjuntamente; comparte el conteo cuando filtro y alcance coinciden. Conserva el total distinto del filtrado cuando corresponde. |
+| Listados de administración, ventas y almacén | `paginationRepository.findPage` ejecuta filas y conteos independientes conjuntamente; comparte el conteo cuando filtro y alcance coinciden, incluso si son objetos distintos con iguales valores y fechas. Conserva el total distinto del filtrado cuando corresponde. |
 | Consultas transaccionales | `materialHelpers` espera sus lecturas en orden. `lib/queuedPrismaPg.js` comparte una cola entre `queryRaw` y `executeRaw` de cada transacción; evita que la carga interna de relaciones de Prisma envíe consultas simultáneas a su conexión. El pool y las demás transacciones conservan su concurrencia. |
 | Exportaciones | Omiten conteos que no consumen. Usan un escritor XLSX progresivo sobre un temporal privado. Inventario lee por cursor en bloques de 5.000; los demás conservan sus consultas actuales. |
 | Stock de materiales y mermas | Agrupa los cambios por identidad y ejecuta una actualización parametrizada por lote. El repositorio bloquea filas en orden común, aplica la condición de saldo y devuelve los saldos de la escritura. Cualquier fila ausente provoca rollback desde el servicio. |
@@ -112,6 +112,100 @@ con el benchmark sin registrar cuerpos, parámetros SQL ni credenciales.
 Los resultados de cada ejecución se conservan como evidencia de la entrega, no como
 valores permanentes de este documento. El perfilador sólo se carga desde el benchmark
 y no cambia el cliente Prisma ni el logging de producción.
+
+## Índices de fechas y revisión con Supabase
+
+Prisma declara índices B-tree compuestos para `GoodsReceipt(type, receptionDate, id)`
+y `GoodsIssue(type, requestDate, id)`, que acompañan el tipo de documento y el rango
+de fecha. En `WasteIssue` se conserva el índice simple `requestDate`: reemplazarlo
+por fecha/id no mostró una ventaja suficiente en las mediciones de revisión.
+El orden fecha/id sigue siendo explícito en la consulta del histórico.
+La migración incremental no cambia datos ni permisos.
+Los índices admiten el orden ascendente de sus columnas; un orden descendente de
+fecha con id ascendente puede requerir ordenación adicional. No cubren todos los
+campos de ordenación ni evitan recorrer las coincidencias de un conteo exacto.
+
+Antes de aplicarlos en un despliegue, contrastar los planes reales generados por
+Prisma con `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` y estadísticas actualizadas en
+una base aislada con fechas distribuidas. Comparar filas, orden, conteos, bloques
+leídos y tiempo con y sin el índice; conservar SQL y resultados como evidencia.
+Un plan secuencial es válido para tablas pequeñas o filtros poco selectivos.
+
+Los avisos de Supabase orientan la revisión: una FK sin índice no justifica añadirlo
+sin evaluar sus consultas y el costo de escritura; un índice sin usos observados
+tampoco justifica retirarlo si soporta integridad o una operación poco frecuente.
+Revisar la antigüedad de estadísticas y el historial de migraciones antes de inferir
+cardinalidades o modificar tablas que ya no pertenecen al modelo Prisma.
+Las búsquedas `contains` siguen necesitando índices apropiados, como `pg_trgm`, y
+medición de selectividad; los índices de fecha no aceleran por sí solos `ILIKE`.
+
+`relationLoadStrategy: join` requiere la capacidad preliminar `relationJoins` en
+Prisma 7.10. No se activa globalmente: cambiar de estrategia puede desplazar trabajo
+al motor SQL y debe medirse con los documentos y transacciones del consumidor.
+El cliente compartido, su adaptador pg y las lecturas por lotes siguen vigentes.
+
+### Búsquedas por nombre y complementos de Prisma
+
+`Material_name_trgm_idx` usa GIN con `gin_trgm_ops` para `Material.name`.
+Prisma lo declara con `@@index`, `type: Gin` y `ops: raw("gin_trgm_ops")`;
+la migración reutiliza la extensión PostgreSQL `pg_trgm` ya requerida por las
+observaciones de salidas. No requiere activar `postgresqlExtensions` ni cambiar
+el generador de Prisma: la instalación de la extensión permanece en el SQL versionado.
+
+El índice acompaña `contains`/`ILIKE` en las consultas de material–proveedor de
+Materiales y Consumibles. Mantiene el significado de la búsqueda, los filtros de
+tipo/proveedor, la proyección por permisos y los conteos. Los términos muy cortos o
+poco selectivos pueden seguir usando un recorrido secuencial; no se fuerza el plan
+ni se sustituyen búsquedas parciales por búsqueda de palabras completas.
+Se conserva la unicidad de identidad mediante `Material_identity_key`, que tiene
+otra responsabilidad. No se extiende GIN automáticamente a columnas de stock ni
+a búsquedas de otros módulos sin planes que justifiquen su costo.
+
+| Complemento o capacidad | Decisión para Nexus |
+| --- | --- |
+| `pg_trgm` + índice GIN declarado en Prisma | Aplicado a nombre de material tras comparar filas, conteos y planes de búsquedas selectivas, amplias, cortas y sin coincidencias. Requiere mantener el índice al registrar o modificar materiales. |
+| `pg_stat_statements`, `hypopg` e `index_advisor` de Supabase | Herramientas de diagnóstico ya disponibles en el proyecto; sirven para revisar SQL y candidatos a índices, sin ejecutarlas dentro de cada solicitud de negocio. |
+| `@prisma/adapter-pg` y pool existente | Se mantienen con el cliente compartido. No se crea un segundo pool ni cliente por petición. |
+| `relationJoins` / `relationLoadStrategy` | Capacidad preliminar en la versión actual; requiere comparar cargas concretas antes de cambiar la estrategia. |
+| `@prisma/instrumentation` | Integra trazas con OpenTelemetry; requiere configurar su recolector y destino. Diagnostica tiempos, pero no optimiza una consulta por instalarlo. El benchmark y el logger existentes cubren esta revisión. |
+| Prisma Accelerate y caché de consultas | No se incorporan a las lecturas operativas de inventario: requieren diseñar vigencia, aislamiento por permisos e invalidación tras escrituras y medir frente a la conexión existente a Supabase. |
+| Extensiones de cliente con `$extends` | Se reservan para comportamiento transversal necesario y medido; una envoltura sin cambios de SQL no resuelve un índice faltante ni el costo de una relación. |
+
+La revisión conserva los índices únicos y los funcionales/parciales mantenidos por
+migraciones. Los avisos de índice sin uso no sustituyen esa revisión de integridad.
+Las nuevas migraciones se prueban en una base aislada y sólo se aplican a Supabase
+como parte del despliegue autorizado.
+
+### Selección y reducción de índices auxiliares
+
+Se conservan las claves primarias, los índices únicos y la identidad funcional o
+parcial: garantizan referencias, folios, facturas, idempotencia y ausencia de
+duplicados, aunque sus estadísticas indiquen pocas lecturas. Los índices de
+relación, filtros operativos, vencimiento y auditoría se evalúan según su consulta.
+
+La migración `20261114210000_prune_redundant_indexes` retira siete auxiliares:
+
+| Índice retirado | Cobertura o motivo que permanece |
+| --- | --- |
+| `SupplierMaterial_supplierId_idx` | El único `(supplierId, materialId)` conserva la búsqueda por su prefijo `supplierId` y la cobertura de la FK. |
+| `Waste_supplierId_idx` | El único de identidad de merma comienza por `supplierId`; conserva ese filtro y su FK. |
+| `GoodsReceipt_supplierId_idx` | El único `(supplierId, invoice)` conserva el filtro por proveedor y su FK, incluso para facturas nulas. |
+| `GoodsIssue_type_idx` | El compuesto `(type, requestDate, id)` conserva el prefijo de tipo y el rango de fechas. |
+| `GoodsReceipt_type_idx` | El compuesto `(type, receptionDate, id)` conserva el prefijo de tipo y el rango de fechas. |
+| `InventoryImport_userId_createdAt_idx` | Las lecturas actuales usan id/usuario o `(userId, operationId)`, no un listado cronológico por usuario. La PK, el único de operación y `(status, expiresAt, id)` permanecen. |
+| `HistoricalDeliveryBatch_userId_createdAt_idx` | No hay listado cronológico por usuario; las lecturas usan la PK o `(userId, operationId)`. El único también conserva el prefijo de usuario para su FK. |
+
+Un índice compuesto puede reemplazar el acceso por su primer campo, pero un índice
+simple más pequeño puede resultar más barato en otra distribución. La retirada se
+contrasta con planes y carga de proveedores/tipos representativos: deben conservar
+filas, orden, conteos, lectura por cursor, reintentos y cobertura de FK. La mejora
+esperada es mantener menos estructuras al escribir; no se promete acelerar cada
+lectura. Una consulta futura que ordene recibos por usuario/fecha debe medir de
+nuevo esa necesidad antes de reinstalar el índice.
+
+Se mantienen los tres índices nuevos medidos de fechas y búsqueda por nombre.
+El historial de migraciones anterior conserva cómo se crearon los retirados; la
+reducción se expresa en una migración nueva, sin borrar ni reescribir ese historial.
 
 ## Generación de Excel y carga mixta de Node.js
 

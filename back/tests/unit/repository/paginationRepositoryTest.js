@@ -20,6 +20,26 @@ describe('consulta paginada', () => {
     expect(await findPage({ model, query: {}, includeCounts: false })).toEqual({ data: [{ id: 'row' }] });
     expect(model.count).not.toHaveBeenCalled();
   });
+
+  it.each([
+    { query: {}, totalWhere: undefined },
+    { query: { where: {} }, totalWhere: undefined },
+    { query: { where: { type: 'MATERIAL', requestDate: { gte: new Date('2026-01-01') } } },
+      totalWhere: { requestDate: { gte: new Date('2026-01-01') }, type: 'MATERIAL' } }
+  ])('evita repetir el conteo con filtros equivalentes: %j', async ({ query, totalWhere }) => {
+    const model = { findMany: vi.fn().mockResolvedValue([]), count: vi.fn().mockResolvedValue(5) };
+    expect(await findPage({ model, query, totalWhere })).toEqual({ data: [], recordsTotal: 5, recordsFiltered: 5 });
+    expect(model.count).toHaveBeenCalledTimes(1);
+  });
+
+  it('conserva el conteo filtrado cuando el alcance cambia de fecha', async () => {
+    const model = { findMany: vi.fn().mockResolvedValue([]), count: vi.fn().mockResolvedValueOnce(8).mockResolvedValueOnce(2) };
+    const page = await findPage({ model,
+      totalWhere: { requestDate: { gte: new Date('2026-01-01') } },
+      query: { where: { requestDate: { gte: new Date('2026-02-01') } } } });
+    expect(page).toEqual({ data: [], recordsTotal: 8, recordsFiltered: 2 });
+    expect(model.count).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('lectura por bloques de exportación', () => {

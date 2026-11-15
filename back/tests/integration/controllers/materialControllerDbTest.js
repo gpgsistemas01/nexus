@@ -155,4 +155,29 @@ describe('registro de materiales con y sin medidas', () => {
     expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
   });
 
+  it('conserva búsqueda parcial por nombre, tipo, proveedor y visibilidad de costos con el índice de trigramas', async () => {
+    const { findAllSupplierMaterials } = await import('../../../src/services/warehouse/materials/supplierMaterialService.js');
+    const name = `Lamina Ámbar ${suffix}`;
+    const expected = new Map();
+    for (const type of ['MATERIAL', 'CONSUMABLE']) {
+      const material = await prisma.material.create({ data: {
+        name, type, presentationId: ids.presentation, unitMeasureId: ids.meters,
+        ...(type === 'MATERIAL' && { base: 2, height: 3 })
+      } });
+      await prisma.supplierMaterial.create({ data: { materialId: material.id, supplierId: ids.supplier, maxUnitCost: 10 } });
+      expected.set(type, material.id);
+    }
+    for (const type of ['MATERIAL', 'CONSUMABLE']) {
+      const page = await findAllSupplierMaterials({ type, supplierId: ids.supplier,
+        search: `mInA ÁmBaR ${suffix}`, orderBy: 'name', canReadCosts: false });
+      expect(page.recordsFiltered).toBe(1);
+      expect(page.data.map(row => row.material.id)).toEqual([expected.get(type)]);
+      expect(page.data[0].material.name).toBe(name);
+      expect(page.data[0]).not.toHaveProperty('maxUnitCost');
+    }
+    const absent = await findAllSupplierMaterials({ type: 'MATERIAL', supplierId: randomUUID(), search: name });
+    expect(absent.recordsFiltered).toBe(0);
+    expect(absent.data).toEqual([]);
+  });
+
 });
