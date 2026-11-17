@@ -97,6 +97,7 @@ El [capítulo de reportes](14-reports.md) explica su alcance.
 
 Seleccione la presentación **KILOGRAMOS** o **METRO LINEAL**: esa elección fija
 ambas medidas en **1 × 1**, independientemente de la unidad de medida seleccionada.
+Estos campos se ocultan durante el alta porque se completan automáticamente.
 La cantidad comprada expresa kg o metros, respectivamente: 4 kilos a $20 por kilo
 suman $80 antes de IVA. Las medidas representan la unidad y no multiplican el precio.
 Esta regla también aplica al alta desde Compras y Excel. En Excel, Base y Altura

@@ -397,7 +397,7 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
 });
 
 it.each([false, true])(
-  'alta desde Compras muestra las medidas del consumible (por pieza: %s)',
+  'alta desde Compras oculta sólo las medidas fijadas por presentación (fijas: %s)',
   (isPerPiece) => {
     const target = { action: 'create' as const };
     const preview = previewWaste(initialInventoryValues(target));
@@ -408,9 +408,12 @@ it.each([false, true])(
       hasSupplier: true,
     });
     const fields = sections.find((section) => section.id === 'measurements')?.fields;
-    expect(fields?.map((field) => field.name)).toEqual(['base', 'height']);
-    expect(fields?.find((field) => field.name === 'height')?.isReadOnly).toBe(isPerPiece);
-    if (isPerPiece) expect(fields?.find((field) => field.name === 'base')?.isReadOnly).toBe(true);
+    if (isPerPiece) {
+      expect(fields).toBeUndefined();
+    } else {
+      expect(fields?.map((field) => field.name)).toEqual(['base', 'height']);
+      expect(fields?.find((field) => field.name === 'height')?.isReadOnly).toBe(false);
+    }
   },
 );
 
