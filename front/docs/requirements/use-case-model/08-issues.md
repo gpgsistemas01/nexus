@@ -45,9 +45,6 @@ direction LR
 
     operational -- ucMaterialIssueQuery
     warehouse -- ucMaterialIssueQuery
-    admin -- ucMaterialSupply
-    admin -- ucMaterialReturn
-    admin -- ucMaterialIssueReport
     ucMaterialIssueQuery -- ucMaterialIssueDetails
     ucMaterialIssueQuery -- ucMaterialIssueHeader
     ucMaterialIssueQuery -- ucMaterialIssueCreate
@@ -86,9 +83,6 @@ direction LR
 
     operational -- ucWasteIssueQuery
     warehouse -- ucWasteIssueQuery
-    admin -- ucWasteSupply
-    admin -- ucWasteReturn
-    admin -- ucWasteIssueReport
     ucWasteIssueQuery -- ucWasteIssueDetails
     ucWasteIssueQuery -- ucWasteIssueHeader
     ucWasteIssueQuery -- ucWasteIssueCreate
@@ -127,9 +121,6 @@ direction LR
 
     operational -- ucConsumableIssueQuery
     warehouse -- ucConsumableIssueQuery
-    admin -- ucConsumableSupply
-    admin -- ucConsumableReturn
-    admin -- ucConsumableIssueReport
     ucConsumableIssueQuery -- ucConsumableIssueDetails
     ucConsumableIssueQuery -- ucConsumableIssueHeader
     ucConsumableIssueQuery -- ucConsumableIssueCreate

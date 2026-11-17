@@ -34,7 +34,6 @@ direction LR
     admin -- ucMaterialStock
     operational -- ucMaterialQuery
     warehouse -- ucMaterialInventoryReport
-    admin -- ucMaterialInventoryReport
 
     ucMaterialQuery -- ucMaterialCreate
     ucMaterialQuery -- ucMaterialEdit
@@ -71,7 +70,6 @@ direction LR
     admin -- ucWasteStock
     operational -- ucWasteQuery
     warehouse -- ucWasteReport
-    admin -- ucWasteReport
 
     ucWasteQuery -- ucWasteCreate
     ucWasteQuery -- ucWasteEdit
@@ -108,7 +106,6 @@ direction LR
     admin -- ucConsumableStock
     operational -- ucConsumableQuery
     warehouse -- ucConsumableReport
-    admin -- ucConsumableReport
 
     ucConsumableQuery -- ucConsumableCreate
     ucConsumableQuery -- ucConsumableEdit
