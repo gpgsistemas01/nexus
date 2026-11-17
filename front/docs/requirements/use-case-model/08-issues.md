@@ -14,9 +14,10 @@ Las líneas de acceso desde Consulta no indican participación de las áreas ope
 en esas funciones ni les conceden permisos.
 
 El alta contextual de cliente se representa una sola vez en [Altas desde selectores](09-contextual-creation.md#cliente-durante-una-salida).
-Aquí no se repite ese caso. Surtir, devolver y generar reportes son objetivos
-independientes con participación de Personal de almacén. Sus líneas desde Consulta
-siguen la convención de acceso del modelo, sin afirmar `«include»` ni `«extend»`.
+Aquí no se repite ese caso. Surtir, devolver y generar reportes son extensiones
+opcionales de la consulta. `«extend»` indica que parten de ella; las asociaciones
+actor–caso indican quién puede ejecutarlos. Las áreas operativas sólo están asociadas
+con las consultas y no participan en esas extensiones.
 
 ## Salidas de materiales
 
@@ -48,9 +49,9 @@ direction LR
     ucMaterialIssueQuery -- ucMaterialIssueDetails
     ucMaterialIssueQuery -- ucMaterialIssueHeader
     ucMaterialIssueQuery -- ucMaterialIssueCreate
-    ucMaterialIssueQuery -- ucMaterialSupply
-    ucMaterialIssueQuery -- ucMaterialReturn
-    ucMaterialIssueQuery -- ucMaterialIssueReport
+    ucMaterialSupply ..>:extend ucMaterialIssueQuery
+    ucMaterialReturn ..>:extend ucMaterialIssueQuery
+    ucMaterialIssueReport ..>:extend ucMaterialIssueQuery
     warehouse -- ucMaterialSupply
     warehouse -- ucMaterialReturn
     warehouse -- ucMaterialIssueReport
@@ -86,9 +87,9 @@ direction LR
     ucWasteIssueQuery -- ucWasteIssueDetails
     ucWasteIssueQuery -- ucWasteIssueHeader
     ucWasteIssueQuery -- ucWasteIssueCreate
-    ucWasteIssueQuery -- ucWasteSupply
-    ucWasteIssueQuery -- ucWasteReturn
-    ucWasteIssueQuery -- ucWasteIssueReport
+    ucWasteSupply ..>:extend ucWasteIssueQuery
+    ucWasteReturn ..>:extend ucWasteIssueQuery
+    ucWasteIssueReport ..>:extend ucWasteIssueQuery
     warehouse -- ucWasteSupply
     warehouse -- ucWasteReturn
     warehouse -- ucWasteIssueReport
@@ -124,9 +125,9 @@ direction LR
     ucConsumableIssueQuery -- ucConsumableIssueDetails
     ucConsumableIssueQuery -- ucConsumableIssueHeader
     ucConsumableIssueQuery -- ucConsumableIssueCreate
-    ucConsumableIssueQuery -- ucConsumableSupply
-    ucConsumableIssueQuery -- ucConsumableReturn
-    ucConsumableIssueQuery -- ucConsumableIssueReport
+    ucConsumableSupply ..>:extend ucConsumableIssueQuery
+    ucConsumableReturn ..>:extend ucConsumableIssueQuery
+    ucConsumableIssueReport ..>:extend ucConsumableIssueQuery
     warehouse -- ucConsumableSupply
     warehouse -- ucConsumableReturn
     warehouse -- ucConsumableIssueReport

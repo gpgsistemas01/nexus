@@ -160,8 +160,10 @@ alcanzar un objetivo. Puede especializar a otro actor; no representa una entidad
 de datos, una cuenta concreta ni una pantalla.
 
 **Ejemplo:** `DIA-VUE-LEG-004`. Vista resumida de consulta y operaciones, con un caso
-propio de un actor especializado. Los enlaces consulta–operación son la convención
-de acceso del documento; no representan relaciones UML entre casos.
+propio de un actor especializado. Una línea continua entre casos indica asociación;
+`«extend»` indica comportamiento opcional agregado a la consulta. La asociación entre
+actor y caso expresa participación; la extensión no concede permisos al actor de la
+consulta, que se determinan por las asociaciones actor–caso explícitas y la herencia.
 
 ```mermaid
 usecase-beta
