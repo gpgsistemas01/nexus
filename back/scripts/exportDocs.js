@@ -29,13 +29,6 @@ import {
 
 const ROOT = process.cwd();
 const OPENAPI_SOURCE = 'docs/architecture/openapi/openapi.json';
-const collectionGroups = [
-    'authentication',
-    'identity-access',
-    'catalogs',
-    'purchases',
-    'issues'
-];
 const getDirectoryDocuments = (directory) => {
     const entries = readdirSync(path.join(ROOT, directory), { withFileTypes: true })
         .filter((entry) => entry.isDirectory() || entry.name.endsWith('.md'))
@@ -59,7 +52,6 @@ const sequenceGroups = [
     'issues'
 ];
 const packagePart = (entry, sources) => [entry, ...sources.filter((source) => source !== entry)];
-const REQUIREMENT_ENTRY = 'docs/requirements/index.md';
 const ARCHITECTURE_ENTRY = 'docs/architecture/index.md';
 const {
     publication: requestedPublication,
@@ -94,25 +86,6 @@ const PUBLICATIONS = Object.freeze({
             }
         }
     },
-    requisitos: {
-        directory: 'requisitos',
-        parts: {
-            'vision-y-alcance': packagePart(REQUIREMENT_ENTRY, [
-                ...getDirectoryDocuments('docs/requirements/vision-scope-and-requirements')
-            ]),
-            especificacion: packagePart(REQUIREMENT_ENTRY, [
-                ...getDirectoryDocuments('docs/requirements/requirements-specification'),
-                'docs/requirements/business-glossary.md'
-            ]),
-            'dominio-y-casos-de-uso': packagePart(REQUIREMENT_ENTRY, [
-                ...getDirectoryDocuments('docs/requirements/domain-and-use-cases')
-            ]),
-            ...Object.fromEntries(collectionGroups.map((group) => [
-                `casos-de-uso-${group}`,
-                packagePart(REQUIREMENT_ENTRY, getCollectionDocuments('docs/requirements/use-cases', [group]))
-            ]))
-        }
-    },
     datos: {
         parts: {
             datos: [
@@ -128,7 +101,6 @@ const PUBLICATIONS = Object.freeze({
             'vision-y-navegacion': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/index.md',
                 'docs/architecture/views/scenarios/index.md',
-                'docs/requirements/domain-and-use-cases/02-current-use-cases.md',
                 '../front/docs/architecture/views/scenarios/index.md',
                 'docs/architecture/views/processes/index.md',
                 'docs/architecture/views/processes/01-end-to-end-interaction.md',
@@ -158,7 +130,6 @@ const PUBLICATIONS = Object.freeze({
             ],
             backend: packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
-                'docs/architecture/views/development/inventory-excel-import.md',
                 'docs/architecture/views/development/excel-library-decision.md',
                 'docs/architecture/views/development/code-structure/06-prisma-and-persistence.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/backend-technical-documentation')
@@ -387,7 +358,7 @@ if ((requestedPublication !== 'todos' && !selectablePublicationNames.includes(re
     || invalidDocument
     || positionalArgumentCount > 3
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- [todos|manuales|requisitos|datos|arquitectura|pruebas|gobernanza] [seccion] [docx|pdf|ambos] [--check|--check-sources]');
+    console.error('Uso: npm run docs:export -- [todos|manuales|datos|arquitectura|pruebas|gobernanza] [seccion] [docx|pdf|ambos] [--check|--check-sources]');
     process.exit(1);
 }
 

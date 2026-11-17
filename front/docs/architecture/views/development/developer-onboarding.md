@@ -46,5 +46,4 @@ muestra el recorrido completo. Las pruebas de
 | Operación de negocio | Requisito, caso de uso, contrato API y coordinador del dominio. |
 
 La [estructura del código](code-structure.md) localiza carpetas y responsabilidades.
-El [procedimiento de revisión](../../../development/04-change-review.md) indica qué
-comprobar según el cambio.
+La [guía de comandos](../../../development/00-commands.md#comprobar-y-compilar-vue) indica cómo ejecutar las comprobaciones.

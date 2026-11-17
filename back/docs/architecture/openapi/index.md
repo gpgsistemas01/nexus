@@ -6,7 +6,7 @@ La especificación [OpenAPI 3.1](openapi.json) define el contrato HTTP.
 | --- | --- |
 | Iniciar sesión y enviar una petición | [Inicio rápido](01-consumption.md). |
 | Revisar rutas, parámetros y esquemas | [OpenAPI](openapi.json). |
-| Explorar y probar en desarrollo | [Swagger UI](02-maintenance.md#swagger-ui-en-desarrollo). |
+| Explorar y probar en desarrollo | [Swagger UI](02-maintenance.md#probar-en-desarrollo). |
 | Validar y publicar | [Mantenimiento](02-maintenance.md). |
 
 Las rutas se agrupan en [sesión](paths/auth.json), [ventas](paths/sales.json),

@@ -79,11 +79,11 @@ direction LR
     systemBoundary clientContext["Nexus · Cliente desde Salidas"]
         client("CU-CAT-06 Crear cliente")
         createMaterial("CU-SAL-02 Crear salida de material")
-        headerMaterial("CU-SAL-03 Editar encabezado de material")
+        headerMaterial("CU-SAL-03 Editar encabezado de salida de material")
         createWaste("CU-SAL-09 Crear salida de merma")
-        headerWaste("CU-SAL-10 Editar encabezado de merma")
+        headerWaste("CU-SAL-10 Editar encabezado de salida de merma")
         createConsumable("CU-SAL-16 Crear salida de consumible")
-        headerConsumable("CU-SAL-17 Editar encabezado de consumible")
+        headerConsumable("CU-SAL-17 Editar encabezado de salida de consumible")
     end
     warehouse -- client
     client ..>:extend createMaterial

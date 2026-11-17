@@ -25,7 +25,7 @@ repositorio y ya exige mantener sincronizados los documentos relacionados.
 ### Títulos y vocabulario técnico
 
 El producto se llama **Nexus**. Al describir sus funciones, acciones y resultados
-en requisitos, casos de uso y manuales, se usa ese nombre. Los términos sistema
+en requisitos y casos de uso, se usa ese nombre. Los términos sistema
 operativo, pruebas de sistema y límite del sistema en UML conservan su significado;
 también los nombres visibles, como Administrador del sistema, y el campo documental
 Versión del sistema.

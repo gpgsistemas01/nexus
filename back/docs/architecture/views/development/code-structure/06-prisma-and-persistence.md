@@ -77,7 +77,7 @@ incremental, conservando los índices de integridad y el historial anterior.
 ## Comandos habituales
 
 Desde `back/`, use Node.js 24 y `npm ci` para instalar las versiones del lockfile.
-Configure las [variables del README](../../../../../README.md#variables-de-entorno):
+Configure las [variables de desarrollo](../../../../development/local-development.md#preparar-el-entorno):
 la aplicación usa `DATABASE_URL`; el CLI prefiere `DIRECT_URL`. Ambas deben
 apuntar a la misma base del entorno. En pruebas se seleccionan
 `DATABASE_TEST_URL` y, si existe, `DIRECT_TEST_URL`, para una base aislada.

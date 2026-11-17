@@ -28,5 +28,5 @@ Las rutas de importación se interpretan desde el archivo de código indicado.
 [EditorConfig](../../../.editorconfig), [Prettier](../../../prettier.config.js),
 [ESLint](../../../eslint.config.js), [TypeScript](../../../tsconfig.app.json) y
 [Vite](../../../vite.config.ts) concretan las convenciones automatizadas.
-La [guía de herramientas](../../development/02-tooling.md) reúne los comandos;
-la [revisión de cambios](../../development/04-change-review.md), los controles de entrega.
+La [guía de herramientas](../../development/02-tooling.md) describe la configuración;
+la [guía de comandos](../../development/00-commands.md), las comprobaciones disponibles.

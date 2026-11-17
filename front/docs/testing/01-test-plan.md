@@ -152,7 +152,7 @@ de sistema se prepara según su [guía de aislamiento](05-system-tests.md).
 ## Criterios de revisión y finalización
 
 Aplicar los criterios de [entrada, suspensión y salida](#entrada-suspensión-y-salida)
-y la [revisión de cambios](../development/04-change-review.md).
+y los comandos de la [guía de comandos](../development/00-commands.md#comprobar-y-compilar-vue).
 
 La configuración de CI y los comandos se consultan en
 [Herramientas](../development/02-tooling.md#configuración-y-compatibilidad). Los resultados JUnit,

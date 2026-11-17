@@ -1,16 +1,12 @@
 # 6. Mantenimiento y evidencia de revisión
 
-Al modificar requisitos se debe:
+Al cambiar la API, la persistencia o una colaboración del backend, actualice el
+contrato y las vistas técnicas afectados. Regenere los inventarios cuando cambien
+rutas, imports o Prisma, y ejecute `npm run docs:check`.
 
-1. aplicar la tabla binaria de ISO/IEC/IEEE 29148 a cada requisito afectado;
-2. comprobar que casos de uso y diagramas conservan los mismos `CU-*`;
-3. revisar actores, glosario, modos y efectos de las operaciones y estados;
-4. mantener las pruebas unitarias junto a su artefacto y las integraciones CRUD en
-   `tests/integration/controllers`;
-5. ejecutar `npm run docs:check` y las pruebas relacionadas;
-6. registrar cualquier criterio no aplicable, brecha aceptada o aprobación externa en
-   la incidencia que origina el cambio.
+Las secuencias técnicas conservan los identificadores y nombres de los casos de
+uso definidos en `front/docs/requirements/`. Los requisitos se mantienen allí;
+las pruebas del backend verifican sus garantías HTTP y persistentes.
 
-La reevaluación completa ocurre al cambiar la edición contractual de una norma, el
-alcance del producto, los actores, las características de calidad o la estructura de los
-artefactos documentales.
+Conserve los resultados de comprobación y los límites de la revisión en CI o en la
+solicitud de cambio. Los Markdown describen la versión vigente del sistema.

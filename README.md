@@ -11,8 +11,7 @@ en `front/`.
 - **Entender la solución:** [arquitectura backend](back/docs/architecture/index.md)
   y [arquitectura Vue](front/docs/architecture/index.md).
 - **Usar el sistema:** [manuales Vue](front/docs/user-manual/index.md).
-- **Consultar requisitos:** [requisitos backend](back/docs/requirements/index.md)
-  y [requisitos Vue](front/docs/requirements/index.md).
+- **Consultar requisitos:** [requisitos y casos de uso](front/docs/requirements/index.md).
 
 ## Repositorio
 

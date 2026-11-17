@@ -57,28 +57,9 @@ Al cambiar un recurso se revisan sus archivos y contrato; al cambiar una pieza c
 se revisan sus configuradores y consumidores. Esta vista describe la implementación
 vigente; los cambios se pueden rastrear en Git.
 
-## Criterio de índices
-
-El índice de esta vista presenta sus colecciones; el `index.md` de cada colección
-localiza sus capítulos o módulos. Un capítulo técnico desarrolla su contrato o decisión,
-sin mantener otra lista equivalente de navegación. Los índices de grupos de secuencias
-sirven para encontrar casos entre muchos archivos y seleccionar su paquete exportable.
-Las tablas de notación, decisiones o cobertura aportan otra pregunta y sólo se conservan
-cuando no reproducen esa misma lista.
-
 Para comenzar a contribuir, consulte la [guía de incorporación](developer-onboarding.md).
 
-## Importación de inventario
+## Archivos Excel
 
-La [importación de inventario por Excel](inventory-excel-import.md) define
-plantillas, contratos, reutilización, confirmación y retención de archivos.
-Incluye límites de ejecución, confirmación atómica y limpieza de borradores.
-El [motor Excel](excel-library-decision.md) describe la integración, los límites
-de recursos y sus condiciones de compatibilidad.
-
-La [conciliación de inventario y entregas históricas](inventory-reconciliation.md)
-implementa el conteo físico por Excel y el registro por lote de entregas ya realizadas
-sin otro descuento de existencias.
-
-La [revisión de implementación del hilo](thread-implementation-review.md) distingue
-las capacidades existentes, las brechas encontradas y sus implementaciones verificables.
+El [motor Excel](excel-library-decision.md) describe la lectura y escritura en workers,
+los límites de recursos y la compatibilidad del binario nativo.

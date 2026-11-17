@@ -23,5 +23,5 @@ configurado; las cookies son `SameSite=Lax`.
 
 Envíe cuerpos como `application/json`. Obtenga los UUID y versiones del entorno;
 los ejemplos de OpenAPI son ficticios. Consulte los
-[errores y reintentos](api-contract.md#errores-globales-y-códigos-públicos) antes de
+[errores y reintentos](api-contract.md#escrituras-y-reintentos) antes de
 repetir una escritura.

@@ -21,12 +21,12 @@ direction LR
     actor warehouse("Personal de almacén")
 
     systemBoundary receiptPackage1["Nexus · Compras de materiales"]
-        ucReceiptQuery("CU-ENT-01 Consultar")
-        ucReceiptCreate("CU-ENT-02 Crear")
-        ucReceiptEdit("CU-ENT-03 Editar")
-        ucReceiptCorrect("CU-ENT-04 Corregir detalle")
-        ucReceiptCancel("CU-ENT-05 Cancelar detalle")
-        ucPurchaseReport("CU-ENT-06 Generar reporte")
+        ucReceiptQuery("CU-ENT-01 Consultar compras de material")
+        ucReceiptCreate("CU-ENT-02 Crear compra de material")
+        ucReceiptEdit("CU-ENT-03 Editar compra de material")
+        ucReceiptCorrect("CU-ENT-04 Corregir material de una compra")
+        ucReceiptCancel("CU-ENT-05 Cancelar material de una compra")
+        ucPurchaseReport("CU-ENT-06 Generar reporte de compras de material")
     end
 
     warehouse -- ucReceiptQuery
@@ -51,12 +51,12 @@ direction LR
     actor warehouse("Personal de almacén")
 
     systemBoundary receiptPackage2["Nexus · Compras de consumibles"]
-        ucConsumableReceiptQuery("CU-ENT-07 Consultar")
-        ucConsumableReceiptCreate("CU-ENT-08 Crear")
-        ucConsumableReceiptEdit("CU-ENT-09 Editar")
-        ucConsumableReceiptCorrect("CU-ENT-10 Corregir detalle")
-        ucConsumableReceiptCancel("CU-ENT-11 Cancelar detalle")
-        ucConsumablePurchaseReport("CU-ENT-12 Generar reporte")
+        ucConsumableReceiptQuery("CU-ENT-07 Consultar compras de consumible")
+        ucConsumableReceiptCreate("CU-ENT-08 Crear compra de consumible")
+        ucConsumableReceiptEdit("CU-ENT-09 Editar compra de consumible")
+        ucConsumableReceiptCorrect("CU-ENT-10 Corregir consumible de una compra")
+        ucConsumableReceiptCancel("CU-ENT-11 Cancelar consumible de una compra")
+        ucConsumablePurchaseReport("CU-ENT-12 Generar reporte de compras de consumible")
     end
 
     warehouse -- ucConsumableReceiptQuery

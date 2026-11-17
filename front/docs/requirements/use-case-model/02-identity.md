@@ -19,10 +19,10 @@ direction LR
     actor warehouse("Personal de almacén")
 
     systemBoundary identityPackage1["Nexus · Personas"]
-        ucPersonQuery("CU-IDA-01 Consultar")
-        ucPersonCreate("CU-IDA-02 Crear")
-        ucPersonEdit("CU-IDA-03 Editar")
-        ucPersonReport("CU-IDA-04 Generar reporte")
+        ucPersonQuery("CU-IDA-01 Consultar personas")
+        ucPersonCreate("CU-IDA-02 Crear persona")
+        ucPersonEdit("CU-IDA-03 Editar persona")
+        ucPersonReport("CU-IDA-04 Generar reporte de personas")
     end
 
     warehouse -- ucPersonQuery
@@ -45,11 +45,11 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary identityPackage2["Nexus · Usuarios y credenciales"]
-        ucUserQuery("CU-IDA-05 Consultar")
-        ucUserCreate("CU-IDA-06 Crear")
-        ucUserEdit("CU-IDA-07 Editar")
-        ucPasswordEdit("CU-IDA-08 Cambiar contraseña")
-        ucUserReport("CU-IDA-09 Generar reporte")
+        ucUserQuery("CU-IDA-05 Consultar usuarios")
+        ucUserCreate("CU-IDA-06 Crear usuario y asignar acceso")
+        ucUserEdit("CU-IDA-07 Editar usuario y acceso")
+        ucPasswordEdit("CU-IDA-08 Cambiar contraseña de usuario")
+        ucUserReport("CU-IDA-09 Generar reporte de usuarios")
     end
 
     admin -- ucUserQuery

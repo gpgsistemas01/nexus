@@ -618,7 +618,7 @@ test('almacén: filtros y paginación se envían al servidor y permiten recupera
   });
   await page.goto('/almacen/materiales');
   await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
-  await expect(page.getByText('11–12 de 12', { exact: true })).toBeVisible();
+  await expect(page.getByText('Registros 11–12 de 12', { exact: true })).toBeVisible();
   expect(queries.at(-1)?.get('start')).toBe('10');
   await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('error');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();

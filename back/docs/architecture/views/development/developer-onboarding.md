@@ -20,7 +20,7 @@ Una página visible no autoriza todas sus operaciones. Consulte las políticas d
 
 ## Seguir una recepción de materiales
 
-1. Lea `CU-ENT-02` en [casos de uso de compras](../../../requirements/use-cases/purchases/index.md): explica por qué el operador registra la recepción y qué resultado debe conservar.
+1. Lea `CU-ENT-02` en [casos de uso de compras](../../../../../front/docs/requirements/use-cases/purchases/index.md): explica por qué el operador registra la recepción y qué resultado debe conservar.
 2. Localice la página `/compras/materiales` en la [navegación web](../../../../../front/docs/architecture/views/scenarios/navigation-and-screens.md) y siga su formulario en la [referencia frontend](../../../../../front/docs/architecture/views/development/code-structure.md). El selector puede crear un material con existencia cero; abrir o guardar ese catálogo no debe registrar lo recibido.
 3. Revise la solicitud en el [contrato API](../../openapi/api-contract.md) y la ruta registrada. La ruta fija el contexto de materiales o consumibles; la entrada del navegador no debe cambiarlo.
 4. Siga el controlador y el servicio en la [secuencia backend de la recepción](../processes/backend-code-sequences/purchases/cu-ent-02.md). Al confirmar la compra, documento, detalles, existencias y movimientos deben conservarse juntos; un fallo no debe dejar una recepción parcial.
@@ -31,13 +31,8 @@ En el repositorio, use el [mapa generado](code-map.md) para localizar archivos y
 
 ## Preparar y verificar un cambio
 
-Siga la instalación y configuración del [README de la aplicación](../../../../README.md). Use una versión de Node.js admitida por `engines` en `back/package.json`. Las pruebas persistentes requieren una base de pruebas distinta de desarrollo; la configuración se comprueba antes de ejecutar integración.
-
-Antes de agregar un módulo, busque una fábrica, servicio o componente equivalente. Mantenga una sola transacción en escrituras compuestas y transmita su cliente a los colaboradores. No mezcle consultas del cliente global con la transacción que está guardando un documento. Revise los [patrones](design-and-construction-patterns/index.md) y el [estándar de código](../../coding-standards/index.md) para preservar la organización local.
-
-Ejecute las pruebas específicas, `npm run test:unit` y `npm run docs:check`. Si cambian rutas, imports o Prisma, regenere con `npm run docs:architecture`. Si cambia una pantalla o permiso visible, revise manuales y capturas del perfil afectado. La documentación curada se actualiza con la decisión; un inventario regenerado no explica por sí solo por qué se tomó.
-
-Las brechas de seguridad, auditoría y alcance están identificadas en [acceso y auditoría](../logical/02-identity-access-and-audit.md) y en la [visión](../../../requirements/vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md). Una entidad modelada o un servicio aislado no demuestra que exista un recorrido operativo completo.
+Consulta [Desarrollo backend](../../../development/index.md) para instalar, ejecutar
+y validar la API. Las convenciones están en el [estándar de código](../../coding-standards/index.md).
 
 ## Localizar el arranque y las comprobaciones operativas
 

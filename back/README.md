@@ -9,7 +9,7 @@ interfaz Vue consume los contratos HTTP y los recursos compartidos del backend.
 - **¿Cómo se organiza el backend y cómo persiste los datos?** Consulta la
   [arquitectura](docs/architecture/index.md), el [modelo Prisma](prisma/schema.prisma)
   y las [referencias de datos](docs/architecture/views/logical/data-and-persistence/index.md).
-- **¿Qué reglas y resultados implementa?** Consulta [requisitos y casos de uso](docs/requirements/index.md).
+- **¿Qué reglas y resultados implementa?** Consulta [requisitos y casos de uso](../front/docs/requirements/index.md).
 - **¿Cómo se comportan las operaciones?** Consulta las
   [secuencias y procesos](docs/architecture/views/processes/index.md).
 - **¿Cómo se inicia en desarrollo, se valida o se exporta la documentación?** Sigue
@@ -23,7 +23,7 @@ interfaz Vue consume los contratos HTTP y los recursos compartidos del backend.
 src/          Aplicación HTTP, rutas, controladores, servicios y persistencia
 prisma/       Esquema y migraciones PostgreSQL
 tests/        Pruebas unitarias, HTTP, integración y rendimiento
-docs/         Arquitectura, requisitos, pruebas, desarrollo y gobernanza
+docs/         Arquitectura, pruebas, desarrollo y gobernanza
 ```
 
 Las rutas componen los controladores; éstos coordinan entrada, validación y
