@@ -1,28 +1,17 @@
-# Documentación de la API de Nexus
+# API de Nexus
 
-## Datos generales del documento
+La especificación [OpenAPI 3.1](openapi.json) define el contrato HTTP.
 
-| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
-| --- | --- | --- | --- | --- |
-| 1.1 | 1.0.0 | En revisión | 2026-10-31 | Equipo Nexus |
-
-Referencia de las rutas `/api`: autenticación, consultas, escrituras y reportes.
-Los comandos se ejecutan desde `back/`.
-
-| Necesidad | Consultar |
+| Necesidad | Fuente |
 | --- | --- |
-| Iniciar sesión y hacer una petición | [Inicio rápido](01-consumption.md). |
-| Revisar errores, límites y reintentos | [Contrato HTTP](api-contract.md). |
-| Ver operaciones, parámetros y esquemas | [OpenAPI 3.1](openapi.json). |
-| Explorar y probar la API en desarrollo | [Swagger UI](02-maintenance.md#swagger-ui-en-desarrollo). |
-| Validar o publicar el contrato | [Mantenimiento](02-maintenance.md). |
+| Iniciar sesión y enviar una petición | [Inicio rápido](01-consumption.md). |
+| Revisar rutas, parámetros y esquemas | [OpenAPI](openapi.json). |
+| Explorar y probar en desarrollo | [Swagger UI](02-maintenance.md#swagger-ui-en-desarrollo). |
+| Validar y publicar | [Mantenimiento](02-maintenance.md). |
 
-OpenAPI conserva el detalle por operación en [Sesión](paths/auth.json),
-[Clientes](paths/sales.json), [Almacén](paths/warehouse.json) y
-[Administración](paths/admin.json). Las
-[importaciones de inventario](paths/inventory-imports.json) documentan plantillas,
-multipart, confirmación y recuperación. El contrato HTTP reúne las reglas comunes.
-
-La [interfaz Vue](../../../../front/docs/architecture/views/development/code-structure.md)
-y la [implementación del servidor](../views/development/backend-technical-documentation/index.md)
-tienen referencias propias.
+Las rutas se agrupan en [sesión](paths/auth.json), [ventas](paths/sales.json),
+[almacén](paths/warehouse.json), [administración](paths/admin.json),
+[importaciones](paths/inventory-imports.json) y [entregas históricas](paths/historical-deliveries.json).
+La [API de Vue](../../../../front/docs/architecture/contracts/index.md) y la
+[implementación del servidor](../views/development/backend-technical-documentation/index.md)
+se documentan por separado.

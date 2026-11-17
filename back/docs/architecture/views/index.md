@@ -14,6 +14,12 @@ una pregunta arquitectónica y enlaza los artefactos que la contestan.
 | [Desarrollo](development/index.md) | ¿Cómo se organiza, implementa y reutiliza el código? | Referencias técnicas, diagramas, patrones y mapa generado. |
 | [Física](physical/index.md) | ¿Dónde se ejecuta y despliega la solución? | Contexto, contenedores e infraestructura. |
 
+## Referencia ISO para la descripción arquitectónica
+
+Nexus toma [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) como
+referencia selectiva. 4+1, Markdown, Mermaid y C4 son elecciones locales; no se declara
+conformidad porque falta una matriz central de interesados y preocupaciones.
+
 ## Artefactos de apoyo fuera de las vistas
 
 No todo documento de arquitectura es una vista. Las referencias y reglas transversales

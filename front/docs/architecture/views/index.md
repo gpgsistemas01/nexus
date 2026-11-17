@@ -1,13 +1,13 @@
 # Vistas arquitectónicas
 
-El cliente se describe mediante cinco vistas: escenarios, lógica, procesos,
-desarrollo y ejecución. Cada vista utiliza las figuras que explican su contenido. La [vista general](overview.md) contiene el contexto y el corte de componentes.
+El cliente se describe en cinco vistas: escenarios, lógica, procesos, desarrollo y
+física. La [vista general](overview.md) contiene el contexto y los componentes.
 
 | Vista | Pregunta | Artefactos |
 | --- | --- | --- |
 | [Escenarios (+1)](scenarios/index.md) | ¿Qué objetivo se realiza y cómo se llega a él? | Catálogo de pantallas, navegación y casos de uso. |
 | [Lógica](logical/index.md) | ¿Qué componentes, contratos y estados colaboran? | Componentes por dominio, clases/interfaces/tipos, propiedad de datos y estados. |
-| [Procesos](processes/index.md) | ¿En qué orden se coordina una operación? | Ocho secciones de secuencias con decisiones, vigencia, rechazo y recuperación. |
+| [Procesos](processes/index.md) | ¿En qué orden se coordina una operación? | Secuencias y estados de interacción. |
 | [Desarrollo: organización del código](development/index.md) | ¿Dónde vive el código y cómo se compone? | Unidades de código, patrones, integración de reglas públicas y referencia generada. |
 | [Física](physical/index.md) | ¿Dónde se ejecuta y qué configuración necesita? | Vite, alojamiento estático, proxy, build e imagen final. |
 
