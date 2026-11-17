@@ -8,9 +8,10 @@ Las altas auxiliares son opcionales: `«extend»` apunta del alta a la captura p
 Requieren el permiso de alta y devuelven el registro seleccionado sin guardar el documento principal.
 
 Las asociaciones representan participación autorizada: las áreas operativas consultan,
-registran y editan sus solicitudes; Personal de almacén también surte, devuelve y genera
-reportes. El Administrador del sistema hereda las funciones de almacén. Una consulta no
-concede por sí misma acceso a las demás operaciones.
+registran y editan sus solicitudes. Surtir, devolver y generar reportes tienen
+asociaciones sólo con Personal de almacén; el Administrador hereda esas funciones.
+Las líneas de acceso desde Consulta no indican participación de las áreas operativas
+en esas funciones ni les conceden permisos.
 
 El alta contextual de cliente se representa una sola vez en [Altas desde selectores](09-contextual-creation.md#cliente-durante-una-salida).
 Aquí no se repite ese caso. Surtir, devolver y generar reportes son objetivos
@@ -44,6 +45,9 @@ direction LR
 
     operational -- ucMaterialIssueQuery
     warehouse -- ucMaterialIssueQuery
+    admin -- ucMaterialSupply
+    admin -- ucMaterialReturn
+    admin -- ucMaterialIssueReport
     ucMaterialIssueQuery -- ucMaterialIssueDetails
     ucMaterialIssueQuery -- ucMaterialIssueHeader
     ucMaterialIssueQuery -- ucMaterialIssueCreate
@@ -82,6 +86,9 @@ direction LR
 
     operational -- ucWasteIssueQuery
     warehouse -- ucWasteIssueQuery
+    admin -- ucWasteSupply
+    admin -- ucWasteReturn
+    admin -- ucWasteIssueReport
     ucWasteIssueQuery -- ucWasteIssueDetails
     ucWasteIssueQuery -- ucWasteIssueHeader
     ucWasteIssueQuery -- ucWasteIssueCreate
@@ -120,6 +127,9 @@ direction LR
 
     operational -- ucConsumableIssueQuery
     warehouse -- ucConsumableIssueQuery
+    admin -- ucConsumableSupply
+    admin -- ucConsumableReturn
+    admin -- ucConsumableIssueReport
     ucConsumableIssueQuery -- ucConsumableIssueDetails
     ucConsumableIssueQuery -- ucConsumableIssueHeader
     ucConsumableIssueQuery -- ucConsumableIssueCreate
