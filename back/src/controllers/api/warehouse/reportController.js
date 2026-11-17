@@ -84,6 +84,7 @@ export const buildGoodsIssueReportHandler = ({ findGoodsIssueReportRows, filenam
         res,
         sheets: signal => buildMonthlyReportSheets(rows, { signal, buildData: buildIssueReportData, sheetName: GOODS_ISSUE_SHEET_NAME }),
         sheetName: GOODS_ISSUE_SHEET_NAME,
+        reportMonth: isMonthlyReportQuery(req.query) ? req.query.reportMonth : undefined,
         filename
     });
 };
@@ -97,6 +98,7 @@ export const exportWasteIssueReportExcel = async (req, res) => {
             baseHeader: 'Base de merma', heightHeader: 'Altura de merma'
         }) }),
         sheetName: WASTE_ISSUE_SHEET_NAME,
+        reportMonth: isMonthlyReportQuery(req.query) ? req.query.reportMonth : undefined,
         filename: WASTE_ISSUE_FILENAME
     });
 };
@@ -128,6 +130,7 @@ export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, fi
         res,
         sheets: signal => buildMonthlyReportSheets(rows, { signal, sheetName: `${ GOODS_RECEIPT_SHEET_NAME } ${ isConsumableReport ? 'consumibles' : 'materiales' }`, buildData: monthRows => buildGoodsReceiptReportData(monthRows, { isConsumableReport, monthlyReport: true }) }),
         sheetName: `${ GOODS_RECEIPT_SHEET_NAME } ${ isConsumableReport ? 'consumibles' : 'materiales' }`,
+        reportMonth: monthlyReport ? req.query.reportMonth : undefined,
         filename: `${ GOODS_RECEIPT_FILENAME }_${ isConsumableReport ? 'consumibles' : 'materiales' }`
     });
 };

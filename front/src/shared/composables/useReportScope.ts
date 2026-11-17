@@ -5,7 +5,11 @@ import { useFileExport } from './useFileExport.js';
 import type { FileExportOptions } from './useFileExport.js';
 
 export const useReportScope = (options: FileExportOptions<ReportScope> & { kind?: ReportKind }) => {
-    const report = useFileExport(options);
+    const report = useFileExport({
+        ...options,
+        reportMonth: (scope: ReportScope) =>
+            scope.mode === 'specific-month' ? scope.month : undefined,
+    });
     const isReportOpen = ref(false);
     const reportValues = reactive<ReportScope>({
         mode: !options.kind || options.kind === 'period' ? 'current-month' : 'filtered',

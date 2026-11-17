@@ -15,10 +15,10 @@ import { createFormulaCell, sendExcelReport, buildMonthlyReportSheets } from '..
 const paths = vi.hoisted(() => ({ root: null }));
 vi.mock('node:os', () => ({ tmpdir: () => paths.root }));
 
-const exportData = async (data, sheets) => {
+const exportData = async (data, sheets, reportMonth) => {
   let operation;
   const app = createControllerTestApp({ registerRoutes: app => app.get('/report', (_req, res) => {
-    operation = sendExcelReport({ res, data, sheets, sheetName: 'Reporte', filename: 'inventario' });
+    operation = sendExcelReport({ res, data, sheets, sheetName: 'Reporte', filename: 'inventario', reportMonth });
     return operation;
   }) });
   const response = await request(app).get('/report').buffer(true).parse((res, callback) => {
@@ -65,6 +65,13 @@ describe('generación progresiva de reportes Excel', () => {
     expect(sheet.getCell('A1').font).toMatchObject({ bold: true });
     expect(sheet.getColumn(1).width).toBeGreaterThanOrEqual(14);
     expect(await readdir(paths.root)).toEqual([]);
+  });
+
+  it('usa el mes solicitado en el nombre HTTP aunque el reporte esté vacío', async () => {
+    const { response, operation } = await exportData([['Fecha']], undefined, '2025-02');
+    await operation;
+    expect(response.status).toBe(200);
+    expect(response.headers['content-disposition']).toContain('inventario_02_2025.xlsx');
   });
 
   it('consume filas asíncronas y conserva un reporte vacío con sus encabezados', async () => {

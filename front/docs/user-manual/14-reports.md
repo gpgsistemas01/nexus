@@ -7,7 +7,7 @@
 3. Revise el alcance y confirme **Descargar Excel**.
 4. Abra el archivo `.xlsx` y compruebe su contenido.
 
-Los módulos con **Exportar Excel** usan este recorrido. El nombre incluye mes y año de descarga.
+Los módulos con **Exportar Excel** usan este recorrido. El nombre incluye mes y año de descarga; al elegir **Mes específico**, usa el mes y año seleccionados.
 Cerrar el diálogo sin confirmar no genera un archivo.
 
 <!-- module:any warehouse -->

@@ -5,13 +5,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setImmediate } from 'node:timers/promises';
 import { createSpreadsheet } from './spreadsheetUtils.js';
-import { getMexicoMonthYearParts } from './formattersUtils.js';
+import { getMexicoMonthYearParts, getReportMonthDateRange } from './formattersUtils.js';
 import { ReportMonthInvalid } from '../errors/reportError.js';
 
 const ROW_YIELD_INTERVAL = 250;
 
-export const buildReportFilename = ({ filename } = {}) => {
-    const { month, year } = getMexicoMonthYearParts();
+export const buildReportFilename = ({ filename, reportMonth } = {}) => {
+    const { month, year } = reportMonth ? getReportMonthDateRange(reportMonth) : getMexicoMonthYearParts();
     return [filename, month, year].join('_');
 };
 
@@ -94,7 +94,7 @@ const writeWorkbookFile = async ({ filePath, sheetName, data, sheets, abortContr
     }
 };
 
-export const sendExcelReport = async ({ res, data, sheets, sheetName, filename }) => {
+export const sendExcelReport = async ({ res, data, sheets, sheetName, filename, reportMonth }) => {
     const abortController = new AbortController();
     const onClose = () => {
         if (!res.writableFinished) abortController.abort();
@@ -107,7 +107,7 @@ export const sendExcelReport = async ({ res, data, sheets, sheetName, filename }
         await writeWorkbookFile({ filePath, sheetName, data, sheets: typeof sheets === 'function' ? sheets(abortController.signal) : sheets, abortController });
         await new Promise((resolve, reject) => res.download(
             filePath,
-            `${buildReportFilename({ filename })}.xlsx`,
+            `${buildReportFilename({ filename, reportMonth })}.xlsx`,
             error => error ? reject(error) : resolve()
         ));
         return res;

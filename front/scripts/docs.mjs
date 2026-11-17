@@ -16,11 +16,7 @@ const runExport = (exportArgs, section = null) => {
         [
             'scripts/exportDocs.js',
             section === 'manual' ? 'manual-vue' : 'documentacion-vue',
-            section === 'manual'
-                ? 'manual-usuario'
-                : section
-                  ? `vue-${section}`
-                  : 'vue',
+            section === 'manual' ? 'manual-usuario' : section ? `vue-${section}` : 'vue',
             ...exportArgs,
         ],
         {
