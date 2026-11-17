@@ -24,13 +24,13 @@ const cleanupCatalogs = async () => {
   await prisma.unitMeasure.deleteMany({
     where: {
       OR: [
-        { name: { startsWith: 'IT Unit ' } },
-        { name: { startsWith: 'IT MU ' } },
-        { name: { startsWith: 'IT Managed Unit ' } }
+        { name: { startsWith: 'IT Unit ', mode: 'insensitive' } },
+        { name: { startsWith: 'IT MU ', mode: 'insensitive' } },
+        { name: { startsWith: 'IT Managed Unit ', mode: 'insensitive' } }
       ]
     }
   });
-  await prisma.presentation.deleteMany({ where: { name: { startsWith: 'IT Presentation ' } } });
+  await prisma.presentation.deleteMany({ where: { name: { startsWith: 'IT Presentation ', mode: 'insensitive' } } });
   await prisma.role.deleteMany({ where: { name: { startsWith: 'IT Role ' } } });
   await prisma.department.deleteMany({ where: { name: { startsWith: 'IT Department ' } } });
 };
@@ -142,7 +142,7 @@ describe('catalog controllers database integration', () => {
 
     expect(created.body).toMatchObject({
       code: 'CREATED_CATALOG_ENTRY',
-      data: { name: names.managedUnit, symbol: names.unitSymbol, isActive: true }
+      data: { name: names.managedUnit.toUpperCase(), symbol: names.unitSymbol, isActive: true }
     });
 
     const listed = await request(app)
@@ -156,7 +156,7 @@ describe('catalog controllers database integration', () => {
       recordsFiltered: 1,
       data: [expect.objectContaining({
         id: created.body.data.id,
-        name: names.managedUnit,
+        name: names.managedUnit.toUpperCase(),
         isActive: true
       })]
     });
@@ -170,14 +170,14 @@ describe('catalog controllers database integration', () => {
       .expect(response => {
         expect(response.body).toMatchObject({
           code: 'UPDATED_CATALOG_ENTRY',
-          data: { id: created.body.data.id, name: updatedName, isActive: false }
+          data: { id: created.body.data.id, name: updatedName.toUpperCase(), isActive: false }
         });
       });
 
     await expect(prisma.unitMeasure.findUnique({
       where: { id: created.body.data.id }
     })).resolves.toMatchObject({
-      name: updatedName,
+      name: updatedName.toUpperCase(),
       symbol: names.unitSymbol,
       isActive: false
     });
@@ -214,7 +214,7 @@ describe('catalog controllers database integration', () => {
     }).expect(201);
     const id = created.body.data.id;
     const before = await prisma.presentation.findUniqueOrThrow({ where: { id } });
-    expect(before).toMatchObject({ name, isActive: true, version: 0 });
+    expect(before).toMatchObject({ name: name.toUpperCase(), isActive: true, version: 0 });
     expect(id).not.toBe('caller-id');
     expect(before.name).not.toContain('&#');
 
@@ -223,7 +223,7 @@ describe('catalog controllers database integration', () => {
       id: 'replacement-id', version: 999, key: 'changed-key'
     }).expect(200);
     const after = await prisma.presentation.findUniqueOrThrow({ where: { id } });
-    expect(after).toMatchObject({ id, name: `${name} v2`, isActive: false, version: 1 });
+    expect(after).toMatchObject({ id, name: `${name} v2`.toUpperCase(), isActive: false, version: 1 });
 
     const searched = await request(app).get('/managed/presentations')
       .query({ search: "' OR 1=1 --" }).expect(200);

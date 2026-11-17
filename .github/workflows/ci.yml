@@ -7,6 +7,15 @@ on:
       - master
       - features
   pull_request:
+  workflow_dispatch:
+    inputs:
+      browser_suite:
+        description: Suite de navegador Vue
+        type: choice
+        default: full
+        options:
+          - full
+          - essential
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -34,7 +43,7 @@ jobs:
       # El generador sólo usa módulos nativos de Node.js, por lo que esta
       # comprobación no necesita instalar las dependencias de la aplicación.
       - name: Verify generated architecture documentation outside main
-        if: github.event_name == 'pull_request' || github.ref != 'refs/heads/main'
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
         run: npm run docs:check
 
       - name: Regenerate architecture documentation on the main branch
@@ -176,7 +185,12 @@ jobs:
       - name: Install browser for frontend tests
         run: npx playwright install --with-deps chromium
 
-      - name: Test login and warehouse in browser
+      - name: Test essential Vue browser flows
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && (github.event_name != 'workflow_dispatch' || inputs.browser_suite != 'full')
+        run: npm run test:e2e:essential
+
+      - name: Test complete Vue browser regression
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || (github.event_name == 'workflow_dispatch' && inputs.browser_suite == 'full')
         run: npm run test:e2e
 
       - name: Install backend for the system browser test

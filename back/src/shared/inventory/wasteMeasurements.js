@@ -47,7 +47,7 @@ export const prepareWasteRollReference = ({ material }) => {
 
 // Una dimensión almacena el factor por pieza y la otra conserva el multiplicador neutro.
 export const isPerPieceMeasure = ({ name = '', symbol = '' } = {}) =>
-    /^(KILOGRAMOS?|METROS?( LINEALES?)?)$/.test(String(name).trim().toUpperCase())
+    /^(KILOGRAMOS?|METROS?( LINEAL(?:ES)?)?)$/.test(String(name).trim().toUpperCase())
     || /^(KG|M|ML|MT|MTS)$/.test(String(symbol).trim().toUpperCase());
 
 export const getPerPieceMeasureError = (unit = {}, { base, height } = {}) => {

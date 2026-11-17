@@ -34,7 +34,7 @@ describe('registro de materiales con y sin medidas', () => {
     ids.supplier = (await prisma.supplier.create({ data: {
       codeNumber: Date.now() % 100000000, code: suffix, legalName: `IT Measures ${suffix}`, tradeName: `IT Measures ${suffix}`
     } })).id;
-    for (const [unit, name, symbol] of [['piece', 'PIEZA', 'p'], ['meters', 'METRO CUADRADO', 'm'], ['liters', 'LITRO', 'l']]) {
+    for (const [unit, name, symbol] of [['piece', 'PIEZA', 'p'], ['meters', 'METRO CUADRADO', 'm'], ['liters', 'LITRO', 'l'], ['kilograms', 'KILOGRAMO', 'k'], ['linear', 'METRO LINEAL', 'ml']]) {
       ids[unit] = (await prisma.unitMeasure.create({ data: { name, symbol: `${symbol}${suffix}` } })).id;
     }
     ids.sources = {};
@@ -57,10 +57,10 @@ describe('registro de materiales con y sin medidas', () => {
       await prisma.stockAdjustment.deleteMany({ where: { id: { in: adjustmentIds } } });
     }
     if (ids.supplier) await prisma.supplierMaterial.deleteMany({ where: { supplierId: ids.supplier } });
-    if (ids.presentation) await prisma.material.deleteMany({ where: { presentationId: ids.presentation } });
+    if (ids.presentation) await prisma.material.deleteMany({ where: { OR: [{ presentationId: ids.presentation }, { name: { startsWith: 'IT Measures ', endsWith: suffix } }] } });
     if (ids.supplier) await prisma.supplier.delete({ where: { id: ids.supplier } });
     if (ids.presentation) await prisma.presentation.delete({ where: { id: ids.presentation } });
-    await prisma.unitMeasure.deleteMany({ where: { id: { in: [ids.piece, ids.meters, ids.liters].filter(Boolean) } } });
+    await prisma.unitMeasure.deleteMany({ where: { id: { in: [ids.piece, ids.meters, ids.liters, ids.kilograms, ids.linear].filter(Boolean) } } });
     if (ids.user) await prisma.user.delete({ where: { id: ids.user } });
   });
 
@@ -132,12 +132,29 @@ describe('registro de materiales con y sin medidas', () => {
     expect(await prisma.supplierMaterial.count({ where: { supplierId: ids.supplier, material: { name: data.name } } })).toBe(0);
   });
 
-  it.each(['direct', 'goodsReceipt'])('registra consumibles sin medidas desde %s, incluso si llegan campos sobrantes', async context => {
+  it.each(['direct', 'goodsReceipt'])('rechaza medidas inválidas de consumibles desde %s sin persistir cambios', async context => {
     const data = { ...body(`consumable ${context}`), unitMeasureId: ids.meters, base: 2, height: 'ignorado', ...(context === 'goodsReceipt' ? { creationContext: context } : {}) };
+    await request(app).post('/consumables').send(data).expect(400);
+    expect(await prisma.material.count({ where: { name: data.name } })).toBe(0);
+    expect(await prisma.supplierMaterial.count({ where: { supplierId: ids.supplier, material: { name: data.name } } })).toBe(0);
+  });
+
+  it.each(['kilograms', 'linear'].flatMap(unit => ['direct', 'goodsReceipt'].map(context => ({ unit, context }))))('consumible $unit desde $context persiste unidad 1 × 1 y rechaza CAJA o factores arbitrarios', async ({ unit, context }) => {
+    const presentationName = unit === 'kilograms' ? 'KILOGRAMOS' : 'METRO LINEAL';
+    const presentation = await prisma.presentation.upsert({ where: { name: presentationName }, update: {}, create: { name: presentationName } });
+    const data = { ...body(`unit-${unit}-${context}`), unitMeasureId: ids[unit], presentationId: presentation.id,
+      base: 1, height: 1, newStock: 7.5, ...(context === 'goodsReceipt' ? { creationContext: context } : {}) };
+    for (const invalid of [{ height: 2 }, { presentationId: ids.presentation }]) {
+      await request(app).post('/consumables').send({ ...data, ...invalid }).expect(400);
+      expect(await prisma.material.count({ where: { name: data.name } })).toBe(0);
+    }
     await request(app).post('/consumables').send(data).expect(200);
-    const saved = await prisma.supplierMaterial.findFirst({ where: { supplierId: ids.supplier, material: { name: data.name } }, include: { material: true } });
-    expect(saved.material).toMatchObject({ type: 'CONSUMABLE', base: null, height: null });
-    expect(Number(saved.convertedQuantity)).toBe(context === 'direct' ? 7 : 0);
+    const saved = await prisma.supplierMaterial.findFirstOrThrow({ where: { supplierId: ids.supplier, material: { name: data.name } }, include: { material: true } });
+    expect(Number(saved.material.base)).toBe(1);
+    expect(Number(saved.material.height)).toBe(1);
+    expect(Number(saved.currentStock)).toBe(context === 'direct' ? 7.5 : 0);
+    expect(Number(saved.convertedQuantity)).toBe(Number(saved.currentStock));
+    expect(saved.material.presentationId).toBe(presentation.id);
   });
 
   it('ofrece para merma sólo materiales en m² del proveedor y excluye consumibles', async () => {

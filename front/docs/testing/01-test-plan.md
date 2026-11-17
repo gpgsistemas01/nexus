@@ -159,3 +159,24 @@ La configuración de CI y los comandos se consultan en
 capturas y trazas permanecen como artefactos de ejecución.
 
 No se deduce cobertura total de conteos aprobados ni rendimiento de producción por el tiempo de la suite. Las brechas funcionales/de evidencia permanecen en la [matriz local](04-use-case-coverage.md).
+
+## Selección de navegador en CI
+
+Los push a `features` y los pull requests ejecutan `npm run test:e2e:essential`: casos marcados
+`@essential` de login/refresh, permisos operativos, alta/edición/conflicto,
+compras y salidas, surtido/devolución, reportes, importación con recuperación,
+histórico y selectores auxiliares. Las variantes por recurso de estos recorridos
+se conservan cuando cambian contratos o permisos. CI usa dos trabajadores de
+Playwright para archivos con sesiones y respuestas simuladas independientes.
+
+Las unitarias y las pruebas de sistema con Express/PostgreSQL siguen completas.
+Las matrices de móvil, anchuras, rutas, fallos y estados adicionales se conservan
+en `npm run test:e2e`. La regresión completa se ejecuta en los push a `main`/`master` y está disponible en GitHub Actions
+mediante **Run workflow → browser_suite: full** y debe ejecutarse antes de publicar
+y al modificar componentes compartidos, navegación o permisos. La selección esencial
+no acredita todas esas combinaciones visuales; no se retiran pruebas ni se sustituyen
+por unitarias cuando observan interacciones de navegador.
+
+Al cambiar un recorrido esencial, mantener su marca y las variantes necesarias.
+Al cambiar una regla compartida, ejecutar además los archivos afectados de la suite
+completa. Los reportes JUnit conservan el resultado de la selección ejecutada.

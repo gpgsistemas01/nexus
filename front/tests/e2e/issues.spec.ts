@@ -325,69 +325,73 @@ for (const [path, label] of [
   ['consumibles', 'Lona'],
   ['mermas', 'Sobrante de lona'],
 ] as const) {
-  test(`salidas ${path}: entregas parciales conservan proyecto y diferencia negativa`, async ({
-    page,
-  }) => {
-    const { writes } = await mockIssues(page);
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto(`/salidas/${path}`);
-    for (const [quantity, expected] of [
-      [0.5, 0],
-      [0.5, 0.5],
-      [1, 1],
-    ] as const) {
-      await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
-      const dialog = page.getByRole('dialog', {
-        name: /^Surtir salida( de merma)? - Folio SAL-001$/,
-      });
-      await expect(dialog.getByRole('columnheader').first()).toHaveCSS('position', 'sticky');
-      await expect(dialog.locator('tbody tr').first().locator('td').first()).toHaveCSS(
-        'position',
-        'sticky',
-      );
-      await dialog.getByRole('checkbox', { name: `Surtir: ${label}`, exact: true }).check();
-      await dialog
-        .getByRole('spinbutton', { name: `Cantidad de proyecto: ${label}`, exact: true })
-        .fill('250');
-      const field = dialog.getByRole('spinbutton', {
-        name: `Cantidad a surtir: ${label}`,
-        exact: true,
-      });
-      await expect(field).toHaveAttribute('max', String(2 - expected));
-      if (expected === 0) {
-        await field.fill('3');
+  test(
+    `salidas ${path}: entregas parciales conservan proyecto y diferencia negativa`,
+    { tag: '@essential' },
+    async ({ page }) => {
+      const { writes } = await mockIssues(page);
+      await page.setViewportSize({ width: 1920, height: 1080 });
+      await page.goto(`/salidas/${path}`);
+      for (const [quantity, expected] of [
+        [0.5, 0],
+        [0.5, 0.5],
+        [1, 1],
+      ] as const) {
+        await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+        const dialog = page.getByRole('dialog', {
+          name: /^Surtir salida( de merma)? - Folio SAL-001$/,
+        });
+        await expect(dialog.getByRole('columnheader').first()).toHaveCSS('position', 'sticky');
+        await expect(dialog.locator('tbody tr').first().locator('td').first()).toHaveCSS(
+          'position',
+          'sticky',
+        );
+        await dialog.getByRole('checkbox', { name: `Surtir: ${label}`, exact: true }).check();
+        await dialog
+          .getByRole('spinbutton', { name: `Cantidad de proyecto: ${label}`, exact: true })
+          .fill('250');
+        const field = dialog.getByRole('spinbutton', {
+          name: `Cantidad a surtir: ${label}`,
+          exact: true,
+        });
+        await expect(field).toHaveAttribute('max', String(2 - expected));
+        if (expected === 0) {
+          await field.fill('3');
+          await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
+          await expect(
+            dialog.getByRole('alert').filter({
+              hasText: 'no puede superar el saldo pendiente',
+            }),
+          ).toBeVisible();
+          expect(writes).toHaveLength(0);
+        }
+        await field.fill(String(quantity));
+        await expect(dialog.getByRole('cell', { name: '-50.00', exact: true })).toBeVisible();
         await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
-        await expect(
-          dialog.getByRole('alert').filter({
-            hasText: 'no puede superar el saldo pendiente',
-          }),
-        ).toBeVisible();
-        expect(writes).toHaveLength(0);
+        await expect(dialog).toBeHidden();
+        expect(writes.at(-1)!.data.details).toEqual([
+          {
+            id: issueDetailId,
+            isSupplied: true,
+            projectConvertedQuantity: 250,
+            quantityToSupply: quantity,
+            expectedSuppliedQuantity: expected,
+          },
+        ]);
+        if (expected < 1)
+          await expect(
+            page.getByRole('cell', { name: 'Surtido parcial', exact: true }),
+          ).toBeVisible();
       }
-      await field.fill(String(quantity));
-      await expect(dialog.getByRole('cell', { name: '-50.00', exact: true })).toBeVisible();
-      await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
-      await expect(dialog).toBeHidden();
-      expect(writes.at(-1)!.data.details).toEqual([
-        {
-          id: issueDetailId,
-          isSupplied: true,
-          projectConvertedQuantity: 250,
-          quantityToSupply: quantity,
-          expectedSuppliedQuantity: expected,
-        },
-      ]);
-      if (expected < 1)
-        await expect(
-          page.getByRole('cell', { name: 'Surtido parcial', exact: true }),
-        ).toBeVisible();
-    }
-    expect(writes).toHaveLength(3);
-    await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveCount(0);
-    await expect(
-      page.getByRole('button', { name: 'Devolver material surtido', exact: true }),
-    ).toBeVisible();
-  });
+      expect(writes).toHaveLength(3);
+      await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveCount(
+        0,
+      );
+      await expect(
+        page.getByRole('button', { name: 'Devolver material surtido', exact: true }),
+      ).toBeVisible();
+    },
+  );
 }
 
 test('salidas: varias áreas autorizadas conservan la selección y una búsqueda no bloquea el selector', async ({
@@ -421,146 +425,155 @@ for (const [path, label, name] of [
   ['consumibles', 'Consumible', 'Lona'],
   ['mermas', 'Merma', 'Sobrante de lona'],
 ] as const) {
-  test(`salidas ${path}: edición pendiente, surtido y devolución`, async ({ page }) => {
-    const { writes } = await mockIssues(page);
-    await page.setViewportSize({ width: 900, height: 844 });
-    await page.goto(`/salidas/${path}`);
-    const row = page.getByRole('row').filter({
-      has: page.getByRole('cell', { name: 'SAL-001', exact: true }),
-    });
-    await expect
-      .poll(() =>
-        row
-          .getByRole('button')
-          .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label'))),
-      )
-      .toEqual(['Editar salida', 'Surtir detalle', 'Consultar salida']);
-    await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
-    let dialog = page.getByRole('dialog');
-    await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue(
-      'Captura de solicitud',
-    );
-    await expect(dialog.getByRole('combobox', { name: label, exact: true })).toBeVisible();
-    await dialog.getByRole('button', { name: 'Regresar', exact: true }).click();
-    await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
-    dialog = page.getByRole('dialog');
-    await expect(dialog.getByRole('columnheader')).toHaveText([
-      label,
-      'Medidas',
-      'Salida',
-      'Cantidad surtida',
-      'Presentación',
-      'Conversión',
-      'Costo unitario de Conversión',
-      'Cantidad a surtir',
-      'Cantidad de proyecto',
-      'Diferencia',
-      'Surtir',
-      'Base',
-      'Altura',
-      'Cantidad',
-      'Unidad',
-    ]);
-    await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toHaveCSS(
-      'overflow-x',
-      'auto',
-    );
-    await expect(dialog.getByLabel('Cliente', { exact: true })).toBeDisabled();
-    await dialog.getByRole('checkbox', { name: `Surtir: ${name}`, exact: true }).check();
-    await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
-    expect(writes).toHaveLength(0);
-    await dialog
-      .getByRole('spinbutton', { name: `Cantidad de proyecto: ${name}`, exact: true })
-      .fill('180');
-    await dialog
-      .getByRole('spinbutton', { name: `Cantidad a surtir: ${name}`, exact: true })
-      .fill('2');
-    await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
-    await expect(dialog).toBeHidden();
-    expect(writes[0]!.url.pathname).toMatch(/\/details$/);
-    expect(writes[0]!.data).toEqual({
-      details: [
-        {
-          id: issueDetailId,
-          isSupplied: true,
-          quantityToSupply: 2,
-          expectedSuppliedQuantity: 0,
-          projectConvertedQuantity: 180,
-        },
-      ],
-    });
-    await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
-    dialog = page.getByRole('dialog');
-    await expect(dialog.getByRole('combobox', { name: label, exact: true })).toHaveCount(0);
-    await dialog.getByLabel('Observaciones', { exact: true }).fill('Nueva nota');
-    await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
-    await expect(dialog).toBeHidden();
-    expect(writes[1]!.url.pathname).toMatch(/\/header$/);
-    expect(writes[1]!.data).not.toHaveProperty('details');
-    await expect
-      .poll(() =>
-        row
-          .getByRole('button')
-          .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label'))),
-      )
-      .toEqual(['Editar salida', 'Devolver material surtido', 'Consultar salida']);
-    await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
-    await expect(page.getByRole('dialog').getByRole('columnheader')).toHaveText([
-      label,
-      'Medidas',
-      'Salida',
-      'Cantidad surtida',
-      'Cantidad devuelta',
-      'Presentación',
-      'Conversión',
-      'Acciones',
-      'Base',
-      'Altura',
-      'Cantidad',
-      'Unidad',
-    ]);
-    await page.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
-    const returning = page.getByRole('dialog', { name: 'Devolver detalle de salida', exact: true });
-    await expect(returning.locator('[aria-invalid="true"]')).toHaveCount(0);
-    await returning.getByLabel('Cantidad a devolver', { exact: true }).fill('3');
-    await returning.getByRole('button', { name: 'Devolver', exact: true }).click();
-    expect(writes).toHaveLength(2);
-    await returning.getByLabel('Cantidad a devolver', { exact: true }).fill('1');
-    await returning.getByRole('button', { name: 'Devolver', exact: true }).click();
-    await expect(returning).toBeHidden();
-    expect(writes[2]!.url.pathname).toMatch(/\/returns$/);
-    expect(writes[2]!.data).toEqual({ returnQuantity: 1, observations: '' });
-  });
+  test(
+    `salidas ${path}: edición pendiente, surtido y devolución`,
+    { tag: '@essential' },
+    async ({ page }) => {
+      const { writes } = await mockIssues(page);
+      await page.setViewportSize({ width: 900, height: 844 });
+      await page.goto(`/salidas/${path}`);
+      const row = page.getByRole('row').filter({
+        has: page.getByRole('cell', { name: 'SAL-001', exact: true }),
+      });
+      await expect
+        .poll(() =>
+          row
+            .getByRole('button')
+            .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label'))),
+        )
+        .toEqual(['Editar salida', 'Surtir detalle', 'Consultar salida']);
+      await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
+      let dialog = page.getByRole('dialog');
+      await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue(
+        'Captura de solicitud',
+      );
+      await expect(dialog.getByRole('combobox', { name: label, exact: true })).toBeVisible();
+      await dialog.getByRole('button', { name: 'Regresar', exact: true }).click();
+      await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+      dialog = page.getByRole('dialog');
+      await expect(dialog.getByRole('columnheader')).toHaveText([
+        label,
+        'Medidas',
+        'Salida',
+        'Cantidad surtida',
+        'Presentación',
+        'Conversión',
+        'Costo unitario de Conversión',
+        'Cantidad a surtir',
+        'Cantidad de proyecto',
+        'Diferencia',
+        'Surtir',
+        'Base',
+        'Altura',
+        'Cantidad',
+        'Unidad',
+      ]);
+      await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toHaveCSS(
+        'overflow-x',
+        'auto',
+      );
+      await expect(dialog.getByLabel('Cliente', { exact: true })).toBeDisabled();
+      await dialog.getByRole('checkbox', { name: `Surtir: ${name}`, exact: true }).check();
+      await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
+      expect(writes).toHaveLength(0);
+      await dialog
+        .getByRole('spinbutton', { name: `Cantidad de proyecto: ${name}`, exact: true })
+        .fill('180');
+      await dialog
+        .getByRole('spinbutton', { name: `Cantidad a surtir: ${name}`, exact: true })
+        .fill('2');
+      await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
+      await expect(dialog).toBeHidden();
+      expect(writes[0]!.url.pathname).toMatch(/\/details$/);
+      expect(writes[0]!.data).toEqual({
+        details: [
+          {
+            id: issueDetailId,
+            isSupplied: true,
+            quantityToSupply: 2,
+            expectedSuppliedQuantity: 0,
+            projectConvertedQuantity: 180,
+          },
+        ],
+      });
+      await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
+      dialog = page.getByRole('dialog');
+      await expect(dialog.getByRole('combobox', { name: label, exact: true })).toHaveCount(0);
+      await dialog.getByLabel('Observaciones', { exact: true }).fill('Nueva nota');
+      await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
+      await expect(dialog).toBeHidden();
+      expect(writes[1]!.url.pathname).toMatch(/\/header$/);
+      expect(writes[1]!.data).not.toHaveProperty('details');
+      await expect
+        .poll(() =>
+          row
+            .getByRole('button')
+            .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label'))),
+        )
+        .toEqual(['Editar salida', 'Devolver material surtido', 'Consultar salida']);
+      await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
+      await expect(page.getByRole('dialog').getByRole('columnheader')).toHaveText([
+        label,
+        'Medidas',
+        'Salida',
+        'Cantidad surtida',
+        'Cantidad devuelta',
+        'Presentación',
+        'Conversión',
+        'Acciones',
+        'Base',
+        'Altura',
+        'Cantidad',
+        'Unidad',
+      ]);
+      await page.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
+      const returning = page.getByRole('dialog', {
+        name: 'Devolver detalle de salida',
+        exact: true,
+      });
+      await expect(returning.locator('[aria-invalid="true"]')).toHaveCount(0);
+      await returning.getByLabel('Cantidad a devolver', { exact: true }).fill('3');
+      await returning.getByRole('button', { name: 'Devolver', exact: true }).click();
+      expect(writes).toHaveLength(2);
+      await returning.getByLabel('Cantidad a devolver', { exact: true }).fill('1');
+      await returning.getByRole('button', { name: 'Devolver', exact: true }).click();
+      await expect(returning).toBeHidden();
+      expect(writes[2]!.url.pathname).toMatch(/\/returns$/);
+      expect(writes[2]!.data).toEqual({ returnQuantity: 1, observations: '' });
+    },
+  );
 }
 
-test('salidas: sin permiso de surtido oculta controles; acceso directo sin permiso se rechaza', async ({
-  page,
-}) => {
-  const permissions = issuePermissions.filter((p) => p !== 'goods:issue-details-manage');
-  const { writes } = await mockIssues(page, permissions);
-  await page.route('**/api/auth/me', (route) =>
-    route.fulfill({
-      json: {
-        user: { ...user, permissions, organization: { isWarehouse: false, isSystem: false } },
-      },
-    }),
-  );
-  await page.goto('/salidas/materiales');
-  await expect(page.getByRole('columnheader')).toHaveText([
-    'Folio',
-    'Solicitud',
-    'Proyecto',
-    'Cliente',
-    'Estado surtido',
-    'Acciones',
-  ]);
-  await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Editar salida', exact: true })).toBeVisible();
-  expect(writes).toHaveLength(0);
-  await mockIssues(page, ['materials:read']);
-  await page.goto('/salidas/materiales');
-  await expect(page).toHaveURL(/sin-permiso/);
-});
+test(
+  'salidas: sin permiso de surtido oculta controles; acceso directo sin permiso se rechaza',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const permissions = issuePermissions.filter((p) => p !== 'goods:issue-details-manage');
+    const { writes } = await mockIssues(page, permissions);
+    await page.route('**/api/auth/me', (route) =>
+      route.fulfill({
+        json: {
+          user: { ...user, permissions, organization: { isWarehouse: false, isSystem: false } },
+        },
+      }),
+    );
+    await page.goto('/salidas/materiales');
+    await expect(page.getByRole('columnheader')).toHaveText([
+      'Folio',
+      'Solicitud',
+      'Proyecto',
+      'Cliente',
+      'Estado surtido',
+      'Acciones',
+    ]);
+    await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Editar salida', exact: true })).toBeVisible();
+    expect(writes).toHaveLength(0);
+    await mockIssues(page, ['materials:read']);
+    await page.goto('/salidas/materiales');
+    await expect(page).toHaveURL(/sin-permiso/);
+  },
+);
 
 test('salidas: filtros aplicados y Excel; modal usable en móvil', async ({ page }) => {
   const { reads, reports } = await mockIssues(page);

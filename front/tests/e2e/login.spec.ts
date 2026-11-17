@@ -3,81 +3,84 @@ import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { mockWarehouse } from './warehouseFixtures.js';
 import { user } from '../fixtures/inventory.js';
 
-test('login: captura inválida, rechazo genérico y reintento con cookies hacia materiales', async ({
-  page,
-  context,
-}) => {
-  await mockWarehouse(page);
-  const requests: { url: string; data: unknown }[] = [];
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  let attempt = 0;
-  await page.route('**/api/auth/**', async (route) => {
-    if (new URL(route.request().url()).pathname === '/api/auth/me')
-      return route.fulfill({ json: { user } });
-    requests.push({
-      url: new URL(route.request().url()).pathname,
-      data: route.request().postDataJSON(),
+test(
+  'login: captura inválida, rechazo genérico y reintento con cookies hacia materiales',
+  { tag: '@essential' },
+  async ({ page, context }) => {
+    await mockWarehouse(page);
+    const requests: { url: string; data: unknown }[] = [];
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    let attempt = 0;
+    await page.route('**/api/auth/**', async (route) => {
+      if (new URL(route.request().url()).pathname === '/api/auth/me')
+        return route.fulfill({ json: { user } });
+      requests.push({
+        url: new URL(route.request().url()).pathname,
+        data: route.request().postDataJSON(),
+      });
+      attempt += 1;
+      await route.fulfill({
+        status: attempt === 1 ? 401 : 200,
+        contentType: 'application/json',
+        headers:
+          attempt === 1
+            ? {}
+            : { 'Set-Cookie': 'accessToken=prueba; HttpOnly; Path=/; SameSite=Lax' },
+        body: JSON.stringify({ code: attempt === 1 ? 'LOGIN_ERROR' : 'SUCCESS_LOGIN' }),
+      });
     });
-    attempt += 1;
-    await route.fulfill({
-      status: attempt === 1 ? 401 : 200,
-      contentType: 'application/json',
-      headers:
-        attempt === 1 ? {} : { 'Set-Cookie': 'accessToken=prueba; HttpOnly; Path=/; SameSite=Lax' },
-      body: JSON.stringify({ code: attempt === 1 ? 'LOGIN_ERROR' : 'SUCCESS_LOGIN' }),
-    });
-  });
-  await page.goto('/');
-  await page.getByRole('heading', { name: 'Iniciar sesión' }).waitFor();
-  await expect(page).toHaveURL(/\/inicio-sesion$/);
-  await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
-  await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeHidden();
-  await expect(page.getByText('La contraseña es un valor requerido')).toBeHidden();
-  await page.getByRole('textbox', { name: 'Nombre de usuario', exact: true }).focus();
-  await page.locator('input[name="password"]').focus();
-  await page.getByRole('button', { name: 'Mostrar contraseña', exact: true }).focus();
-  await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeHidden();
-  await expect(page.getByText('La contraseña es un valor requerido')).toBeHidden();
-  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeVisible();
-  await expect(page.getByText('La contraseña es un valor requerido')).toBeVisible();
-  expect(requests).toEqual([]);
+    await page.goto('/');
+    await page.getByRole('heading', { name: 'Iniciar sesión' }).waitFor();
+    await expect(page).toHaveURL(/\/inicio-sesion$/);
+    await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+    await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeHidden();
+    await expect(page.getByText('La contraseña es un valor requerido')).toBeHidden();
+    await page.getByRole('textbox', { name: 'Nombre de usuario', exact: true }).focus();
+    await page.locator('input[name="password"]').focus();
+    await page.getByRole('button', { name: 'Mostrar contraseña', exact: true }).focus();
+    await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeHidden();
+    await expect(page.getByText('La contraseña es un valor requerido')).toBeHidden();
+    await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+    await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeVisible();
+    await expect(page.getByText('La contraseña es un valor requerido')).toBeVisible();
+    expect(requests).toEqual([]);
 
-  const username = page.getByRole('textbox', { name: 'Nombre de usuario', exact: true });
-  const password = page.locator('input[name="password"]');
-  await username.fill(' usuario ');
-  await password.fill(' legado ');
-  await page.getByRole('button', { name: 'Mostrar contraseña', exact: true }).click();
-  await expect(password).toHaveAttribute('type', 'text');
-  await page.getByRole('button', { name: 'Ocultar contraseña', exact: true }).click();
-  await expect(password).toHaveAttribute('type', 'password');
-  await page.getByRole('checkbox', { name: 'Recordar usuario' }).check();
-  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await acknowledgeFormError(page, 'Usuario o contraseña incorrectos.');
-  expect(await page.evaluate(() => localStorage.length)).toBe(0);
-  await password.fill(' válida ');
-  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page).toHaveURL(/\/almacen\/materiales$/);
-  await expect(
-    page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
-  ).toBeVisible();
-  expect(requests).toEqual([
-    { url: '/api/auth/login', data: { name: 'usuario', password: ' legado ' } },
-    { url: '/api/auth/login', data: { name: 'usuario', password: ' válida ' } },
-  ]);
-  expect((await context.cookies()).find((cookie) => cookie.name === 'accessToken')?.httpOnly).toBe(
-    true,
-  );
-  await page.goto('/inicio-sesion');
-  await expect(username).toHaveValue('usuario');
-  await expect(password).toHaveValue('');
-  await expect(page.getByRole('checkbox', { name: 'Recordar usuario' })).toBeChecked();
-  expect(await page.evaluate(() => ({ ...localStorage }))).toEqual({
-    'nexus.rememberedUser': 'usuario',
-  });
-  expect(errors).toEqual([]);
-});
+    const username = page.getByRole('textbox', { name: 'Nombre de usuario', exact: true });
+    const password = page.locator('input[name="password"]');
+    await username.fill(' usuario ');
+    await password.fill(' legado ');
+    await page.getByRole('button', { name: 'Mostrar contraseña', exact: true }).click();
+    await expect(password).toHaveAttribute('type', 'text');
+    await page.getByRole('button', { name: 'Ocultar contraseña', exact: true }).click();
+    await expect(password).toHaveAttribute('type', 'password');
+    await page.getByRole('checkbox', { name: 'Recordar usuario' }).check();
+    await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+    await acknowledgeFormError(page, 'Usuario o contraseña incorrectos.');
+    expect(await page.evaluate(() => localStorage.length)).toBe(0);
+    await password.fill(' válida ');
+    await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+    await expect(page).toHaveURL(/\/almacen\/materiales$/);
+    await expect(
+      page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+    ).toBeVisible();
+    expect(requests).toEqual([
+      { url: '/api/auth/login', data: { name: 'usuario', password: ' legado ' } },
+      { url: '/api/auth/login', data: { name: 'usuario', password: ' válida ' } },
+    ]);
+    expect(
+      (await context.cookies()).find((cookie) => cookie.name === 'accessToken')?.httpOnly,
+    ).toBe(true);
+    await page.goto('/inicio-sesion');
+    await expect(username).toHaveValue('usuario');
+    await expect(password).toHaveValue('');
+    await expect(page.getByRole('checkbox', { name: 'Recordar usuario' })).toBeChecked();
+    expect(await page.evaluate(() => ({ ...localStorage }))).toEqual({
+      'nexus.rememberedUser': 'usuario',
+    });
+    expect(errors).toEqual([]);
+  },
+);
 
 test('login: errores 400 por campo y fallos de conexión permiten reintentar', async ({ page }) => {
   let attempt = 0;

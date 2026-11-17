@@ -10,7 +10,7 @@ Para diseñar o modificar casos, consulte el [plan](01-test-plan.md), los
 | Tipo | Qué prepara la persona que ejecuta | De dónde salen los usuarios y datos |
 | --- | --- | --- |
 | Unitarias, `test:unit` | Dependencias de `front/`. Sin PostgreSQL ni Chromium. | Fixtures y dobles definidos en las pruebas. No necesita usuario de Nexus. |
-| Navegador con API simulada, `test:e2e` | Dependencias frontend y Chromium. Vite puede iniciarse desde la configuración. | Los casos simulan sesión, respuestas y datos. Los nombres y contraseñas de ejemplo no son cuentas para ingresar a Nexus. |
+| Navegador con API simulada, `test:e2e:essential` o `test:e2e` | Dependencias frontend y Chromium. Vite puede iniciarse desde la configuración. | Los casos simulan sesión, respuestas y datos. Los nombres y contraseñas de ejemplo no son cuentas para ingresar a Nexus. |
 | Sistema, `test:e2e:system` | Dependencias de ambas aplicaciones, Chromium, base PostgreSQL aislada y variables de conexión. | El setup crea cuentas temporales, genera la contraseña y prepara registros en esa base. El caso inicia sesión con esa fixture y comprueba datos persistidos. |
 
 `npm --prefix front run check` ejecuta formato, lint, unitarias y build con tipos.

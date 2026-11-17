@@ -61,57 +61,65 @@ const sessionScenario = async (page: Page) => {
 
 const target = '/directorio/clientes?consulta=Ana#tabla';
 
-test('sesión: cerrar elimina cookies y el acceso directo posterior vuelve al login', async ({
-  page,
-}) => {
-  const state = await sessionScenario(page);
-  let logoutCalls = 0;
-  await page.route('**/cerrar-sesion', (route) => {
-    expect(route.request().method()).toBe('POST');
-    expect(route.request().headers().cookie).toContain('refreshToken=refresh-fixture');
-    logoutCalls++;
-    state.isAuthenticated = false;
-    return route.fulfill({
-      status: 303,
-      headers: {
-        location: '/inicio-sesion',
-        'set-cookie': ['accessToken', 'refreshToken']
-          .map((name) => `${name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`)
-          .join('\n'),
-      },
+test(
+  'sesión: cerrar elimina cookies y el acceso directo posterior vuelve al login',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const state = await sessionScenario(page);
+    let logoutCalls = 0;
+    await page.route('**/cerrar-sesion', (route) => {
+      expect(route.request().method()).toBe('POST');
+      expect(route.request().headers().cookie).toContain('refreshToken=refresh-fixture');
+      logoutCalls++;
+      state.isAuthenticated = false;
+      return route.fulfill({
+        status: 303,
+        headers: {
+          location: '/inicio-sesion',
+          'set-cookie': ['accessToken', 'refreshToken']
+            .map((name) => `${name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`)
+            .join('\n'),
+        },
+      });
     });
-  });
-  await page.goto(target);
-  await expect(page.getByRole('heading', { name: 'Tabla de Clientes', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Iniciar sesión', exact: true })).toBeVisible();
-  expect(logoutCalls).toBe(1);
-  expect(
-    (await page.context().cookies()).filter((cookie) =>
-      ['accessToken', 'refreshToken'].includes(cookie.name),
-    ),
-  ).toEqual([]);
-  await page.goto(target);
-  await expect(page).toHaveURL(/inicio-sesion\?returnTo=/);
-  await expect(page.getByRole('heading', { name: 'Iniciar sesión', exact: true })).toBeVisible();
-  expect(state.refreshCalls).toBe(2);
-});
+    await page.goto(target);
+    await expect(
+      page.getByRole('heading', { name: 'Tabla de Clientes', exact: true }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Iniciar sesión', exact: true })).toBeVisible();
+    expect(logoutCalls).toBe(1);
+    expect(
+      (await page.context().cookies()).filter((cookie) =>
+        ['accessToken', 'refreshToken'].includes(cookie.name),
+      ),
+    ).toEqual([]);
+    await page.goto(target);
+    await expect(page).toHaveURL(/inicio-sesion\?returnTo=/);
+    await expect(page.getByRole('heading', { name: 'Iniciar sesión', exact: true })).toBeVisible();
+    expect(state.refreshCalls).toBe(2);
+  },
+);
 
-test('sesión: un access token vencido se renueva automáticamente mediante la cookie HttpOnly', async ({
-  page,
-}) => {
-  const state = await sessionScenario(page);
-  await page.goto(target);
-  await expect(page.getByRole('heading', { name: 'Tabla de Clientes', exact: true })).toBeVisible();
-  expect(state.refreshCalls).toBe(1);
-  expect(state.meCalls).toBe(2);
-  await expect(page).toHaveURL(new RegExp('/directorio/clientes\\?consulta=Ana#tabla$'));
-  const cookies = await page.context().cookies();
-  expect(cookies.find((cookie) => cookie.name === 'accessToken')).toMatchObject({
-    value: 'renewed-fixture',
-    httpOnly: true,
-  });
-});
+test(
+  'sesión: un access token vencido se renueva automáticamente mediante la cookie HttpOnly',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const state = await sessionScenario(page);
+    await page.goto(target);
+    await expect(
+      page.getByRole('heading', { name: 'Tabla de Clientes', exact: true }),
+    ).toBeVisible();
+    expect(state.refreshCalls).toBe(1);
+    expect(state.meCalls).toBe(2);
+    await expect(page).toHaveURL(new RegExp('/directorio/clientes\\?consulta=Ana#tabla$'));
+    const cookies = await page.context().cookies();
+    expect(cookies.find((cookie) => cookie.name === 'accessToken')).toMatchObject({
+      value: 'renewed-fixture',
+      httpOnly: true,
+    });
+  },
+);
 
 for (const endpoint of ['me', 'refresh'] as const) {
   test(`sesión: un 502 transitorio de ${endpoint} se recupera sin abrir la pantalla de reintento`, async ({

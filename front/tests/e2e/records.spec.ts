@@ -38,154 +38,168 @@ for (const entry of recordRoutes) {
   });
 }
 
-test('clientes: alta con validación diferida, campos propios y estado inactivo', async ({
-  page,
-}) => {
-  const { writes } = await mockRecords(page);
-  await page.goto('/directorio/clientes');
-  await page.getByRole('button', { name: 'Nuevo cliente', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: 'Registrar cliente', exact: true });
-  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).focus();
-  await dialog.getByRole('button', { name: 'Cerrar', exact: true }).focus();
-  await expect(dialog.getByText(/valor requerido/)).toHaveCount(0);
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(dialog.getByText(/valor requerido/)).toBeVisible();
-  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill(' Cliente nuevo ');
-  await dialog.getByRole('checkbox', { name: 'Activo', exact: true }).uncheck();
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes.at(-1)).toMatchObject({
-    method: 'POST',
-    resource: 'clients',
-    data: { name: 'Cliente nuevo', isActive: false },
-  });
-  await expect(page.getByRole('cell', { name: 'Cliente nuevo', exact: true })).toBeVisible();
-});
+test(
+  'clientes: alta con validación diferida, campos propios y estado inactivo',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { writes } = await mockRecords(page);
+    await page.goto('/directorio/clientes');
+    await page.getByRole('button', { name: 'Nuevo cliente', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Registrar cliente', exact: true });
+    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).focus();
+    await dialog.getByRole('button', { name: 'Cerrar', exact: true }).focus();
+    await expect(dialog.getByText(/valor requerido/)).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(dialog.getByText(/valor requerido/)).toBeVisible();
+    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill(' Cliente nuevo ');
+    await dialog.getByRole('checkbox', { name: 'Activo', exact: true }).uncheck();
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes.at(-1)).toMatchObject({
+      method: 'POST',
+      resource: 'clients',
+      data: { name: 'Cliente nuevo', isActive: false },
+    });
+    await expect(page.getByRole('cell', { name: 'Cliente nuevo', exact: true })).toBeVisible();
+  },
+);
 
-test('proveedores: crear y editar razón social y nombre comercial con la versión leída', async ({
-  page,
-}) => {
-  const { writes } = await mockRecords(page);
-  await page.goto('/directorio/proveedores');
-  await page.getByRole('button', { name: 'Nuevo proveedor', exact: true }).click();
-  const create = page.getByRole('dialog', { name: 'Registrar proveedor', exact: true });
-  await create.getByRole('textbox', { name: 'Razón social', exact: true }).fill('Empresa nueva SA');
-  await create
-    .getByRole('textbox', { name: 'Nombre comercial', exact: true })
-    .fill('Empresa nueva');
-  await create.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(create).toBeHidden();
-  await page
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name: 'Proveedor Central', exact: true }) })
-    .getByRole('button', { name: 'Editar registro', exact: true })
-    .click();
-  const dialog = page.getByRole('dialog', { name: 'Editar proveedor', exact: true });
-  await expect(dialog.getByRole('textbox', { name: 'Razón social', exact: true })).toHaveValue(
-    supplierData.legalName,
-  );
-  await dialog
-    .getByRole('textbox', { name: 'Nombre comercial', exact: true })
-    .fill('Proveedor modificado');
-  await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes.at(-1)?.data).toEqual({
-    legalName: supplierData.legalName,
-    tradeName: 'Proveedor modificado',
-    isActive: true,
-    expectedVersion: 6,
-  });
-});
+test(
+  'proveedores: crear y editar razón social y nombre comercial con la versión leída',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { writes } = await mockRecords(page);
+    await page.goto('/directorio/proveedores');
+    await page.getByRole('button', { name: 'Nuevo proveedor', exact: true }).click();
+    const create = page.getByRole('dialog', { name: 'Registrar proveedor', exact: true });
+    await create
+      .getByRole('textbox', { name: 'Razón social', exact: true })
+      .fill('Empresa nueva SA');
+    await create
+      .getByRole('textbox', { name: 'Nombre comercial', exact: true })
+      .fill('Empresa nueva');
+    await create.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(create).toBeHidden();
+    await page
+      .getByRole('row')
+      .filter({ has: page.getByRole('cell', { name: 'Proveedor Central', exact: true }) })
+      .getByRole('button', { name: 'Editar registro', exact: true })
+      .click();
+    const dialog = page.getByRole('dialog', { name: 'Editar proveedor', exact: true });
+    await expect(dialog.getByRole('textbox', { name: 'Razón social', exact: true })).toHaveValue(
+      supplierData.legalName,
+    );
+    await dialog
+      .getByRole('textbox', { name: 'Nombre comercial', exact: true })
+      .fill('Proveedor modificado');
+    await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes.at(-1)?.data).toEqual({
+      legalName: supplierData.legalName,
+      tradeName: 'Proveedor modificado',
+      isActive: true,
+      expectedVersion: 6,
+    });
+  },
+);
 
-test('personas: alta con responsabilidades, rechazo de área repetida y conservación al editar', async ({
-  page,
-}) => {
-  const { writes } = await mockRecords(page);
-  await page.goto('/identidad/personas');
-  await page.getByRole('button', { name: 'Nueva persona', exact: true }).click();
-  const create = page.getByRole('dialog', { name: 'Registrar persona', exact: true });
-  await create.getByRole('textbox', { name: 'Nombre completo', exact: true }).fill('Persona nueva');
-  await chooseOption(page, 'Área', 'ALMACÉN');
-  await chooseOption(page, 'Rol', 'COORDINADOR');
-  await create.getByRole('combobox', { name: 'Área', exact: true }).fill('VENTAS');
-  await expect(page.getByRole('option', { name: 'VENTAS', exact: true })).toBeVisible();
-  await expect(page.getByRole('option', { name: 'ALMACÉN', exact: true })).toBeVisible();
-  await page.keyboard.press('Escape');
-  await create.getByRole('button', { name: 'Agregar', exact: true }).click();
-  await chooseOption(page, 'Área', 'ALMACÉN');
-  await chooseOption(page, 'Rol', 'OPERADOR');
-  await create.getByRole('button', { name: 'Agregar', exact: true }).click();
-  await expect(create.getByRole('alert')).toContainText('ya está');
-  await create.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(create).toBeHidden();
-  expect(writes[0]?.data).toEqual({
-    fullName: 'Persona nueva',
-    accesses: [{ departmentId: recordIds.department, roleId: recordIds.role }],
-  });
-  await page
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name: 'Ana Pérez', exact: true }) })
-    .getByRole('button', { name: 'Editar registro', exact: true })
-    .click();
-  const edit = page.getByRole('dialog', { name: 'Editar persona', exact: true });
-  await page.setViewportSize({ width: 599, height: 844 });
-  await expect(edit.locator('.responsive-table-cards')).toBeVisible();
-  await expect(edit.getByRole('table')).toBeHidden();
-  await expect(
-    edit.getByRole('button', { name: 'Quitar asignación de VENTAS', exact: true }),
-  ).toBeVisible();
-  await edit.getByRole('textbox', { name: 'Nombre completo', exact: true }).fill('Ana modificada');
-  await edit.getByRole('button', { name: 'Actualizar', exact: true }).click();
-  await expect(edit).toBeHidden();
-  expect(writes.at(-1)?.data).toEqual({
-    fullName: 'Ana modificada',
-    expectedVersion: 4,
-    accesses: personData.accesses.map((row) => ({
-      departmentId: row.department.id,
-      roleId: row.role.id,
-    })),
-  });
-});
+test(
+  'personas: alta con responsabilidades, rechazo de área repetida y conservación al editar',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { writes } = await mockRecords(page);
+    await page.goto('/identidad/personas');
+    await page.getByRole('button', { name: 'Nueva persona', exact: true }).click();
+    const create = page.getByRole('dialog', { name: 'Registrar persona', exact: true });
+    await create
+      .getByRole('textbox', { name: 'Nombre completo', exact: true })
+      .fill('Persona nueva');
+    await chooseOption(page, 'Área', 'ALMACÉN');
+    await chooseOption(page, 'Rol', 'COORDINADOR');
+    await create.getByRole('combobox', { name: 'Área', exact: true }).fill('VENTAS');
+    await expect(page.getByRole('option', { name: 'VENTAS', exact: true })).toBeVisible();
+    await expect(page.getByRole('option', { name: 'ALMACÉN', exact: true })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await create.getByRole('button', { name: 'Agregar', exact: true }).click();
+    await chooseOption(page, 'Área', 'ALMACÉN');
+    await chooseOption(page, 'Rol', 'OPERADOR');
+    await create.getByRole('button', { name: 'Agregar', exact: true }).click();
+    await expect(create.getByRole('alert')).toContainText('ya está');
+    await create.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(create).toBeHidden();
+    expect(writes[0]?.data).toEqual({
+      fullName: 'Persona nueva',
+      accesses: [{ departmentId: recordIds.department, roleId: recordIds.role }],
+    });
+    await page
+      .getByRole('row')
+      .filter({ has: page.getByRole('cell', { name: 'Ana Pérez', exact: true }) })
+      .getByRole('button', { name: 'Editar registro', exact: true })
+      .click();
+    const edit = page.getByRole('dialog', { name: 'Editar persona', exact: true });
+    await page.setViewportSize({ width: 599, height: 844 });
+    await expect(edit.locator('.responsive-table-cards')).toBeVisible();
+    await expect(edit.getByRole('table')).toBeHidden();
+    await expect(
+      edit.getByRole('button', { name: 'Quitar asignación de VENTAS', exact: true }),
+    ).toBeVisible();
+    await edit
+      .getByRole('textbox', { name: 'Nombre completo', exact: true })
+      .fill('Ana modificada');
+    await edit.getByRole('button', { name: 'Actualizar', exact: true }).click();
+    await expect(edit).toBeHidden();
+    expect(writes.at(-1)?.data).toEqual({
+      fullName: 'Ana modificada',
+      expectedVersion: 4,
+      accesses: personData.accesses.map((row) => ({
+        departmentId: row.department.id,
+        roleId: row.role.id,
+      })),
+    });
+  },
+);
 
-test('usuarios: alta con rol y área; edición preserva persona y no reenvía contraseña', async ({
-  page,
-}) => {
-  const { writes } = await mockRecords(page);
-  await page.goto('/identidad/usuarios');
-  await page.getByRole('button', { name: 'Nuevo usuario', exact: true }).click();
-  const create = page.getByRole('dialog', { name: 'Registrar usuario', exact: true });
-  await create.getByRole('textbox', { name: 'Usuario', exact: true }).fill('operador');
-  await create.getByLabel('Contraseña', { exact: true }).fill('ClaveNueva2026!');
-  await chooseOption(page, 'Área', 'ALMACÉN');
-  await chooseOption(page, 'Rol', 'OPERADOR');
-  await create.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(create).toBeHidden();
-  expect(writes[0]?.data).toEqual({
-    name: 'operador',
-    password: 'ClaveNueva2026!',
-    departmentId: recordIds.department,
-    roleId: recordIds.secondRole,
-  });
-  await page
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name: 'ana', exact: true }) })
-    .getByRole('button', { name: 'Editar registro', exact: true })
-    .click();
-  const edit = page.getByRole('dialog', { name: 'Editar usuario', exact: true });
-  await expect(edit.getByRole('textbox', { name: 'Persona vinculada', exact: true })).toHaveValue(
-    'Ana Pérez',
-  );
-  await expect(edit.getByLabel('Contraseña', { exact: true })).toHaveCount(0);
-  await edit.getByRole('textbox', { name: 'Usuario', exact: true }).fill('ana2');
-  await edit.getByRole('button', { name: 'Actualizar', exact: true }).click();
-  await expect(edit).toBeHidden();
-  expect(writes.at(-1)?.data).toEqual({
-    name: 'ana2',
-    departmentId: recordIds.department,
-    roleId: recordIds.role,
-    expectedVersion: 7,
-  });
-});
+test(
+  'usuarios: alta con rol y área; edición preserva persona y no reenvía contraseña',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { writes } = await mockRecords(page);
+    await page.goto('/identidad/usuarios');
+    await page.getByRole('button', { name: 'Nuevo usuario', exact: true }).click();
+    const create = page.getByRole('dialog', { name: 'Registrar usuario', exact: true });
+    await create.getByRole('textbox', { name: 'Usuario', exact: true }).fill('operador');
+    await create.getByLabel('Contraseña', { exact: true }).fill('ClaveNueva2026!');
+    await chooseOption(page, 'Área', 'ALMACÉN');
+    await chooseOption(page, 'Rol', 'OPERADOR');
+    await create.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(create).toBeHidden();
+    expect(writes[0]?.data).toEqual({
+      name: 'operador',
+      password: 'ClaveNueva2026!',
+      departmentId: recordIds.department,
+      roleId: recordIds.secondRole,
+    });
+    await page
+      .getByRole('row')
+      .filter({ has: page.getByRole('cell', { name: 'ana', exact: true }) })
+      .getByRole('button', { name: 'Editar registro', exact: true })
+      .click();
+    const edit = page.getByRole('dialog', { name: 'Editar usuario', exact: true });
+    await expect(edit.getByRole('textbox', { name: 'Persona vinculada', exact: true })).toHaveValue(
+      'Ana Pérez',
+    );
+    await expect(edit.getByLabel('Contraseña', { exact: true })).toHaveCount(0);
+    await edit.getByRole('textbox', { name: 'Usuario', exact: true }).fill('ana2');
+    await edit.getByRole('button', { name: 'Actualizar', exact: true }).click();
+    await expect(edit).toBeHidden();
+    expect(writes.at(-1)?.data).toEqual({
+      name: 'ana2',
+      departmentId: recordIds.department,
+      roleId: recordIds.role,
+      expectedVersion: 7,
+    });
+  },
+);
 
 test('usuarios: el cambio de contraseña es una operación independiente y versionada', async ({
   page,
