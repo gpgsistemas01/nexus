@@ -11,7 +11,7 @@ capturas y publicación. Esta página explica las herramientas.
 | [package.json](../../package.json) y [lockfile](../../package-lock.json) | Versiones de Node y dependencias instaladas con `npm ci`. |
 | [tsconfig.json](../../tsconfig.json) | Entornos de aplicación, configuración y pruebas. |
 | [ESLint](../../eslint.config.js) y [Prettier](../../prettier.config.js) | Análisis de código y formato. |
-| [CI](../../../.github/workflows/ci.yml) | Versiones de Node, instalación, comprobaciones y reportes automatizados. |
+| [CI](../../../.github/workflows/ci.yml) | Node 24, instalación, comprobaciones y reportes automatizados. |
 
 El [estándar de formato](../architecture/coding-standards/02-format-of-the-file.md)
 y las [reglas de imports](../architecture/coding-standards/04-imports-exports-and-dependencies.md)
@@ -31,3 +31,6 @@ de compilar. Los imports TypeScript usan `.js` y los componentes, `.vue`.
 
 `npm run format` aplica el formato versionado. Puedes activar Prettier y «Format
 on Save» en el editor; los comandos y CI también comprueban el resultado.
+
+CI usa Node 24 para ambas aplicaciones y ejecuta los eventos push y pull request.
+Un cambio nuevo cancela la ejecución anterior del mismo evento y rama o PR.
