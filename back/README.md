@@ -23,7 +23,7 @@ interfaz Vue consume los contratos HTTP y los recursos compartidos del backend.
 src/          Aplicación HTTP, rutas, controladores, servicios y persistencia
 prisma/       Esquema y migraciones PostgreSQL
 tests/        Pruebas unitarias, HTTP, integración y rendimiento
-docs/         Arquitectura, pruebas, desarrollo y gobernanza
+docs/         Arquitectura, pruebas y desarrollo
 ```
 
 Las rutas componen los controladores; éstos coordinan entrada, validación y

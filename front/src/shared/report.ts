@@ -9,7 +9,12 @@ export interface ReportScope {
 
 export type ReportKind = 'period' | 'inventory' | 'filtered';
 
-export const reportFilename = (name: string, date = new Date()): string => {
+export const reportFilename = (name: string, date = new Date(), month?: string): string => {
+    if (month && /^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
+        const [year, selectedMonth] = month.split('-');
+        return `${name.replace(/\.xlsx$/i, '')}_${selectedMonth}_${year}.xlsx`;
+    }
+
     const parts = new Intl.DateTimeFormat('en-US', {
         timeZone: MEXICO_TIME_ZONE,
         month: '2-digit',

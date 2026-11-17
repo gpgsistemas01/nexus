@@ -369,6 +369,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `canExport` | `canExport: () => boolean;` |
 | `request` | `request: (scope: Scope, signal: AbortSignal) => Promise<Blob>;` |
 | `filename` | `filename: string \| (() => string);` |
+| `reportMonth` | `reportMonth?: (scope: Scope) => string \| undefined;` |
 | `onDenied` | `onDenied: (status: number) => void;` |
 
 ## InteractiveForm

@@ -1,4 +1,4 @@
-# 1. Componentes y reutilización de frontend y backend
+# 1. Componentes y contratos de la API
 
 La vista muestra componentes y dependencias. El orden de las peticiones pertenece a
 la [vista de procesos](../processes/index.md).
@@ -8,7 +8,7 @@ la [vista de procesos](../processes/index.md).
 
 **Componentes y contratos con clasificadores UML en Mermaid:** `DIA-ARQ-CMP-001`.
 
-### Contratos HTTP entre frontend y backend
+### Consumidor y contrato HTTP
 
 ```mermaid
 ---
@@ -18,26 +18,14 @@ config:
 ---
 classDiagram
     direction TB
-    namespace Navegador {
-        class Visual { <<component>> }
-        class Application { <<component>> }
+    namespace ConsumidorAPI {
         class HttpClient { <<component>> }
     }
     namespace Backend {
-        class WebMVC { <<component>> }
-        class StaticFiles { <<component>> }
         class OperationalAPI { <<component>> }
     }
-    class WebHTTP { <<interface>> }
-    class StaticHTTP { <<interface>> }
     class ApiHTTP { <<interface>> }
 
-    Visual ..> Application : usa
-    Application ..> HttpClient : usa
-    Visual ..> WebHTTP : requiere HTML
-    WebHTTP <|.. WebMVC : provee
-    Visual ..> StaticHTTP : requiere módulos y estilos
-    StaticHTTP <|.. StaticFiles : provee
     HttpClient ..> ApiHTTP : requiere JSON y archivos
     ApiHTTP <|.. OperationalAPI : provee
 ```
@@ -67,7 +55,8 @@ classDiagram
 ### Canal de eventos
 
 Esta figura separa Socket.IO de las peticiones HTTP para conservar legibilidad.
-`OperationalAPI` y `Visual` son los mismos componentes de la figura anterior.
+`OperationalAPI` es el mismo componente de la figura anterior. El servidor expone
+Socket.IO; el cliente Vue actual no implementa una suscripción a ese canal.
 
 ```mermaid
 ---
@@ -77,35 +66,31 @@ config:
 ---
 classDiagram
     direction TB
-    namespace Navegador {
-        class EventClient { <<component>> }
-        class Visual { <<component>> }
-    }
-    namespace Backend {
-        class OperationalAPI { <<component>> }
-        class EventPublisher { <<component>> }
-    }
+    class OperationalAPI { <<component>> }
+    class EventPublisher { <<component>> }
+    class SocketServer { <<component>> }
     class SocketEvents { <<interface>> }
-    class CustomEvents { <<interface>> }
-    OperationalAPI ..> EventPublisher : publica después de escribir
-    SocketEvents <|.. EventPublisher : provee
-    EventClient ..> SocketEvents : se suscribe
-    EventClient ..> CustomEvents : emite
-    Visual ..> CustomEvents : escucha
+    OperationalAPI ..> EventPublisher : notifica después de confirmar
+    EventPublisher ..> SocketServer : publica a conexiones autorizadas
+    SocketEvents <|.. SocketServer : provee
 ```
 
 `<<component>>` identifica componentes y `<<interface>>` contratos. `<|..` indica
 realización y `..>` dependencia. Mermaid aproxima esta vista con clasificadores;
-no dibuja puertos ni conectores de componente UML nativos. `CustomEvents` representa
-los eventos del navegador: el emisor no depende de los listados que los escuchan.
+no dibuja puertos ni conectores de componente UML nativos. El cliente Vue actual
+consume el contrato HTTP; su alojamiento y composición visual quedan fuera del
+proceso Express.
 
 | Componente | Responsabilidad |
 | --- | --- |
-| `Visual`, `Application`, `HttpClient` | Interfaz, coordinación frontend y peticiones Axios; el cliente HTTP gestiona la renovación y el reintento ante 401. |
-| `WebMVC`, `StaticFiles`, `OperationalAPI` | Entregan HTML renderizado, archivos estáticos y el contrato API para JSON y descargas. |
+| `HttpClient` | Cliente Axios de Vue; consume la API y gestiona renovación de sesión y reintento ante 401. |
+| `OperationalAPI` | Express registra rutas HTTP, aplica middleware y entrega JSON y descargas; no renderiza las pantallas Vue. |
 | `DomainServices`, `SharedServices` | Aplican reglas del dominio y colaboraciones reutilizables; las escrituras compuestas conservan una transacción. |
 | `Persistence` | Repositories y Prisma; la estructura de tablas pertenece al modelo persistente. |
-| `EventPublisher`, `EventClient` | Publican y reciben avisos Socket.IO; el cliente emite eventos del navegador para actualizar los listados. |
+| `EventPublisher`, `SocketServer` | `socketUtils.js` autentica conexiones y revalida identidad/permisos antes de publicar avisos. |
+
+Las fuentes son `src/app.js`, `src/routes/api/index.js`, `src/routes/system/index.js`,
+`src/server.js` y `src/utils/socketUtils.js`; Vue usa `front/src/shared/http/apiClient.ts`.
 
 HTTP y Socket.IO son contratos separados de la misma aplicación. Los avisos se emiten
 tras completar la operación correspondiente; no sustituyen la respuesta HTTP ni la
@@ -113,9 +98,8 @@ consulta de datos del listado.
 
 ## Reutilización y mantenimiento
 
-Las factories y consumidores se detallan en los
-[diagramas de reutilización](../development/reuse-and-refactoring/index.md)
-y en el [patrón de composición visual](../development/design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md).
+Las factories y consumidores de servicios se detallan en los
+[diagramas de reutilización](../development/reuse-and-refactoring/index.md).
 Las [colaboraciones por dominio](../development/code-structure/03-backend-domains-and-dependencies.md)
 amplían las dependencias y [OpenAPI](../../openapi/openapi.json) define los contratos HTTP.
 

@@ -1,4 +1,4 @@
-# 16. Principios SOLID en funciones y módulos
+# 15. Principios SOLID en funciones y módulos
 
 SOLID orienta dependencias y contratos; no es un patrón adicional ni una norma de
 carpetas. Se aplica a este monolito funcional y a Vue por composición. No exige

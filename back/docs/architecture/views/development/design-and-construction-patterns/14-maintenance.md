@@ -1,4 +1,4 @@
-# 15. Mantenimiento
+# 14. Mantenimiento
 
 Un patrón se documenta como aplicado sólo cuando hay al menos una implementación y un
 uso verificables. Si una refactorización cambia su contrato o elimina sus consumidores,

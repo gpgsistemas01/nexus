@@ -1,39 +1,35 @@
 # 3. Catálogo visual de patrones aplicados
 
-El catálogo conecta las responsabilidades compartidas con sus implementaciones y
-consumidores. Las figuras localizan dependencias, configuración y contratos de implementación.
-Los recorridos temporales se consultan en procesos. Cada mecanismo tiene
-un contrato y variantes que permanecen en el recurso. Los símbolos y archivos permiten
-contrastar el dibujo con código y pruebas, sin atribuirle cobertura adicional.
+El catálogo conecta patrones de implementación de la API con sus módulos y pruebas.
+Las figuras localizan dependencias, configuración y contratos internos; los recorridos
+temporales están en procesos. Las vistas de la interfaz Vue pertenecen a la
+documentación del frontend.
 
 Los capítulos de detalle completan [políticas y adaptación de datos](06-dtos-adapters-and-policies.md),
-[publicador y suscriptores](10-publication-of-events-of-inventory.md),
-[ownership visual](12-composition-and-ownership-of-components-visual.md) y
+[publicación de eventos](10-publication-of-events-of-inventory.md) y
 [refactorización](../reuse-and-refactoring/04-refactoring-and-extension.md). Los códigos **Patrones** de los casos
 son enlaces a estas colaboraciones; no sustituyen su evidencia de aplicación.
 
 ### Estructura por dominio, capas y fronteras
 
-**Identificador:** `DIA-PAT-EST-001`. **Pregunta:** ¿dónde se materializa la separación
-por capa en el recurso materiales? **Fuente:** imports de los módulos nombrados.
-**Alcance:** ejemplo de capas en módulos ES; las flechas apuntan del consumidor a la dependencia.
+**Identificador:** `DIA-PAT-EST-001`. **Pregunta:** ¿cómo se separan las responsabilidades
+de la API para consultar materiales? **Fuente:** imports de los módulos nombrados.
+**Alcance:** capas de una ruta HTTP; las flechas muestran dependencias, no el orden temporal.
 
 ```mermaid
 flowchart TB
+    client["Consumidor HTTP"] -->|HTTP| routes
     routes["routes/api/warehouse/materialApiRoute.js"] --> middleware["middleware/authMiddleware.js<br/>validators/forms/materialValidations.js"]
     routes --> controller["controllers/api/warehouse/materialController.js"]
     controller --> dto["dtos/materialDTO.js"]
     controller --> service["services/warehouse/materials/materialService.js"]
-    service --> db["repository/baseRepository.js<br/>lib/prisma.js"]
-    page["public/js/pages/warehouse/materials/materialForm.js"] --> application["application/warehouse/materials/materials.js"]
-    application --> requests["services/warehouse/materialService.js<br/>axiosInstanceApi.js"]
-    page --> visual["ui/forms/formUI.js"]
-    requests -->|HTTP| routes
+    service --> persistence["repository/baseRepository.js<br/>lib/prisma.js"]
+    persistence --> database[("PostgreSQL")]
 ```
 
-Los módulos son archivos JavaScript con funciones exportadas. El [mapa completo del backend](../code-structure/03-backend-domains-and-dependencies.md)
-permite seguir archivos concretos. La referencia backend explica el contrato de cada
-capacidad y la frontend explica qué se configura y qué estado conserva la pantalla.
+Los módulos son archivos JavaScript con funciones exportadas. El [mapa de dominios API](../code-structure/03-backend-domains-and-dependencies.md)
+permite seguir dependencias entre rutas, controllers, servicios y persistencia.
+OpenAPI conserva el contrato que consume el cliente.
 
 ### Pipeline, DTO y políticas declarativas
 

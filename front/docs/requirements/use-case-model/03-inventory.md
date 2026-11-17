@@ -3,6 +3,10 @@
 [Índice y notación del modelo](index.md#alcance-y-notación).
 
 Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-contextual-creation.md).
+Los ajustes y reportes son extensiones opcionales de la consulta. `«extend»` indica
+que se inician desde ella; las asociaciones actor–caso fijan quién puede ejecutarlos.
+El ajuste se asocia sólo con el Administrador. El reporte se asocia con Personal de
+almacén y el Administrador hereda esa participación.
 
 ## Materiales
 
@@ -33,12 +37,13 @@ direction LR
     warehouse -- ucMaterialQuery
     admin -- ucMaterialStock
     operational -- ucMaterialQuery
+    warehouse -- ucMaterialInventoryReport
 
     ucMaterialQuery -- ucMaterialCreate
     ucMaterialQuery -- ucMaterialEdit
     ucMaterialQuery -- ucMaterialRemove
-    ucMaterialQuery -- ucMaterialInventoryReport
-    ucMaterialQuery -- ucMaterialStock
+    ucMaterialInventoryReport ..>:extend ucMaterialQuery
+    ucMaterialStock ..>:extend ucMaterialQuery
 ```
 
 ## Mermas
@@ -68,12 +73,13 @@ direction LR
     warehouse -- ucWasteQuery
     admin -- ucWasteStock
     operational -- ucWasteQuery
+    warehouse -- ucWasteReport
 
     ucWasteQuery -- ucWasteCreate
     ucWasteQuery -- ucWasteEdit
     ucWasteQuery -- ucWasteAddStock
-    ucWasteQuery -- ucWasteReport
-    ucWasteQuery -- ucWasteStock
+    ucWasteReport ..>:extend ucWasteQuery
+    ucWasteStock ..>:extend ucWasteQuery
 ```
 
 ## Consumibles
@@ -103,10 +109,11 @@ direction LR
     warehouse -- ucConsumableQuery
     admin -- ucConsumableStock
     operational -- ucConsumableQuery
+    warehouse -- ucConsumableReport
 
     ucConsumableQuery -- ucConsumableCreate
     ucConsumableQuery -- ucConsumableEdit
     ucConsumableQuery -- ucConsumableRemove
-    ucConsumableQuery -- ucConsumableReport
-    ucConsumableQuery -- ucConsumableStock
+    ucConsumableReport ..>:extend ucConsumableQuery
+    ucConsumableStock ..>:extend ucConsumableQuery
 ```

@@ -5,7 +5,7 @@
 La vista lógica responde qué dominios, componentes, estados y datos colaboran:
 
 1. [Componentes y reutilización](01-components-and-reuse.md): capas, dependencias y
-   puntos de reutilización de frontend y backend.
+   puntos de reutilización de la API y sus contratos con Vue.
 2. [Identidad, acceso y auditoría](02-identity-access-and-audit.md): separación entre
    cuenta, persona, autorización y actor de una escritura.
 3. [Modelo persistente](data-and-persistence/index.md): diagramas ER y diccionario

@@ -8,21 +8,16 @@ Las altas auxiliares son opcionales: `«extend»` apunta del alta a la captura p
 Requieren el permiso de alta y devuelven el registro seleccionado sin guardar el documento principal.
 
 Las asociaciones representan participación autorizada: las áreas operativas consultan,
-registran y editan sus solicitudes; Personal de almacén también surte, devuelve y genera
-reportes. El Administrador del sistema hereda las funciones de almacén. Una consulta no
-concede por sí misma acceso a las demás operaciones.
+registran y editan sus solicitudes. Surtir, devolver y generar reportes tienen
+asociaciones sólo con Personal de almacén; el Administrador hereda esas funciones.
+Las líneas de acceso desde Consulta no indican participación de las áreas operativas
+en esas funciones ni les conceden permisos.
 
-Crear cliente se relaciona mediante `«extend»` con Crear salida y Editar encabezado.
-La salida puede completarse con un cliente existente; el alta auxiliar es opcional.
-Surtir y Devolver conservan su actor específico y se inician según estado y permiso;
-no son inclusiones obligatorias de Consulta ni de Crear salida.
-
-El punto de extensión es la selección de Cliente del paso 3 al crear una salida
-o editar su encabezado. Con permisos de lectura/alta de Directorio y cliente
-editable, se escribe un nombre sin coincidencia y se elige **Registrar cliente**.
-`CU-CAT-06` devuelve el cliente activo y retoma la captura; cancelar conserva la
-selección anterior. El alta auxiliar no guarda la salida. Las áreas operativas,
-el surtimiento y la devolución no permiten esta extensión.
+El alta contextual de cliente se representa una sola vez en [Altas desde selectores](09-contextual-creation.md#cliente-durante-una-salida).
+Aquí no se repite ese caso. Surtir, devolver y generar reportes son extensiones
+opcionales de la consulta. `«extend»` indica que parten de ella; las asociaciones
+actor–caso indican quién puede ejecutarlos. Las áreas operativas sólo están asociadas
+con las consultas y no participan en esas extensiones.
 
 ## Salidas de materiales
 
@@ -47,7 +42,6 @@ direction LR
         ucMaterialSupply("CU-SAL-05 Surtir material")
         ucMaterialReturn("CU-SAL-06 Devolver material surtido")
         ucMaterialIssueReport("CU-SAL-07 Generar reporte de salidas de material")
-        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     operational -- ucMaterialIssueQuery
@@ -55,12 +49,12 @@ direction LR
     ucMaterialIssueQuery -- ucMaterialIssueDetails
     ucMaterialIssueQuery -- ucMaterialIssueHeader
     ucMaterialIssueQuery -- ucMaterialIssueCreate
+    ucMaterialSupply ..>:extend ucMaterialIssueQuery
+    ucMaterialReturn ..>:extend ucMaterialIssueQuery
+    ucMaterialIssueReport ..>:extend ucMaterialIssueQuery
     warehouse -- ucMaterialSupply
     warehouse -- ucMaterialReturn
     warehouse -- ucMaterialIssueReport
-    warehouse -- clientExtension
-    clientExtension ..>:extend ucMaterialIssueCreate
-    clientExtension ..>:extend ucMaterialIssueHeader
 ```
 
 ## Salidas de mermas
@@ -86,7 +80,6 @@ direction LR
         ucWasteSupply("CU-SAL-12 Surtir merma")
         ucWasteReturn("CU-SAL-13 Devolver merma surtida")
         ucWasteIssueReport("CU-SAL-14 Generar reporte de salidas de merma")
-        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     operational -- ucWasteIssueQuery
@@ -94,12 +87,12 @@ direction LR
     ucWasteIssueQuery -- ucWasteIssueDetails
     ucWasteIssueQuery -- ucWasteIssueHeader
     ucWasteIssueQuery -- ucWasteIssueCreate
+    ucWasteSupply ..>:extend ucWasteIssueQuery
+    ucWasteReturn ..>:extend ucWasteIssueQuery
+    ucWasteIssueReport ..>:extend ucWasteIssueQuery
     warehouse -- ucWasteSupply
     warehouse -- ucWasteReturn
     warehouse -- ucWasteIssueReport
-    warehouse -- clientExtension
-    clientExtension ..>:extend ucWasteIssueCreate
-    clientExtension ..>:extend ucWasteIssueHeader
 ```
 
 ## Salidas de consumibles
@@ -125,7 +118,6 @@ direction LR
         ucConsumableSupply("CU-SAL-19 Surtir consumible")
         ucConsumableReturn("CU-SAL-20 Devolver consumible surtido")
         ucConsumableIssueReport("CU-SAL-21 Generar reporte de salidas de consumible")
-        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     operational -- ucConsumableIssueQuery
@@ -133,10 +125,10 @@ direction LR
     ucConsumableIssueQuery -- ucConsumableIssueDetails
     ucConsumableIssueQuery -- ucConsumableIssueHeader
     ucConsumableIssueQuery -- ucConsumableIssueCreate
+    ucConsumableSupply ..>:extend ucConsumableIssueQuery
+    ucConsumableReturn ..>:extend ucConsumableIssueQuery
+    ucConsumableIssueReport ..>:extend ucConsumableIssueQuery
     warehouse -- ucConsumableSupply
     warehouse -- ucConsumableReturn
     warehouse -- ucConsumableIssueReport
-    warehouse -- clientExtension
-    clientExtension ..>:extend ucConsumableIssueCreate
-    clientExtension ..>:extend ucConsumableIssueHeader
 ```

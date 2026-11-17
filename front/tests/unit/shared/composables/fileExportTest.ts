@@ -129,3 +129,37 @@ it('los periodos comparten orden y omiten filtros; personalizado conserva búsqu
   });
   expect(query.get('length')).toBe('10');
 });
+
+it('descarga con el mes específico elegido aunque cambie durante la solicitud', async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-11-05T12:00:00Z'));
+  vi.stubGlobal('URL', { createObjectURL: () => 'blob:excel', revokeObjectURL: vi.fn() });
+  const names: string[] = [];
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+    this: HTMLAnchorElement,
+  ) {
+    names.push(this.download);
+  });
+  let complete!: (file: Blob) => void;
+  const mounted = mountComposable(() =>
+    useReportScope({
+      kind: 'period',
+      canExport: () => true,
+      filename: 'reporte_salidas',
+      onDenied: vi.fn(),
+      request: () =>
+        new Promise<Blob>((resolve) => {
+          complete = resolve;
+        }),
+    }),
+  );
+  mounted.value.setReportMode('specific-month');
+  mounted.value.setReportMonth('2025-02');
+  const download = mounted.value.exportReport();
+  mounted.value.reportValues.month = '2026-08';
+  complete(new Blob(['excel']));
+  await download;
+  expect(names).toEqual(['reporte_salidas_02_2025.xlsx']);
+  mounted.wrapper.unmount();
+  vi.runAllTimers();
+});

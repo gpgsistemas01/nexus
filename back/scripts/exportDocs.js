@@ -66,12 +66,12 @@ const frontendManualProfile = requestedPublication === 'manual-vue'
 const frontendManualSources = frontendManualProfile
     ? await loadManualModulePublications(path.resolve(ROOT, '../front'), frontendManualProfile) : null;
 const frontendSource = source => `../front/docs/${source}`;
-const frontendSectionParts = requestedPublication === 'arquitectura'
-    && requestedDocument?.startsWith('frontend-vue-')
+const frontendSectionParts = requestedPublication === 'documentacion-vue'
+    && requestedDocument?.startsWith('vue-')
     ? Object.fromEntries(Object.entries(frontendCatalog.sections)
         .filter(([name]) => name !== 'manual')
         .map(([name, definition]) => [
-            `frontend-vue-${name}`,
+            `vue-${name}`,
             definition.sources.map(frontendSource)
         ]))
     : {};
@@ -101,7 +101,6 @@ const PUBLICATIONS = Object.freeze({
             'vision-y-navegacion': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/index.md',
                 'docs/architecture/views/scenarios/index.md',
-                '../front/docs/architecture/views/scenarios/index.md',
                 'docs/architecture/views/processes/index.md',
                 'docs/architecture/views/processes/01-end-to-end-interaction.md',
                 'docs/architecture/views/logical/index.md',
@@ -117,26 +116,22 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/development/code-structure'),
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
                 ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
-                '../front/docs/architecture/views/overview.md',
-                ...getDirectoryDocuments('../front/docs/architecture/views/development/design-and-construction-patterns'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             'incorporacion-desarrolladores': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/developer-onboarding.md'
             ]),
-            'desarrollo-backend': [
+            'desarrollo-backend': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/development/index.md',
-                'docs/development/local-development.md'
-            ],
+                'docs/development/local-development.md',
+                'docs/development/documentation.md'
+            ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
                 'docs/architecture/views/development/excel-library-decision.md',
                 'docs/architecture/views/development/code-structure/06-prisma-and-persistence.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/backend-technical-documentation')
             ]),
-            frontend: frontendCatalog.completeSources.map(frontendSource),
-            'frontend-vue': frontendCatalog.completeSources.map(frontendSource),
-            ...frontendSectionParts,
             'comportamiento-transversal': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/processes/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/processes/shared-runtime-behavior')
@@ -159,9 +154,12 @@ const PUBLICATIONS = Object.freeze({
             ])))
         }
     },
-    gobernanza: {
-        directory: 'gobernanza',
-        parts: { gobernanza: getDirectoryDocuments('docs/governance') }
+    'documentacion-vue': {
+        directory: 'documentacion-vue',
+        parts: {
+            vue: frontendCatalog.completeSources.map(frontendSource),
+            ...frontendSectionParts
+        }
     },
     pruebas: {
         parts: {
@@ -340,7 +338,7 @@ const insertAfterDocumentData = (content, insertion) => {
 
 const preparePublicationSource = (content, source, output) => {
     const document = path.basename(output).replace(/\.(?:docx|pdf)$/, '');
-    const section = frontendCatalog.sections[document.replace(/^frontend-vue-/, '')];
+    const section = frontendCatalog.sections[document.replace(/^vue-/, '')];
     if (requestedPublication === 'manual-vue' && !frontendManualProfile) content = filterManualModule(content, MANUAL_REFERENCE_CONTEXT);
     const titledContent = source === '../front/docs/index.md' && section
         ? prepareSectionEntry(content, `${section.title} del frontend Vue`)
@@ -358,7 +356,7 @@ if ((requestedPublication !== 'todos' && !selectablePublicationNames.includes(re
     || invalidDocument
     || positionalArgumentCount > 3
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- [todos|manuales|datos|arquitectura|pruebas|gobernanza] [seccion] [docx|pdf|ambos] [--check|--check-sources]');
+    console.error('Uso: npm run docs:export -- [todos|manuales|datos|arquitectura|documentacion-vue|pruebas] [seccion] [docx|pdf|ambos] [--check|--check-sources]');
     process.exit(1);
 }
 

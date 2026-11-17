@@ -77,6 +77,6 @@ El [plan de pruebas](../testing/test-plan.md) y la guía de
 
 Los scripts autoritativos están en [`package.json`](../../package.json). Para
 exportar documentación técnica, usa `npm --prefix back run docs:export -- <familia>
-<sección> <docx|pdf|ambos>`; la [guía de exportación](../governance/document-export-guide/index.md)
+<sección> <docx|pdf|ambos>`; la [guía de exportación](documentation.md)
 describe formatos, herramientas y selecciones disponibles. Capturas y manuales de
 usuario se generan desde la [guía de desarrollo Vue](../../../front/docs/development/index.md).

@@ -1,30 +1,26 @@
-# 4. Monolito modular por dominio y arquitectura por capas
+# 4. Monolito modular por dominio y capas de la API
 
-Nexus se despliega como una aplicación, pero organiza responsabilidades por dominio y
-capa. El recorrido habitual es:
+La API se ejecuta en una aplicación Node y organiza su código por dominios y
+responsabilidades. Una solicitud sigue, en general, este recorrido:
 
 ```text
-ruta/middleware → controller/DTO → servicio de dominio → Prisma → PostgreSQL
+router/middleware → controller/DTO → servicio de dominio → repository/Prisma → PostgreSQL
 ```
 
-En el navegador, `services` encapsula HTTP, `application` expresa operaciones del caso
-de uso y `pages` compone comportamiento visual. Esto se parece a MVC en algunos puntos,
-pero no se declara un MVC estricto: los servicios de dominio, DTO, JavaScript del
-navegador y eventos no encajan en tres componentes únicos.
+Los routers definen el contrato HTTP y aplican middleware de sesión, permisos y
+validación. Los controllers adaptan `req` y `res`, y delegan reglas de negocio a
+servicios. Los servicios coordinan consultas y escrituras; repositories y Prisma
+acceden a la base, propagando el cliente transaccional cuando la operación lo requiere.
 
-Vue implementa la presentación; Express adapta HTTP y coordina los servicios de dominio.
+Las carpetas bajo `routes/api`, `controllers/api` y `services` conservan el dominio de
+la operación. Las variantes de materiales y consumibles fijan el contexto y delegan
+en núcleos compartidos cuando las reglas coinciden. Los colaboradores transversales
+se mantienen separados, sin convertir cada helper en una capa.
 
-**Regla de construcción:** un recurso nuevo conserva el mismo dominio y nombre a través
-de sus capas. No se crea una carpeta horizontal nueva sólo para una operación CRUD.
+La aplicación comparte módulos puros desde `src/shared` con el consumidor Vue, pero
+esa distribución no traslada validación ni autorización al cliente. Los workers Excel
+son temporales del proceso API. Socket.IO publica avisos después de completar
+operaciones y no reemplaza la respuesta HTTP.
 
-Las reglas puras utilizadas por ambos entornos viven en `src/shared`, servido en
-`/shared`. `public/js/utils` conserva lectura y etiquetas de inventario, Select2 adapta
-sus opciones en `plugins/select2/inventorySelectData.js`, y `application` adapta
-contratos de detalle. Las páginas entregan callbacks a los plugins para componer
-modales sin dependencias inversas. La captura de compra vive en `goodsReceiptContext`.
-
-Las consultas y resúmenes de compra/merma se mantienen junto a su dominio. La
-construcción de filas y fórmulas Excel pertenece al adaptador de salida, separado de
-los controllers y del escritor de archivos. Los validadores devuelven errores de
-detalle estructurados; no serializan JSON dentro de mensajes. Las altas preservan
-`AppError` y normalizan errores de persistencia con `handleServiceError`.
+El recorrido concreto se verifica en las [secuencias API](../../processes/index.md)
+y las [colaboraciones por módulo](../code-structure/03-backend-domains-and-dependencies.md).

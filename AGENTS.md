@@ -14,7 +14,7 @@ en la raíz del repositorio.
 ## Fuentes de verdad
 
 - Consulta `docs/architecture/coding-standards/index.md` para formato, nombres, capas, imports, errores y convenciones de frontend y pruebas.
-- Consulta `docs/README.md` para arquitectura, datos, pruebas y gobierno del backend. Los requisitos y casos de uso se mantienen en `front/docs/requirements/`, desde la raíz del repositorio.
+- Consulta `docs/README.md` para arquitectura, datos y pruebas del backend. Los requisitos y casos de uso se mantienen en `front/docs/requirements/`, desde la raíz del repositorio.
 - Trata `prisma/schema.prisma` como fuente técnica del modelo de datos y `src/routes` como fuente de las rutas registradas.
 - No edites manualmente `docs/architecture/views/development/code-map.md` ni `docs/architecture/views/logical/data-and-persistence/generated/`; regenera esos archivos con `npm run docs:architecture`.
 
@@ -84,7 +84,7 @@ en la raíz del repositorio.
 - Conserva la semántica propia de los diagramas ER y de flujo. Identifica como aproximaciones los diagramas que Mermaid no representa con notación UML completa, como despliegue.
 - Los casos de uso `usecase-beta` requieren un visor compatible con Mermaid 12. No elimines metadatos UML de participantes para adaptar el contenido a un renderizador anterior.
 - Mantén las versiones y la configuración del renderizador centralizadas en `scripts/mermaidExportUtils.js`; `scripts/prepareMermaidCli.js` comprueba su compatibilidad. Si cambian versiones o configuración, conserva su participación en la clave de caché de imágenes.
-- Al cambiar diagramas o el exportador, valida el renderizado de los diagramas afectados y una exportación representativa con `npm run docs:export -- <familia> <seccion> ambos`. Comprueba legibilidad y ausencia de recortes en DOCX/PDF; `docs:check` no sustituye esa verificación. Consulta `docs/governance/document-export-guide/03-prepare-the-tools.md` para herramientas y configuración.
+- Al cambiar diagramas o el exportador, valida el renderizado de los diagramas afectados y una exportación representativa con `npm run docs:export -- <familia> <seccion> ambos`. Comprueba legibilidad y ausencia de recortes en DOCX/PDF; `docs:check` no sustituye esa verificación. Consulta `docs/development/documentation.md#herramientas` para herramientas y configuración.
 
 ## Capturas del manual
 

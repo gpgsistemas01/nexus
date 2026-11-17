@@ -6,6 +6,7 @@ export interface FileExportOptions<Scope> {
     canExport: () => boolean;
     request: (scope: Scope, signal: AbortSignal) => Promise<Blob>;
     filename: string | (() => string);
+    reportMonth?: (scope: Scope) => string | undefined;
     onDenied: (status: number) => void;
 }
 
@@ -26,13 +27,18 @@ export const useFileExport = <Scope>(options: FileExportOptions<Scope>) => {
         try {
             const filename =
                 typeof options.filename === 'function' ? options.filename() : options.filename;
+            const downloadFilename = reportFilename(
+                filename,
+                new Date(),
+                options.reportMonth?.(scope),
+            );
             const file = await options.request(scope, current.signal);
             if (current.signal.aborted) return;
 
             const url = URL.createObjectURL(file);
             const link = document.createElement('a');
             link.href = url;
-            link.download = reportFilename(filename);
+            link.download = downloadFilename;
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (cause) {

@@ -44,6 +44,7 @@ const sendMovementReport = async ({ req, res, context, sheetName, filename, addi
     return sendExcelReport({
         res,
         data: buildMovementReportData(rows, { context }),
+        reportMonth: isMonthlyReportQuery(req.query) ? req.query.reportMonth : undefined,
         sheetName,
         filename
     });
