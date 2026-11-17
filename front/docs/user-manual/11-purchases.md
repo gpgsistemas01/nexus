@@ -76,7 +76,7 @@ no aparece el botón.
 
 <!-- module:end -->
 
-Complete el formulario auxiliar y guarde. El artículo nuevo queda seleccionado;
+Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: para KILOGRAMO o METRO LINEAL, el multiplicador es 1 y se captura la medida por pieza. Al volver a Compras, el artículo seleccionado muestra sus medidas, unidad y cantidad convertida prevista antes de pulsar **Agregar**. El artículo nuevo queda seleccionado;
 todavía debe capturar **Cantidad** y **Costo por Presentación**,
 pulsar **Agregar** y guardar la compra. El alta auxiliar no recibe la mercancía:
 la existencia de esta recepción se registra al guardar la compra.

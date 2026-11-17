@@ -1,3 +1,8 @@
+import { inventorySections } from '../../../../src/modules/warehouse/formFields.js';
+import {
+  initialInventoryValues,
+  previewWaste,
+} from '../../../../src/modules/warehouse/formModel.js';
 import { inventoryCatalogService } from '../../../../src/modules/warehouse/services/inventoryCatalogService.js';
 import { normalizeInventoryRow } from '../../../../src/modules/warehouse/mappers/inventoryMapper.js';
 import { defineComponent, h } from 'vue';
@@ -384,3 +389,21 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     expect(saved).not.toHaveBeenCalled();
   });
 });
+
+it.each([false, true])(
+  'alta desde Compras muestra las medidas del consumible (por pieza: %s)',
+  (isPerPiece) => {
+    const target = { action: 'create' as const };
+    const preview = previewWaste(initialInventoryValues(target));
+    const sections = inventorySections('consumables', target, preview, {
+      creationContext: 'goodsReceipt',
+      usesMeasurements: isPerPiece,
+      isPerPiece,
+      hasSupplier: true,
+    });
+    const fields = sections.find((section) => section.id === 'measurements')?.fields;
+    expect(fields?.map((field) => field.name)).toEqual(['base', 'height']);
+    expect(fields?.find((field) => field.name === 'height')?.isReadOnly).toBe(false);
+    if (isPerPiece) expect(fields?.find((field) => field.name === 'base')?.isReadOnly).toBe(true);
+  },
+);

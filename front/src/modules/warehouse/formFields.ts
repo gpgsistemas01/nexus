@@ -217,14 +217,16 @@ export const inventorySections = (
             ],
         });
 
-    if (isWaste || options.usesMeasurements)
+    if (isWaste || resource === 'consumables' || options.usesMeasurements)
         sections.push({
             id: 'measurements',
             title: options.isPerPiece
                 ? 'Medida por pieza'
-                : isWaste
-                  ? 'Medidas de la merma'
-                  : 'Medidas del material',
+                : resource === 'consumables'
+                  ? 'Medidas del consumible'
+                  : isWaste
+                    ? 'Medidas de la merma'
+                    : 'Medidas del material',
             description:
                 isWaste && isRoll && isCreating
                     ? 'Se calculan a partir de los pesos y del material de origen.'
