@@ -18,6 +18,9 @@ Pulse **Importar Excel** y siga el [procedimiento de materiales y consumibles](0
 El selector asigna una sola operación a todo el archivo. Base y Altura permanecen
 como referencias vacías en la estructura de consulta; los consumibles no capturan
 dimensiones. Conserve los IDs/versiones incluidos para editar o ajustar.
+
+![Importación de consumibles con la operación y sus instrucciones.](images/06a-consumable-import.png)
+
 <!-- manual:end -->
 <!-- manual:end -->
 <!-- manual:end -->
@@ -36,6 +39,14 @@ consumible. Compruebe que el registro no exista con los mismos datos.
 3. Complete **Stock mínimo**, **Costo máximo unitario** y **Activo**.
 4. Capture **Cantidad inicial** y las **Observaciones** de esa existencia.
 5. Pulse **Guardar** y compruebe el registro y su saldo en el listado.
+
+<!-- manual:all suppliers:manage suppliers:read -->
+Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
+y espere la búsqueda. Si ya existe, selecciónelo; si falta, pulse
+**Registrar proveedor «texto escrito»** al final de la lista. Abrir el selector
+vacío no muestra el botón. Complete **Razón social**, revise **Nombre comercial**,
+guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
+<!-- manual:end -->
 
 ![Formulario de alta de un consumible.](images/07-consumable-create.png)
 

@@ -25,7 +25,7 @@ export const createPendingWasteOperation = (
                 (value) => value === null || ['string', 'number', 'boolean'].includes(typeof value),
             )
         ) {
-            throw new Error(
+            throw new ApiError(
                 'La captura pendiente no se puede leer. Conserva sus datos y contacta al administrador.',
             );
         }

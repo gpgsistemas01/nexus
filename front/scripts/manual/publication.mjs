@@ -7,6 +7,11 @@ import {
     filterManualContent,
     imageNames,
     imageReferences,
+    selectedManualModules,
+    filterManualModule,
+    MANUAL_MODULE_EDITION_VERSION,
+    MANUAL_MODULES,
+    MANUAL_REFERENCE_CONTEXT,
 } from './model.mjs';
 import { validProfileId } from './profiles.mjs';
 import { prepareManualDirectory } from './paths.mjs';
@@ -88,7 +93,9 @@ const readManualChapters = async (frontRoot, permissions) =>
                 'utf8',
             );
             try {
-                return { ...chapter, content: filterManualContent(source, permissions) };
+                const content = filterManualContent(source, permissions);
+                filterManualModule(content, MANUAL_REFERENCE_CONTEXT);
+                return { ...chapter, content };
             } catch (cause) {
                 throw new Error(`No se pudo preparar ${chapter.file}: ${cause.message}`, { cause });
             }
@@ -166,6 +173,7 @@ export const prepareManual = async (frontRoot, profile, session) => {
         images: [...images].sort((left, right) =>
             left.localeCompare(right, 'en', { numeric: true }),
         ),
+        moduleEditionVersion: MANUAL_MODULE_EDITION_VERSION,
         status: 'pending',
     };
 };
@@ -282,4 +290,128 @@ export const loadManualPublication = async (frontRoot, id, { mode } = {}) => {
             throw new Error(`La captura ${image} debe volver a verificarse.`);
     }
     return sources;
+};
+
+// Cada documento usa únicamente fuentes y capturas verificadas de la misma cuenta.
+export const loadManualModulePublications = async (frontRoot, id, options = {}) => {
+    await loadManualPublication(frontRoot, id, options);
+    const root = await prepareManualDirectory(frontRoot, id);
+    const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
+    if (manifest.moduleEditionVersion !== MANUAL_MODULE_EDITION_VERSION)
+        throw new Error(
+            'La edición por módulos debe volver a prepararse con docs:screenshots antes de exportar.',
+        );
+    const definitions = selectedManualModules(manifest.permissions);
+    const baseIndex = await readFile(path.join(root, 'sources/index.md'), 'utf8');
+    const documentData = baseIndex.match(
+        /^## Datos generales del documento\r?\n\r?\n(?:\|[^\r\n]*\r?\n)+/m,
+    )?.[0];
+    if (!documentData) throw new Error('El manual no contiene los datos generales del documento.');
+    /** @type {Record<string, string[]>} */
+    const parts = {};
+    for (const module of definitions) {
+        const folder = path.join(root, 'modules', module.id);
+        await mkdir(folder, { recursive: true });
+        const includes =
+            module.id === 'inicio'
+                ? [
+                      '00-induction.md',
+                      '01-access.md',
+                      '02-navigation-and-controls.md',
+                      '15-errors-and-recovery.md',
+                  ]
+                : [module.chapter];
+        if (module.reportPermission && manifest.permissions.includes(module.reportPermission))
+            includes.push('14-reports.md');
+        if (
+            module.id === 'almacen-consumibles' &&
+            /^## Importar/m.test(
+                await readFile(path.join(root, 'sources/04-consumables.md'), 'utf8'),
+            )
+        )
+            includes.splice(1, 0, '03-materials.md');
+        includes.push('16-glossary.md');
+        const mainContent = module.chapter
+            ? await readFile(path.join(root, 'sources', module.chapter), 'utf8')
+            : '';
+        const context = {
+            ...module,
+            tags: [
+                ...module.tags,
+                ...(includes.includes('14-reports.md') ? ['report'] : []),
+                ...(module.tags.includes('warehouse') && /^## Importar/m.test(mainContent)
+                    ? ['import']
+                    : []),
+            ],
+        };
+        const files = new Set(['index.md', ...includes]);
+        const title = `Manual de Nexus — ${module.title}`;
+        const owner = baseIndex.split('\n')[0].replace(/^# /, '');
+        const access = baseIndex.match(/^## Su cuenta\r?\n\r?\n(?:\|[^\r\n]*\r?\n)+/m)?.[0] ?? '';
+        const index = `# ${title}\n\n${documentData}\n${owner}.\n\n${access}\n\nEsta guía contiene las tareas de ${module.title} disponibles para su cuenta y su glosario. Para acceso, navegación y recuperación, consulte el archivo inicio de esta carpeta.\n`;
+        await writeFile(path.join(folder, 'index.md'), index);
+        for (const [chapterIndex, filename] of includes.entries()) {
+            let content = filterManualModule(
+                await readFile(path.join(root, 'sources', filename), 'utf8'),
+                context,
+            );
+            if (module.id === 'almacen-consumibles' && filename === '03-materials.md') {
+                content = content.match(
+                    /^## Importar[\s\S]*?(?=^!.*03-materials-list|^## Registrar)/m,
+                )?.[0];
+                if (!content)
+                    throw new Error(
+                        'Falta el procedimiento compartido de importación de consumibles.',
+                    );
+            }
+            if (module.tags.includes('catalogs')) {
+                const label = module.title.split(' — ')[1];
+                const catalogImage = module.tags.includes('catalog-unit-measures')
+                    ? (content.match(/^!\[[^\n]*11-catalog-list[^\n]*/m)?.[0] ?? '')
+                    : '';
+                content = content.replace(
+                    /## Elegir el catálogo[\s\S]*?(?=\nEn \*\*Filtrar por columna)/,
+                    `## Consultar ${label}\n\nAbra **Catálogos → ${label}**. Sus registros se utilizan en los selectores del sistema.\n\n${catalogImage}\n`,
+                );
+                if (!module.tags.includes('catalog-unit-measures'))
+                    content = content.replace(
+                        ' En Unidades de medida, complete también **Símbolo**.',
+                        '',
+                    );
+            }
+            if (module.id === 'almacen-materiales')
+                content = content.replace(
+                    'Importar materiales o consumibles desde Excel',
+                    'Importar desde Excel',
+                );
+            let chapterTitle = content.split('\n')[0].replace(/^#{1,2} (?:\d+\. )?/, '');
+            if (filename === '03-materials.md' && module.id === 'almacen-consumibles')
+                chapterTitle = 'Importación de consumibles';
+            else if (filename === module.chapter) chapterTitle = module.title;
+            else if (filename === '16-glossary.md') chapterTitle = 'Glosario del módulo';
+            else if (filename === '14-reports.md') chapterTitle = 'Reportes del módulo';
+            content = content.replace(/^#{1,2} [^\r\n]+/, `# ${chapterIndex + 1}. ${chapterTitle}`);
+            content = content.replace(/\]\(\.\.\/images\//g, '](../../images/');
+            content = content.replace(
+                /(?<!!)\[([^\]]+)\]\(([a-z0-9-]+\.md)(#[^)]*)?\)/g,
+                (link, label, target) =>
+                    files.has(target) ? link.replace(/#[^)]*\)/, ')') : label,
+            );
+            await writeFile(path.join(folder, filename), content);
+        }
+        await removeUnselectedFiles(folder, files, '.md');
+        parts[module.id] = [...files].map((filename) =>
+            path
+                .relative(path.resolve(frontRoot, '../back'), path.join(folder, filename))
+                .split(path.sep)
+                .join('/'),
+        );
+    }
+    const selected = new Set(definitions.map((module) => module.id));
+    const owned = new Set(MANUAL_MODULES.map((module) => module.id));
+    for (const entry of await readdir(path.join(root, 'modules'), { withFileTypes: true })) {
+        if (entry.isDirectory() && owned.has(entry.name) && !selected.has(entry.name))
+            await rm(path.join(root, 'modules', entry.name), { recursive: true, force: true });
+    }
+    return parts;
 };

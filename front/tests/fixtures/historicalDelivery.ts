@@ -10,6 +10,7 @@ export const historicalPreview = (): HistoricalDeliveryPreview => ({
   resource: 'materials',
   cutoffDate: '2026-10-31T18:00:00.000Z',
   page: 1,
+  total: 1,
   hasMore: false,
   documents: [
     {

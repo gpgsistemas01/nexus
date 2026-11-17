@@ -4,8 +4,9 @@ El backend Express y Prisma de `back/` conserva los contratos HTTP, reglas de ne
 transacciones y operación de PostgreSQL. La interfaz de usuario se implementa en
 `front/` con Vue 3 y tiene [documentación propia](../../front/docs/index.md).
 
-Los comandos y rutas técnicas de esta colección se interpretan desde `back/`.
-Docker y Docker Compose se ejecutan desde la raíz del repositorio.
+Los comandos para preparar y ejecutar el backend están en
+[Desarrollo](development/index.md). Docker y Docker Compose se ejecutan desde
+la raíz del repositorio.
 
 ## Fuentes de verdad
 

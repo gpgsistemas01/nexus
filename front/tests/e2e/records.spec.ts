@@ -128,6 +128,9 @@ test('personas: alta con responsabilidades, rechazo de área repetida y conserva
     .getByRole('button', { name: 'Editar registro', exact: true })
     .click();
   const edit = page.getByRole('dialog', { name: 'Editar persona', exact: true });
+  await page.setViewportSize({ width: 599, height: 844 });
+  await expect(edit.locator('.responsive-table-cards')).toBeVisible();
+  await expect(edit.getByRole('table')).toBeHidden();
   await expect(
     edit.getByRole('button', { name: 'Quitar asignación de VENTAS', exact: true }),
   ).toBeVisible();
@@ -288,18 +291,8 @@ test('identidad: filtros de personas y reporte por área; vista móvil sin desbo
 
 for (const [path, title, reportPath, search] of [
   ['/identidad/usuarios', 'Usuarios', '/api/admin/reports/users/excel', 'ana'],
-  [
-    '/directorio/clientes',
-    'Clientes',
-    '/api/sales/reports/clients/excel',
-    'Central',
-  ],
-  [
-    '/directorio/proveedores',
-    'Proveedores',
-    '/api/warehouse/reports/suppliers/excel',
-    'Central',
-  ],
+  ['/directorio/clientes', 'Clientes', '/api/sales/reports/clients/excel', 'Central'],
+  ['/directorio/proveedores', 'Proveedores', '/api/warehouse/reports/suppliers/excel', 'Central'],
 ] as const) {
   test(`reportes ${title}: exporta búsqueda sin paginación y recupera una descarga fallida`, async ({
     page,

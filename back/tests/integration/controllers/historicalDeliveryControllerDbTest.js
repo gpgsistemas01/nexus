@@ -119,7 +119,8 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
     const issue = await seedIssue('consumables');
     const original = (await preview('consumables')).documents.find(item => item.id === issue.id);
     const command = capture([original]);
-    await confirm('materials', command).expect(404);
+    const outsideScope = await confirm('materials', command).expect(404);
+    expect(outsideScope.body.code).toBe('HISTORICAL_DELIVERY_NOT_FOUND');
     await confirm('consumables', { ...command, declaredDelivered: false }).expect(400);
     await confirm('consumables', { ...command, cutoffDate: '2099-01-01T00:00:00Z' }).expect(400);
     await confirm('consumables', { ...command, deliveredAt: '2026-11-01T00:00:00Z' }).expect(400);
@@ -218,6 +219,39 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
     } finally {
       await prisma.$executeRawUnsafe('DROP TRIGGER test_historical_failure ON "GoodsIssue"');
       await prisma.$executeRawUnsafe('DROP FUNCTION test_historical_failure()');
+    }
+  });
+
+  it.each(['materials', 'consumables', 'wastes'])('pagina %s de cien en cien y cuenta sólo salidas con pendientes reales', async resource => {
+    const db = resource === 'wastes' ? prisma.wasteIssue : prisma.goodsIssue;
+    const detailDb = resource === 'wastes' ? prisma.wasteIssueDetail : prisma.goodsIssueDetail;
+    const existing = await preview(resource);
+    const created = await Promise.all(Array.from({ length: 101 }, () => seedIssue(resource)));
+    const excluded = await Promise.all(Array.from({ length: 3 }, () => seedIssue(resource)));
+    try {
+      await detailDb.update({ where: { id: excluded[0].details[0].id }, data: { suppliedQuantity: 5 } });
+      await detailDb.update({ where: { id: excluded[1].details[0].id }, data: { fulfillmentStatusId: statuses.Cancelado } });
+      await detailDb.update({ where: { id: excluded[2].details[0].id }, data: { isSupplied: true } });
+      if (resource !== 'wastes') await detailDb.update({ where: { id: created[0].details[0].id }, data: { suppliedQuantity: null } });
+      const first = await preview(resource);
+      expect(first.total).toBe(existing.total + 101);
+      expect(first.documents).toHaveLength(100);
+      expect(first.hasMore).toBe(true);
+      const second = await preview(resource, 2);
+      expect(second.total).toBe(first.total);
+      expect(second.documents).toHaveLength(first.total - 100);
+      expect(second.hasMore).toBe(false);
+      const documents = [...first.documents, ...second.documents];
+      expect(new Set(documents.map(item => item.id)).size).toBe(first.total);
+      for (const issue of created) expect(documents.some(item => item.id === issue.id)).toBe(true);
+      for (const issue of excluded) expect(documents.some(item => item.id === issue.id)).toBe(false);
+      const empty = await preview(resource, 3);
+      expect(empty).toMatchObject({ total: first.total, documents: [], hasMore: false });
+    } finally {
+      const ids = [...created, ...excluded].map(item => item.id);
+      await detailDb.deleteMany({ where: resource === 'wastes'
+        ? { wasteIssueId: { in: ids } } : { goodsIssueId: { in: ids } } });
+      await db.deleteMany({ where: { id: { in: ids } } });
     }
   });
 

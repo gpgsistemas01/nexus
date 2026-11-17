@@ -1,79 +1,107 @@
-# 2. Convenciones
+# Cómo redactar y revisar requisitos
 
-### 2.1 Identificadores
+La SRS define resultados y restricciones que Nexus debe cumplir. Usa de forma
+selectiva los criterios de **ISO/IEC/IEEE 29148:2018** para calidad de requisitos
+y **ISO/IEC 25010:2023** como vocabulario para atributos de calidad; esta guía
+local no declara conformidad con esas normas. El alcance de cada referencia está
+en [estándares documentales](../../governance/documentation-standards/03-application-by-type-of-document.md).
 
-| Prefijo | Tipo |
+## Identificadores y fuentes
+
+| Prefijo | Uso |
 | --- | --- |
-| `RF` | Requisito funcional observable por un actor o consumidor. |
-| `RN` | Regla de negocio que restringe varios flujos. |
-| `RD` | Requisito sobre persistencia o representación de datos. |
-| `RC` | Requisito de calidad u operación. |
-| `CA` | Criterio de aceptación numerado dentro de un requisito cuando se necesitan varios escenarios verificables. |
+| `RF` | Capacidad o respuesta observable de Nexus. |
+| `RN` | Regla de negocio aplicable a una o más operaciones. |
+| `RD` | Condición de información, relación, conservación o integridad de datos. |
+| `RC` | Restricción de calidad, seguridad, compatibilidad u operación del producto. |
+| `CA` | Criterio verificable que concreta una variante o condición de un requisito. |
+| `CU` | Objetivo de actor cuyo recorrido se describe en un caso de uso. |
 
-Un requisito conserva una obligación principal. Si requiere varios ejemplos o
-escenarios, se redactan criterios `CA-<ID>-<n>` en lugar de construir una sola oración
-con decisiones de interfaz, implementación y excepciones. La evidencia técnica se
-mantiene en su columna y no sustituye el resultado observable.
+Los identificadores son estables y no expresan prioridad. Se conserva el ID cuando
+se aclara su redacción; un ID retirado no se asigna a otra obligación. La fila de
+requisito identifica el ámbito y la fuente propietaria; la evidencia enlaza código,
+contrato o prueba, pero no reemplaza la obligación.
 
-ISO/IEC/IEEE 29148 no obliga a crear una fila independiente para cada verbo CRUD ni
-define la numeración concreta de Nexus. Sí orienta a que los requisitos sean singulares,
-inequívocos y verificables. El proyecto aplica esos criterios separando operaciones que
-pueden autorizarse, fallar y probarse por separado; mantiene juntos únicamente los
-atributos y escenarios que describen una misma obligación observable.
+## Forma de un requisito
 
-Por tanto, no se dejan juntas obligaciones independientes ni se fragmenta cada campo en
-un requisito. La singularidad aplica a requisitos funcionales (`RF-*`), de datos
-(`RD-*`), reglas de negocio (`RN-*`) y calidad (`RC-*`): se crea otro identificador
-cuando cambia el resultado, la restricción, la aprobación o la prueba que decide su
-cumplimiento. Los criterios `CA-*` conservan variantes inseparables de una misma
-obligación.
+Cada fila debe expresar **una obligación** y poder revisarse sin interpretar la
+arquitectura. Usa actor o sistema, condición relevante, obligación y resultado
+observable. Para restricciones de calidad, especifica el contexto de uso y la
+condición que se pueda medir o comprobar.
 
-### 2.2 Estados
+```text
+Cuando [condición], [actor o Nexus] debe [acción/obligación] y [resultado observable].
+```
 
-| Estado | Interpretación |
+Usa términos del [glosario del negocio](../business-glossary.md). Evita palabras
+indeterminadas como «correctamente», «rápido», «seguro» o «intuitivo» sin un criterio
+que permita decidir si se cumple. Distingue entre la obligación y lo que hoy hace
+el software: el estado de implementación va en su columna.
+
+**Ejemplo verificable:** «Cuando el stock contado sea cero, Nexus debe aceptar el
+ajuste autorizado, registrar motivo y diferencia, y dejar la existencia en cero».
+La prueba puede observar permiso, respuesta, movimiento y saldo persistido.
+
+**No es una obligación del producto:** «El servicio debe reutilizar la factory
+CRUD». Es una convención interna y pertenece a arquitectura/codificación; las
+decisiones de prueba pertenecen al plan de pruebas y los comandos de validación,
+a desarrollo.
+
+## Separación de contenido
+
+| Contenido | Ubicación |
 | --- | --- |
-| Implementado | Existe un flujo registrado y evidencia suficiente en el código. |
-| Parcial | Existe parte del flujo, pero falta una operación, interfaz o evidencia relevante. |
-| Modelado | Existen entidades o piezas aisladas, pero no un flujo web/API registrado. |
-| Fuera del alcance actual | Capacidad excluida del producto vigente; requiere un nuevo acuerdo de alcance. |
-| Propuesto | Requiere decisión o implementación futura; no debe anunciarse como disponible. |
-| Fuera del alcance actual | Capacidad excluida del producto vigente, conservada como referencia histórica de alcance; no se ofrece ni se verifica como capacidad disponible. |
+| Necesidad, actores y límites del producto | [Visión y alcance](../vision-scope-and-requirements/index.md). |
+| Obligación, regla, condición de datos o calidad | Catálogo de esta SRS. |
+| Pasos, alternativas, excepciones y garantías del actor | [Casos de uso](../use-cases/index.md). |
+| Rutas HTTP, parámetros y respuestas | [OpenAPI](../../architecture/openapi/index.md). |
+| Módulos, clases, tablas, bibliotecas y realización técnica | [Arquitectura](../../architecture/index.md). |
+| Cobertura y método de comprobación | [Plan y cobertura de pruebas](../../testing/test-plan.md). |
 
-El estado describe la evidencia del repositorio, no la aprobación del producto por un
-usuario responsable. Esa aprobación debe registrarse en la historia o incidencia que
-originó el cambio.
+Incluye un nombre técnico dentro de la obligación sólo cuando sea una restricción
+de compatibilidad, seguridad, interfaz o despliegue que el producto deba mantener.
+En los demás casos, deja los nombres de rutas, archivos, modelos y pruebas en la
+columna de evidencia o en el documento propietario.
 
-### 2.3 Lectura y aceptación entre partes interesadas
+## Criterios de aceptación y trazabilidad
 
-El responsable funcional revisa la necesidad, el actor, las reglas y el resultado observable. Desarrollo y pruebas revisan factibilidad y evidencia; el estado técnico no sustituye la decisión de aceptación. La [gobernanza documental](../../governance/documentation-standards/06-responsibilities-and-change-control.md) define dónde registrar esa decisión y sus pendientes.
+Añade `CA-<ID>-<n>` cuando una condición concreta no cabe claramente en la oración
+principal o cuando varias variantes verificables comparten una obligación. Cada
+criterio conserva el requisito padre y declara condición y resultado; no crea otro
+flujo de usuario ni repite una regla transversal. Una variante con autorización,
+resultado o efecto independiente suele requerir otro requisito.
 
-Por ejemplo, para una recepción: **dado** un proveedor y artículos válidos, **cuando** Almacén confirme lo recibido, **Nexus debe** registrar el folio e incrementar la existencia de esos artículos; si la operación falla, no debe quedar una recepción parcial. El negocio puede revisar esa garantía sin conocer nombres de tablas ni rutas HTTP.
+Relaciona cada obligación con las reglas transversales y los `CU-*` afectados en
+la [matriz de trazabilidad](05-requirement-traceability-rules.md). Los casos de uso
+explican los pasos; los requisitos relacionados no se duplican como texto.
 
-### 2.4 Terminología y operaciones
+## Reglas de negocio y calidad
 
-Los requisitos usan los términos canónicos del
-[glosario del negocio](../business-glossary.md). El glosario define significado compartido
-para usuarios y responsables; el [diccionario técnico](../../architecture/views/logical/data-and-persistence/generated/data-dictionary.md)
-documenta cómo se representan los datos persistentes. Ninguno debe sustituir al otro.
+- Una `RN-*` se usa sólo para una regla del dominio compartida por operaciones; las
+  reglas de una sola acción permanecen en su `RF-*` o caso de uso.
+- Una `RD-*` declara una obligación de información significativa para el negocio,
+  no cada columna del esquema Prisma.
+- Una `RC-*` selecciona una característica de calidad relevante para Nexus y la
+  concreta con escenario, medida, umbral o resultado comprobable. Usa ISO/IEC 25010
+  como clasificación, no como lista de promesas automáticas.
+- Si la organización aún no ha acordado medida, umbral, carga, responsable o
+  infraestructura para rendimiento, disponibilidad o recuperación, registra la
+  necesidad como `Propuesto`; no la marques implementada por la sola presencia de
+  código o pruebas.
+- Las directrices de desarrollo, convenciones de código, obligatoriedad de pruebas
+  y mantenimiento documental se mantienen en sus documentos de gobierno, arquitectura
+  y pruebas; no se presentan como necesidades del actor o requisitos del producto.
 
-Los [modos, precondiciones y efectos](06-operation-modes-and-effects.md) conservan el
-contrato funcional de las operaciones. La composición técnica se consulta en el
-[diagrama de componentes](../../architecture/views/logical/01-components-and-reuse.md),
-los métodos y rutas en [OpenAPI](../../architecture/openapi/openapi.json) y la
-autorización efectiva en la política del servidor.
+## Estado, evidencia y aceptación
 
-### 2.4 Condiciones y comprobación
+| Estado | Significado |
+| --- | --- |
+| Implementado | El alcance descrito está presente en una ruta disponible y hay evidencia técnica pertinente. |
+| Parcial | Sólo una parte del resultado está disponible o falta una condición relevante. |
+| Modelado | Hay datos o piezas internas, pero no un flujo disponible que cumpla la obligación. |
+| Fuera del alcance actual | La capacidad está explícitamente excluida del producto vigente. |
+| Propuesto | La necesidad o sus criterios requieren definición o aprobación antes de tratarse como compromiso vigente. |
 
-La obligación y sus criterios expresan resultados del negocio. Los nombres de rutas,
-modelos, campos y herramientas se conservan en la evidencia, salvo que constituyan una
-restricción técnica explícita de datos, seguridad u operación. No se eliminan esas
-restricciones de `RD-*` o `RC-*` para hacerlas parecer funciones de un actor.
-
-Cada criterio `CA-<ID>-<n>` pertenece al requisito indicado y conserva numeración local.
-Las condiciones transversales se enlazan mediante `RN-*`, sin copiar su definición.
-Una operación rechazada conserva los datos e inventario anteriores y no deja cambios
-parciales; una consulta o reporte no modifica los datos consultados.
-
-Los IDs son referencias estables, no pasos de un flujo. El orden de interacción se lee
-en las fichas de casos de uso; corregir redacción o alcance no renumera requisitos ni
-asigna un ID existente a una capacidad distinta.
+El estado resume la implementación observada; no equivale a aprobación funcional.
+La aceptación corresponde a las partes interesadas y se registra por el proceso de
+[cambio y versionado](../../governance/documentation-standards/06-responsibilities-and-change-control.md).

@@ -70,7 +70,6 @@ model HistoricalDeliveryBatch {
   wasteIssues WasteIssue[]
 
   @@unique([userId, operationId])
-  @@index([userId, createdAt])
 }
 
 model InventoryImport {
@@ -95,7 +94,6 @@ model InventoryImport {
 
   @@unique([userId, operationId])
   @@index([status, expiresAt, id])
-  @@index([userId, createdAt])
 }
 
 model CriticalWriteAudit {
@@ -202,6 +200,8 @@ model Material {
   supplierMaterials                  SupplierMaterial[]
   wasteRolls                         Waste[]                    @relation("WasteRollMaterial")
   stockAdjustmentDetails             StockAdjustmentDetail[]
+
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Material_name_trgm_idx")
 }
 
 enum MaterialType {
@@ -262,7 +262,6 @@ model SupplierMaterial {
   material                   Material @relation(fields: [materialId], references: [id])
 
   @@unique([supplierId, materialId])
-  @@index([supplierId])
   @@index([materialId])
 }
 
@@ -305,7 +304,6 @@ model Waste {
 
   @@unique([supplierId, name, base, height, coneWeightKg, totalWeightKg])
   @@index([sourceMaterialId])
-  @@index([supplierId])
   @@index([presentationId])
   @@index([unitMeasureId])
 }
@@ -605,10 +603,9 @@ model GoodsReceipt {
   updatedAt DateTime @updatedAt
 
   @@unique([supplierId, invoice])
-  @@index([supplierId])
   @@index([statusId])
   @@index([receivedById])
-  @@index([type])
+  @@index([type, receptionDate, id])
 }
 
 model GoodsReceiptDetail {
@@ -684,7 +681,7 @@ model GoodsIssue {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([type])
+  @@index([type, requestDate, id])
   @@index([historicalDeliveryBatchId])
   @@index([departmentId])
   @@index([requesterId])

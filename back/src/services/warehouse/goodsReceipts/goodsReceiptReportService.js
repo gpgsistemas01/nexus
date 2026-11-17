@@ -1,4 +1,4 @@
-import { formatDateLongWithTime, toNumber } from '../../../utils/formattersUtils.js';
+import { formatDateLongWithTime, toNumber, getReportMonthKey } from '../../../utils/formattersUtils.js';
 import { GOODS_RECEIPT_STATUS_NAMES } from '../../../shared/constants/goodsReceiptStatuses.js';
 import { GOODS_RECEIPT_DETAIL_STATUSES } from '../../../shared/constants/goodsReceiptStatuses.js';
 import { QUERY_BATCH_SIZES } from '../../../constants/pagination.js';
@@ -16,6 +16,7 @@ const mapGoodsReceiptDetailRows = function* (goodsReceipts = [], { materialId = 
             yield {
                 referenceNumber: goodsReceipt.referenceNumber,
                 receptionDate,
+                reportMonth: getReportMonthKey(goodsReceipt.receptionDate),
                 receivedByName: goodsReceipt.receivedByName,
                 supplierName: goodsReceipt.supplierName,
                 invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',

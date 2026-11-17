@@ -243,12 +243,12 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         });
     });
 
-    it('exporta compras a través del límite de lote y conserva fórmulas y resúmenes reales', async () => {
+    it('exporta compras por mes a través del límite de lote y conserva fórmulas y resúmenes reales', async () => {
         const prefix = `RCB-${suffix}`;
-        const rows = Array.from({ length: 251 }, (_, index) => ({
+        const rows = Array.from({ length: 252 }, (_, index) => ({
             id: randomUUID(), referenceNumber: `${prefix}-${String(index).padStart(3, '0')}`,
             supplierId: ids.supplier, supplierName: 'Proveedor de lotes', receivedById: ids.person,
-            receivedByName: 'Receptor de lotes', receptionDate: new Date('2026-10-16T12:00:00Z'),
+            receivedByName: 'Receptor de lotes', receptionDate: new Date(index === 251 ? '2026-11-16T12:00:00Z' : '2026-10-16T12:00:00Z'),
             statusId: ids.status, type: 'MATERIAL', totalQuantity: 1,
             totalNetPurchaseAmount: 10, totalGrossPurchaseAmount: 11.6
         }));
@@ -264,7 +264,12 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
                 res.on('data', chunk => chunks.push(chunk));
                 res.on('end', () => callback(null, Buffer.concat(chunks)));
             }).expect(200);
-        const { sheet, rows: values } = await readExcelReport(response.body, 'Compras materiales');
+        const { workbook, sheet, rows: values } = await readExcelReport(response.body, '2026-10');
+        expect(workbook.worksheets.map(item => item.name)).toEqual(['2026-10', '2026-11']);
+        const november = workbook.getWorksheet('2026-11');
+        expect(november.getCell('A2').value).toBe(`${prefix}-251`);
+        expect(november.getCell('O2').value).toEqual({ formula: 'I2*N2', result: 10 });
+        expect(november.getCell('B6').value).toBe(10);
         expect(values.filter(row => String(row[0]).startsWith(prefix))).toHaveLength(251);
         expect(new Set(values.filter(row => String(row[0]).startsWith(prefix)).map(row => row[0])).size).toBe(251);
         expect(sheet.getCell('O252').value).toEqual({ formula: 'I252*N252', result: 10 });

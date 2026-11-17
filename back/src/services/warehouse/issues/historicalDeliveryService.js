@@ -64,12 +64,25 @@ export const previewHistoricalDeliveries = async ({ user, resource, query = {} }
     const cutoffDate = cutoff(query.cutoffDate);
     const page = Number(query.page ?? 1);
     if (!Number.isInteger(page) || page < 1 || page > limits.maxPage) throw invalid('Revisa la página.');
-    const issues = await model(getDb(), resource).findMany({ where: { ...contextWhere(resource, user),
+    const db = getDb();
+    const detailModel = resource === INVENTORY_COLLECTIONS.WASTES ? db.wasteIssueDetail : db.goodsIssueDetail;
+    const remainingQuantity = { quantity: { gt: detailModel.fields.suppliedQuantity } };
+    const where = { ...contextWhere(resource, user),
         historicalDeliveryBatchId: null, requestDate: { lte: cutoffDate },
         status: { name: { not: GOODS_ISSUE_STATUS_NAMES.CANCELED } }, fulfillmentStatus: { name: { in: pendingStatuses } },
-    }, include, orderBy: [{ requestDate: 'asc' }, { id: 'asc' }], skip: (page - 1) * limits.maxDocuments, take: limits.maxDocuments + 1 });
-    return { resource, cutoffDate, page, hasMore: issues.length > limits.maxDocuments,
-        documents: issues.slice(0, limits.maxDocuments).filter(issue => pendingDetails(issue).length).map(candidate) };
+        details: { some: { isSupplied: false,
+            fulfillmentStatus: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } },
+            ...(resource === INVENTORY_COLLECTIONS.WASTES ? remainingQuantity
+                : { OR: [remainingQuantity, { suppliedQuantity: null, quantity: { gt: 0 } }] })
+        } }
+    };
+    const [total, issues] = await db.$transaction([
+        model(db, resource).count({ where }),
+        model(db, resource).findMany({ where, include, orderBy: [{ requestDate: 'asc' }, { id: 'asc' }],
+            skip: (page - 1) * limits.pageSize, take: limits.pageSize })
+    ], { isolationLevel: 'RepeatableRead' });
+    return { resource, cutoffDate, page, total, hasMore: page * limits.pageSize < total,
+        documents: issues.map(candidate) };
 };
 
 const normalizeCommand = command => {
@@ -102,7 +115,7 @@ export const confirmHistoricalDeliveries = async ({ user, resource, command }) =
             }
             await lockHistoricalDeliveryDocuments({ tx, resource, ids: capture.documents.map(item => item.id) });
             const issues = await model(tx, resource).findMany({ where: { ...contextWhere(resource, user), id: { in: capture.documents.map(item => item.id) } }, include, orderBy: { id: 'asc' } });
-            if (issues.length !== capture.documents.length) throw new AppError('Una salida no existe o no pertenece al alcance autorizado.', 'NOT_FOUND', 404);
+            if (issues.length !== capture.documents.length) throw new HistoricalDeliveryError('NOT_FOUND');
             const statusIds = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
             if (!statusIds.get(FULFILLMENT_STATUS_NAMES.COMPLETE)) throw invalid('Falta configurar el estado Surtido.');
             const result = { id: randomUUID(), resource, cutoffDate: capture.cutoffDate, deliveredAt: capture.deliveredAt,

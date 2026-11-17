@@ -5,7 +5,7 @@ import { ids } from '../fixtures/inventory.js';
 import { personData } from '../fixtures/records.js';
 import { purchaseItem } from '../fixtures/purchases.js';
 
-test('compras: conserva fichas en móvil y ajusta la tabla en tableta', async ({ page }) => {
+test('compras: usa fichas en móvil y tabla desplazable desde 600 px', async ({ page }) => {
   await mockPurchases(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/compras/materiales');
@@ -24,13 +24,19 @@ test('compras: conserva fichas en móvil y ajusta la tabla en tableta', async ({
   );
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 
-  await page.setViewportSize({ width: 768, height: 844 });
+  await page.setViewportSize({ width: 599, height: 844 });
+  await expect(details).toBeVisible();
+  await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(599);
+
+  await page.setViewportSize({ width: 600, height: 844 });
   const table = dialog.locator('.table-frame--fit-columns .v-table__wrapper');
   await expect(table).toBeVisible();
   await expect(details).toBeHidden();
   await expect(dialog.getByRole('table')).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
-  await expect(table).toHaveCSS('overflow-x', 'hidden');
+  await expect(table).toHaveCSS('overflow-x', 'auto');
+  await expect(dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(600);
 });
 
 test('compras: corregir PIEZA valida cantidad entera y límite sin cerrar la consulta tras guardar', async ({
@@ -82,6 +88,7 @@ for (const [path, title, item] of [
   test(`compras ${path}: alta con detalles, validación diferida y payload sin totales`, async ({
     page,
   }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
     await page.addInitScript(() => {
       Object.defineProperty(crypto, 'randomUUID', { value: undefined });
     });

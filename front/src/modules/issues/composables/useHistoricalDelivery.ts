@@ -150,7 +150,7 @@ export const useHistoricalDelivery = (options: {
                 documents: selected.value.map((id) => {
                     const candidate = candidates.value.get(id);
                     if (!candidate)
-                        throw new Error(
+                        throw new ApiError(
                             'No se encontró una salida seleccionada. Vuelve a buscar antes de confirmar.',
                         );
 
@@ -225,7 +225,7 @@ export const useHistoricalDelivery = (options: {
                     for (const candidate of result.documents) {
                         allCandidates.set(candidate.id, candidate);
                         if (allCandidates.size > limits.maxDocuments)
-                            throw new Error(
+                            throw new ApiError(
                                 `Hay más de ${limits.maxDocuments} salidas para este corte. Selecciona manualmente hasta ${limits.maxDocuments} por lote.`,
                             );
                     }
@@ -237,7 +237,7 @@ export const useHistoricalDelivery = (options: {
                 }
 
                 if (!complete)
-                    throw new Error(
+                    throw new ApiError(
                         'Hay demasiadas páginas para seleccionar todos los resultados de una vez. Selecciona manualmente hasta 100 salidas por lote.',
                     );
 

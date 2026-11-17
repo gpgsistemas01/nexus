@@ -503,9 +503,13 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const bytes = await createInventoryImportTemplate({ user: fixture.user, resource: 'wastes', mode: 'create', query: { supplierId: source.supplierId, search: source.material.name } });
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(Buffer.from(bytes));
-        const reference = workbook.getWorksheet('Catalogos').getCell('E2').value;
+        const catalog = workbook.getWorksheet('Catalogos');
+        const headers = catalog.getRow(1).values.slice(1);
+        expect(headers).toContain('Material de referencia');
+        expect(headers).toContain('Proveedor (código | nombre)');
+        const reference = catalog.getCell(2, headers.indexOf('Material de referencia') + 1).value;
         expect(reference).toContain(`${source.materialId} | ${source.material.name}`);
-        const data = { name: fixture.row('Merma desde catálogo').name, supplierCode: workbook.getWorksheet('Catalogos').getCell('A2').value,
+        const data = { name: fixture.row('Merma desde catálogo').name, supplierCode: catalog.getCell(2, headers.indexOf('Proveedor (código | nombre)') + 1).value,
             materialId: reference, base: 1.5, height: 2, minStock: 0, maxUnitCost: 10, isActive: 'SI', initialQuantity: 3 };
         const columns = getImportConfig('wastes', 'create').columns;
         expect(columns.map(([header]) => header)).not.toContain('ID merma');

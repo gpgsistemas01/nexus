@@ -7,7 +7,7 @@ secciones permitidas para su cuenta.
 
 En pantallas grandes, el panel comienza como una columna de iconos. Al navegar,
 hacer clic fuera del panel o pulsar **Escape**, vuelve al estado compacto. En un
-teléfono, también puede cerrarlo con **Cerrar menú**.
+teléfono, use **Menú** para abrirlo o cerrarlo, o seleccione una sección.
 
 Puede guardar la dirección de una página como favorito.
 
@@ -51,15 +51,16 @@ todas sus asignaciones activas.
 6. Use **Limpiar filtros** para regresar a la consulta general.
 
 Pulse un encabezado habilitado para ordenar y cambie el tamaño de página para ver
-más registros. En teléfonos, cada registro se presenta como ficha con sus campos
-identificados. En tabletas y ventanas compactas se conserva la tabla: las columnas
-ajustan su ancho y los encabezados y valores pueden ocupar varias líneas para evitar
-el desplazamiento horizontal; los textos largos se muestran en varias líneas sin
-recortarse. Use los encabezados o el selector de columna para ordenar, según la
-presentación.
+más registros. En teléfonos (hasta 599 px), cada registro se presenta como ficha con
+sus campos identificados. Desde 600 px se muestra la tabla. Entre 600 y 899 px, si no
+caben todas las columnas, desplázate dentro de la tabla con la barra inferior o los
+controles de flecha superiores; la columna identificadora permanece fija y la página
+no se desplaza horizontalmente. Desde 900 px las columnas vuelven a ajustarse para
+aprovechar el espacio disponible. Use los encabezados o el selector para ordenar.
 Al final de las fichas o la tabla se indica cuántos registros contiene la página actual; el
 selector **Registros por página** permite cambiar ese límite.
-Las tablas de detalle también usan fichas en teléfonos y mantienen sus acciones e inputs.
+Las fichas de todas las tablas conservan sus acciones e inputs, incluidos los detalles
+de compras y salidas y las asignaciones de personas.
 Los formularios distribuyen los campos según el ancho disponible.
 
 Si falta un registro, limpie los filtros. La actualización automática los conserva
@@ -95,15 +96,30 @@ proveedor y después el material de referencia. Revise el artículo si cambia de
 Desplácese al final de la lista para cargar más opciones. Ante un fallo, pulse
 **Reintentar catálogo**.
 
-<!-- manual:any suppliers:manage clients:create materials:write persons:write -->
+<!-- manual:any suppliers:manage clients:create materials:write -->
 
-Cuando aparezca una acción **Registrar…** junto al selector:
+### Registrar un dato nuevo desde un selector
 
-1. Abra esa acción sin cerrar el formulario principal.
-2. Complete el formulario secundario y guárdelo.
-3. Compruebe que regresa al formulario principal y que el nuevo registro queda
-   seleccionado.
-4. Continúe y guarde la operación principal.
+En los selectores que permiten altas, el botón se ofrece **después de escribir**
+el nombre que desea registrar. Abrir el selector vacío no muestra esa acción.
+
+1. Abra el selector y escriba el nombre completo del registro nuevo. En **Proveedor**,
+   escriba su **nombre comercial**.
+2. Espere a que termine la búsqueda y revise las opciones. Si encuentra el registro,
+   selecciónelo; no lo vuelva a crear.
+3. Si falta y tiene permiso, busque al final de la lista el botón
+   **Registrar cliente «texto escrito»**, **Registrar proveedor «texto escrito»**,
+   **Registrar material «texto escrito»** o **Registrar consumible «texto escrito»**, según el campo.
+4. Pulse el botón sin cerrar la captura principal. El texto escrito se precarga
+   en el formulario secundario; complete sus demás campos y pulse **Guardar**.
+5. Compruebe que vuelve al formulario principal con el registro nuevo seleccionado.
+   Continúe la captura y guarde la operación principal cuando esté completa.
+
+El botón no aparece si el texto está vacío, coincide exactamente con una opción
+disponible, el campo está bloqueado, la búsqueda sigue cargando o falló, o no tiene
+permiso para esa alta. Si hay un error de consulta, use **Reintentar catálogo**.
+Escribir texto **no selecciona ni registra** un dato: para usar uno existente debe
+elegir la opción; para crear uno nuevo debe abrir su alta y guardarla.
 
 El registro creado permanece aunque cierre la operación principal. Cerrar el
 formulario secundario sin guardar conserva la captura principal.
@@ -147,3 +163,16 @@ Conserve las copias necesarias para comprobar el trabajo y elimine las restantes
 cuando ya no se necesiten, según el procedimiento de su organización. Los archivos
 pueden contener cantidades, costos y datos de otras personas; compártalos sólo con
 quienes deban utilizarlos y no incluya contraseñas en ellos.
+
+
+<!-- manual:any goods:receipts-page-view goods:issues-page-view waste:issues-page-view -->
+## Leer las tablas de partidas
+
+En los detalles de **Compras** y **Salidas**, los nombres se leen desde la izquierda
+y las cantidades e importes se alinean a la derecha. Los encabezados **Medidas** y
+**Conversión** agrupan sus columnas. La letra conserva un tamaño legible.
+Si faltan columnas en pantalla, use **Desplazar tabla a la izquierda** o
+**Desplazar tabla a la derecha**, sobre la tabla, o la barra horizontal. El nombre
+del artículo y las acciones permanecen a los extremos para identificar la partida.
+
+<!-- manual:end -->

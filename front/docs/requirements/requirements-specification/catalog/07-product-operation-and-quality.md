@@ -7,12 +7,6 @@
 | RC-SEG-003 | Una ruta con cuerpo debe rechazar un tipo de contenido distinto del declarado antes de procesarlo. | Implementado |
 | RC-SEG-004 | Los secretos y URLs con credenciales deben proceder de variables de entorno y no exponerse en logs. | Implementado |
 | RC-DAT-001 | Las migraciones deben poder desplegarse de forma reproducible. | Implementado |
-| RC-DAT-002 | Las pruebas con persistencia real deben usar `DATABASE_TEST_URL` y nunca la base de desarrollo. | Implementado |
-| RC-PRU-001 | Las pruebas unitarias deben cubrir límites, decisiones, errores y efectos negativos del artefacto modificado. | Parcial |
-| RC-PRU-002 | Las integraciones CRUD deben atravesar HTTP y comprobar la persistencia real con Prisma. | Parcial |
-| RC-MAN-001 | Rutas, capas y pruebas deben organizarse por dominio. | Implementado |
-| RC-MAN-002 | Antes de crear un flujo debe evaluarse la reutilización de fábricas CRUD y componentes compartidos. | Implementado |
-| RC-DOC-001 | Los cambios en rutas, imports o Prisma deben dejar actualizados los documentos generados y superar `npm run docs:check`. | Implementado |
 | RC-OBS-001 | Los fallos operacionales deben registrarse mediante logs estructurados. | Implementado |
 | RC-OBS-002 | Los errores y logs expuestos al cliente no deben revelar secretos. | Implementado |
 | RC-DES-001 | Si falta `DIRECT_URL` o falla una migración requerida, el contenedor debe terminar antes de iniciar la aplicación. | Implementado |
@@ -21,7 +15,7 @@
 | RC-COM-002 | La API debe intercambiar JSON salvo rutas declaradas para archivos o texto plano. | Implementado |
 | RC-USA-001 | Una tabla en pantalla angosta debe conservar accesibles las acciones y datos prioritarios. | Implementado |
 | RC-USA-002 | La interfaz debe presentar los errores de validación sin perder el contexto del formulario. | Implementado |
-| RC-REN-001 | Los listados definidos como paginados deben obtener los datos aplicando filtros y límites de página, sin descargar el conjunto completo para paginarlo en el navegador. | Parcial |
+| RC-REN-001 | En los listados con paginación remota, Vue debe enviar filtros y página al servidor, mostrar sólo los resultados devueltos y respetar el total informado por el contrato, sin paginar el conjunto completo en el navegador. | Parcial |
 
 ## Alcance y comprobación de calidad
 
@@ -33,8 +27,9 @@
 - **CA-RC-SEG-002-1:** la consulta de inventario debe omitir los costos cuando la
   cuenta no tenga permiso para leerlos. El cliente debe omitir su presentación y
   la API no debe incluir el valor protegido en la respuesta.
-- `RC-PRU-001`, `RC-PRU-002` y `RC-REN-001` permanecen parciales. Un resultado positivo
-  de la suite disponible no demuestra cobertura completa de esas obligaciones.
+- `RC-REN-001` permanece parcial mientras haya listados que no apliquen la paginación
+  remota. Los estándares de implementación, pruebas y documentación están en sus
+  documentos propietarios y no constituyen requisitos del producto Vue.
 
 ## Objetivos de calidad por definir
 
@@ -47,15 +42,6 @@ Véase [Decisiones pendientes](../../vision-scope-and-requirements/04-open-decis
 | RC-REN-003 | Volumen y concurrencia soportados: escenario, datos, usuarios simultáneos, umbrales y forma de prueba. | Propuesto |
 | RC-DIS-001 | Disponibilidad del servicio: infraestructura, período de medida, objetivo y responsable de operación. | Propuesto |
 | RC-DIS-002 | Recuperación y respaldo: tiempo de recuperación (RTO), pérdida de datos tolerada (RPO), infraestructura y forma de comprobación. | Propuesto |
-
-## Restricción de construcción con identificador histórico
-
-`RN-006` conserva su ID histórico para una condición de construcción relacionada
-con `RC-MAN-002`.
-
-| ID | Requisito | Estado |
-| --- | --- | --- |
-| RN-006 | Un catálogo debe reutilizar el ciclo listar-crear-actualizar y sus componentes existentes cuando no cambien sus reglas, permisos ni persistencia. | Implementado |
 
 ## Responsabilidad de comprobación
 

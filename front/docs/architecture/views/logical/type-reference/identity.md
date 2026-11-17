@@ -41,7 +41,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PersonForm.defineProps
 
-**Fuente:** [src/modules/identity/components/PersonForm.vue](../../../../../src/modules/identity/components/PersonForm.vue) · línea 13, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/identity/components/PersonForm.vue](../../../../../src/modules/identity/components/PersonForm.vue) · línea 16, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -64,7 +64,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PersonForm.defineEmits
 
-**Fuente:** [src/modules/identity/components/PersonForm.vue](../../../../../src/modules/identity/components/PersonForm.vue) · línea 26, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/identity/components/PersonForm.vue](../../../../../src/modules/identity/components/PersonForm.vue) · línea 29, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -85,6 +85,20 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `search` |
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `more` |
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `retry` |
+
+## PersonAccessRow
+
+**Fuente:** [src/modules/identity/components/PersonForm.vue](../../../../../src/modules/identity/components/PersonForm.vue) · línea 42, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+PersonAccess & { id: string }
+```
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [PersonAccess](../../../../../src/modules/identity/identity.ts) | `type` |
 
 ## UserForm.defineProps
 

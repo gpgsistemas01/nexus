@@ -92,7 +92,7 @@ fuente de verdad.
 | Salida de merma | Documento que solicita y suministra existencias de merma, con posibilidad de devolución. | Reutiliza el patrón de salida, pero conserva stock y movimientos de merma separados. |
 | Encabezado | Datos generales compartidos por todos los detalles de un documento, como actores, fechas, cliente, proyecto y observaciones. | Editar encabezado no equivale a cambiar cantidades de detalle. |
 | Detalle | Renglón de un documento que identifica recurso, cantidad, importes o estado de cumplimiento. | Sus operaciones pueden requerir un permiso diferente del encabezado. |
-| Suministro o entrega | Entrega de toda la cantidad pendiente de uno o varios detalles, con descuento de existencia y registro de movimiento. | Una salida queda parcialmente surtida si quedan otros detalles pendientes; no es sinónimo de crear o editar el documento. |
+| Suministro o entrega | Operación que entrega una cantidad positiva de uno o varios detalles, descuenta sólo lo entregado y registra un movimiento. | Puede cubrir todo el saldo pendiente o una parte; las entregas siguientes acumulan saldo sin superar lo solicitado. |
 | Devolución | Operación que reingresa una cantidad previamente suministrada y la enlaza con documento, detalle y movimiento originales. | Puede ser parcial o total, no elimina el suministro histórico y no es una acción directa de cancelación. |
 | Corrección | Cambio trazable de un detalle de entrada que conserva valor anterior, valor corregido, motivo y actor. | No es una edición silenciosa ni una devolución. |
 | Cancelación | Transición que invalida un documento o detalle conforme a sus reglas, conservando su historia. | En salidas es un resultado derivado: la devolución total cancela el detalle y sólo la cancelación de todos los detalles cancela el encabezado; no existe una acción ni un endpoint de cancelación directa. |
@@ -108,7 +108,7 @@ fuente de verdad.
 | Estado activo | Indicador de disponibilidad de un registro de catálogo para operaciones posteriores. | Activar o desactivar no elimina el registro, no cambia su identidad ni modifica sus existencias o historia. |
 | Estado de compra | Situación derivada de una entrada: **Confirmada** mientras conserva detalles activos y **Cancelada** cuando todos sus detalles se cancelaron. | No se captura directamente. Corregir un detalle no cancela la compra y editar el encabezado no cambia el estado. |
 | Estado de detalle de compra | Situación **Activo** o **Cancelado** de un renglón de entrada. | Un detalle corregido permanece activo; cancelar revierte su inventario, lo excluye de los totales activos y conserva su historia. |
-| Estado de cumplimiento | Grado de surtimiento de una salida o detalle: **Pendiente**, **Surtido parcial**, **Surtido** o **Cancelado** para la salida; el detalle usa **Pendiente**, **Surtido** y **Cancelado**. | El cumplimiento parcial indica que quedan otros detalles pendientes. Se deriva de suministros y devoluciones; no es estado activo ni aprobación. |
+| Estado de cumplimiento | Grado de surtimiento de una salida o detalle: **Pendiente**, **Surtido parcial**, **Surtido** o **Cancelado**. | Un detalle puede quedar **Surtido parcial** si conserva saldo por entregar; la salida queda parcial si algún detalle tiene entrega acumulada y aún falta surtir. Se deriva de suministros y devoluciones. |
 | Tipo de movimiento | Clasificación del efecto registrado en inventario: entrada, salida, ajuste o devolución presentada a partir de su movimiento de reversa. | Describe el efecto sobre stock; no es el tipo de comprobante ni el estado del documento de origen. |
 
 ## Cantidades
@@ -116,7 +116,8 @@ fuente de verdad.
 | Término canónico | Definición compartida | Regla de uso |
 | --- | --- | --- |
 | Cantidad solicitada | Cantidad registrada como objetivo en un detalle de salida. | Es la base para validar acumulados de suministro y devolución. |
-| Cantidad pendiente de surtir | Cantidad solicitada menos la cantidad ya suministrada del detalle. | Se entrega completa al surtir el detalle; una devolución no vuelve a abrirlo como pendiente. |
+| Cantidad pendiente de surtir | Cantidad solicitada menos la cantidad ya suministrada del detalle. | Puede cubrirse en una o más operaciones de surtido; una devolución no vuelve a abrirla como pendiente. |
+| Cantidad a surtir | Cantidad física que se entrega en la operación actual, expresada en la presentación del artículo. | Debe ser positiva, no superar el saldo pendiente y no exceder la existencia disponible. |
 | Cantidad suministrada | Acumulado efectivamente entregado para un detalle. | No puede quedar incompatible con cantidad solicitada y devoluciones. |
 | Cantidad devuelta | Acumulado reingresado después de un suministro. | Cada incremento requiere trazabilidad con su movimiento de reversa. |
 | Saldo entregado | Cantidad suministrada de un detalle menos sus devoluciones anteriores. | Es el máximo disponible para una nueva devolución; no es existencia de almacén ni cantidad pendiente de surtir. |

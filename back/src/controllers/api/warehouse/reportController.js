@@ -13,7 +13,7 @@ import {
 } from '../../../services/warehouse/reportService.js';
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from '../../../utils/formattersUtils.js';
-import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
+import { sendExcelReport, buildMonthlyReportSheets } from "../../../utils/reportExcelUtils.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 
 const SHEET_NAME = 'Inventario';
@@ -82,7 +82,7 @@ export const buildGoodsIssueReportHandler = ({ findGoodsIssueReportRows, filenam
 
     return sendExcelReport({
         res,
-        data: buildIssueReportData(rows),
+        sheets: signal => buildMonthlyReportSheets(rows, { signal, buildData: buildIssueReportData, sheetName: GOODS_ISSUE_SHEET_NAME }),
         sheetName: GOODS_ISSUE_SHEET_NAME,
         filename
     });
@@ -93,10 +93,9 @@ export const exportWasteIssueReportExcel = async (req, res) => {
 
     return sendExcelReport({
         res,
-        data: buildIssueReportData(rows, {
-            baseHeader: 'Base de merma',
-            heightHeader: 'Altura de merma'
-        }),
+        sheets: signal => buildMonthlyReportSheets(rows, { signal, sheetName: WASTE_ISSUE_SHEET_NAME, buildData: monthRows => buildIssueReportData(monthRows, {
+            baseHeader: 'Base de merma', heightHeader: 'Altura de merma'
+        }) }),
         sheetName: WASTE_ISSUE_SHEET_NAME,
         filename: WASTE_ISSUE_FILENAME
     });
@@ -127,7 +126,7 @@ export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, fi
 
     return sendExcelReport({
         res,
-        data: buildGoodsReceiptReportData(rows, { isConsumableReport, monthlyReport }),
+        sheets: signal => buildMonthlyReportSheets(rows, { signal, sheetName: `${ GOODS_RECEIPT_SHEET_NAME } ${ isConsumableReport ? 'consumibles' : 'materiales' }`, buildData: monthRows => buildGoodsReceiptReportData(monthRows, { isConsumableReport, monthlyReport: true }) }),
         sheetName: `${ GOODS_RECEIPT_SHEET_NAME } ${ isConsumableReport ? 'consumibles' : 'materiales' }`,
         filename: `${ GOODS_RECEIPT_FILENAME }_${ isConsumableReport ? 'consumibles' : 'materiales' }`
     });

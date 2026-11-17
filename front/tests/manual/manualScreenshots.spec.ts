@@ -13,20 +13,31 @@ import { purchasePermissions } from '../fixtures/purchases.js';
 import { issuePermissions } from '../fixtures/issues.js';
 import { PERMISSIONS } from '@nexus/permissions';
 import { DOCUMENT_STATE_CAPTURES, mockDocumentCapture } from '../manual-profiles/documentStates.js';
-import { captureRecipe } from '../manual-profiles/captureRecipes.js';
+import {
+  captureRecipe,
+  INVENTORY_IMPORT_CAPTURES,
+  HISTORICAL_DELIVERY_CAPTURES,
+  MOVEMENT_CAPTURES,
+} from '../manual-profiles/captureRecipes.js';
 
 const imageDirectory = path.resolve('docs/user-manual/images');
 const writeAttempts = new WeakMap<Page, string[]>();
 
-test('vista móvil de materiales', async ({ page }) => {
-  const permissions = Object.values(PERMISSIONS);
-  await mockWarehouse(page, permissions);
-  await readOnly(page);
-  await captureRecipe(page, '03a-material-mobile.png', path.resolve('docs/user-manual'), {
-    ...user,
-    permissions,
+for (const filename of [
+  ...Object.keys(INVENTORY_IMPORT_CAPTURES),
+  ...Object.keys(HISTORICAL_DELIVERY_CAPTURES),
+  ...Object.keys(MOVEMENT_CAPTURES),
+]) {
+  test(`importación e histórico: ${filename}`, async ({ page }) => {
+    const permissions = Object.values(PERMISSIONS);
+    if (HISTORICAL_DELIVERY_CAPTURES[filename]) await mockIssues(page, permissions);
+    else if (MOVEMENT_CAPTURES[filename]) await mockMovements(page, permissions);
+    else await mockWarehouse(page, permissions);
+    await readOnly(page);
+    await captureRecipe(page, filename, path.resolve('docs/user-manual'), { ...user, permissions });
+    expect(page.viewportSize()!.width).toBeGreaterThanOrEqual(1280);
   });
-});
+}
 
 for (const [filename, state] of Object.entries(DOCUMENT_STATE_CAPTURES)) {
   test(`estados de documentos: ${filename}`, async ({ page }) => {

@@ -1,4 +1,4 @@
-# Desarrollo local y publicación
+# Desarrollo para programadores
 
 | Quiero… | Seguir |
 | --- | --- |
@@ -12,5 +12,5 @@
 | Importar inventario por Excel | [Altas, actualizaciones y archivos](05-inventory-excel-import.md). |
 | Revisar la conciliación de inventario desfasado | [Conteo y entregas históricas](06-inventory-reconciliation.md). |
 
-El [README](../../README.md) ofrece el inicio rápido. Para entender la implementación,
+El [README](../../README.md) resume el proyecto. Para entender la implementación,
 consulta la [incorporación al código](../architecture/views/development/developer-onboarding.md).

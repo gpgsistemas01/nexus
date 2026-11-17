@@ -1,4 +1,5 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
+import { ApiError } from '../../../shared/http/apiError.js';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
@@ -40,7 +41,7 @@ export const purchaseService = {
         );
         const document = normalizePurchaseDocument(result.goodsReceipt, resource);
         if (document.id !== id)
-            throw new Error('La compra recibida no coincide con la solicitada.');
+            throw new ApiError('La compra recibida no coincide con la solicitada.');
 
         return document;
     },

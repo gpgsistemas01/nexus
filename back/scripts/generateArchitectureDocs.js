@@ -132,6 +132,7 @@ const validateUseCaseDiagramCoverage = async () => {
         const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
         const actors = [
             ['Usuario registrado', 'user'],
+            ['Usuario autorizado de área operativa', 'operational'],
             ['Personal de almacén', 'warehouse'],
             ['Administrador del sistema', 'admin']
         ].filter(([label]) => declaredActor.includes(label)).map(([, alias]) => alias);
@@ -193,13 +194,15 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`casos de uso: generalización ${specialized} --|> ${general} entre actores inválidos`);
             }
         }
-        // Los enlaces desde Consulta organizan operaciones; no conceden permisos.
-        // La participación normativa se comprueba desde el actor de cada ficha.
+        // Los enlaces desde Consulta son una convención visual, no asociaciones UML.
+        // La participación normativa sólo se obtiene de asociaciones actor-caso y
+        // generalizaciones de actores.
         const reachableByActor = new Map([...actors].map((actor) => {
             const reachable = new Set([actor]);
             const pending = [actor];
             for (let index = 0; index < pending.length; index += 1) {
                 for (const [from, to] of [...associations, ...generalizations]) {
+                    if (!actors.has(from)) continue;
                     if (from !== pending[index] || reachable.has(to)) continue;
                     reachable.add(to);
                     pending.push(to);
@@ -215,22 +218,13 @@ const validateUseCaseDiagramCoverage = async () => {
             }
         }
         for (const [, alias, id, title] of cases) {
-            if (/^(?:Crear|Registrar) /.test(title)) {
-                for (const [actor, target] of associations.filter(([from]) => actors.has(from))) {
-                    if (target === alias && associations.some(([from, to]) => (
-                        queryAliases.has(from) && to === alias && !extensionAliases.has(alias)
-                    ))) {
-                        failures.push(`casos de uso: ${id} repite la asociación de ${actor} que en esta vista ya se muestra desde Consulta`);
-                    }
-                }
-            }
             if (title !== expectedTitles.get(id)) {
                 failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
             }
             const normativeActors = permittedActors.get(id) ?? [];
             const visibleActors = normativeActors.filter(actor => actors.has(actor));
             if (!visibleActors.length || visibleActors.some(actor => !reachableByActor.get(actor)?.has(alias))) {
-                failures.push(`casos de uso: ${id} no se asocia con su actor normativo directamente, por herencia o desde Consulta`);
+                failures.push(`casos de uso: ${id} no se asocia con su actor normativo directamente o por herencia`);
             }
             if (normativeActors.length === 1 && normativeActors[0] === 'admin'
                 && reachableByActor.get('warehouse')?.has(alias)) {

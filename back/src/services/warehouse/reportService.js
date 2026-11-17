@@ -1,4 +1,4 @@
-import { formatDateLongWithTime, toNumber } from '../../utils/formattersUtils.js';
+import { formatDateLongWithTime, toNumber, getReportMonthKey } from '../../utils/formattersUtils.js';
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
@@ -73,6 +73,7 @@ const mapWasteRows = (wastes = []) => wastes.map((item) => ({
 const mapIssueDetailRow = ({ issue, detail, material, supplier, requestDate }) => ({
     referenceNumber: issue.referenceNumber,
     requestDate,
+    reportMonth: getReportMonthKey(issue.requestDate),
     departmentName: issue.departmentName,
     requesterName: issue.requesterName,
     clientName: issue.clientName,

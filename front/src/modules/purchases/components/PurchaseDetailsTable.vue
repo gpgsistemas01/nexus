@@ -32,29 +32,37 @@ const money = [
     'grossPurchaseAmount',
 ] as const;
 const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
-    { title: 'Material', key: 'name', nowrap: true, fixed: 'start' },
+    { title: 'Material', key: 'name', align: 'start' as const, nowrap: true, fixed: 'start' },
     {
         title: 'Medidas',
         children: [
-            { title: 'Base', key: 'base' },
-            { title: 'Altura', key: 'height' },
+            { title: 'Base', key: 'base', align: 'end' as const },
+            { title: 'Altura', key: 'height', align: 'end' as const },
         ],
     },
-    { title: 'Compra', key: 'quantity' },
-    { title: 'Presentación', key: 'presentation' },
+    { title: 'Compra', key: 'quantity', align: 'end' as const },
+    { title: 'Presentación', key: 'presentation', align: 'start' as const },
     {
         title: 'Conversión',
         children: [
-            { title: 'Cantidad', key: 'convertedQuantity' },
-            { title: 'Unidad', key: 'unitMeasure' },
+            { title: 'Cantidad', key: 'convertedQuantity', align: 'end' as const },
+            { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
         ],
     },
-    { title: 'Costo Unitario de Conversión', key: 'conversionUnitCost' },
-    { title: 'Costo por Presentación', key: 'costPerUnitType' },
-    { title: 'Monto s/ IVA', key: 'netPurchaseAmount' },
-    { title: 'Monto c/ IVA', key: 'grossPurchaseAmount' },
+    { title: 'Costo Unitario de Conversión', key: 'conversionUnitCost', align: 'end' as const },
+    { title: 'Costo por Presentación', key: 'costPerUnitType', align: 'end' as const },
+    { title: 'Monto s/ IVA', key: 'netPurchaseAmount', align: 'end' as const },
+    { title: 'Monto c/ IVA', key: 'grossPurchaseAmount', align: 'end' as const },
     ...(props.canChange || props.canRemove
-        ? [{ title: 'Acciones', key: 'actions', sortable: false }]
+        ? [
+              {
+                  title: 'Acciones',
+                  key: 'actions',
+                  align: 'center' as const,
+                  fixed: 'end' as const,
+                  sortable: false,
+              },
+          ]
         : []),
 ]);
 const sortBy = ref<DataTableSortItem[]>([]);
@@ -98,6 +106,7 @@ const cardValue = (item: PurchaseDetail, key: string) => {
     <TableFrame
         fit-columns
         mobile-cards
+        details
     >
         <VDataTable
             v-model:sort-by="sortBy"

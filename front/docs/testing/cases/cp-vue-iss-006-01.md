@@ -11,3 +11,9 @@ Fuentes: [unitarias](../../../tests/unit/modules/issues/historicalDeliveryTest.t
 y [Chromium](../../../tests/e2e/historicalDelivery.spec.ts).
 La [integración HTTP/Prisma](../../../../back/tests/integration/controllers/historicalDeliveryControllerDbTest.js)
 comprueba ausencia de movimientos, estados, rollback, concurrencia y frontera 100/101 reales.
+
+La paginación histórica usa la tabla compartida y 100 registros por página: con 101
+salidas se ven 100 y 1, con rango y total visibles en escritorio y móvil. La selección
+se conserva al navegar. El total cuenta sólo salidas con partidas realmente pendientes,
+antes de paginar; se excluyen detalles cancelados, completos o marcados surtidos.
+La integración HTTP cubre los tres recursos y el saldo suministrado nulo.

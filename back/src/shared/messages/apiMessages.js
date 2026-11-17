@@ -6,6 +6,8 @@ import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMess
 import { PIECE_QUANTITY_MESSAGE } from '../inventory/pieceQuantity.js';
 
 export const errorMessages = {
+    REPORT_MONTH_INVALID: 'No se pudo generar el reporte porque contiene un mes inválido. Contacta al administrador.',
+    HISTORICAL_DELIVERY_NOT_FOUND: 'Una salida no existe o no pertenece al alcance autorizado.',
     HISTORICAL_DELIVERY_VALIDATION: 'Revisa el corte, motivo y selección de salidas. Debes declarar su entrega física completa antes del corte.',
     HISTORICAL_DELIVERY_CONFLICT: 'La salida ya cambió o no tiene pendientes elegibles. Actualiza la búsqueda y revisa los folios.',
     HISTORICAL_DELIVERY_BUSY: 'Otra operación está modificando estas salidas. Reintenta conservando la misma clave.',

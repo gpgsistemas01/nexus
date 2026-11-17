@@ -61,6 +61,20 @@ los valores y eventos intercambiados.
 | DOM | Conservar el control de Vue/Vuetify; no superponer otro controlador sobre sus nodos. |
 | Avisos | Reutilizar `shared/ui/feedback.ts`; enfocar Cancelar en confirmaciones destructivas. |
 
+### Lectura de las partidas
+
+Las tablas de detalles de Compras y Salidas usan **Inter** como fuente local,
+con tamaño mínimo de 14 px en escritorio y tableta. Los nombres y descripciones
+se alinean al inicio; cantidades e importes, al final, con cifras tabulares y cero
+distinguible. Los encabezados de grupo se centran sobre sus subcolumnas.
+Los nombres conservan espacio propio y las cifras se muestran completas, sin
+partir decimales ni reducir la letra para encajar todas las columnas.
+
+Cuando faltan píxeles, se desplaza el contenido dentro de `TableFrame`, con sus
+controles superiores y la columna del artículo y las acciones fijas. En móvil se
+conservan las fichas. Esta distribución se activa con `details`; los listados
+mantienen su distribución existente.
+
 ## Presentación numérica
 
 `convertedQuantityText` presenta las cantidades en m² con dos decimales en tablas,

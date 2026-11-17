@@ -279,10 +279,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `sortBy` | `sortBy?: DataTableSortItem[];` |
 | `sortRows` | `sortRows?: boolean;` |
 | `sortValue` | `sortValue?: (row: Row, key: string) => unknown;` |
+| `emptyText` | `emptyText?: string;` |
 
 ## ResponsiveTableCards.defineEmits
 
-**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 27, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -300,6 +301,8 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `page` | `page: number;` |
 | `pageSize` | `pageSize: number;` |
 | `isLoading` | `isLoading: boolean;` |
+| `pageSizeOptions` | `pageSizeOptions?: number[];` |
+| `tableLabel` | `tableLabel?: string;` |
 | `sortBy` | `sortBy?: DataTableSortItem[];` |
 | `mustSort` | `mustSort?: boolean;` |
 | `rowProps` | `rowProps?: (data: { item: Row }) => { class: string };` |
@@ -307,7 +310,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ServerTable.defineEmits
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 33, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -346,13 +349,14 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## TableFrame.defineProps
 
-**Fuente:** [src/shared/components/TableFrame.vue](../../../../../src/shared/components/TableFrame.vue) · línea 2, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/TableFrame.vue](../../../../../src/shared/components/TableFrame.vue) · línea 7, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `isLoading` | `isLoading?: boolean;` |
 | `fitColumns` | `fitColumns?: boolean;` |
-| `mobileCards` | `mobileCards?: boolean` |
+| `mobileCards` | `mobileCards?: boolean;` |
+| `details` | `details?: boolean;` |
 
 ## FileExportOptions
 
@@ -615,7 +619,7 @@ Record<OrganizationResource, LookupState>
 
 ## ReportScope
 
-**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 3, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 4, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -625,7 +629,7 @@ Record<OrganizationResource, LookupState>
 
 ## ReportKind
 
-**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 9, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 10, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

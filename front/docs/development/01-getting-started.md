@@ -199,17 +199,26 @@ explica el formato de host y usuario. Conserva las credenciales sólo en `back/.
 
 ### Dependencias no resueltas en Vite
 
-Detén Vite y reinstala las dependencias declaradas. Ejemplo para `vee-validate`:
+Detén Vite y reinstala las dependencias declaradas. Si aparece
+`Failed to resolve import "@fontsource-variable/inter/wght.css"`, el paquete de
+Inter falta o está incompleto en `front/node_modules`. Actualizar con Git no
+instala el paquete, aunque `package.json` y `package-lock.json` ya lo declaren.
+El mismo fallo puede repetirse como `Internal server error` y `Pre-transform error`.
+
+Desde la raíz del repositorio (también en PowerShell):
 
 ```bash
 npm --prefix front ci --include=dev
-npm --prefix front ls vee-validate --depth=0
+npm --prefix front ls @fontsource-variable/inter --depth=0
 npm --prefix front run dev -- --force
 ```
 
 Continúa si `ci` termina correctamente y `ls` encuentra el paquete. Si falta,
 revisa la rama, `front/package.json` y el lockfile. `--force` rehace la caché de Vite;
 no instala dependencias.
+Para otra dependencia, consulta su nombre con `ls` en lugar del paquete de Inter.
+Conserva el import y el lockfile: instalar una versión distinta o retirar la fuente
+no corrige la desactualización de la instalación local.
 
 ## Archivos locales ignorados y su ubicación
 

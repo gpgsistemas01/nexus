@@ -4,6 +4,7 @@ import {
     HISTORICAL_DELIVERY_LIMITS as limits,
     HISTORICAL_DELIVERY_REVISION_PATTERN,
 } from '@nexus/historical-deliveries';
+import { ApiError } from '../../../shared/http/apiError.js';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -15,7 +16,7 @@ import type {
 } from '../historicalDelivery.js';
 
 const invalid = () =>
-    new Error(
+    new ApiError(
         'La respuesta de regularización está incompleta. Revisa el estado antes de continuar.',
     );
 
@@ -38,7 +39,7 @@ export const readHistoricalDeliveryCommand = (value: unknown): HistoricalDeliver
             (!isText(value.deliveredAt) || !Number.isFinite(Date.parse(value.deliveredAt)))) ||
         !Array.isArray(value.documents) ||
         !value.documents.length ||
-        value.documents.length > limits.maxDocuments ||
+        value.documents.length > limits.pageSize ||
         value.documents.some(
             (item) =>
                 !isRecord(item) ||
@@ -73,9 +74,11 @@ export const historicalDeliveryService = {
             value.page !== query.page ||
             !isText(value.cutoffDate) ||
             Date.parse(value.cutoffDate) !== Date.parse(query.cutoffDate) ||
+            !Number.isSafeInteger(value.total) ||
+            Number(value.total) < 0 ||
             typeof value.hasMore !== 'boolean' ||
             !Array.isArray(value.documents) ||
-            value.documents.length > limits.maxDocuments ||
+            value.documents.length > limits.pageSize ||
             new Set(value.documents.map((item) => (isRecord(item) ? item.id : null))).size !==
                 value.documents.length ||
             value.documents.some(

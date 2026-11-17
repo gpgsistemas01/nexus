@@ -14,7 +14,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `groups` | `groups: readonly NavigationGroup[];` |
 | `activeGroup` | `activeGroup: string;` |
 | `isCompact` | `isCompact: boolean;` |
-| `isTemporary` | `isTemporary: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -22,7 +21,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## AppNavigation.defineEmits
 
-**Fuente:** [src/app/components/AppNavigation.vue](../../../../../src/app/components/AppNavigation.vue) · línea 19, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/app/components/AppNavigation.vue](../../../../../src/app/components/AppNavigation.vue) · línea 18, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

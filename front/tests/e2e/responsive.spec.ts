@@ -28,7 +28,7 @@ const views = [
   ['/catalogos/unit-measures', '', mockCatalogs],
 ] as const;
 
-for (const width of [320, 390, 768, 1024, 1440, 1920]) {
+for (const width of [320, 390, 599, 600, 768, 880, 900, 1024, 1440, 1920]) {
   test(`pantallas y formularios accesibles a ${width} px`, async ({ page }) => {
     test.setTimeout(180_000);
     await page.setViewportSize({ width, height: 844 });
@@ -46,7 +46,14 @@ for (const width of [320, 390, 768, 1024, 1440, 1920]) {
         await expect(page.getByRole('table').first()).toBeVisible();
         await expect(cards).toBeHidden();
         await expect(tableWrapper).toBeVisible();
-        if (width < 1600) await expect(tableWrapper).toHaveCSS('overflow-x', 'hidden');
+        if (width >= 600 && width < 900) {
+          await expect(tableWrapper).toHaveCSS('overflow-x', 'auto');
+          await expect(
+            page.getByRole('button', { name: 'Desplazar tabla a la derecha' }).first(),
+          ).toBeVisible();
+        } else if (width < 1600) {
+          await expect(tableWrapper).toHaveCSS('overflow-x', 'hidden');
+        }
       }
       await expect(page.locator('.v-data-table__progress .v-progress-linear')).toHaveCount(0);
       expect(
@@ -68,10 +75,35 @@ for (const width of [320, 390, 768, 1024, 1440, 1920]) {
   });
 }
 
-test('inventario en tableta muestra todas las columnas de la tabla sin desplazamiento horizontal', async ({
+test('inventario entre 600 y 899 px desplaza la tabla dentro de su contenedor', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 768, height: 844 });
+  await mockWarehouse(page, permissions);
+  await page.goto('/almacen/materiales');
+
+  const wrapper = page.locator('.table-frame--fit-columns .v-table__wrapper').first();
+  await expect(page.getByRole('table')).toBeVisible();
+  await expect(page.locator('.responsive-table-cards')).toBeHidden();
+  await expect(wrapper).toHaveCSS('overflow-x', 'auto');
+  const dimensions = await wrapper.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+    firstHeaderPosition: getComputedStyle(element.querySelector('thead th')!).position,
+    firstCellPosition: getComputedStyle(element.querySelector('tbody td')!).position,
+  }));
+  expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
+  expect(dimensions.firstHeaderPosition).toBe('sticky');
+  expect(dimensions.firstCellPosition).toBe('sticky');
+  await page.getByRole('button', { name: 'Desplazar tabla a la derecha' }).first().click();
+  await expect.poll(() => wrapper.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
+});
+
+test('inventario desde 900 px muestra todas las columnas sin desplazamiento horizontal', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 900, height: 844 });
   await mockWarehouse(page, permissions);
   await page.goto('/almacen/materiales');
 
@@ -96,13 +128,38 @@ test('inventario en tableta muestra todas las columnas de la tabla sin desplazam
   expect(await wrapper.evaluate((element) => element.scrollWidth)).toBeLessThanOrEqual(
     await wrapper.evaluate((element) => element.clientWidth),
   );
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(900);
+});
+
+test('mantiene la agrupación y el estilo de subcolumnas en tabla y fichas', async ({ page }) => {
+  await mockWarehouse(page, permissions);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/almacen/materiales');
+
+  const cards = page.locator('.responsive-table-card').first();
+  const groupedFields = cards.locator('.responsive-table-card__field--subcolumn');
+  await expect(cards).toBeVisible();
+  await expect(groupedFields.filter({ hasText: 'Medidas' })).toHaveCount(2);
+  await expect(groupedFields.first()).toHaveCSS('background-color', 'rgb(255, 243, 217)');
+  await expect(groupedFields.first().locator('.responsive-table-card__group')).toHaveText(
+    'Medidas',
+  );
+
+  for (const width of [600, 768, 900, 1024, 1599, 1600, 1920]) {
+    await page.setViewportSize({ width, height: 844 });
+    const table = page.getByRole('table').first();
+    const subcolumn = table.locator('thead tr').nth(1).locator('th').filter({ hasText: 'Base' });
+    await expect(table).toBeVisible();
+    await expect(subcolumn).toHaveCSS('background-color', 'rgb(255, 243, 217)');
+    await expect(subcolumn).toHaveCSS('color', 'rgb(51, 45, 45)');
+    await expect(subcolumn).toHaveCSS('border-bottom-color', 'rgb(216, 133, 0)');
+  }
 });
 
 test('el texto largo se ajusta al ancho de su celda en tabla y ficha móvil', async ({ page }) => {
   const longName = 'MaterialConNombreMuyLargoSinEspaciosParaProbarElAjuste';
   await mockWarehouse(page, permissions, { materialName: longName });
-  await page.setViewportSize({ width: 768, height: 844 });
+  await page.setViewportSize({ width: 1024, height: 844 });
   await page.goto('/almacen/materiales');
 
   const table = page.getByRole('table');
@@ -135,3 +192,86 @@ test('el texto largo se ajusta al ancho de su celda en tabla y ficha móvil', as
   expect(cardText.clientHeight).toBeGreaterThan(cardText.lineHeight);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
+
+for (const width of [600, 768, 900, 1024, 1440]) {
+  for (const resource of ['compras', 'salidas']) {
+    test(`partidas de ${resource} legibles a ${width} px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 1100 });
+      const name = 'Lona translúcida para impresión y montaje · referencia Il1 O0';
+      if (resource === 'compras') {
+        const fixture = await mockPurchases(page);
+        Object.assign(fixture.document.details[0]!, {
+          materialName: name,
+          quantity: '123456.5',
+          convertedQuantity: '12345650',
+          costPerUnitType: '100',
+          conversionUnitCost: '1',
+          netPurchaseAmount: '12345650',
+          grossPurchaseAmount: '14320954',
+        });
+        await page.goto('/compras/materiales');
+        await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+      } else {
+        const fixture = await mockIssues(page);
+        Object.assign(fixture.docs.materials.details[0]!, {
+          materialName: name,
+          quantity: '123456.5',
+          convertedQuantity: '12345650',
+        });
+        await page.goto('/salidas/materiales');
+        await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+      }
+      const dialog = page.getByRole('dialog').last();
+      const table = dialog.getByRole('table');
+      const row = table
+        .getByRole('row')
+        .filter({ has: page.getByRole('cell', { name, exact: true }) });
+      await expect(row).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      await dialog.screenshot({
+        path: test.info().outputPath('partidas.png'),
+        animations: 'disabled',
+      });
+      const dimensions = await row.getByRole('cell', { name, exact: true }).evaluate((element) => ({
+        width: element.getBoundingClientRect().width,
+        fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+      }));
+      expect(dimensions.width).toBeGreaterThanOrEqual(width < 900 ? 180 : 220);
+      expect(dimensions.fontSize).toBeGreaterThanOrEqual(14);
+      const headerFontSize = await table
+        .getByRole('columnheader')
+        .first()
+        .evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+      expect(headerFontSize).toBeGreaterThanOrEqual(14);
+      const quantity = row.getByRole('cell', { name: '123,456.5', exact: true });
+      const text = await quantity.evaluate((element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        return {
+          height: range.getBoundingClientRect().height,
+          lineHeight: Number.parseFloat(getComputedStyle(element).lineHeight),
+        };
+      });
+      expect(text.height).toBeLessThanOrEqual(text.lineHeight + 1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        width,
+      );
+      if (resource === 'salidas') {
+        await row.getByRole('checkbox', { name: `Surtir: ${name}`, exact: true }).check();
+        const field = row.getByRole('spinbutton', {
+          name: `Cantidad a surtir: ${name}`,
+          exact: true,
+        });
+        await field.scrollIntoViewIfNeeded();
+        await field.click();
+        await field.fill('123456.5');
+        await expect(field).toHaveValue('123456.5');
+        expect((await field.boundingBox())!.width).toBeGreaterThanOrEqual(100);
+        await dialog.screenshot({
+          path: test.info().outputPath('partidas-captura.png'),
+          animations: 'disabled',
+        });
+      }
+    });
+  }
+}

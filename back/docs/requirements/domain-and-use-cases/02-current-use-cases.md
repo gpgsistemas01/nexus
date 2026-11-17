@@ -1,12 +1,11 @@
 # 2. Casos de uso vigentes
 
 Los diagramas usan la notación de casos de uso de Mermaid 12 (`usecase-beta`):
-actores fuera del límite de Nexus, óvalos para objetivos y asociaciones del actor con
-el caso de consulta de cada recurso. Las asociaciones directas con otras operaciones
-se reservan para situaciones particulares justificadas en las fichas normativas.
-La generalización apunta del actor especializado al general con un triángulo hueco. Las asociaciones expresan participación funcional; cada operación
-conserva sus comprobaciones de permiso en el servidor. Los enlaces sin etiqueta desde
-Consulta conservan la organización visual por recurso del documento; no representan
+actores fuera del límite de Nexus, óvalos para objetivos y asociaciones directas entre
+cada actor autorizado y sus casos. La generalización apunta del actor especializado al
+general con un triángulo hueco. Las asociaciones expresan participación funcional; cada
+operación conserva sus comprobaciones de permiso en el servidor. Los enlaces sin
+etiqueta desde Consulta agrupan visualmente operaciones del mismo recurso; no representan
 inclusión, extensión, generalización ni herencia de actores. `«include»` y `«extend»` se reservan para
 comportamientos y puntos de extensión explícitos en las fichas normativas.
 Ventas y Dirección no son actores con acceso vigente; su participación futura sigue
@@ -24,21 +23,20 @@ intervienen como extensiones; la repetición del identificador no crea otro caso
 Cada óvalo conserva únicamente el identificador y el nombre normativo del objetivo.
 El grupo propietario y la condición de referencia se explican en el texto y en la
 tabla de extensiones, sin añadir esas aclaraciones a la etiqueta del caso.
-Las asociaciones con las consultas se muestran para el actor autorizado; las operaciones se despliegan desde la consulta.
-Se conservan los enlaces directos que distinguen casos exclusivos del administrador
-o altas desde selectores. El administrador hereda las asociaciones de Almacén mediante
-generalización, sin duplicarlas.
+Las asociaciones directas muestran quién participa en cada objetivo, incluidas las
+operaciones que también se agrupan visualmente desde Consulta. Se conservan las
+asociaciones exclusivas del administrador y de las altas desde selectores. El
+administrador hereda las asociaciones de Almacén mediante generalización, sin duplicarlas.
 
 La separación en vistas es una decisión de legibilidad, no una exigencia de UML. Un
 único diagrama con los 94 casos y todas las asociaciones dificultaría su revisión. Las
 relaciones se muestran junto al caso base y no en una vista independiente que obligue a
 reconstruirlas entre diagramas. La jerarquía de autenticación enlaza Personal de almacén con Usuario registrado y
 Administrador del sistema con Personal de almacén. La generalización operativa se
-repite en las figuras que muestran ambos actores. Las asociaciones compartidas se
-muestran sólo en el actor general: el administrador las hereda sin repetirlas y puede
-además asociarse con sus casos exclusivos. Así, Personal de almacén participa en la
-consulta, mientras el administrador hereda esa participación y se asocia directamente
-con Ajustar existencia. No hay un enlace desde la consulta compartida hacia el ajuste.
+repite en las figuras que muestran ambos actores. Personal de almacén se asocia con
+cada caso compartido; el administrador hereda esas asociaciones y puede además
+asociarse con sus casos exclusivos. Así, ambos participan en los casos compartidos de
+Almacén y sólo el administrador se asocia con Ajustar existencia.
 La generalización no lleva palabra adicional, sólo el triángulo hueco hacia el actor
 general.
 
@@ -113,6 +111,7 @@ direction LR
     actor admin("Administrador del sistema")
     admin --|> warehouse
 
+
     systemBoundary identityPackage1["Nexus · Personas"]
         ucPersonQuery("CU-IDA-01 Consultar personas")
         ucPersonCreate("CU-IDA-02 Crear persona")
@@ -120,6 +119,10 @@ direction LR
         ucPersonReport("CU-IDA-04 Generar reporte de personas")
     end
 
+
+    warehouse -- ucPersonCreate
+    warehouse -- ucPersonEdit
+    warehouse -- ucPersonReport
     warehouse -- ucPersonQuery
 
     ucPersonQuery -- ucPersonCreate
@@ -135,6 +138,7 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary identityPackage2["Nexus · Usuarios y credenciales"]
         ucUserQuery("CU-IDA-05 Consultar usuarios")
         ucUserCreate("CU-IDA-06 Crear usuario y asignar acceso")
@@ -143,6 +147,11 @@ direction LR
         ucUserReport("CU-IDA-09 Generar reporte de usuarios")
     end
 
+
+    admin -- ucUserCreate
+    admin -- ucUserEdit
+    admin -- ucPasswordEdit
+    admin -- ucUserReport
     admin -- ucUserQuery
 
     ucUserQuery -- ucUserCreate
@@ -159,8 +168,12 @@ direction LR
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor user("Usuario registrado")
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    operational --|> user
+    warehouse --|> user
     admin --|> warehouse
 
     systemBoundary warehousePackage1["Nexus · Materiales"]
@@ -173,6 +186,11 @@ direction LR
     end
 
     warehouse -- ucMaterialQuery
+    warehouse -- ucMaterialCreate
+    warehouse -- ucMaterialEdit
+    warehouse -- ucMaterialRemove
+    warehouse -- ucMaterialInventoryReport
+    operational -- ucMaterialQuery
     admin -- ucMaterialStock
 
     ucMaterialQuery -- ucMaterialCreate
@@ -193,11 +211,14 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary materialMovementsPackage["Nexus · Movimientos de materiales"]
         ucMaterialMovements("CU-ALM-07 Consultar movimientos de materiales")
         ucMaterialMovementReport("CU-ALM-08 Generar reporte de movimientos de materiales")
     end
 
+
+    admin -- ucMaterialMovementReport
     admin -- ucMaterialMovements
     ucMaterialMovements -- ucMaterialMovementReport
 ```
@@ -208,8 +229,12 @@ direction LR
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor user("Usuario registrado")
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    operational --|> user
+    warehouse --|> user
     admin --|> warehouse
 
     systemBoundary warehousePackage2["Nexus · Mermas"]
@@ -222,6 +247,11 @@ direction LR
     end
 
     warehouse -- ucWasteQuery
+    warehouse -- ucWasteCreate
+    warehouse -- ucWasteEdit
+    warehouse -- ucWasteAddStock
+    warehouse -- ucWasteReport
+    operational -- ucWasteQuery
     admin -- ucWasteStock
 
     ucWasteQuery -- ucWasteCreate
@@ -242,11 +272,14 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary wasteMovementsPackage["Nexus · Movimientos de mermas"]
         ucWasteMovements("CU-ALM-15 Consultar movimientos de mermas")
         ucWasteMovementReport("CU-ALM-16 Generar reporte de movimientos de mermas")
     end
 
+
+    admin -- ucWasteMovementReport
     admin -- ucWasteMovements
     ucWasteMovements -- ucWasteMovementReport
 ```
@@ -257,8 +290,12 @@ direction LR
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor user("Usuario registrado")
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    operational --|> user
+    warehouse --|> user
     admin --|> warehouse
 
     systemBoundary warehousePackage3["Nexus · Consumibles"]
@@ -271,6 +308,11 @@ direction LR
     end
 
     warehouse -- ucConsumableQuery
+    warehouse -- ucConsumableCreate
+    warehouse -- ucConsumableEdit
+    warehouse -- ucConsumableRemove
+    warehouse -- ucConsumableReport
+    operational -- ucConsumableQuery
     admin -- ucConsumableStock
 
     ucConsumableQuery -- ucConsumableCreate
@@ -289,10 +331,13 @@ usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
     actor admin("Administrador del sistema")
+
     systemBoundary consumableMovementsPackage["Nexus · Movimientos de consumibles"]
         query("CU-ALM-23 Consultar movimientos de consumibles")
         report("CU-ALM-24 Generar reporte de movimientos de consumibles")
     end
+
+    admin -- report
     admin -- query
     query -- report
 ```
@@ -359,12 +404,16 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary catalogPackage3["Nexus · Áreas"]
         ucAreaQuery("CU-CAT-09 Consultar área")
         ucAreaCreate("CU-CAT-10 Crear área")
         ucAreaEdit("CU-CAT-11 Editar área")
     end
 
+
+    admin -- ucAreaCreate
+    admin -- ucAreaEdit
     admin -- ucAreaQuery
 
     ucAreaQuery -- ucAreaCreate
@@ -379,12 +428,16 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary catalogPackage4["Nexus · Roles"]
         ucRoleQuery("CU-CAT-12 Consultar rol")
         ucRoleCreate("CU-CAT-13 Crear rol")
         ucRoleEdit("CU-CAT-14 Editar rol")
     end
 
+
+    admin -- ucRoleCreate
+    admin -- ucRoleEdit
     admin -- ucRoleQuery
 
     ucRoleQuery -- ucRoleCreate
@@ -399,12 +452,16 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary catalogPackage5["Nexus · Presentaciones"]
         ucPresentationQuery("CU-CAT-15 Consultar presentación")
         ucPresentationCreate("CU-CAT-16 Crear presentación")
         ucPresentationEdit("CU-CAT-17 Editar presentación")
     end
 
+
+    admin -- ucPresentationCreate
+    admin -- ucPresentationEdit
     admin -- ucPresentationQuery
 
     ucPresentationQuery -- ucPresentationCreate
@@ -419,12 +476,16 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary catalogPackage6["Nexus · Unidades de medida"]
         ucUnitMeasureQuery("CU-CAT-18 Consultar unidad de medida")
         ucUnitMeasureCreate("CU-CAT-19 Crear unidad de medida")
         ucUnitMeasureEdit("CU-CAT-20 Editar unidad de medida")
     end
 
+
+    admin -- ucUnitMeasureCreate
+    admin -- ucUnitMeasureEdit
     admin -- ucUnitMeasureQuery
 
     ucUnitMeasureQuery -- ucUnitMeasureCreate
@@ -439,12 +500,16 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary catalogPackage7["Nexus · Motivos de ajuste"]
         ucAdjustmentReasonQuery("CU-CAT-21 Consultar motivo de ajuste")
         ucAdjustmentReasonCreate("CU-CAT-22 Crear motivo de ajuste")
         ucAdjustmentReasonEdit("CU-CAT-23 Editar motivo de ajuste")
     end
 
+
+    admin -- ucAdjustmentReasonCreate
+    admin -- ucAdjustmentReasonEdit
     admin -- ucAdjustmentReasonQuery
 
     ucAdjustmentReasonQuery -- ucAdjustmentReasonCreate
@@ -459,12 +524,16 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
 
+
     systemBoundary catalogPackage8["Nexus · Estados de cumplimiento"]
         ucFulfillmentStatusQuery("CU-CAT-24 Consultar estado de cumplimiento")
         ucFulfillmentStatusCreate("CU-CAT-25 Crear estado de cumplimiento")
         ucFulfillmentStatusEdit("CU-CAT-26 Editar estado de cumplimiento")
     end
 
+
+    admin -- ucFulfillmentStatusCreate
+    admin -- ucFulfillmentStatusEdit
     admin -- ucFulfillmentStatusQuery
 
     ucFulfillmentStatusQuery -- ucFulfillmentStatusCreate
@@ -491,6 +560,7 @@ direction LR
     actor admin("Administrador del sistema")
     admin --|> warehouse
 
+
     systemBoundary receiptPackage1["Nexus · Compras de materiales"]
         ucReceiptQuery("CU-ENT-01 Consultar compras de material")
         ucReceiptCreate("CU-ENT-02 Crear compra de material")
@@ -502,6 +572,12 @@ direction LR
         materialExtension("CU-ALM-02 Crear material")
     end
 
+
+    warehouse -- ucReceiptCreate
+    warehouse -- ucReceiptEdit
+    warehouse -- ucReceiptCorrect
+    warehouse -- ucReceiptCancel
+    warehouse -- ucPurchaseReport
     supplierExtension ..>:extend ucReceiptCreate
     materialExtension ..>:extend ucReceiptCreate
 
@@ -526,6 +602,7 @@ direction LR
     actor admin("Administrador del sistema")
     admin --|> warehouse
 
+
     systemBoundary receiptPackage2["Nexus · Compras de consumibles"]
         ucConsumableReceiptQuery("CU-ENT-07 Consultar compras de consumible")
         ucConsumableReceiptCreate("CU-ENT-08 Crear compra de consumible")
@@ -537,6 +614,12 @@ direction LR
         consumableExtension("CU-ALM-18 Crear consumible")
     end
 
+
+    warehouse -- ucConsumableReceiptCreate
+    warehouse -- ucConsumableReceiptEdit
+    warehouse -- ucConsumableReceiptCorrect
+    warehouse -- ucConsumableReceiptCancel
+    warehouse -- ucConsumablePurchaseReport
     supplierExtension ..>:extend ucConsumableReceiptCreate
     consumableExtension ..>:extend ucConsumableReceiptCreate
 
@@ -555,6 +638,12 @@ direction LR
 
 Los tres contextos conservan casos propios. Consumibles utiliza `CU-SAL-15` a
 `CU-SAL-21`, con las mismas transiciones de estado y existencias separadas.
+En cada figura, Usuario de área operativa participa en consulta, creación y edición
+de sus solicitudes; Personal de almacén participa también en esas operaciones y en
+surtimiento, devolución y reportes. El Administrador hereda las asociaciones de
+Almacén. La creación contextual del cliente corresponde al actor con permisos de
+consulta y alta de Directorio; la solicitud operativa por sí sola no concede esos
+permisos.
 
 #### Salidas de materiales
 
@@ -562,8 +651,12 @@ Los tres contextos conservan casos propios. Consumibles utiliza `CU-SAL-15` a
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor user("Usuario registrado")
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    operational --|> user
+    warehouse --|> user
     admin --|> warehouse
 
     systemBoundary issuePackage1["Nexus · Salidas de materiales"]
@@ -580,7 +673,17 @@ direction LR
     clientExtension ..>:extend ucMaterialIssueCreate
 
     warehouse -- ucMaterialIssueQuery
+    warehouse -- ucMaterialIssueCreate
+    warehouse -- ucMaterialIssueHeader
+    warehouse -- ucMaterialIssueDetails
+    warehouse -- ucMaterialSupply
+    warehouse -- ucMaterialReturn
+    warehouse -- ucMaterialIssueReport
     warehouse -- clientExtension
+    operational -- ucMaterialIssueQuery
+    operational -- ucMaterialIssueCreate
+    operational -- ucMaterialIssueHeader
+    operational -- ucMaterialIssueDetails
 
     ucMaterialIssueQuery -- ucMaterialIssueCreate
     ucMaterialIssueQuery -- ucMaterialIssueHeader
@@ -596,8 +699,12 @@ direction LR
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor user("Usuario registrado")
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    operational --|> user
+    warehouse --|> user
     admin --|> warehouse
 
     systemBoundary issuePackage2["Nexus · Salidas de mermas"]
@@ -611,6 +718,16 @@ direction LR
     end
 
     warehouse -- ucWasteIssueQuery
+    warehouse -- ucWasteIssueCreate
+    warehouse -- ucWasteIssueHeader
+    warehouse -- ucWasteIssueDetails
+    warehouse -- ucWasteSupply
+    warehouse -- ucWasteReturn
+    warehouse -- ucWasteIssueReport
+    operational -- ucWasteIssueQuery
+    operational -- ucWasteIssueCreate
+    operational -- ucWasteIssueHeader
+    operational -- ucWasteIssueDetails
 
     ucWasteIssueQuery -- ucWasteIssueCreate
     ucWasteIssueQuery -- ucWasteIssueHeader
@@ -627,8 +744,12 @@ direction LR
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor user("Usuario registrado")
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    operational --|> user
+    warehouse --|> user
     admin --|> warehouse
 
     systemBoundary issuePackage3["Nexus · Salidas de consumibles"]
@@ -645,7 +766,17 @@ direction LR
     clientExtension ..>:extend ucConsumableIssueCreate
 
     warehouse -- ucConsumableIssueQuery
+    warehouse -- ucConsumableIssueCreate
+    warehouse -- ucConsumableIssueHeader
+    warehouse -- ucConsumableIssueDetails
+    warehouse -- ucConsumableSupply
+    warehouse -- ucConsumableReturn
+    warehouse -- ucConsumableIssueReport
     warehouse -- clientExtension
+    operational -- ucConsumableIssueQuery
+    operational -- ucConsumableIssueCreate
+    operational -- ucConsumableIssueHeader
+    operational -- ucConsumableIssueDetails
 
     ucConsumableIssueQuery -- ucConsumableIssueCreate
     ucConsumableIssueQuery -- ucConsumableIssueHeader
@@ -657,19 +788,23 @@ direction LR
 
 ### Condiciones y puntos de extensión
 
-Las seis extensiones se dibujan en las vistas `ENT` y `SAL`, junto a sus casos base.
+Las extensiones se dibujan en las vistas `ENT` y `SAL`, junto a sus casos base.
 Los casos referenciados conservan su identificador y su definición en `CAT` o `ALM`.
 Esta tabla complementa las flechas con la condición, el punto de inserción y el retorno
 que también figuran en las fichas.
 
 | Extensión | Caso base | Punto de extensión y condición | Retorno al caso base |
 | -- | -- | -- | -- |
-| `CU-CAT-02` Crear proveedor | `CU-ENT-02` Crear compra de material | Paso 3, seleccionar proveedor; el actor elige **Nuevo proveedor** (A6). | Proveedor creado seleccionado; continúa la captura del paso 3. |
-| `CU-CAT-02` Crear proveedor | `CU-ENT-08` Crear compra de consumible | Paso 3, seleccionar proveedor; el actor elige **Nuevo proveedor** (A6). | Proveedor creado seleccionado; continúa la captura del paso 3. |
+| `CU-CAT-02` Crear proveedor | `CU-ENT-02` Crear compra de material | Paso 3, buscar proveedor; si no aparece una coincidencia, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar proveedor** (A6). | Proveedor creado y seleccionado; continúa en el paso 3. |
+| `CU-CAT-02` Crear proveedor | `CU-ENT-08` Crear compra de consumible | Paso 3, buscar proveedor; si no aparece una coincidencia, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar proveedor** (A6). | Proveedor creado y seleccionado; continúa en el paso 3. |
 | `CU-ALM-02` Crear material | `CU-ENT-02` Crear compra de material | Paso 3, seleccionar material; el actor elige **Registrar material** (A5). | Material con existencia cero seleccionado; continúa el detalle en el paso 4. |
 | `CU-ALM-18` Crear consumible | `CU-ENT-08` Crear compra de consumible | Paso 3, seleccionar consumible; el actor elige **Registrar consumible** (A5). | Consumible con existencia cero seleccionado; continúa el detalle en el paso 4. |
-| `CU-CAT-06` Crear cliente | `CU-SAL-02` Crear salida de material | Paso 3, seleccionar cliente; el actor elige **Nuevo cliente** (A3). | Cliente creado seleccionado; continúa la captura del paso 3. |
-| `CU-CAT-06` Crear cliente | `CU-SAL-16` Crear salida de consumible | Paso 3, seleccionar cliente; el actor elige **Nuevo cliente** (A3). | Cliente creado seleccionado; continúa la captura del paso 3. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-02` Crear salida de material | Paso 3, buscar cliente; si no aparece en los resultados, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar cliente** (A3). | Cliente creado y seleccionado; continúa en el paso 3. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-03` Editar encabezado de salida de material | Paso 3, buscar cliente; si no aparece en los resultados, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar cliente** (A2). | Cliente creado y seleccionado; continúa en el paso 3. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-09` Crear salida de merma | Paso 3, buscar cliente; si no aparece en los resultados, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar cliente** (A3). | Cliente creado y seleccionado; continúa en el paso 3. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-10` Editar encabezado de salida de merma | Paso 3, buscar cliente; si no aparece en los resultados, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar cliente** (A2). | Cliente creado y seleccionado; continúa en el paso 3. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-16` Crear salida de consumible | Paso 3, buscar cliente; si no aparece en los resultados, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar cliente** (A3). | Cliente creado y seleccionado; continúa en el paso 3. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-17` Editar encabezado de salida de consumible | Paso 3, buscar cliente; si no aparece en los resultados, Personal de almacén o Administrador con permisos de lectura y alta elige **Registrar cliente** (A2). | Cliente creado y seleccionado; continúa en el paso 3. |
 
 Las bases pueden completarse seleccionando recursos existentes; las extensiones no son
 obligatorias y por ello no se representan con `«include»`. Si un alta se cancela o
@@ -734,10 +869,10 @@ describen su realización técnica.
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 
-El actor se asocia con la consulta de cada recurso; desde esa consulta se despliegan
-sus operaciones mediante enlaces sin texto, sin repetir el enlace del actor a cada
-operación. El administrador hereda las asociaciones de Almacén. Cuando una ficha
-define una participación particular, se conserva la asociación directa correspondiente:
+Cada actor se asocia directamente con los objetivos en los que participa; los enlaces
+desde Consulta agrupan casos del mismo recurso y no sustituyen esas asociaciones. El
+administrador hereda las asociaciones de Almacén. Las relaciones particulares conservan
+su actor autorizado explícito:
 
 - Los ajustes de existencia exclusivos del administrador (`CU-ALM-05`, `CU-ALM-12`
   y `CU-ALM-21`) mantienen su enlace para distinguirlos de las operaciones compartidas
@@ -748,12 +883,12 @@ define una participación particular, se conserva la asociación directa corresp
   independientes, asociadas sólo con el administrador y sin enlaces desde las consultas
   de materiales o mermas. Sus reportes (`CU-ALM-08` y `CU-ALM-16`) parten únicamente de
   la consulta de movimientos correspondiente.
-- Las altas de materiales y consumibles (`CU-ALM-02` y `CU-ALM-18`) se enlazan desde
-  su consulta en las vistas de inventario, sin repetir la asociación directa del actor.
-  Su participación desde selectores se muestra en las extensiones de Compras.
+  - Las altas de materiales y consumibles (`CU-ALM-02` y `CU-ALM-18`) se asocian
+    directamente con Personal de almacén en las vistas de inventario. Su participación
+    desde selectores se muestra en las extensiones de Compras.
 - Las altas de proveedores y clientes desde selectores (`CU-CAT-02` y `CU-CAT-06`)
   mantienen la asociación con Personal de almacén, que no participa en la consulta
-  independiente de esos catálogos según las fichas vigentes. Las seis extensiones de
+  independiente de esos catálogos según las fichas vigentes. Las extensiones de
   altas conservan sus asociaciones en Compras y Salidas, donde se inicia ese contexto.
 - Iniciar y cerrar sesión (`CU-AUT-01` y `CU-AUT-02`) conservan sus asociaciones
   independientes porque no parten de una consulta.
@@ -761,7 +896,7 @@ define una participación particular, se conserva la asociación directa corresp
 Los enlaces desde Consulta son una convención
 visual del documento y no una relación UML de inclusión, extensión o generalización.
 Sólo `«include»` y `«extend»` llevan su estereotipo; la generalización se identifica por
-el triángulo hueco, sin etiqueta. Las seis extensiones opcionales se conservan junto
+el triángulo hueco, sin etiqueta. Las extensiones opcionales se conservan junto
 a sus casos base y en la tabla de condiciones y las fichas correspondientes.
 
 Los grupos son ayudas de lectura, no límites del sistema ni permisos. El Administrador

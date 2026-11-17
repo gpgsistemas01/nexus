@@ -7,21 +7,17 @@
 | RC-SEG-003 | Una ruta con cuerpo debe rechazar un tipo de contenido distinto del declarado antes de procesarlo. | Implementado |
 | RC-SEG-004 | Los secretos y URLs con credenciales deben proceder de variables de entorno y no exponerse en logs. | Implementado |
 | RC-DAT-001 | Las migraciones deben poder desplegarse de forma reproducible. | Implementado |
-| RC-DAT-002 | Las pruebas con persistencia real deben usar `DATABASE_TEST_URL` y nunca la base de desarrollo. | Implementado |
-| RC-PRU-001 | Las pruebas unitarias deben cubrir límites, decisiones, errores y efectos negativos del artefacto modificado. | Parcial |
-| RC-PRU-002 | Las integraciones CRUD deben atravesar HTTP y comprobar la persistencia real con Prisma. | Parcial |
-| RC-MAN-001 | Rutas, capas y pruebas deben organizarse por dominio. | Implementado |
-| RC-MAN-002 | Antes de crear un flujo debe evaluarse la reutilización de fábricas CRUD y componentes compartidos. | Implementado |
-| RC-DOC-001 | Los cambios en rutas, imports o Prisma deben dejar actualizados los documentos generados y superar `npm run docs:check`. | Implementado |
 | RC-OBS-001 | Los fallos operacionales deben registrarse mediante logs estructurados. | Implementado |
 | RC-OBS-002 | Los errores y logs expuestos al cliente no deben revelar secretos. | Implementado |
 | RC-DES-001 | Si falta `DIRECT_URL` o falla una migración requerida, el contenedor debe terminar antes de iniciar la aplicación. | Implementado |
 | RC-DES-002 | La aplicación debe usar `DATABASE_URL` y Prisma CLI debe preferir `DIRECT_URL` para migraciones. | Implementado |
-| RC-COM-001 | La aplicación debe instalarse y ejecutarse en Node.js `>=22 <25`. | Implementado |
+| RC-COM-001 | El backend debe instalarse y ejecutarse con una versión Node.js admitida por `engines` de `back/package.json` y las dependencias del lockfile (`^24.14.1` o `^26.12.1`). | Implementado |
 | RC-COM-002 | La API debe intercambiar JSON salvo rutas declaradas para archivos o texto plano. | Implementado |
+| RC-OPS-001 | El proceso debe responder `200` con `{ "status": "ok" }` en `/health/live` aunque PostgreSQL no esté disponible, para distinguir vida del proceso de disponibilidad de dependencias. | Implementado |
+| RC-OPS-002 | `/health/ready` debe responder `200` con `{ "status": "ready" }` sólo cuando el proceso acepte tráfico y PostgreSQL responda; durante el arranque, cierre o fallo de base debe responder `503` con `{ "status": "unavailable" }` sin divulgar detalles internos. | Implementado |
 | RC-USA-001 | Una tabla en pantalla angosta debe conservar accesibles las acciones y datos prioritarios. | Implementado |
 | RC-USA-002 | La interfaz debe presentar los errores de validación sin perder el contexto del formulario. | Implementado |
-| RC-REN-001 | Los listados cuyo flujo contempla paginación y filtros deben aplicarlos al obtener los datos; las consultas todavía no cubiertas conservan el estado Parcial. | Parcial |
+| RC-REN-001 | Los listados cuyo contrato ofrece filtros y paginación deben aplicarlos en la consulta de servidor y devolver sólo la página solicitada, junto con el total cuando el contrato lo incluye. | Parcial |
 | RC-REN-002 | Los tiempos máximos de respuesta requieren línea base, umbral y aprobación del responsable del producto. | Propuesto |
 | RC-REN-003 | Los límites de concurrencia y volumen requieren línea base, umbral y aprobación del responsable del producto. | Propuesto |
 | RC-DIS-001 | El objetivo de disponibilidad requiere infraestructura, medida y aprobación explícitas. | Propuesto |
@@ -30,6 +26,10 @@
 No se inventan umbrales de rendimiento o disponibilidad: deben acordarse con quien
 opera Nexus y convertirse en una prueba o monitor reproducible antes de cambiar
 su estado.
+
+`RC-OPS-001` y `RC-OPS-002` se comprueban en `tests/unit/runtime/healthTest.js`;
+la implementación propietaria está en `src/routes/system/healthRoute.js` y
+`src/services/healthService.js`.
 
 ### Alcance y comprobación de calidad
 
@@ -47,14 +47,8 @@ Su evidencia se consulta en el [plan de pruebas](../../../testing/test-plan.md),
 - `RC-REN-002`, `RC-REN-003`, `RC-DIS-001` y `RC-DIS-002` son necesidades propuestas,
   no objetivos cuantitativos aprobados. Antes de verificar cumplimiento se deben acordar
   medida, carga o escenario, umbral, infraestructura, responsable y método de evaluación.
-- `RC-PRU-001`, `RC-PRU-002` y `RC-REN-001` permanecen parciales. Un resultado positivo
-  de la suite disponible no demuestra cobertura completa de esas obligaciones.
-
-### Restricción de construcción con identificador histórico
-
-`RN-006` se conserva por trazabilidad, pero su obligación es de construcción, no una
-regla del negocio ni una acción del actor. Se revisa junto con `RC-MAN-002`.
-
-| ID | Restricción verificable | Estado | Evidencia principal |
-| --- | --- | --- | --- |
-| RN-006 | Un catálogo debe reutilizar el ciclo listar-crear-actualizar y sus componentes existentes cuando no cambien sus reglas, permisos ni persistencia. | Implementado | fábricas CRUD y servicios de catálogo compartidos |
+`RC-REN-001` permanece parcial mientras haya consultas que no apliquen el contrato de
+paginación del lado servidor. Las prácticas de pruebas y organización del código se
+definen en sus [documentos propietarios](../../../testing/test-plan.md) y en los
+[estándares de código](../../../architecture/coding-standards/index.md), no como
+requisitos de producto.

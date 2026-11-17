@@ -42,6 +42,38 @@ callback. Un fallo dentro del callback revierte sus escrituras, incluido el
 contador del folio; una operación posterior al commit tiene otra frontera.
 Los detalles se explican en [contexto transaccional](../design-and-construction-patterns/09-context-transactional-and-consistency-atomic.md).
 
+## Consultas e índices
+
+Los índices de fecha de compras y salidas se declaran con `@@index` en Prisma y
+se aplican mediante una migración SQL incremental. El tipo y la fecha forman el
+prefijo de compras y salidas de materiales/consumibles; `id` añade el desempate del
+orden por fecha. En merma se conserva el índice existente de fecha sola, porque
+el reemplazo por fecha/id no demostró una ventaja suficiente en las mediciones.
+La consulta mantiene rangos sobre la columna original, sin convertirla a texto ni
+envolverla en funciones de fecha que impidan aprovechar ese prefijo.
+
+`findPage` reutiliza un único conteo cuando el filtro de filas es igual al alcance
+total, comparando valores y fechas; filtros distintos conservan conteos distintos.
+Las exportaciones siguen omitiendo los conteos. Las estrategias de carga de
+relaciones y los índices se evalúan con SQL y planes reales conforme a la
+[guía de rendimiento](../../../../testing/backend-performance.md), sin cambiar
+el contrato de respuesta ni trasladar permisos fuera del servidor.
+
+El nombre de material utiliza un índice GIN de trigramas para las búsquedas
+parciales de Materiales y Consumibles. `ops: raw("gin_trgm_ops")` declara la clase
+de operadores en el esquema y la migración SQL mantiene `pg_trgm`. No se cambia
+la comparación `contains`, la identidad única ni el cliente compartido. Las
+decisiones sobre diagnóstico, caché y carga de relaciones están en la misma guía
+de rendimiento; añadir una extensión de cliente no optimiza por sí solo el SQL.
+
+La selección retira índices simples de proveedor y tipo cuando otro índice
+conserva su prefijo y los planes comprobados mantienen el acceso. Los recibos de
+importación e histórico conservan la PK y el único por usuario/operación, junto con
+el índice de vencimiento de importaciones; no mantienen un índice de orden
+usuario/fecha sin consulta que lo aproveche. La tabla de decisiones y sus límites
+se mantiene en la guía de rendimiento. Las retiradas se aplican con una migración
+incremental, conservando los índices de integridad y el historial anterior.
+
 ## Comandos habituales
 
 Desde `back/`, use Node.js 24 y `npm ci` para instalar las versiones del lockfile.

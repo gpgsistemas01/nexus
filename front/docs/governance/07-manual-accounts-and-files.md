@@ -252,8 +252,8 @@ las capturas del mismo modo y no ejecuta Playwright.
 | `docs/user-manual/accounts/<cuenta>/sources/*.md` | Capítulos filtrados y glosario. Corregir sus originales en `docs/user-manual`; se regeneran. |
 | `docs/user-manual/accounts/<cuenta>/images/*.png` | Capturas propias; en `dev`, muestran los datos visibles para esa cuenta. |
 | `docs/user-manual/accounts/<cuenta>/manifest.json` | Estado `pending`/`ready`, permisos, fuentes y huellas de vigencia y reanudación. No editar a mano; no contiene contraseñas. |
-| `build/docs/docx/manuales-vue/<cuenta>/manual-<cuenta>.docx` | Word, después de completar las capturas requeridas. |
-| `build/docs/pdf/manuales-vue/<cuenta>/manual-<cuenta>.pdf` | PDF, si se solicitó y terminó la conversión. |
+| `build/docs/docx/manuales-vue/<cuenta>/<modulo>.docx` | Word, después de completar las capturas requeridas. |
+| `build/docs/pdf/manuales-vue/<cuenta>/<modulo>.pdf` | PDF, si se solicitó y terminó la conversión. |
 | `build/test-results/manual-profiles.xml` | Reporte del recorrido para diagnosticar fallos; no es el manual. |
 
 `<cuenta>` es el `id` del JSON, por ejemplo `cuenta-01`. Cada usuario conserva sus
@@ -345,3 +345,17 @@ describen los controles de sesión y escrituras.
 | `expectedAccess` en el JSON | Comprueba opcionalmente un rol y área. La plantilla puede incluirlo; se puede omitir. No asigna permisos. |
 | Variables del proceso/CI | Sustituyen las credenciales locales y tienen prioridad sobre `.env.manual.local`. |
 | `--accounts`, `--env-file` | Seleccionan otros archivos de cuentas y credenciales. |
+
+
+## Archivos separados por módulo
+
+La carpeta de cada cuenta contiene `inicio` y un archivo por módulo autorizado.
+Por ejemplo, Almacén se entrega como `almacen-materiales.pdf`,
+`almacen-consumibles.pdf` y `almacen-mermas.pdf`, cada uno con su glosario.
+Los resultados están en `build/docs/{docx,pdf}/manuales-vue/<cuenta>/`.
+
+Primero prepare la edición con `docs:screenshots`; después ejecute `docs:manuals`.
+Una edición anterior a la separación por módulo requiere volver a preparar las
+fuentes; la exportación no abre el navegador ni genera capturas faltantes.
+La [guía de mantenimiento](05-user-manual.md#archivos-separados-por-módulo)
+describe la composición y los archivos de trabajo.

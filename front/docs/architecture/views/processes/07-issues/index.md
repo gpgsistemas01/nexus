@@ -1,5 +1,9 @@
 # Salidas, surtido y devolución
 
+Los diagramas de casos de uso muestran acceso por actor: las áreas operativas consultan,
+registran y editan sus solicitudes; Almacén y Sistemas también surten, devuelven y generan
+reportes. Las áreas operativas no crean clientes ni proveedores desde estos selectores.
+
 ## Recorrido de lectura
 
 - [Salida: apertura, modos y escritura](01-issue-open-save.md): `DIA-VUE-SEQ-015/027`.

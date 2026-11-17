@@ -80,6 +80,21 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     expect(query.get('page')).toBe('1');
     expect(query.has('search')).toBe(false);
   });
+  it.each([undefined, -1, 1.5, '1'])(
+    'rechaza un total de registros inválido: %s',
+    async (total) => {
+      apiClient.http.defaults.adapter = mockHttpAdapter(() => ({
+        data: { preview: { ...historicalPreview(), total } },
+      }));
+      await expect(
+        historicalDeliveryService.preview(
+          'materials',
+          { cutoffDate: historicalPreview().cutoffDate, page: 1 },
+          new AbortController().signal,
+        ),
+      ).rejects.toThrow('incompleta');
+    },
+  );
   it('carga automáticamente las salidas usando la hora actual como corte', async () => {
     const mounted = await mount();
     const [resource, query] = mounted.preview.mock.calls[0]!;
@@ -109,6 +124,30 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     expect(mounted.value.recoveryRequired.value).toBe(true);
     await mounted.value.recover();
     expect(send.mock.calls[1]![1]).toEqual(original);
+    expect(mounted.value.receipt.value).toEqual(historicalReceipt());
+    expect(mounted.value.recoveryRequired.value).toBe(false);
+    expect(localStorage.length).toBe(0);
+    mounted.wrapper.unmount();
+  });
+  it('un recibo inválido usa ApiError local y conserva la captura para recuperar la confirmación', async () => {
+    const transport = vi
+      .fn<(config: InternalAxiosRequestConfig) => { data: Record<string, unknown> }>()
+      .mockReturnValue({ data: {} });
+    apiClient.http.defaults.adapter = mockHttpAdapter(transport);
+    const mounted = await mount();
+    await mounted.value.selectAll();
+    mounted.value.values.reason = 'Entrega física comprobada';
+    mounted.value.values.declaredDelivered = true;
+    await mounted.value.confirm();
+    expect(mounted.value.error.value).toContain('incompleta');
+    expect(mounted.value.recoveryRequired.value).toBe(true);
+    const original = pendingHistoricalDelivery(ids.user, 'materials').read();
+    expect(original).not.toBeNull();
+    transport.mockReturnValue({
+      data: { code: 'HISTORICAL_DELIVERY_COMPLETED', receipt: historicalReceipt() },
+    });
+    await mounted.value.recover();
+    expect(JSON.parse(transport.mock.calls[1]![0].data as string)).toEqual(original);
     expect(mounted.value.receipt.value).toEqual(historicalReceipt());
     expect(mounted.value.recoveryRequired.value).toBe(false);
     expect(localStorage.length).toBe(0);

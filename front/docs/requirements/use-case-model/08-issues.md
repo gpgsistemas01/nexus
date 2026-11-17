@@ -6,9 +6,17 @@ La [jerarquía común de actores](01-access.md#autenticación) conserva la parti
 
 Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-contextual-creation.md).
 
+Las asociaciones representan participación autorizada: las áreas operativas consultan,
+registran y editan sus solicitudes; Personal de almacén también surte, devuelve y genera
+reportes. El Administrador del sistema hereda las funciones de almacén. Una consulta no
+concede por sí misma acceso a las demás operaciones.
+El alta contextual de cliente se modela aparte: sólo aparece para actores con permisos
+de lectura y alta de Directorio, cuando escriben en el selector un nombre sin coincidencia.
+La extensión no concede esos permisos a las áreas operativas.
+
 ## Salidas de materiales
 
-**Identificador:** `DIA-VUE-CU-020`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
+**Identificador:** `DIA-VUE-CU-020`. **Pregunta:** ¿Qué actor puede realizar cada objetivo?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -20,6 +28,8 @@ usecase-beta
 direction LR
     actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
 
     systemBoundary issuePackage1["Nexus · Salidas de materiales"]
         ucMaterialIssueQuery("CU-SAL-01 Consultar")
@@ -31,20 +41,22 @@ direction LR
         ucMaterialIssueReport("CU-SAL-07 Generar reporte")
     end
 
-    warehouse -- ucMaterialIssueQuery
     operational -- ucMaterialIssueQuery
-
-    ucMaterialIssueQuery -- ucMaterialIssueCreate
-    ucMaterialIssueQuery -- ucMaterialIssueHeader
-    ucMaterialIssueQuery -- ucMaterialIssueDetails
-    ucMaterialIssueQuery -- ucMaterialSupply
-    ucMaterialIssueQuery -- ucMaterialReturn
-    ucMaterialIssueQuery -- ucMaterialIssueReport
+    operational -- ucMaterialIssueCreate
+    operational -- ucMaterialIssueHeader
+    operational -- ucMaterialIssueDetails
+    warehouse -- ucMaterialIssueQuery
+    warehouse -- ucMaterialIssueCreate
+    warehouse -- ucMaterialIssueHeader
+    warehouse -- ucMaterialIssueDetails
+    warehouse -- ucMaterialSupply
+    warehouse -- ucMaterialReturn
+    warehouse -- ucMaterialIssueReport
 ```
 
 ## Salidas de mermas
 
-**Identificador:** `DIA-VUE-CU-021`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
+**Identificador:** `DIA-VUE-CU-021`. **Pregunta:** ¿Qué actor puede realizar cada objetivo?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -54,6 +66,8 @@ usecase-beta
 direction LR
     actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
 
     systemBoundary issuePackage2["Nexus · Salidas de mermas"]
         ucWasteIssueQuery("CU-SAL-08 Consultar")
@@ -65,20 +79,22 @@ direction LR
         ucWasteIssueReport("CU-SAL-14 Generar reporte")
     end
 
-    warehouse -- ucWasteIssueQuery
     operational -- ucWasteIssueQuery
-
-    ucWasteIssueQuery -- ucWasteIssueCreate
-    ucWasteIssueQuery -- ucWasteIssueHeader
-    ucWasteIssueQuery -- ucWasteIssueDetails
-    ucWasteIssueQuery -- ucWasteSupply
-    ucWasteIssueQuery -- ucWasteReturn
-    ucWasteIssueQuery -- ucWasteIssueReport
+    operational -- ucWasteIssueCreate
+    operational -- ucWasteIssueHeader
+    operational -- ucWasteIssueDetails
+    warehouse -- ucWasteIssueQuery
+    warehouse -- ucWasteIssueCreate
+    warehouse -- ucWasteIssueHeader
+    warehouse -- ucWasteIssueDetails
+    warehouse -- ucWasteSupply
+    warehouse -- ucWasteReturn
+    warehouse -- ucWasteIssueReport
 ```
 
 ## Salidas de consumibles
 
-**Identificador:** `DIA-VUE-CU-022`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
+**Identificador:** `DIA-VUE-CU-022`. **Pregunta:** ¿Qué actor puede realizar cada objetivo?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -88,6 +104,8 @@ usecase-beta
 direction LR
     actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
 
     systemBoundary issuePackage3["Nexus · Salidas de consumibles"]
         ucConsumableIssueQuery("CU-SAL-15 Consultar")
@@ -99,13 +117,15 @@ direction LR
         ucConsumableIssueReport("CU-SAL-21 Generar reporte")
     end
 
-    warehouse -- ucConsumableIssueQuery
     operational -- ucConsumableIssueQuery
-
-    ucConsumableIssueQuery -- ucConsumableIssueCreate
-    ucConsumableIssueQuery -- ucConsumableIssueHeader
-    ucConsumableIssueQuery -- ucConsumableIssueDetails
-    ucConsumableIssueQuery -- ucConsumableSupply
-    ucConsumableIssueQuery -- ucConsumableReturn
-    ucConsumableIssueQuery -- ucConsumableIssueReport
+    operational -- ucConsumableIssueCreate
+    operational -- ucConsumableIssueHeader
+    operational -- ucConsumableIssueDetails
+    warehouse -- ucConsumableIssueQuery
+    warehouse -- ucConsumableIssueCreate
+    warehouse -- ucConsumableIssueHeader
+    warehouse -- ucConsumableIssueDetails
+    warehouse -- ucConsumableSupply
+    warehouse -- ucConsumableReturn
+    warehouse -- ucConsumableIssueReport
 ```

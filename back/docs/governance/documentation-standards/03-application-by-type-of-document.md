@@ -4,56 +4,20 @@
 | --- | --- | --- |
 | [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) | Mantener requisitos identificables, necesarios, verificables, trazables y separados de su evidencia de implementación. | Aplica a necesidades, interesados y límites de `vision-scope-and-requirements/`, a `requirements-specification/`, `use-cases/` y las vistas normativas de `domain-and-use-cases/`. Es la guía principal, no una declaración de conformidad. |
 | [IEEE 1016-2009](https://standards.ieee.org/ieee/1016/4502/) | Estructurar una descripción de diseño mediante interesados, preocupaciones, puntos de vista, vistas, elementos de diseño, relaciones y justificación. | Referencia histórica en estado Inactive-Reserved según IEEE, complementaria a 42010. Se aplica selectivamente a las referencias separadas de backend y frontend; no prescribe JSDoc, nombres de funciones, bloques de código ni una plantilla por endpoint. |
-| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Explicar interesados, preocupaciones, puntos de vista, vistas y decisiones arquitectónicas cuando esa información sea útil. | Aplica de forma ligera a `architecture/views/index.md`; no exige reemplazar Mermaid ni adoptar una herramienta nueva. |
+| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Estructurar la descripción arquitectónica y relacionar preocupaciones con puntos de vista, vistas, modelos y decisiones. | Aplica selectivamente a los índices y modelos de `architecture/`. El sistema, las vistas y su notación están descritos; falta una matriz central de interesados y preocupaciones. No se declara conformidad. |
 | [ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) | Usar un vocabulario consistente para características de calidad y convertir sólo objetivos acordados en requisitos medibles. | Sirve para revisar la sección de calidad; no autoriza inventar umbrales de rendimiento, disponibilidad o seguridad. |
 | [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html) | Orientar el contenido y ciclo de vida de los elementos de información sin imponer un formato único. | Se usa para revisar propósito, contenido, referencias y mantenimiento de visión y alcance y de los paquetes documentales, sin afirmar conformidad completa. |
 | [ISO/IEC/IEEE 29119-3:2021](https://www.iso.org/standard/79429.html) y [29119-4:2021](https://www.iso.org/standard/79430.html) | Separar diseño, especificación del caso y resultado real; elegir técnicas según condiciones y riesgos. | El [plan de pruebas](../../testing/test-plan.md) adapta formatos `DP-*`, `CP-*` y `EP-*` de forma selectiva. No se atribuyen tablas literales a ISO ni se declara conformidad; los resultados permanecen en CI o en la revisión del cambio. |
 | OpenAPI 3.1 | Versionar el contrato HTTP de rutas, parámetros, cuerpos, respuestas, errores y autenticación. | Es una especificación técnica complementaria, no una norma ISO ni un sustituto de requisitos o arquitectura. Su mantenimiento se describe en la [guía API](../../architecture/openapi/02-maintenance.md). |
 
-### Decisión para documentación técnica y rutas API
+### API HTTP
 
-No existe una única norma ISO que defina cómo comentar cada función JavaScript o cómo
-documentar una ruta Express. Para Nexus se combinan referencias según la pregunta:
+No se adopta una norma ISO para describir esta API REST. [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.html)
+define el contrato procesable y [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)
+define la semántica HTTP. El proyecto ISO/IEC DIS 19518 para modelar APIs y servicios
+sigue en desarrollo y no se usa como requisito del repositorio.
 
-- **IEEE 1016-2009**, como referencia histórica, orienta la descripción del diseño implementado: elementos,
-  responsabilidades, relaciones, interfaces y decisiones. Justifica organizar la
-  referencia técnica por vistas y mantener trazabilidad hacia el código.
-- **ISO/IEC/IEEE 42010:2022** se usa en el nivel arquitectónico para separar interesados,
-  preocupaciones, puntos de vista y vistas. No baja por sí sola al contrato de cada
-  función.
-- **ISO/IEC/IEEE 15289:2019** ayuda a gobernar los artefactos del ciclo de vida, su
-  propósito, contenido, mantenimiento y relación, pero no aporta una sintaxis de API.
-- **OpenAPI 3.1**, aunque no es ISO, es la especificación adecuada para describir de
-  manera procesable métodos HTTP, parámetros, cuerpos, respuestas, errores y seguridad.
-
-Por tanto, las tablas de símbolos, firmas y bloques de código de las referencias de
-[backend](../../architecture/views/development/backend-technical-documentation/index.md) y
-[interfaz Vue](../../../../front/docs/architecture/views/development/code-structure.md) son una convención local
-alineada selectivamente con 1016. Las fichas actuales del
-[contrato API](../../architecture/openapi/api-contract.md) se complementan con la
-[especificación OpenAPI 3.1](../../architecture/openapi/openapi.json). No se atribuye a ninguna ISO
-una plantilla que la norma no proporciona.
-
-### Entregables recomendados para Nexus
-
-La aplicación conjunta de estas referencias no obliga a elegir entre SRS y arquitectura:
-ambas responden preguntas distintas y deben conservarse como entregas coordinadas.
-
-| Entrega | Contenido recomendado | Relación con casos de uso |
-| --- | --- | --- |
-| Visión y alcance | Necesidad, interesados, contexto de negocio, objetivos y límites del producto. | Resume capacidades; no contiene el flujo detallado. |
-| SRS | Requisitos funcionales y de calidad, reglas, condiciones, resultados, atributos, estado y trazabilidad. | Es propietaria de actores, precondiciones, flujo principal, alternativas, excepciones y postcondiciones de cada `CU-*`. |
-| Descripción de arquitectura | Interesados y preocupaciones arquitectónicas, puntos de vista, vistas, correspondencias, decisiones y justificación; se complementa con elementos, interfaces y relaciones de diseño. | Usa los `CU-*` como escenarios o entradas para seleccionar y validar vistas; documenta su realización sin copiar la ficha. |
-
-ISO/IEC/IEEE 15289 permite gobernar estos contenidos como elementos de información; no
-se interpreta aquí que cada concepto deba convertirse en un archivo físico independiente.
-Por ello Nexus mantiene fuentes Markdown modulares y produce paquetes exportables. ISO no
-obliga a utilizar Mermaid, UML, C4, 4+1, arc42 ni una herramienta concreta: son elecciones
-locales para representar las vistas y sólo se atribuyen a la norma los conceptos que ésta
-orienta.
-
-ISO 9001 o ISO/IEC 27001 sólo deben introducirse como requisitos documentales si la
-organización adopta formalmente un sistema de gestión de calidad o de seguridad de la
-información. No son necesarias únicamente porque Nexus sea una aplicación de software.
-La obligación contractual, regulatoria o de auditoría siempre prevalece sobre este
-criterio y debe registrarse explícitamente.
+Las referencias de [backend](../../architecture/views/development/backend-technical-documentation/index.md)
+y [Vue](../../../../front/docs/architecture/views/development/code-structure.md) describen
+la implementación; el [contrato OpenAPI](../../architecture/openapi/openapi.json) describe
+la interfaz HTTP. Los requisitos conservan el comportamiento que esa interfaz debe cumplir.
