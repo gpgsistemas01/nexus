@@ -8,7 +8,7 @@
 | RF-IMP-002 | Confirmar todas las filas de una operación o ninguna: revalidar versiones, identidad y duplicados, persistir cambios, stock, conversiones, movimientos, folios y recibo en una transacción según la operación elegida. Editar conserva stock; Ajustar usa Stock contado final, con motivo/observaciones. Cero válido; vacío rechazado. Un destino por fila, sin cambios se omiten. Repetir clave devuelve el recibo. | Implementado |
 | RF-IMP-003 | Permitir acceso sólo al creador autorizado. Descartar archivo tras analizarlo, vencer el borrador en 24 h y conservar el recibo confirmado. El navegador sólo guarda la referencia de confirmación. | Implementado |
 
-El [flujo Vue](../../../development/05-inventory-excel-import.md) concreta la
+El [guía de importación](../../../user-manual/03-materials.md#importar-materiales-o-consumibles-desde-excel) concreta la
 captura; el servidor verifica las reglas y ejecuta la transacción.
 
 Las recepciones y salidas de artículos se operan en contextos separados de materiales

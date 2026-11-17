@@ -24,7 +24,7 @@ a la [vista física](../../physical/index.md).
 de inventario. El payload y la vista previa son temporales; el resultado confirmado
 permanece para recuperar reintentos. Su FK al actor admite `SET NULL` al retirar la
 cuenta. La unicidad de actor/clave impide reutilizar una confirmación en otro lote.
-El [flujo de importación](../../development/inventory-excel-import.md) define
+El [Contrato HTTP](../../../openapi/index.md) define
 permisos, transacción y limpieza.
 
 Las líneas unen tablas, no filas individuales de atributos. Su etiqueta identifica

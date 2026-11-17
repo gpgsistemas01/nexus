@@ -24,12 +24,11 @@ Un criterio tiene condición y resultado observable: «con saldo leído 2, captu
 devolución 3 muestra error y no envía la solicitud». Esa prueba del formulario no
 demuestra por sí sola el saldo persistido.
 
-## Decisiones individuales y cambios compartidos
+## Contenido vigente
 
-Cada desarrollador elige nombres locales, descomposición y algoritmo dentro del
-contrato y el estándar. Explica elecciones que introducen dependencias o costos
-relevantes. Una excepción local registra necesidad y alcance.
+Describir la implementación actual. Presentar comandos con directorio y resultado
+en Desarrollo; los pasos de usuario, en el manual. Enlazar esas fuentes sin copiar
+sus instrucciones. El historial de revisiones permanece en Git.
 
-Cambiar una regla compartida exige revisar consumidores y pruebas, actualizar
-código, configuración y documentación, y someter el resultado a revisión. Las
-fuentes de cada regla están en el [mapa de estándares](09-standards-and-ownership.md).
+Cada sección explica su alcance, condiciones y resultado sin exigir la lectura
+de otras secciones. Los enlaces aportan detalle complementario y trazabilidad.

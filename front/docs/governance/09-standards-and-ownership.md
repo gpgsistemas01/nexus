@@ -15,9 +15,9 @@
 | Referencias ISO/IEEE y Vue | [Aplicabilidad](03-standard-applicability.md) | Referencias seleccionadas y adaptación al proyecto, sin declaración de conformidad integral. |
 
 La [clasificación de enunciados](04-conventions-and-criteria.md) distingue una regla,
-una recomendación, una decisión y un resultado. El
-[procedimiento de revisión](../development/04-change-review.md) relaciona los controles
-que corresponden a cada cambio.
+una recomendación, una decisión y un resultado. La
+[guía de comandos](../development/00-commands.md#comprobar-y-compilar-vue) indica cómo ejecutar
+las comprobaciones.
 
 ## Mantener una sola definición
 

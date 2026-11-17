@@ -9,4 +9,10 @@
 
 Los IDs de requisitos y capturas permiten mantenimiento y trazabilidad. Los manuales exportados conservan sus anclas internas, pero muestran títulos y pies de figura comprensibles, sin códigos `CU-*` o `CAP-*` como instrucciones para el usuario. Los comandos de generación permanecen en gobernanza.
 
-Antes de aceptar un texto, comprobar que una persona de su audiencia puede explicar su propósito, localizar la tarea y reconocer el resultado esperado. No basta corregir ortografía: una frase puede ser gramatical y atribuir un acceso, una aprobación o una capacidad que no existe.
+Documentar el funcionamiento vigente. Para ejecutar una tarea, indicar comando,
+directorio y resultado; enlazar la guía existente en lugar de repetirla. Los pasos
+operativos pertenecen al manual y los comandos de desarrollo a Desarrollo.
+El historial de revisiones y las explicaciones del chat se consultan en Git.
+
+Cada sección explica su alcance, condiciones y resultado sin exigir la lectura
+de otras secciones. Los enlaces aportan detalle complementario y trazabilidad.

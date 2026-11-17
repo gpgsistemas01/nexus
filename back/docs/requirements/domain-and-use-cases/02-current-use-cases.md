@@ -638,12 +638,18 @@ direction LR
 
 Los tres contextos conservan casos propios. Consumibles utiliza `CU-SAL-15` a
 `CU-SAL-21`, con las mismas transiciones de estado y existencias separadas.
-En cada figura, Usuario de área operativa participa en consulta, creación y edición
-de sus solicitudes; Personal de almacén participa también en esas operaciones y en
-surtimiento, devolución y reportes. El Administrador hereda las asociaciones de
+En cada figura, las áreas operativas y Almacén se asocian con Consulta; desde ella
+se relacionan Crear, Editar encabezado y Editar detalles. Surtir, Devolver y Generar
+reporte conservan la asociación específica con Almacén. El Administrador hereda las asociaciones de
 Almacén. La creación contextual del cliente corresponde al actor con permisos de
 consulta y alta de Directorio; la solicitud operativa por sí sola no concede esos
-permisos.
+permisos. Crear cliente extiende opcionalmente Crear salida o Editar encabezado:
+en la selección de Cliente del paso 3, un nombre sin coincidencia y permisos de
+lectura/alta habilitan **Registrar cliente**. El alta devuelve el cliente activo y
+retoma la captura; cancelar conserva la selección anterior. No se guarda la salida.
+No corresponde `«include»`: una salida puede completarse con un cliente existente.
+Surtir y Devolver son objetivos independientes, condicionados por el estado de la
+salida y el permiso del actor; no se ejecutan obligatoriamente al consultar o crear.
 
 #### Salidas de materiales
 
@@ -673,24 +679,16 @@ direction LR
     clientExtension ..>:extend ucMaterialIssueCreate
 
     warehouse -- ucMaterialIssueQuery
-    warehouse -- ucMaterialIssueCreate
-    warehouse -- ucMaterialIssueHeader
-    warehouse -- ucMaterialIssueDetails
     warehouse -- ucMaterialSupply
     warehouse -- ucMaterialReturn
     warehouse -- ucMaterialIssueReport
     warehouse -- clientExtension
     operational -- ucMaterialIssueQuery
-    operational -- ucMaterialIssueCreate
-    operational -- ucMaterialIssueHeader
-    operational -- ucMaterialIssueDetails
 
     ucMaterialIssueQuery -- ucMaterialIssueCreate
     ucMaterialIssueQuery -- ucMaterialIssueHeader
     ucMaterialIssueQuery -- ucMaterialIssueDetails
-    ucMaterialIssueQuery -- ucMaterialSupply
-    ucMaterialIssueQuery -- ucMaterialReturn
-    ucMaterialIssueQuery -- ucMaterialIssueReport
+    clientExtension ..>:extend ucMaterialIssueHeader
 ```
 
 #### Salidas de mermas
@@ -715,26 +713,21 @@ direction LR
         ucWasteSupply("CU-SAL-12 Surtir merma")
         ucWasteReturn("CU-SAL-13 Devolver merma surtida")
         ucWasteIssueReport("CU-SAL-14 Generar reporte de salidas de merma")
+        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     warehouse -- ucWasteIssueQuery
-    warehouse -- ucWasteIssueCreate
-    warehouse -- ucWasteIssueHeader
-    warehouse -- ucWasteIssueDetails
     warehouse -- ucWasteSupply
     warehouse -- ucWasteReturn
     warehouse -- ucWasteIssueReport
     operational -- ucWasteIssueQuery
-    operational -- ucWasteIssueCreate
-    operational -- ucWasteIssueHeader
-    operational -- ucWasteIssueDetails
 
     ucWasteIssueQuery -- ucWasteIssueCreate
     ucWasteIssueQuery -- ucWasteIssueHeader
     ucWasteIssueQuery -- ucWasteIssueDetails
-    ucWasteIssueQuery -- ucWasteSupply
-    ucWasteIssueQuery -- ucWasteReturn
-    ucWasteIssueQuery -- ucWasteIssueReport
+    warehouse -- clientExtension
+    clientExtension ..>:extend ucWasteIssueCreate
+    clientExtension ..>:extend ucWasteIssueHeader
 ```
 
 
@@ -766,24 +759,16 @@ direction LR
     clientExtension ..>:extend ucConsumableIssueCreate
 
     warehouse -- ucConsumableIssueQuery
-    warehouse -- ucConsumableIssueCreate
-    warehouse -- ucConsumableIssueHeader
-    warehouse -- ucConsumableIssueDetails
     warehouse -- ucConsumableSupply
     warehouse -- ucConsumableReturn
     warehouse -- ucConsumableIssueReport
     warehouse -- clientExtension
     operational -- ucConsumableIssueQuery
-    operational -- ucConsumableIssueCreate
-    operational -- ucConsumableIssueHeader
-    operational -- ucConsumableIssueDetails
 
     ucConsumableIssueQuery -- ucConsumableIssueCreate
     ucConsumableIssueQuery -- ucConsumableIssueHeader
     ucConsumableIssueQuery -- ucConsumableIssueDetails
-    ucConsumableIssueQuery -- ucConsumableSupply
-    ucConsumableIssueQuery -- ucConsumableReturn
-    ucConsumableIssueQuery -- ucConsumableIssueReport
+    clientExtension ..>:extend ucConsumableIssueHeader
 ```
 
 ### Condiciones y puntos de extensión

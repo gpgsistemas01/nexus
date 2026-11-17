@@ -125,4 +125,4 @@ estado visual del selector.
 | Validación visible, foco y mensajes | [Estándar de interfaz](../interface-standards.md#formularios). |
 | Captura, cierre, conflicto y respuesta tardía | [Ciclo de vida compartido](../views/logical/states/04-state-ownership-and-save.md) y [estados de documentos](../views/logical/states/index.md). |
 | Orden de llamadas y recuperación | [Secuencias de procesos](../views/processes/index.md). |
-| Preparación y evidencia de un cambio | [Revisión de cambios](../../development/04-change-review.md). |
+| Preparación y evidencia de un cambio | [guía de comandos](../../development/00-commands.md#comprobar-y-compilar-vue). |

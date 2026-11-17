@@ -4,16 +4,6 @@ La [guía de inicio](01-getting-started.md) prepara el entorno. La consulta de
 [Comandos para desarrollo](00-commands.md) reúne los scripts de Vue, API, pruebas,
 capturas y publicación. Esta página explica las herramientas.
 
-## Comandos del frontend
-
-Consulta [comprobación y compilación](00-commands.md#comprobar-y-compilar-vue).
-La guía central indica el directorio de ejecución y el resultado de cada script.
-
-La [ejecución de pruebas](../testing/06-test-files-and-credentials.md) contiene la
-instalación de Chromium, los comandos de navegador y la preparación de sistema.
-La [publicación documental](../governance/02-generation-and-publication.md)
-conserva los comandos `docs:*` y sus resultados.
-
 ## Configuración y compatibilidad
 
 | Fuente | Configura |
@@ -41,26 +31,3 @@ de compilar. Los imports TypeScript usan `.js` y los componentes, `.vue`.
 
 `npm run format` aplica el formato versionado. Puedes activar Prettier y «Format
 on Save» en el editor; los comandos y CI también comprueban el resultado.
-
-## Interfaz y formularios
-
-Vuetify proporciona controles y VeeValidate conserva la captura y sus errores:
-
-| Ámbito | Vuetify | VeeValidate: composables de captura |
-| --- | --- | --- |
-| Login | `LoginPage`, `LoginForm`. | `useLoginForm`. |
-| Almacén | `InventoryPage` y componentes de inventario. | `useInventoryEditor`. |
-| Catálogos | `CatalogPage` y formularios de catálogo. | `useCatalogEditor`. |
-| Identidad | `IdentityPage`, `PersonForm`, `UserForm`. | `usePersonEditor`, `useUserEditor`. |
-| Directorio | `DirectoryPage`, `DirectoryForm`. | `useDirectoryEditor`. |
-| Compras | Páginas, editor, detalles y corrección. | `usePurchaseEditor`, `usePurchaseLineEntry`, `usePurchaseCorrection`. |
-| Salidas | Páginas, editor, detalles, surtido y devolución. | `useIssueEditor`, `useIssueLineEntry`, `useIssueReturn`. |
-
-
-Los filtros tienen su propio estado; usar Vuetify no exige que cada control use
-VeeValidate. Axios realiza el transporte mediante `apiClient` y SweetAlert2 muestra
-los avisos mediante `feedback`.
-
-La [composición visual](../architecture/views/logical/components/08-shared-ui.md)
-localiza controles y estilos; los [contratos](../architecture/contracts/index.md)
-definen datos, eventos y respuestas.

@@ -1,8 +1,7 @@
 # Reglas HTTP complementarias
 
 [OpenAPI](openapi.json) es la fuente de rutas, campos, formatos y respuestas. Esta
-guía sólo resume comportamientos que dependen del estado o no caben en el esquema;
-las reglas de negocio están en [requisitos](../../requirements/index.md).
+guía resume los comportamientos HTTP que dependen del estado de la solicitud.
 
 ## Sesión
 

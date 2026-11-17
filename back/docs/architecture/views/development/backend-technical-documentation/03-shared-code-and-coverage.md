@@ -67,7 +67,7 @@ pueden solicitar `includeCounts: false` sin alterar los resultados de los listad
 
 `getDataTablePaging` acota las páginas HTTP a 100 registros y rechaza coerciones de
 arrays, fracciones y sufijos. El contrato de normalización está en
-[paginación de listados](../../../openapi/api-contract.md#paginación-de-listados).
+[paginación de listados](../../../openapi/api-contract.md#listados-y-reportes).
 `findBatches` usa tamaños internos positivos y cursores por id: si un bloque no
 aporta id final o no avanza, falla antes de emitirlo. Así no repite filas sin límite
 ni completa silenciosamente una exportación incompleta. Conserva memoria por bloque,

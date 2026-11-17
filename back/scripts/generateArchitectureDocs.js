@@ -194,16 +194,20 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`casos de uso: generalización ${specialized} --|> ${general} entre actores inválidos`);
             }
         }
-        // Los enlaces desde Consulta son una convención visual, no asociaciones UML.
-        // La participación normativa sólo se obtiene de asociaciones actor-caso y
-        // generalizaciones de actores.
+        // Issues resume el acceso compartido desde Consulta; las fichas destino
+        // conservan los actores autorizados de cada operación.
+        const caseIdsByAlias = new Map(cases.map(([, alias, id]) => [alias, id]));
         const reachableByActor = new Map([...actors].map((actor) => {
             const reachable = new Set([actor]);
             const pending = [actor];
             for (let index = 0; index < pending.length; index += 1) {
                 for (const [from, to] of [...associations, ...generalizations]) {
-                    if (!actors.has(from)) continue;
                     if (from !== pending[index] || reachable.has(to)) continue;
+                    if (!actors.has(from)) {
+                        if (!queryAliases.has(from) || !caseIdsByAlias.get(to)?.startsWith('CU-SAL-')) continue;
+                        const allowedActors = permittedActors.get(caseIdsByAlias.get(to)) ?? [];
+                        if (!allowedActors.some(allowed => reachable.has(allowed))) continue;
+                    }
                     reachable.add(to);
                     pending.push(to);
                 }

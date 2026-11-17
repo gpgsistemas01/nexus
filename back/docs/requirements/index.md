@@ -36,8 +36,8 @@ Este paquete contiene tres niveles relacionados, pero no intercambiables:
 5. [Glosario del negocio](business-glossary.md).
 
 Las fichas se organizan por grupo, en un archivo por `CU-*`. Los identificadores
-conectan requisitos, casos, arquitectura y pruebas; la [matriz de trazabilidad](01-applicability-and-traceability.md)
-resume esas relaciones.
+conectan requisitos, casos, arquitectura y pruebas; las [reglas de trazabilidad](requirements-specification/05-requirement-traceability-rules.md)
+definen cómo mantener esas relaciones.
 
 ## Control de cambios
 

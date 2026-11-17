@@ -40,7 +40,7 @@ anteriores/propuestos, detalles, errores y advertencias. `GET /:id/errors/excel`
 descarga el informe. El cliente no confirma enviando filas ni abre otra alta tras una
 respuesta incierta. `429` permite reintentar el mismo lote; `409` exige revisar su
 estado. Un `200` incompleto no confirma la operación. La
-[guía de importación](../../development/05-inventory-excel-import.md) precisa límites y recuperación.
+[guía de importación](../../user-manual/03-materials.md#importar-materiales-o-consumibles-desde-excel) precisa límites y recuperación.
 
 | Área | Contrato consumido y datos relevantes |
 | --- | --- |
@@ -208,5 +208,4 @@ Las fuentes comunes son [apiClient](../../../src/shared/http/apiClient.ts),
 [recordContract](../../../src/shared/http/recordContract.ts) y
 [requestExcel](../../../src/shared/http/requestExcel.ts). La
 [referencia de código](../views/development/code-reference.md) localiza los servicios.
-La [revisión de cambios](../../development/04-change-review.md) reúne consumidores y
-evidencia; el [estándar de seguridad](../security-standards.md) define la salida segura.
+La [guía de comandos](../../development/00-commands.md#comprobar-y-compilar-vue) indica cómo validar el cliente; el [estándar de seguridad](../security-standards.md) define la salida segura.

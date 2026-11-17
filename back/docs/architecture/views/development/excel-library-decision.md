@@ -29,12 +29,3 @@ ExcelJS y `read-excel-file` se usan como herramientas de desarrollo para fixture
 y verificación; no forman parte de la instalación de producción ni del cliente Vue.
 Las pruebas cubren formatos de plantilla, validación de celdas, fórmulas, rechazos,
 descargas, concurrencia y liberación de recursos.
-
-## Límites y preguntas de mantenimiento
-
-Para evaluar un cambio de motor, verifica disponibilidad de binarios en plataformas
-soportadas, compatibilidad con plantillas y fórmulas, uso de memoria temporal,
-concurrencia y comportamiento ante cancelación. La
-[guía de rendimiento](../../../testing/backend-performance.md) describe mediciones
-y sus límites. El cambio de biblioteca debe permanecer aislado de los servicios de
-negocio y conservar contratos HTTP y validaciones de inventario.

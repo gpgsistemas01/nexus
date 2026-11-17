@@ -31,13 +31,8 @@ En el repositorio, use el [mapa generado](code-map.md) para localizar archivos y
 
 ## Preparar y verificar un cambio
 
-Siga la instalación y configuración del [README de la aplicación](../../../../README.md). Use una versión de Node.js admitida por `engines` en `back/package.json`. Las pruebas persistentes requieren una base de pruebas distinta de desarrollo; la configuración se comprueba antes de ejecutar integración.
-
-Antes de agregar un módulo, busque una fábrica, servicio o componente equivalente. Mantenga una sola transacción en escrituras compuestas y transmita su cliente a los colaboradores. No mezcle consultas del cliente global con la transacción que está guardando un documento. Revise los [patrones](design-and-construction-patterns/index.md) y el [estándar de código](../../coding-standards/index.md) para preservar la organización local.
-
-Ejecute las pruebas específicas, `npm run test:unit` y `npm run docs:check`. Si cambian rutas, imports o Prisma, regenere con `npm run docs:architecture`. Si cambia una pantalla o permiso visible, revise manuales y capturas del perfil afectado. La documentación curada se actualiza con la decisión; un inventario regenerado no explica por sí solo por qué se tomó.
-
-Las brechas de seguridad, auditoría y alcance están identificadas en [acceso y auditoría](../logical/02-identity-access-and-audit.md) y en la [visión](../../../requirements/vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md). Una entidad modelada o un servicio aislado no demuestra que exista un recorrido operativo completo.
+Consulta [Desarrollo backend](../../../development/index.md) para instalar, ejecutar
+y validar la API. Las convenciones están en el [estándar de código](../../coding-standards/index.md).
 
 ## Localizar el arranque y las comprobaciones operativas
 
