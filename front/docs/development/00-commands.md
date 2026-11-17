@@ -99,7 +99,7 @@ están en la [guía de rendimiento](../../../back/docs/testing/backend-performan
 
 Vue admite `docs:export -- [seccion] [docx|pdf|ambos]`. Los temas y requisitos de
 Pandoc, LibreOffice y Mermaid están en [publicación](../governance/02-generation-and-publication.md).
-La [guía del exportador común](../../../back/docs/governance/document-export-guide/04-commands.md)
+La [guía del exportador común](../../../back/docs/development/documentation.md)
 describe las selecciones de API y sus opciones de comprobación.
 
 ## Capturas y manuales por cuenta

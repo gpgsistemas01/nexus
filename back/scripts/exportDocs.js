@@ -124,10 +124,11 @@ const PUBLICATIONS = Object.freeze({
             'incorporacion-desarrolladores': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/developer-onboarding.md'
             ]),
-            'desarrollo-backend': [
+            'desarrollo-backend': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/development/index.md',
-                'docs/development/local-development.md'
-            ],
+                'docs/development/local-development.md',
+                'docs/development/documentation.md'
+            ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
                 'docs/architecture/views/development/excel-library-decision.md',
@@ -158,10 +159,6 @@ const PUBLICATIONS = Object.freeze({
                 ))
             ])))
         }
-    },
-    gobernanza: {
-        directory: 'gobernanza',
-        parts: { gobernanza: getDirectoryDocuments('docs/governance') }
     },
     pruebas: {
         parts: {
@@ -358,7 +355,7 @@ if ((requestedPublication !== 'todos' && !selectablePublicationNames.includes(re
     || invalidDocument
     || positionalArgumentCount > 3
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- [todos|manuales|datos|arquitectura|pruebas|gobernanza] [seccion] [docx|pdf|ambos] [--check|--check-sources]');
+    console.error('Uso: npm run docs:export -- [todos|manuales|datos|arquitectura|pruebas] [seccion] [docx|pdf|ambos] [--check|--check-sources]');
     process.exit(1);
 }
 

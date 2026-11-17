@@ -1,32 +1,56 @@
-# Vista general de la arquitectura web
+# Vista general de la arquitectura del sistema
 
 ## Contexto y organización
 
-Nexus es una SPA cliente-servidor organizada por dominios, componentes, composables y adaptadores HTTP. Las vistas 4+1 describen su arquitectura: C4 muestra límites; las secuencias,
-interacciones; los estados, modos y recuperación.
+Nexus sigue un modelo cliente-servidor. Vue es una SPA organizada por módulos; la API
+Express es un monolito modular organizado por dominios y capas. Las vistas 4+1 agrupan
+la descripción: C4 muestra límites, y UML las dependencias y colaboraciones.
 
-## Vista lógica de ejecución del cliente
+## Arquitectura general aplicada
 
-**Identificador:** `DIA-VUE-ARQ-001`. **Pregunta:** ¿dónde se ejecuta Vue y qué
-relación tiene con Express y PostgreSQL? **Fuente:** `main.ts`, Router,
-`apiClient`, `vite.config.ts`, Dockerfiles y `back/src/lib/prisma.js`.
-Vista inspirada en el nivel de contenedores C4 con cajas Mermaid: es una
-aproximación, no notación C4 completa ni prueba de un proveedor desplegado.
-Las flechas representan interacción o comunicación, no orden de arranque.
+**Identificador:** `DIA-SIS-ARQ-001`. **Pregunta:** ¿cómo colaboran el cliente web,
+las capas de la API y la persistencia? **Fuentes:** módulos Vue, `apiClient.ts`,
+`back/src/app.js`, `back/src/server.js`, servicios de dominio,
+`back/src/lib/prisma.js` y `back/src/services/warehouse/imports/inventoryWorkbookService.js`.
+Vista lógica de contexto y componentes con cajas Mermaid; no representa una topología
+concreta de proveedores. Las flechas representan uso o comunicación, no orden de arranque.
 
 **Lectura visual:** [formas, límites y flechas del mapa](diagram-reading.md#mapas-y-actividades).
 
 ```mermaid
-flowchart TB
-    user["Usuario autorizado"]
-    user -->|interactúa| spa
-    spa["Frontend Vue<br/>SPA en el navegador"] -->|API mediante proxy HTTP| api["Express<br/>API de la aplicación"]
-    api -->|consultas y transacciones| db[("PostgreSQL")]
+flowchart LR
+    user["Usuario"]
+
+    subgraph client["Cliente · navegador"]
+        vue["Vue<br/>app y módulos<br/>páginas y componentes"]
+        http["Servicios de módulos<br/>y cliente HTTP compartido"]
+        vue --> http
+    end
+
+    subgraph backend["Servidor · aplicación Node.js"]
+        routes["Rutas y middleware<br/>Express"]
+        controllers["Controladores<br/>y DTO"]
+        domain["Servicios<br/>por dominio"]
+        persistence["Persistencia<br/>repositories y Prisma"]
+        excel["Worker temporal<br/>para archivos Excel"]
+        events["Publicación Socket.IO<br/>notificaciones"]
+        routes --> controllers --> domain --> persistence
+        domain -. "análisis de Excel" .-> excel
+        controllers -. "después de completar operación" .-> events
+    end
+
+    database[("PostgreSQL")]
+    user --> vue
+    http <-->|"HTTP · JSON y archivos"| routes
+    persistence -->|"SQL y transacciones"| database
 ```
 
-Un contenedor C4 es una unidad de software; no equivale a una imagen Docker.
-La [vista física](physical/index.md) define alojamiento, proxy, cookies y variantes
-de ejecución.
+Las capas de la API son responsabilidades dentro de la aplicación, no servicios
+desplegados por separado. El worker se crea durante el procesamiento de Excel y no
+es otro servicio. Socket.IO se muestra como publicación del backend; la versión actual
+de Vue no se suscribe a ese canal. Para la distribución de procesos y alojamiento,
+consulte la [vista física](physical/index.md); para detalles de la API, su
+ [arquitectura backend](../../../../back/docs/architecture/index.md#capas-y-componentes-del-backend).
 
 ## Componentes de aplicación y módulos funcionales
 
@@ -63,4 +87,4 @@ Consulte [Navegación](scenarios/navigation-and-screens.md) para rutas,
 
 - [Modelo C4](https://c4model.com/diagrams).
 - [Vistas del cliente](index.md).
-- [Criterios documentales](../../governance/03-standard-applicability.md).
+- [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html), como guía para organizar puntos de vista y modelos.

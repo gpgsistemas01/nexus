@@ -10,6 +10,21 @@ La API es un monolito modular por dominio. Express recibe las solicitudes;
 los controladores delegan en servicios que aplican las reglas de negocio y coordinan
 transacciones. Los repositories acceden a PostgreSQL mediante el cliente Prisma compartido.
 
+El [diagrama general aplicado](../../../front/docs/architecture/views/overview.md#arquitectura-general-aplicada)
+concentra cliente-servidor y las capas de frontend y backend. Esta documentación
+detalla la API desde sus vistas lógica, de procesos, desarrollo y despliegue. Usa
+ISO/IEC/IEEE 42010 como referencia; la
+[organización de vistas](views/index.md) identifica alcance y notaciones.
+
+## Capas y componentes del backend
+
+Las rutas y el middleware Express delegan en controladores y DTO; los servicios
+coordinan reglas por dominio y usan Prisma y repositories para persistir. Estas son
+responsabilidades de la misma aplicación Node, no servicios desplegados por separado.
+La [vista lógica](views/logical/01-components-and-reuse.md) muestra sus componentes y
+dependencias; la [vista física](views/physical/01-system-runtime-and-deployment.md)
+documenta procesos, contenedores y conexiones.
+
 | Pregunta | Documento |
 | --- | --- |
 | ¿Qué capas y módulos colaboran? | [Vista lógica](views/logical/index.md) |

@@ -23,4 +23,9 @@ Use `POST /api/auth/login` para habilitar cookies y probar las rutas autorizadas
 **Authorize** ni ejecuta la renovación automática de Vue. `/api-docs` sólo está activo
 en desarrollo.
 
-Referencia: [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.html).
+## Estándares aplicados
+
+[OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.html) define rutas, parámetros,
+cuerpos, esquemas, autenticación y respuestas. [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)
+define la semántica de métodos y códigos HTTP. Los nombres y reglas de implementación
+siguen el [estándar de codificación](../coding-standards/index.md).

@@ -13,7 +13,7 @@ en una sola guía; arquitectura explica el diseño del sistema.
 | Consultar rutas, permisos, cuerpos y respuestas HTTP | [OpenAPI](../architecture/openapi/index.md) |
 | Ejecutar o interpretar las pruebas | [Plan de pruebas](../testing/test-plan.md) |
 | Construir o mantener imágenes y servicios | [Vista física](../architecture/views/physical/index.md) |
-| Generar y comprobar documentos | [Comandos de exportación](../governance/document-export-guide/04-commands.md) |
+| Generar y comprobar documentos | [Comandos de exportación](documentation.md) |
 
 Los comandos de backend se ejecutan desde `back/`, salvo que se indique `npm --prefix back`
 para ejecutarlos desde la raíz del repositorio.
