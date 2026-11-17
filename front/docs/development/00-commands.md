@@ -94,7 +94,7 @@ están en la [guía de rendimiento](../../../back/docs/testing/backend-performan
 | Validar arquitectura y contrato API | `npm --prefix back run docs:check` |
 | Revisar / agrupar OpenAPI | `npm --prefix back run docs:api:lint` / `npm --prefix back run docs:api:bundle` |
 | Exportar toda la documentación técnica Vue | `npm --prefix front run docs:export -- ambos` |
-| Exportar un tema Vue | `npm --prefix front run docs:export -- inicio ambos` |
+| Exportar el paquete de desarrollo Vue | `npm --prefix front run docs:export -- desarrollo ambos` |
 | Exportar un tema API | `npm --prefix back run docs:export -- arquitectura backend ambos` |
 
 Vue admite `docs:export -- [seccion] [docx|pdf|ambos]`. Los temas y requisitos de

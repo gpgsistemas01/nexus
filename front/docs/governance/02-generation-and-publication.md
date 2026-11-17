@@ -34,7 +34,7 @@ Desde `front/`:
 ```bash
 npm run docs:generate
 npm run docs:check
-npm run docs:export -- inicio ambos
+npm run docs:export -- desarrollo ambos
 npm run docs:export -- arquitectura pdf
 npm run docs:export -- pruebas docx
 npm run docs:export -- completo ambos

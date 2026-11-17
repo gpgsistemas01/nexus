@@ -50,17 +50,17 @@ a Almacén y administración.
 | RF-REC-010 | El reporte generado desde cada consulta de compras debe incluir únicamente el contexto correspondiente y distinguirlo en el nombre del archivo y la hoja; el contexto no puede alterarse mediante filtros enviados por el usuario. | Implementado |
 | RF-REC-011 | Las compras de consumibles deben rechazar detalles o documentos del contexto de materiales, y viceversa, sin cambios parciales; las operaciones de compra se rigen por `RF-REC-001` a `RF-REC-008`. | Implementado |
 | RF-ISS-001 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar salidas de material o consumible, sus detalles y contexto sin modificar existencias; cada consulta se limita a su contexto. | Implementado |
-| RF-ISS-002 | Nexus debe permitir al Personal de almacén o al Administrador del sistema surtir toda la cantidad pendiente de un detalle cuando exista stock suficiente, actualizando documento, existencias y movimiento atómicamente. | Implementado |
+| RF-ISS-002 | Vue debe permitir a Personal de almacén o al Administrador del sistema capturar y confirmar una cantidad positiva de surtido hasta el saldo pendiente; debe mostrar el acumulado y estado devuelto por la API, que descuenta sólo la cantidad entregada. | Implementado |
 | RF-ISS-003 | Nexus debe permitir al Personal de almacén o al Administrador del sistema devolver una cantidad positiva que no exceda el saldo entregado de un detalle de material o consumible, sólo cuando la salida esté completamente surtida, y conservar el vínculo con documento, detalle y movimiento inverso. | Implementado |
 | RF-ISS-004 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema crear una salida pendiente de material o consumible con encabezado y detalles válidos del mismo contexto, sin descontar existencias. | Implementado |
 | RF-ISS-005 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema actualizar únicamente los campos admitidos del encabezado de una salida cuyo estado permita edición. | Implementado |
 | RF-ISS-006 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema agregar o actualizar detalles todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado |
 | RF-ISS-007 | Las salidas de materiales y consumibles deben tener series anuales independientes y folios únicos: `SMA-AAAA-consecutivo` para materiales y `SCO-AAAA-consecutivo` para consumibles. Crear una salida de un contexto no debe consumir el contador del otro; un fallo al guardar tampoco debe consumir un consecutivo. | Implementado |
 | RF-ISS-008 | Las salidas históricas con prefijos `SAL`, `SAL-MAT` o `SAL-CON` deben adoptar el prefijo de su clasificación registrada, conservando año, consecutivo, identidad, detalles e inventario. Las nuevas series deben continuar por encima del máximo emitido y del contador anterior; una colisión debe impedir la conversión completa sin cambios parciales. | Implementado |
-| RF-ISS-009 | Administrador en Sistemas o Coordinador en Almacén debe poder reconocer hasta 100 salidas ya entregadas por lote, con corte, motivo, declaración y revisión original. Completa sólo el pendiente, conserva devoluciones y valores desconocidos, sin descontar stock ni generar movimientos. Recibo durable e idempotente; cancelados o revisiones viejas bloquean todo el lote. Consulta/reporte muestra procedencia histórica; devolución posterior exige confirmar entrada física actual. | Implementado |
+| RF-ISS-009 | Administrador en Sistemas o Coordinador en Almacén debe poder consultar salidas elegibles en páginas de 100 con total, seleccionar hasta 100 y registrar por lote entregas históricas con corte, motivo, declaración y revisión original. Vue muestra el recibo y la procedencia; el servidor completa sólo el pendiente, conserva devoluciones y valores desconocidos, sin descontar stock ni generar movimientos. Cancelados o revisiones viejas bloquean el lote; la devolución posterior exige confirmar entrada física actual. | Implementado |
 | RF-WST-001 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar el inventario de mermas y sus existencias; corresponde a la misma consulta de `RF-CAT-004`, no a documentos de salida. | Implementado |
 | RF-WST-002 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema crear una salida de merma pendiente con encabezado y detalles válidos, sin descontar existencias. | Implementado |
-| RF-WST-003 | Nexus debe permitir al Personal de almacén o al Administrador del sistema surtir toda la cantidad pendiente de un detalle de merma cuando exista stock suficiente, actualizando documento, existencias y movimiento atómicamente. | Implementado |
+| RF-WST-003 | Vue debe permitir a Personal de almacén o al Administrador del sistema capturar y confirmar una cantidad positiva de surtido de merma hasta el saldo pendiente; debe mostrar el acumulado y estado devuelto por la API, que descuenta sólo la cantidad entregada. | Implementado |
 | RF-WST-004 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema actualizar únicamente los campos admitidos del encabezado de una salida de merma cuyo estado permita edición. | Implementado |
 | RF-WST-005 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema agregar o actualizar detalles de merma todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado |
 | RF-WST-006 | Nexus debe permitir al Personal de almacén o al Administrador del sistema devolver una cantidad positiva que no exceda el saldo entregado de un detalle de merma, sólo cuando la salida esté completamente surtida, y confirmar existencia y movimiento inverso como una sola operación. | Implementado |
@@ -108,14 +108,14 @@ a Almacén y administración.
   La política de acceso
   especifica roles, permisos independientes y coincidencia por asignación.
 
-- **CA-RF-ISS-002-1:** cada detalle seleccionado se surte por toda su cantidad pendiente.
-  La salida queda parcialmente surtida si permanecen otros detalles pendientes; no se
-  ofrece captura libre de una entrega parcial de un detalle.
+- **CA-RF-ISS-002-1:** Vue limita la captura al saldo pendiente y muestra la cantidad
+  ya entregada. Al confirmar un surtido parcial conserva la captura restante; una
+  cantidad mayor al saldo o a la existencia es rechazada sin anunciar el cambio.
 - **CA-RF-ISS-003-1:** la nueva devolución no supera cantidad suministrada menos
   devoluciones anteriores. Una devolución parcial conserva `Surtido`; devolver el saldo
   completo cancela el detalle. Cancelar todos los detalles cancela la salida.
-- **CA-RF-WST-003-1:** las mismas condiciones de surtimiento completo del detalle se
-  aplican a merma; la existencia y sus movimientos permanecen independientes.
+- **CA-RF-WST-003-1:** se aplican las mismas condiciones de cantidad parcial y saldo
+  a merma; la existencia y sus movimientos permanecen independientes.
 - **CA-RF-WST-006-1:** se aplican las mismas condiciones de saldo y cancelación derivada
   de devolución, sin una acción de cancelación directa de la salida.
 - **CA-RF-ADJ-001-1:** la cantidad indicada es el saldo final, no un incremento. Puede

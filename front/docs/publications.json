@@ -1,7 +1,7 @@
 {
     "sections": {
-        "inicio": {
-            "title": "Inicio e incorporación",
+        "desarrollo": {
+            "title": "Desarrollo para programadores",
             "sources": [
                 "development/index.md",
                 "development/00-commands.md",

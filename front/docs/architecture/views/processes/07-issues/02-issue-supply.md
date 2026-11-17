@@ -9,7 +9,7 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario
+    actor U as Personal de almacén o Administrador del sistema
     box Interfaz
     participant Form@{ "type": "boundary" } as Issue<br/>Editor.vue
     end

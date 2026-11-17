@@ -12,7 +12,7 @@
 | Acciones de la pantalla | **Editar registro** en el registro seleccionado: [CU-CAT-11](cu-cat-11.md)<br>**Nueva área**: [CU-CAT-10](cu-cat-10.md) |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** rechaza la solicitud, comunica el motivo y no presenta información ni ejecuta cambios fuera de la autorización del actor; termina el caso de uso.<br>**EOP — Consulta no disponible (durante el paso 2):**<br>1. **Nexus:** muestra el fallo de carga y la opción de reintentar; no modifica registros.<br>2. **Actor:** pulsa **Reintentar**, continuando en el paso 2 del flujo principal, o abandona la consulta y termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Áreas.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados.<br>**Alcance:** esta consulta no modifica registros. |
-| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`. |
 
 Familia: [objetivos y realización](index.md).
 

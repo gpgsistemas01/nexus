@@ -1,100 +1,37 @@
-# Arquitectura y construcción de Nexus
+# Arquitectura de Nexus
 
 ## Datos generales del documento
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.12 | 1.0.0 | En revisión | 2026-10-13 | Equipo Nexus |
+| 1.13 | 1.0.0 | En revisión | 2026-11-16 | Equipo Nexus |
 
-## Propósito
+Nexus se organiza como un monolito modular por dominio y capas. La API HTTP, la
+interfaz Vue y PostgreSQL son partes del mismo sistema; los componentes y contratos
+describen sus límites.
 
-Este índice presenta la documentación arquitectónica por pregunta y nivel de detalle.
-Es la portada y entrada del **documento de arquitectura** exportable; no repite decisiones
-ni diagramas que tienen un capítulo propietario. Nexus se describe como un **monolito
-modular por dominio con arquitectura por capas** y una correspondencia de **MVC web
-extendido**.
+## Encuentra una respuesta
 
-## Relación con visión, SRS y casos de uso
-
-Arquitectura responde **cómo** está organizada la solución y cómo satisface las
-obligaciones de Nexus. No es propietaria del propósito y alcance de negocio ni de la
-conducta normativa de los actores:
-
-| Fuente | Responsabilidad | Uso desde arquitectura |
+| Pregunta | Fuente | Qué muestra |
 | --- | --- | --- |
-| [Visión y alcance](../requirements/vision-scope-and-requirements/index.md) | Define por qué existe el producto, sus interesados y sus límites. | Alimenta el contexto y las preocupaciones arquitectónicas. |
-| [SRS](../requirements/requirements-specification/index.md) y [casos de uso](../requirements/use-cases/index.md) | Definen qué debe hacer Nexus, sus reglas y los flujos actor–Nexus. | Aportan los `CU-*` y requisitos que la solución debe realizar. |
-| Este documento de arquitectura | Define estructura, responsabilidades, decisiones, contratos, despliegue y realización técnica. | Traza cada obligación hacia vistas, secuencias, código y pruebas sin copiar su definición funcional. |
+| ¿Cómo se despliega y qué procesos se comunican? | [Vista física](views/physical/index.md) | Contexto, runtime, contenedores, configuración y despliegue. |
+| ¿Qué responsabilidades tienen los módulos y dónde comparten código? | [Vista lógica](views/logical/index.md) | Componentes, dominios, persistencia e identidad. |
+| ¿Cómo colaboran navegador, API y base en una operación? | [Procesos](views/processes/index.md) | Secuencias, validaciones, transacciones y resultados técnicos. |
+| ¿Qué pantallas y objetivos recorre una persona? | [Escenarios](views/scenarios/index.md) | Navegación y relación entre vistas y capacidades. |
+| ¿Qué rutas, permisos y datos expone HTTP? | [Contrato OpenAPI](openapi/index.md) | Endpoints, esquemas, respuestas y códigos de error. |
+| ¿Qué módulos y archivos implementan cada responsabilidad? | [Vista de desarrollo](views/development/index.md) | Estructura, patrones, referencias de módulos e inventario de código. |
+| ¿Cómo se relaciona el modelo persistente? | [Datos y persistencia](views/logical/data-and-persistence/index.md) | Esquema Prisma, relaciones y diccionario de datos. |
+| ¿Qué reglas de implementación comparten los paquetes? | [Estándares de código](coding-standards/index.md) | Convenciones del backend y límites de integración con Vue. |
 
-Que los servicios ejecuten un “caso de uso” o que las secuencias técnicas se organicen
-por `CU-*` no cambia la propiedad documental. La ficha funcional permanece en la SRS;
-backend y frontend muestran colaboraciones internas, errores técnicos y persistencia.
-Ambas vistas se conectan mediante identificadores `CU-*` compartidos por los
-[componentes](views/logical/01-components-and-reuse.md), las secuencias y las pruebas.
+## Relación con requisitos y pruebas
 
-## Forma arquitectónica y criterios normativos
+Los [requisitos](../requirements/index.md) describen los resultados que debe ofrecer
+Nexus; esta arquitectura describe su realización técnica. Los identificadores `CU-*`
+conectan casos de uso con [componentes](views/logical/01-components-and-reuse.md),
+secuencias y [pruebas](../testing/use-case-test-types.md).
 
-El [modelo de vistas aplicado](views/index.md)
-es la fuente propietaria del enfoque Viewpoint/View, su adaptación de 4+1 y el apoyo de
-los niveles de C4. Los [criterios documentales](../governance/documentation-standards/03-application-by-type-of-document.md)
-determinan qué orientan ISO/IEC/IEEE 42010, 29148, 1016 y 15289, qué entrega conserva cada
-contenido y los límites de la adopción. Este índice sólo dirige a esas decisiones: no
-mantiene otra versión de las normas ni del modelo de vistas. El
-[índice de vistas](views/index.md) organiza los artefactos que materializan ese modelo.
+## Desarrollo
 
-## Organización de la documentación arquitectónica
-
-La organización separa las **vistas de Nexus** de los **artefactos de apoyo**:
-
-1. [Vistas arquitectónicas](views/index.md): escenarios, lógica, procesos, desarrollo y
-   física. Bajo `views/` se mantiene todo artefacto cuyo propósito principal es
-   representar la solución desde una de esas perspectivas.
-2. **Apoyo transversal:** contrato API y estándar de codificación. El contrato se
-   mantiene junto a su especificación OpenAPI; el estándar permanece en arquitectura
-   porque gobierna la construcción de Nexus. El gobierno de la documentación, en
-   cambio, pertenece a `docs/governance`.
-
-```text
-architecture/
-├── views/
-│   ├── scenarios/    # Navegación y relación con objetivos del actor
-│   ├── logical/      # Componentes, dominios y persistencia
-│   ├── processes/    # Secuencias, decisiones y estados dinámicos
-│   ├── development/  # Organización, implementación, patrones y mapa del código
-│   └── physical/     # Contexto, contenedores y despliegue
-├── openapi/          # Referencia HTTP y contrato procesable
-└── coding-standards/
-```
-
-Los índices de cada vista conducen a sus colecciones sin duplicar contenido. Los casos
-de uso continúan en requisitos: la vista de escenarios los referencia, pero no adquiere
-su propiedad normativa.
-
-## Incorporación al equipo de desarrollo
-
-Comience con la [guía de incorporación](views/development/developer-onboarding.md), que explica responsabilidades, recorridos de código y comprobaciones para contribuir a Nexus.
-
-## Recorridos de lectura
-
-1. Para comprender Nexus: [vista física](views/physical/index.md) →
-   [vista lógica](views/logical/index.md) → patrón relevante en la
-   [vista de desarrollo](views/development/index.md).
-2. Para revisar una interacción web: [vista de escenarios](views/scenarios/index.md) →
-   [documentación API](openapi/index.md) → [vista de procesos](views/processes/index.md).
-3. Para revisar persistencia: [vista lógica](views/logical/index.md) → esquema y
-   diccionario generados → servicio en la [vista de desarrollo](views/development/index.md).
-4. Para comprobar realización y cobertura: requisito o caso de uso →
-   [componentes](views/logical/01-components-and-reuse.md) y secuencia `CU-*` →
-   [catálogo de pruebas](../testing/use-case-test-types.md).
-
-## Regla de división
-
-Cada documento responde una clase de pregunta. Los diagramas de contexto, contenedores,
-componentes y despliegue presentan arquitectura; las secuencias y actividades presentan
-comportamiento; la navegación presenta experiencia web; el mapa generado presenta
-hechos mecánicos del código. Cuando una vista existente responde la pregunta, se enlaza
-en lugar de duplicarla.
-
-La documentación curada explica intención y decisiones. Los inventarios generados sólo
-presentan información inferible desde `src` o Prisma y se validan mediante
-`npm run docs:check`.
+Para preparar el entorno, ejecutar la API o validar cambios, consulta
+[Desarrollo backend](../development/index.md). Para recorrer el código por dominio,
+consulta la [guía de incorporación](views/development/developer-onboarding.md).

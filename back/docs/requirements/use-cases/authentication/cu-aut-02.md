@@ -12,4 +12,4 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La sesión queda cerrada en ese navegador; el actor debe volver a iniciar sesión para acceder al contenido protegido.<br>2. **Fallo:** Nexus no debe presentar contenido protegido sin volver a comprobar una sesión válida. |
 | Requisitos relacionados | `RF-AUT-003`, `RN-001`. |
 
-El cierre disponible elimina el acceso conservado por ese navegador. La invalidación central de credenciales previamente emitidas permanece pendiente; por eso `RF-AUT-003` se registra como Parcial. La brecha técnica se mantiene en [acceso y auditoría](../../../architecture/views/logical/02-identity-access-and-audit.md).
+El cierre elimina las credenciales conservadas por ese navegador. No revoca copias de credenciales o sesiones en otros dispositivos; esa capacidad no forma parte de `RF-AUT-003` ni de su criterio de aceptación.

@@ -18,8 +18,8 @@ incumplirse y comprobarse de manera independiente.
 | RN-012 | Una disminución de inventario debe rechazarse cuando la existencia vigente no alcance para cubrir la cantidad solicitada. | Implementado | `src/services/inventory/stockHelpers.js`, `src/services/warehouse/wastes/wasteInventoryService.js` |
 | RN-013 | Las cantidades solicitadas o recibidas, las nuevas devoluciones y las entradas adicionales de merma deben ser positivas. El saldo final de un ajuste admite cero; su diferencia puede ser positiva, negativa o cero. Las diferencias de corrección y reversión no se validan como cantidades de entrega. | Implementado | `src/validators/fields/fieldsValidator.js` y DTO de almacén |
 | RN-014 | Cada nueva devolución debe ser positiva y no superar el saldo entregado, calculado como cantidad suministrada menos devoluciones anteriores; el acumulado devuelto no debe superar el acumulado suministrado. | Implementado | `src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js`, `src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js` |
-| RN-015 | En el flujo vigente, un detalle permanece `Pendiente` hasta surtir toda su cantidad pendiente y pasa a `Surtido`; las devoluciones se rigen por `RN-028`. El cumplimiento parcial del documento no implica entrega parcial libre de un detalle. | Implementado | `src/services/warehouse/issues/issueFulfillmentRules.js` |
-| RN-016 | Una salida debe estar `Pendiente` si no tiene detalles surtidos, `Surtido parcial` si tiene entregas y otros detalles pendientes, y `Surtido` cuando todos se han surtido. Las devoluciones conservan ese cumplimiento hasta la cancelación total definida por `RN-029`. | Implementado | `src/services/warehouse/issues/issueFulfillmentRules.js` |
+| RN-015 | Cada surtido debe ser positivo y no superar la cantidad pendiente ni la existencia disponible. La cantidad entregada se acumula; el detalle permanece `Pendiente` con cero entregado, pasa a `Surtido parcial` con una entrega incompleta y a `Surtido` al completar la solicitud. Las devoluciones se rigen por `RN-028`. | Implementado | `src/services/warehouse/issues/issueSupplyRules.js`, `src/services/warehouse/issues/issueFulfillmentRules.js` |
+| RN-016 | Una salida debe estar `Pendiente` sin cantidades entregadas, `Surtido parcial` cuando alguna cantidad se entregó y queda saldo por entregar, y `Surtido` cuando todos los detalles alcanzan sus cantidades solicitadas. Las devoluciones conservan ese cumplimiento hasta la cancelación total definida por `RN-029`. | Implementado | `src/services/warehouse/issues/issueFulfillmentRules.js` |
 | RN-017 | Un detalle cancelado de entrada no debe volver a cancelarse ni participar en los totales activos del documento. | Implementado | `src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js` |
 | RN-018 | Una factura informada sólo puede identificar una entrada por proveedor; un conflicto debe señalar la entrada ya registrada. | Implementado | `src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js` |
 | RN-019 | Una salida para el cliente interno GPG INTERNO sólo debe admitir como asesor a una persona con responsabilidad de coordinador; esa responsabilidad no le concede acceso a Nexus. | Implementado | `src/services/admin/person/personRules.js`, `src/shared/inventory/issueHeaderRules.js` |
@@ -41,10 +41,9 @@ incumplirse y comprobarse de manera independiente.
 
 ### Aplicación de las reglas
 
-Un estado parcial admitido para interpretar datos históricos no habilita una operación
-nueva de entrega parcial de un detalle. El surtimiento vigente completa su pendiente;
-los estados y transiciones se contrastan con los
-[diagramas de estado](../../domain-and-use-cases/03-states-and-data-changed-by-action.md).
+El surtimiento admite entregas parciales acumulativas. Cada operación descuenta sólo
+la cantidad entregada y mantiene pendiente el saldo restante; los estados y transiciones
+se contrastan con los [diagramas de estado](../../domain-and-use-cases/03-states-and-data-changed-by-action.md).
 
 `RN-034` no autoriza regularizar documentos históricos mixtos o vacíos: se conserva su
 historia y la regularización continúa pendiente de un flujo aprobado. El contexto no

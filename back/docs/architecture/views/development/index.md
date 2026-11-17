@@ -11,7 +11,7 @@ capacidades y trazabilidad a [lógica](../logical/index.md).
 | --- | --- | --- |
 | 1. Conjunto del software | [Organización e integración del código](code-structure/index.md) | ¿Cómo se distribuyen servidor, navegador y persistencia? Estructura del repositorio, registros HTTP, fronteras y Prisma. |
 | 2. Implementación de un módulo | Referencias técnicas de [backend](backend-technical-documentation/index.md) y [Vue](../../../../../front/docs/architecture/views/development/code-structure.md) | ¿Qué archivos lo implementan? Imports, configuración, contratos y particularidades del recurso. |
-| 3. Decisión compartida | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | ¿Por qué se elige esta solución? Problema, decisión, aplicación, variantes y límites. |
+| 3. Patrón compartido | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | ¿Qué estructura comparten los módulos y dónde aplica? Implementación, variantes y límites. |
 | 4. Mecanismo reutilizable | [Reutilización y refactorización](reuse-and-refactoring/index.md) | ¿Qué núcleo se comparte y qué configura cada consumidor? Contratos de extensión e impacto de una extracción. |
 | Evidencia técnica | [Mapa generado](code-map.md) | Inventario de rutas, imports y símbolos derivado de `src`. |
 
@@ -54,8 +54,8 @@ de despliegue independientes. Los recorridos HTTP, reintentos, estados y límite
 temporales se consultan en procesos, sin repetirlos con otras etiquetas.
 
 Al cambiar un recurso se revisan sus archivos y contrato; al cambiar una pieza compartida,
-todos sus configuradores y consumidores. El historial de una extracción pertenece a Git;
-esta vista documenta el resultado vigente y su evidencia disponible.
+se revisan sus configuradores y consumidores. Esta vista describe la implementación
+vigente; los cambios se pueden rastrear en Git.
 
 ## Criterio de índices
 
@@ -73,8 +73,8 @@ Para comenzar a contribuir, consulte la [guía de incorporación](developer-onbo
 La [importación de inventario por Excel](inventory-excel-import.md) define
 plantillas, contratos, reutilización, confirmación y retención de archivos.
 Incluye límites de ejecución, confirmación atómica y limpieza de borradores.
-La [decisión del motor Excel](excel-library-decision.md) explica la selección
-de SheetKit, sus requisitos y los criterios de actualización.
+El [motor Excel](excel-library-decision.md) describe la integración, los límites
+de recursos y sus condiciones de compatibilidad.
 
 La [conciliación de inventario y entregas históricas](inventory-reconciliation.md)
 implementa el conteo físico por Excel y el registro por lote de entregas ya realizadas

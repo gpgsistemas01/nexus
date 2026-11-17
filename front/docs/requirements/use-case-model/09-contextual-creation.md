@@ -5,8 +5,8 @@ actor, condición, punto y retorno con sus fichas. El Administrador del sistema 
 de Almacén; las áreas operativas no obtienen permisos de Directorio por solicitar salidas.
 
 Las líneas directas asocian Almacén con las altas; las flechas `«extend»` muestran cuándo
-se insertan, sin transmitir permisos. Los modelos de cada módulo conservan los enlaces
-desde sus consultas.
+se insertan, sin transmitir permisos. Los diagramas por módulo muestran asociaciones
+directas entre actores y objetivos para distinguir las operaciones autorizadas.
 
 **Fuente:** `InventoryWorkspace`, `PurchaseEditorPage`, `IssueWorkspace`,
 `IssueEditorPage` y las fichas de las capturas y altas auxiliares.
@@ -34,8 +34,9 @@ direction LR
     supplier ..>:extend consumablePurchase
 ```
 
-Con permisos de lectura y alta, **Registrar proveedor** abre el auxiliar. Al guardar, el
-proveedor activo queda seleccionado; cancelar conserva la captura. En edición de compra el
+Con permisos de lectura y alta, el actor escribe el nombre en el selector; **Registrar
+proveedor** aparece sólo si la búsqueda no encuentra una coincidencia. Al elegirlo, el
+auxiliar devuelve el proveedor activo y reanuda la captura. En edición de compra el
 proveedor permanece fijo, sin cambio ni alta auxiliar.
 
 ## Artículo para un detalle nuevo de compra
@@ -93,6 +94,9 @@ direction LR
     client ..>:extend headerConsumable
 ```
 
-Con cliente editable y permisos de lectura/alta, **Registrar cliente** devuelve el cliente
-activo y reanuda la captura. No guarda la salida ni abre el Directorio independiente.
+Con cliente editable y permisos de lectura/alta, el actor escribe el nombre en el selector;
+**Registrar cliente** aparece sólo si la búsqueda no encuentra una coincidencia. Al elegirlo,
+el auxiliar devuelve el cliente activo y reanuda la captura. Las áreas operativas no reciben
+permisos de Directorio por solicitar salidas. No guarda la salida ni abre el Directorio
+independiente.
 Surtido y devolución bloquean el encabezado y no ofrecen esta extensión.

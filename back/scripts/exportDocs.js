@@ -152,6 +152,10 @@ const PUBLICATIONS = Object.freeze({
             'incorporacion-desarrolladores': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/developer-onboarding.md'
             ]),
+            'desarrollo-backend': [
+                'docs/development/index.md',
+                'docs/development/local-development.md'
+            ],
             backend: packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
                 'docs/architecture/views/development/inventory-excel-import.md',
