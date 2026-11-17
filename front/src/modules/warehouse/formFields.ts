@@ -221,7 +221,10 @@ export const inventorySections = (
             ],
         });
 
-    if (isWaste || resource === 'consumables' || options.usesMeasurements)
+    if (
+        !(isCreating && options.isPerPiece) &&
+        (isWaste || resource === 'consumables' || options.usesMeasurements)
+    )
         sections.push({
             id: 'measurements',
             title: options.isPerPiece
