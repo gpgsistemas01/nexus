@@ -8,6 +8,10 @@ on:
       - features
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   architecture-docs:
     name: Keep architecture docs current
@@ -51,11 +55,8 @@ jobs:
           git push
 
   test:
-    name: Test (Node ${{ matrix.node }})
+    name: Test (Node 24)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: ['24', '26.12.1']
     defaults:
       run:
         working-directory: back
@@ -77,7 +78,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 24
           cache: npm
           cache-dependency-path: back/package-lock.json
 
@@ -123,7 +124,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-node-${{ matrix.node }}
+          name: test-results-node-24
           path: back/build/test-results/*.xml
           if-no-files-found: warn
 
@@ -131,18 +132,15 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports-node-${{ matrix.node }}
+          name: coverage-reports-node-24
           path: |
             back/coverage/unit/
             back/coverage/integration/
           if-no-files-found: warn
 
   frontend-build:
-    name: Build Vue frontend (Node ${{ matrix.node }})
+    name: Build Vue frontend (Node 24)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: ['24.15.0', '26.12.1']
     defaults:
       run:
         working-directory: front
@@ -153,7 +151,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 24
           cache: npm
           cache-dependency-path: front/package-lock.json
 
@@ -182,11 +180,9 @@ jobs:
         run: npm run test:e2e
 
       - name: Install backend for the system browser test
-        if: matrix.node == '24.15.0'
         run: npm --prefix ../back ci --include=dev
 
       - name: Prepare isolated PostgreSQL for the system browser test
-        if: matrix.node == '24.15.0'
         env:
           PGUSER: postgres
           PGPASSWORD: postgres
@@ -207,17 +203,15 @@ jobs:
           echo "DIRECT_TEST_URL=${DATABASE_TEST_URL}" >> "$GITHUB_ENV"
 
       - name: Apply migrations to the system test database
-        if: matrix.node == '24.15.0'
         run: npm --prefix ../back run test:db:migrate
 
       - name: Test Vue with real Express and PostgreSQL
-        if: matrix.node == '24.15.0'
         run: npm run test:e2e:system
 
       - name: Upload frontend test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-test-results-node-${{ matrix.node }}
+          name: frontend-test-results-node-24
           path: front/build/test-results/*.xml
           if-no-files-found: warn

@@ -73,7 +73,7 @@ interrupción, retirar sólo los IDs propios o desechar la base efímera.
 
 La [CI](../../../.github/workflows/ci.yml) queda configurada para ejecutar este recorrido en Node 24,
 con PostgreSQL local aislado, además de conservar las suites unitarias y de navegador
-simulado en ambas versiones de Node. Publica el JUnit junto a los otros resultados.
+simulado en Node 24. Publica el JUnit junto a los otros resultados.
 Esto añade evidencia de la unión cliente/servidor; no acredita por sí solo todos
 los roles, reportes, cálculos ni rollbacks de inventario. Esas integraciones
 permanecen en `back/tests`.
