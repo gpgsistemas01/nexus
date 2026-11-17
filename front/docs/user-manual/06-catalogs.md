@@ -56,3 +56,5 @@ Desactivar retira el registro de nuevas selecciones y conserva los documentos qu
 
 Corrija los campos señalados. Si el registro cambió, use **Cerrar y actualizar listado**
 y vuelva a abrirlo. Consulte [Errores y recuperación](15-errors-and-recovery.md) ante otros fallos.
+
+Para consumibles en kg se utiliza la presentación **KILOGRAMOS** y para metros, **METRO LINEAL**. **CAJA** queda inactiva para nuevas capturas; los registros anteriores conservan sus referencias.

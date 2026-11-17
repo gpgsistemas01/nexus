@@ -55,3 +55,17 @@ export const getPerPieceMeasureError = (unit = {}, { base, height } = {}) => {
     return Number(base) === 1 && Number(height) > 0 && Number.isFinite(Number(height))
         ? null : 'Para kg o metros lineales, Base debe ser 1 y Altura debe indicar la medida positiva por pieza.';
 };
+
+export const getConsumableUnitPresentation = (unit = {}) => {
+    if (!isPerPieceMeasure(unit)) return null;
+    return /^(KG)$/i.test(String(unit.symbol ?? '').trim()) || /^KILOGRAMOS?$/i.test(String(unit.name ?? '').trim())
+        ? 'KILOGRAMOS' : 'METRO LINEAL';
+};
+
+export const getConsumableUnitError = (unit, { base, height } = {}, presentation = {}) => {
+    const expected = getConsumableUnitPresentation(unit);
+    if (!expected) return null;
+    if (Number(base) !== 1 || Number(height) !== 1) return 'Los consumibles en kg o metros lineales requieren medidas 1 × 1.';
+    return String(presentation.name ?? '').trim().toUpperCase() === expected
+        ? null : `La presentación de este consumible debe ser ${expected}.`;
+};

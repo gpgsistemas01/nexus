@@ -1,4 +1,4 @@
-import { getPerPieceMeasureError } from '../../../shared/inventory/wasteMeasurements.js';
+import { getPerPieceMeasureError, getConsumableUnitError } from '../../../shared/inventory/wasteMeasurements.js';
 import { randomUUID } from 'node:crypto';
 import { setImmediate } from 'node:timers/promises';
 import { validateInventoryImportRow } from '../../../validators/forms/inventoryImportValidations.js';
@@ -113,7 +113,8 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                     }
                 } else {
                     const presentation = context.presentations.get(dto.presentationId);
-                    const measureError = getPerPieceMeasureError(context.units.get(dto.unitMeasureId), dto);
+                    const unit = context.units.get(dto.unitMeasureId);
+                    const measureError = config.type === 'CONSUMABLE' ? getConsumableUnitError(unit, dto, presentation) : getPerPieceMeasureError(unit, dto);
                     if (measureError) add('height', measureError);
                     if (!presentation || !context.units.has(dto.unitMeasureId)) add('presentationName', 'Presentación o unidad inexistente, inactiva o ambigua.');
                     else {

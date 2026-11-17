@@ -32,7 +32,7 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 | RF-CAT-023 | Nexus debe permitir al Administrador del sistema autorizado crear una entrada activa o inactiva en Áreas, Roles, Presentaciones, Unidades de medida, Motivos de ajuste o Estados de cumplimiento, capturando únicamente los campos admitidos para el recurso. | Implementado |
 | RF-CAT-024 | Nexus debe permitir al Administrador del sistema autorizado editar los datos admitidos y el estado activo de una opción de los seis catálogos auxiliares; debe rechazarse un recurso o dato no admitido sin modificar el catálogo. | Implementado |
 | RF-CAT-025 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar, buscar y filtrar por proveedor las ofertas de consumibles, sin incluir materiales ni modificar existencias. | Implementado |
-| RF-CAT-026 | Nexus debe permitir al Personal de almacén o al Administrador del sistema crear un consumible y su oferta de proveedor con presentación y unidad explícitas, con medida por pieza para KILOGRAMO y METRO LINEAL (Base = 1, Altura positiva); su existencia inicial sigue las variantes de alta directa y desde compra de los criterios de `RF-CAT-006`. | Implementado |
+| RF-CAT-026 | Nexus debe permitir al Personal de almacén o al Administrador del sistema crear un consumible y su oferta de proveedor con presentación y unidad explícitas, con medida por pieza para KILOGRAMO y METRO LINEAL (Base = 1, Altura = 1 y presentación KILOGRAMOS o METRO LINEAL); su existencia inicial sigue las variantes de alta directa y desde compra de los criterios de `RF-CAT-006`. | Implementado |
 | RF-CAT-027 | Nexus debe permitir al Personal de almacén o al Administrador del sistema editar el nombre y stock mínimo compartidos de un consumible y el costo máximo y estado de la oferta seleccionada, sin cambiar su tipo, identidad física ni existencia. | Implementado |
 | RF-CAT-028 | Nexus debe permitir al Personal de almacén o al Administrador del sistema retirar una oferta de consumible sólo cuando no exista historia operativa protegida; la identidad sólo debe eliminarse cuando no conserve otras ofertas. | Implementado |
 | RF-CAT-029 | Nexus debe permitir al Administrador del sistema ajustar la existencia de un consumible mediante motivo y observaciones, conservando el ajuste y movimiento trazables; un recurso de otro tipo debe rechazarse. | Implementado |
@@ -48,7 +48,7 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 - **CA-RF-CAT-006-3:** si la identidad ya existe para otro proveedor, se reutiliza y se
   crea únicamente la oferta nueva; si la oferta ya existe, se rechaza sin modificarla.
 - **CA-RF-CAT-026-1:** las mismas variantes se aplican al consumible con clasificación
-  explícita y con medida por pieza para KILOGRAMO y METRO LINEAL (Base = 1, Altura positiva); su unidad de medida no está restringida a «pieza».
+  explícita y con medida por pieza para KILOGRAMO y METRO LINEAL (Base = 1, Altura = 1 y presentación KILOGRAMOS o METRO LINEAL); su unidad de medida no está restringida a «pieza».
 - El costo máximo puede ser cero sólo en el alta inicial. La edición y el uso en
   salidas requieren un costo mayor que cero; las compras y sus correcciones no lo actualizan.
 
@@ -66,4 +66,4 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 Las [equivalencias históricas](../05-requirement-traceability-rules.md#equivalencias-de-requisitos)
 identifican los requisitos que describen una misma garantía de merma.
 
-Para unidades KILOGRAMO o METRO LINEAL, el alta del consumible define Base = 1 y Altura = medida positiva por pieza. La conversión multiplica las piezas por esa medida. Los nombres de presentación y unidad se guardan en mayúsculas.
+Para unidades KILOGRAMO o METRO LINEAL, el alta del consumible define Base = 1 y Altura = 1, con presentación KILOGRAMOS o METRO LINEAL. La conversión conserva la cantidad comprada. Los nombres de presentación y unidad se guardan en mayúsculas.

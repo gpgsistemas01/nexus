@@ -16,7 +16,7 @@ También puede consultar el costo unitario.
 
 Pulse **Importar Excel** y siga el [procedimiento de materiales y consumibles](03-materials.md#importar-materiales-o-consumibles-desde-excel).
 El selector asigna una sola operación a todo el archivo. En altas con KILOGRAMO
-o METRO LINEAL capture Base = 1 y Altura = medida por pieza. Conserve los
+o METRO LINEAL capture Base = 1 y Altura = 1. Conserve los
 IDs/versiones incluidos para editar o ajustar.
 
 ![Importación de consumibles con la operación y sus instrucciones.](images/06a-consumable-import.png)
@@ -93,10 +93,10 @@ Pulse **Exportar Excel** después de revisar la consulta.
 El [capítulo de reportes](14-reports.md) explica su alcance.
 <!-- manual:end -->
 
-## Medida por pieza en el alta
+## Unidad del consumible en el alta
 
-Con unidad **KILOGRAMO** o **METRO LINEAL**, el multiplicador se fija en **1**.
-Capture en la otra medida los kg o metros que contiene cada pieza. Por ejemplo,
-4 piezas de 2.5 kg generan una cantidad convertida de 10 kg. Esta medida se define
-al registrar el consumible, también desde Compras o desde la plantilla Excel
-(**Base = 1**, **Altura = medida por pieza**).
+Para **KILOGRAMO**, seleccione presentación **KILOGRAMOS**. Para **METRO LINEAL**,
+seleccione presentación **METRO LINEAL**. Ambas medidas quedan fijas en **1 × 1**.
+La cantidad comprada expresa kg o metros, respectivamente: 4 kilos a $20 por kilo
+suman $80 antes de IVA. Las medidas representan la unidad y no multiplican el precio.
+Esta regla también aplica al alta desde Compras y Excel (Base = 1, Altura = 1).

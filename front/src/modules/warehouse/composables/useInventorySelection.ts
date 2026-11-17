@@ -1,4 +1,4 @@
-import { isPerPieceMeasure } from '@nexus/waste-measurements';
+import { isPerPieceMeasure, getConsumableUnitPresentation } from '@nexus/waste-measurements';
 import { computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
@@ -92,6 +92,17 @@ export const useInventorySelection = (options: {
 
         if (isPerPieceMeasure(unit.data)) {
             options.setValue('base', '1');
+
+            if (resource === 'consumables') {
+                options.setValue('height', '1');
+                options.clearError('height');
+                const expected = getConsumableUnitPresentation(unit.data);
+                const presentation = presentations.items.value.find(
+                    (item) => String(item.data.name).trim().toUpperCase() === expected,
+                );
+                options.setValue('presentationId', presentation?.id ?? '');
+            }
+
             options.clearError('base');
             return;
         }
