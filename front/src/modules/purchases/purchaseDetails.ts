@@ -9,6 +9,7 @@ export const createPurchaseDetailDraft = (
     item: LookupItem,
     quantity: number,
     costPerUnitType: number,
+    costIsTotal = false,
 ): PurchaseDetail => {
     const material = isRecord(item.data.material) ? item.data.material : {};
     const presentation = isRecord(material.presentation) ? material.presentation : {};
@@ -24,6 +25,7 @@ export const createPurchaseDetailDraft = (
         ...calculateGoodsReceiptDetailAmounts({
             quantity,
             costPerUnitType,
+            costIsTotal,
             base: material.base,
             height: material.height,
         }),

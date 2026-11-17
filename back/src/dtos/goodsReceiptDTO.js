@@ -13,7 +13,8 @@ export const createGoodsReceiptDtoForRegister = (body = {}) => {
         details: (body.details).map(d => ({
             materialId: d.materialId.trim(),
             quantity: d.quantity,
-            costPerUnitType: d.costPerUnitType
+            costPerUnitType: d.costPerUnitType,
+            ...(d.costIsTotal === true && { costIsTotal: true })
         }))
     }
 };
@@ -33,7 +34,8 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
             ...(d.id ? { id: d.id.trim() } : {}),
             materialId: d.materialId.trim(),
             quantity: d.quantity,
-            costPerUnitType: d.costPerUnitType
+            costPerUnitType: d.costPerUnitType,
+            ...(d.costIsTotal === true && { costIsTotal: true })
         }))
     };
 };

@@ -35,6 +35,7 @@ export const calculatePurchaseCorrectionTotals = (
     const corrected = calculateGoodsReceiptDetailAmounts({
         quantity,
         costPerUnitType,
+        costIsTotal: detail.costIsTotal,
         base: detail.base,
         height: detail.height,
     });

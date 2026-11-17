@@ -49,8 +49,14 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
             { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
         ],
     },
-    { title: 'Costo Unitario de Conversión', key: 'conversionUnitCost', align: 'end' as const },
-    { title: 'Costo por Presentación', key: 'costPerUnitType', align: 'end' as const },
+    { title: 'Costo unitario', key: 'conversionUnitCost', align: 'end' as const },
+    { title: 'Costo capturado', key: 'costPerUnitType', align: 'end' as const },
+    {
+        title: 'Alcance del costo',
+        key: 'costScope',
+        sortable: false,
+        value: (item) => (item.costIsTotal ? 'Total del detalle' : 'Por presentación'),
+    },
     { title: 'Monto s/ IVA', key: 'netPurchaseAmount', align: 'end' as const },
     { title: 'Monto c/ IVA', key: 'grossPurchaseAmount', align: 'end' as const },
     ...(props.canChange || props.canRemove
@@ -91,6 +97,8 @@ const cardValue = (item: PurchaseDetail, key: string) => {
                     | 'grossPurchaseAmount'
             ],
         );
+
+    if (key === 'costScope') return item.costIsTotal ? 'Total del detalle' : 'Por presentación';
 
     if (key === 'name')
         return item.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED

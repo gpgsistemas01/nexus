@@ -7,6 +7,7 @@ import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vu
 defineProps<{
     context: string;
     presentation: string;
+    costIsTotal?: boolean;
     quantityLimit: number;
     totals: { quantity: number; net: number; gross: number } | null;
     values: { quantity: string; costPerUnitType: string };
@@ -54,7 +55,9 @@ const emit = defineEmits<{
             @blur="emit('blur', 'quantity')"
         />
         <VTextField
-            label="Costo por presentación correcto"
+            :label="
+                costIsTotal ? 'Costo total correcto sin IVA' : 'Costo por presentación correcto'
+            "
             type="number"
             min="0.000001"
             step="0.000001"

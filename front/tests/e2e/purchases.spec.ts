@@ -143,8 +143,9 @@ for (const [path, title, item] of [
         'Compra',
         'Presentación',
         'Conversión',
-        'Costo Unitario de Conversión',
-        'Costo por Presentación',
+        'Costo unitario',
+        'Costo capturado',
+        'Alcance del costo',
         'Monto s/ IVA',
         'Monto c/ IVA',
         'Acciones',
@@ -517,3 +518,41 @@ test('compras: acceso, menú Vue y diálogo móvil sin desbordamiento global', a
     page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),
   ).toBeVisible();
 });
+
+for (const [path, label] of [
+  ['materiales', 'Material'],
+  ['consumibles', 'Consumible'],
+]) {
+  test(
+    `compras ${path}: costo total reparte el importe por cantidad y agrega IVA`,
+    { tag: '@essential' },
+    async ({ page }) => {
+      const { writes } = await mockPurchases(page);
+      await page.goto(`/compras/${path}`);
+      await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
+      const dialog = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
+      await dialog.getByRole('combobox', { name: 'Proveedor', exact: true }).click();
+      await page.getByRole('option', { name: 'Proveedor Central', exact: true }).click();
+      await dialog.getByRole('combobox', { name: 'Persona que recibe', exact: true }).click();
+      await page.getByRole('option', { name: personData.fullName, exact: true }).click();
+      await dialog.getByRole('radio', { name: 'Remisión', exact: true }).check();
+      await dialog.getByRole('combobox', { name: label, exact: true }).click();
+      await page.getByRole('option', { name: 'Lona · 2 × 50 · ROLLO', exact: true }).click();
+      await dialog.getByLabel('Cantidad', { exact: true }).fill('10');
+      await dialog
+        .getByRole('checkbox', { name: 'El costo capturado corresponde al total', exact: true })
+        .check();
+      await dialog.getByLabel('Costo total del detalle sin IVA', { exact: true }).fill('500');
+      await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
+      const row = dialog.locator('tbody tr').first();
+      await expect(row).toContainText('Total del detalle');
+      await expect(row).toContainText('$50');
+      await expect(dialog.getByLabel('Totales de compra')).toContainText('$580');
+      await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+      await expect(dialog).toBeHidden();
+      expect(writes[0]!.data).toMatchObject({
+        details: [{ quantity: 10, costPerUnitType: 500, costIsTotal: true }],
+      });
+    },
+  );
+}

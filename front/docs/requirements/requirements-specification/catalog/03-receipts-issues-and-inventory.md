@@ -134,3 +134,5 @@ a Almacén y administración.
 - **CA-RF-WST-002-2:** al agregar otra vez la misma merma, el cliente debe sumar su
   cantidad y conversión en un único detalle. La regla también aplica al editar
   detalles pendientes conforme a `RF-WST-005`; no permite enviar IDs de merma duplicados.
+
+Cada detalle de compra permite indicar si el costo capturado es el total sin IVA. En ese modo, el subtotal es ese costo, el costo unitario es costo ÷ cantidad comprada y el IVA se calcula sobre el subtotal. Sin marcar se conserva cantidad × costo. La selección persiste por detalle y se conserva en correcciones, consulta y Excel, para cualquier presentación.

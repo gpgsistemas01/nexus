@@ -16,6 +16,9 @@ import {
 
 const validateGoodsReceiptDetails = details => {
     details.forEach(detail => {
+        if (detail?.costIsTotal !== undefined && typeof detail.costIsTotal !== 'boolean') {
+            throw new Error(errorMap.details.INVALID_FORMAT_REQUIRED);
+        }
         if (!detail || typeof detail !== 'object' || Array.isArray(detail)
             || !detail.materialId || detail.quantity == null || detail.quantity === ''
             || detail.costPerUnitType == null || detail.costPerUnitType === '') {

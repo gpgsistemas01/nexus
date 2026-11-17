@@ -213,3 +213,12 @@ describe('totales mensuales de compras', () => {
     expect(getReportMonthKey('2026-01-01T06:00:00Z')).toBe('2026-01');
   });
 });
+
+it('Excel conserva el modo total y calcula el costo unitario con la cantidad comprada', async () => {
+  const { buildGoodsReceiptReportData } = await import('../../../src/utils/reports/warehouseReportExcel.js');
+  const rows = await Array.fromAsync(buildGoodsReceiptReportData([{ quantity: 10, costPerUnitType: 500,
+    costIsTotal: true, convertedQuantity: 30, conversionUnitCost: 50, netPurchaseAmount: 500, grossPurchaseAmount: 580 }]));
+  expect(rows[1][12]).toEqual({ formula: 'IFERROR(N2/I2,0)', result: 50 });
+  expect(rows[1][14]).toEqual({ formula: 'N2', result: 500 });
+  expect(rows[1][16]).toBe('Total del detalle');
+});

@@ -71,3 +71,8 @@ describe('validación de detalles de compra', () => {
     }
   });
 });
+
+it.each(['true', 'false', 0, 1, null])('rechaza modo de costo no booleano: %s', async costIsTotal => {
+    const details = [{ materialId: 'material-1', quantity: 10, costPerUnitType: 500, costIsTotal }];
+    expect(await runDetailsValidation(goodsReceiptValidation, details)).not.toEqual([]);
+});

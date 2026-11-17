@@ -24,6 +24,7 @@ const { values, errors, message, isSubmitting, isConflicted } = editor;
     <PurchaseCorrectionForm
         :context="detail.name"
         :presentation="detail.presentation"
+        :cost-is-total="detail.costIsTotal"
         :quantity-limit="Number(detail.quantity)"
         :totals="editor.totals.value"
         :values="values"
