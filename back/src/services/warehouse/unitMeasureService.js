@@ -41,6 +41,8 @@ export const findAllUnitMeasures = async ({
 
 const DEFAULT_UNIT_MEASURE_SELECT = {
     id: true,
+    name: true,
+    symbol: true,
     isActive: true
 };
 

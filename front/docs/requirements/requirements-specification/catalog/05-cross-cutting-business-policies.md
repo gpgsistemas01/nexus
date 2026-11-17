@@ -43,7 +43,7 @@ Las reglas se agrupan por tema. Cada identificador conserva una obligación veri
 | RN-023 | Una oferta proveedor-material, merma o proveedor inactivo no debe incorporarse a una relación o detalle nuevo; su desactivación debe conservar identidad, stock e historia y no debe impedir completar un detalle registrado previamente, sujeto a las demás validaciones del surtimiento. | Implementado |
 | RN-024 | Dos artículos de compra no deben coexistir con la misma clasificación como material o consumible, nombre recortado y comparado sin distinguir mayúsculas, presentación, unidad de medida, base y altura. | Implementado |
 | RN-025 | Una identidad de material existente debe reutilizarse cuando otro proveedor ofrezca el mismo material. | Implementado |
-| RN-026 | El formulario de material sólo debe habilitar medidas para unidades de metros o litros; pieza y otras unidades no utilizan esa sección. Ambas dimensiones pueden omitirse; si se envía una, el servidor requiere base y altura positivas. | Implementado |
+| RN-026 | Las altas con unidad KILOGRAMO o METRO LINEAL requieren Base = 1 y Altura positiva como medida por pieza. Las unidades de área, volumen o litros conservan ambas medidas opcionales como pareja positiva. | Implementado |
 | RN-027 | Al editar un material, presentación, unidad de medida y dimensiones deben permanecer inmutables. | Implementado |
 | RN-030 | Existencia, cantidad convertida, costo máximo y estado activo deben pertenecer a cada oferta proveedor-material y no crear otra identidad de material. | Implementado |
 | RN-031 | Un cambio de nombre de material debe rechazarse cuando produzca otra identidad existente. | Implementado |

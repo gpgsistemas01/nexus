@@ -22,7 +22,7 @@ export const findAllConsumables = async ({
 });
 
 export const createConsumable = ({ consumableDto, userId = null }) => createMaterial({
-    materialDto: { ...consumableDto, base: null, height: null },
+    materialDto: consumableDto,
     userId,
     type: MATERIAL_TYPES.CONSUMABLE
 });

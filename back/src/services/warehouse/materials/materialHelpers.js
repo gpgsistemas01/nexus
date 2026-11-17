@@ -1,3 +1,5 @@
+import { getPerPieceMeasureError } from '../../../shared/inventory/wasteMeasurements.js';
+import { AppError } from '../../../errors/AppError.js';
 import { ExcededMaxRetriesSkuError, MaterialRollReferenceReadOnly } from "../../../errors/warehouse/materialError.js";
 import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
@@ -24,7 +26,9 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null, 
     const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...rest } = materialDto;
 
     // La transacción comparte una conexión: cada consulta debe terminar antes de enviar la siguiente.
-    if (!context?.units?.get(unitMeasureId)) await findUniqueUnitMeasure({ tx, id: unitMeasureId });
+    const unit = context?.units?.get(unitMeasureId) ?? await findUniqueUnitMeasure({ tx, id: unitMeasureId });
+    const measureError = getPerPieceMeasureError(unit, rest);
+    if (measureError) throw new AppError(measureError, 'PER_PIECE_MEASURE_INVALID', 400);
     const presentation = context?.presentations?.get(presentationId) ?? await findUniquePresentation({ tx, id: presentationId });
     const supplier = context?.suppliers?.get(supplierId) ?? await findUniqueSupplier({ tx, id: supplierId });
 

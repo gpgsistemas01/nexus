@@ -190,22 +190,22 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     expect(editor.errors.value[field]).toBeTruthy();
   });
 
-  it('crear un consumible omite medidas aunque se manipule su estado local', async () => {
+  it('el alta del consumible envía la medida por pieza', async () => {
     const { editor, request } = openEditor('consumables', { action: 'create' });
     for (const [field, value] of Object.entries({
       name: 'Cinta',
       supplierId: ids.supplier,
       presentationId: ids.presentation,
       unitMeasureId: ids.unit,
-      base: '2',
-      height: '3',
+      base: '1',
+      height: '2.5',
     })) {
       editor.update(field as InventoryField, value);
     }
     await editor.submit();
     expect(request).toHaveBeenCalledOnce();
-    expect(request.mock.calls[0]?.[2]).not.toHaveProperty('base');
-    expect(request.mock.calls[0]?.[2]).not.toHaveProperty('height');
+    expect(request.mock.calls[0]?.[2]).toHaveProperty('base', 1);
+    expect(request.mock.calls[0]?.[2]).toHaveProperty('height', 2.5);
   });
 
   it.each(['materials', 'wastes'] as const)(

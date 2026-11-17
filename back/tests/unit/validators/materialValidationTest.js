@@ -86,9 +86,9 @@ describe('materialValidation', () => {
 
 
 describe('consumibles y referencias históricas', () => {
-  it.each([{ base: 2 }, { height: -1 }, { base: 'ignorado', height: 'ignorado' }])('no pide ni valida dimensiones de consumibles: %j', async dimensions => {
+  it.each([{ base: 2 }, { height: -1 }, { base: 'ignorado', height: 'ignorado' }])('rechaza medidas incompletas o inválidas de consumibles: %j', async dimensions => {
     const errors = await runValidation({ ...validMaterial, creationContext: 'goodsReceipt', ...dimensions }, consumableValidation);
-    expect(errors).toEqual([]);
+    expect(errors.length).toBeGreaterThan(0);
   });
   it.each(['referenceConeWeightKg', 'referenceRollTotalWeightKg'])('rechaza capturar o modificar %s con el código de error establecido', async field => {
     const errors = await runValidation({ ...validMaterial, creationContext: 'goodsReceipt', [field]: 1 });

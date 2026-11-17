@@ -44,3 +44,14 @@ export const prepareWasteRollReference = ({ material }) => {
         lengthM: Number(material[lengthField])
     };
 };
+
+// Una dimensión almacena el factor por pieza y la otra conserva el multiplicador neutro.
+export const isPerPieceMeasure = ({ name = '', symbol = '' } = {}) =>
+    /^(KILOGRAMOS?|METROS?( LINEALES?)?)$/.test(String(name).trim().toUpperCase())
+    || /^(KG|M|ML|MT|MTS)$/.test(String(symbol).trim().toUpperCase());
+
+export const getPerPieceMeasureError = (unit = {}, { base, height } = {}) => {
+    if (!isPerPieceMeasure(unit)) return null;
+    return Number(base) === 1 && Number(height) > 0 && Number.isFinite(Number(height))
+        ? null : 'Para kg o metros lineales, Base debe ser 1 y Altura debe indicar la medida positiva por pieza.';
+};

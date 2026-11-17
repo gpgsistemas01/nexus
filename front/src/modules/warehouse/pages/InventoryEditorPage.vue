@@ -41,6 +41,7 @@ const sections = computed(() =>
         template: editor.selectedTemplate.value,
         presentationName: editor.presentationName.value,
         usesMeasurements: editor.usesMeasurements.value,
+        isPerPiece: editor.isPerPiece.value,
         hasSupplier: !!values.supplierId,
         creationContext: props.creationContext,
         supplier: props.initialSupplier,

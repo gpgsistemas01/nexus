@@ -1,3 +1,4 @@
+import { getPerPieceMeasureError } from '../../../shared/inventory/wasteMeasurements.js';
 import { randomUUID } from 'node:crypto';
 import { setImmediate } from 'node:timers/promises';
 import { validateInventoryImportRow } from '../../../validators/forms/inventoryImportValidations.js';
@@ -21,7 +22,7 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const issue = (field, message, code = errorMap.inventoryImport.VALIDATION) => ({ field, message, code });
 
 export const validateInventoryImportRows = async ({ db, config, rows }) => {
-    // Las columnas de consulta no se convierten en captura. Consumibles conserva sus dimensiones nulas.
+    // Las columnas de consulta no se convierten en captura.
     const captureRows = config.mode === modes.CREATE ? rows.map(input => ({ ...input,
         values: Object.fromEntries(Object.entries(input.values).filter(([key]) => !config.readonlyFields.includes(key)))
     })) : rows;
@@ -112,6 +113,8 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                     }
                 } else {
                     const presentation = context.presentations.get(dto.presentationId);
+                    const measureError = getPerPieceMeasureError(context.units.get(dto.unitMeasureId), dto);
+                    if (measureError) add('height', measureError);
                     if (!presentation || !context.units.has(dto.unitMeasureId)) add('presentationName', 'Presentación o unidad inexistente, inactiva o ambigua.');
                     else {
                         assertPieceQuantity({ quantity: dto.minStock, item: { presentation } });

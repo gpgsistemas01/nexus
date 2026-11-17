@@ -12,6 +12,7 @@ import {
     calculateWasteNetWeight,
     calculateWasteRollLength,
     isRollPresentation,
+    isPerPieceMeasure,
     prepareWasteRollReference,
 } from '@nexus/waste-measurements';
 import type {
@@ -47,6 +48,7 @@ export const initialInventoryValues = (target: EditorTarget): InventoryValues =>
 };
 
 export const unitUsesMeasurements = (unit?: Record<string, unknown>) =>
+    isPerPieceMeasure({ name: String(unit?.name ?? ''), symbol: String(unit?.symbol ?? '') }) ||
     /\b(?:metros?|litros?)\b/i.test(String(unit?.name ?? '')) ||
     /^(?:m[²³23]?|mt|mts|l|lt|lts)$/i.test(String(unit?.symbol ?? ''));
 
@@ -130,12 +132,8 @@ export const buildInventoryPayload = (
             supplierId: String(values.supplierId),
             presentationId: String(values.presentationId),
             unitMeasureId: String(values.unitMeasureId),
-            ...(resource === 'materials'
-                ? {
-                      base: values.base === '' ? null : Number(values.base),
-                      height: values.height === '' ? null : Number(values.height),
-                  }
-                : {}),
+            base: values.base === '' ? null : Number(values.base),
+            height: values.height === '' ? null : Number(values.height),
             ...(values.minStock === '' ? {} : { minStock: Number(values.minStock) }),
             isActive: values.isActive,
         };
@@ -192,12 +190,8 @@ export const buildInventoryPayload = (
         supplierId: String(values.supplierId),
         presentationId: String(values.presentationId),
         unitMeasureId: String(values.unitMeasureId),
-        ...(resource === 'materials'
-            ? {
-                  base: values.base === '' ? null : Number(values.base),
-                  height: values.height === '' ? null : Number(values.height),
-              }
-            : {}),
+        base: values.base === '' ? null : Number(values.base),
+        height: values.height === '' ? null : Number(values.height),
         newStock: Number(values.newStock),
         observations,
     };

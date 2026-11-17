@@ -37,14 +37,14 @@ describe('consumableService', () => {
     }));
   });
 
-  it('crea el consumible como material tipado y sin dimensiones', async () => {
+  it('conserva la medida por pieza en el alta del consumible', async () => {
     await createConsumable({
-      consumableDto: { name: 'Guantes', base: 2, height: 3 },
+      consumableDto: { name: 'Guantes', base: 1, height: 2.5 },
       userId: 'user-1'
     });
 
     expect(createMaterial).toHaveBeenCalledWith({
-      materialDto: { name: 'Guantes', base: null, height: null },
+      materialDto: { name: 'Guantes', base: 1, height: 2.5 },
       userId: 'user-1',
       type: 'CONSUMABLE'
     });
