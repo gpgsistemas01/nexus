@@ -1,4 +1,4 @@
-import { isPerPieceMeasure, getConsumableUnitPresentation } from '@nexus/waste-measurements';
+import { isPerPieceMeasure, isFixedUnitPresentation } from '@nexus/waste-measurements';
 import { computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
@@ -80,28 +80,29 @@ export const useInventorySelection = (options: {
     const usesMeasurements = computed(
         () =>
             resource !== 'wastes' &&
-            (isCreating
-                ? unitUsesMeasurements(selectedUnit.value?.data)
-                : unitUsesMeasurements({
-                      symbol: target.row?.unitMeasure,
-                      name: target.row?.unitMeasure,
-                  })),
+            (isFixedUnitPresentation(
+                isCreating ? selectedPresentation.value?.data : { name: target.row?.presentation },
+            ) ||
+                (isCreating
+                    ? unitUsesMeasurements(selectedUnit.value?.data)
+                    : unitUsesMeasurements({
+                          symbol: target.row?.unitMeasure,
+                          name: target.row?.unitMeasure,
+                      }))),
     );
     watch(selectedUnit, (unit) => {
-        if (resource === 'wastes' || !isCreating || !unit) return;
+        if (
+            resource === 'wastes' ||
+            !isCreating ||
+            !unit ||
+            isFixedUnitPresentation(selectedPresentation.value?.data)
+        )
+            return;
+
+        if (resource === 'consumables') return;
 
         if (isPerPieceMeasure(unit.data)) {
             options.setValue('base', '1');
-
-            if (resource === 'consumables') {
-                options.setValue('height', '1');
-                options.clearError('height');
-                const expected = getConsumableUnitPresentation(unit.data);
-                const presentation = presentations.items.value.find(
-                    (item) => String(item.data.name).trim().toUpperCase() === expected,
-                );
-                options.setValue('presentationId', presentation?.id ?? '');
-            }
 
             options.clearError('base');
             return;
@@ -112,6 +113,21 @@ export const useInventorySelection = (options: {
         for (const field of ['base', 'height'] as const) {
             options.setValue(field, '');
             options.clearError(field);
+        }
+    });
+    watch(selectedPresentation, (presentation, previous) => {
+        if (resource === 'wastes' || !isCreating) return;
+
+        if (isFixedUnitPresentation(presentation?.data)) {
+            for (const field of ['base', 'height'] as const) {
+                options.setValue(field, '1');
+                options.clearError(field);
+            }
+        } else if (isFixedUnitPresentation(previous?.data)) {
+            for (const field of ['base', 'height'] as const) {
+                options.setValue(field, '');
+                options.clearError(field);
+            }
         }
     });
     watch(supplierId, () => {
@@ -150,13 +166,8 @@ export const useInventorySelection = (options: {
         presentationName,
         usesMeasurements,
         isPerPiece: computed(() =>
-            isPerPieceMeasure(
-                isCreating
-                    ? selectedUnit.value?.data
-                    : {
-                          name: target.row?.unitMeasure,
-                          symbol: target.row?.unitMeasure,
-                      },
+            isFixedUnitPresentation(
+                isCreating ? selectedPresentation.value?.data : { name: target.row?.presentation },
             ),
         ),
         refreshSuppliers,

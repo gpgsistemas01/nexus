@@ -322,7 +322,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const invalid = await preview([{ ...row, height: 2 }], 'consumables');
         expect(invalid.preview.summary.errors).toBe(1);
         expect(await savedOffer(row.name)).toBeNull();
-        const batch = await preview([row], 'consumables');
+        const batch = await preview([{ ...row, base: '', height: '' }], 'consumables');
         expect(batch.preview.summary.errors).toBe(0);
         await confirm(batch).expect(200);
         const saved = await savedOffer(row.name);

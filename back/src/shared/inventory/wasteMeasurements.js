@@ -56,16 +56,14 @@ export const getPerPieceMeasureError = (unit = {}, { base, height } = {}) => {
         ? null : 'Para kg o metros lineales, Base debe ser 1 y Altura debe indicar la medida positiva por pieza.';
 };
 
-export const getConsumableUnitPresentation = (unit = {}) => {
-    if (!isPerPieceMeasure(unit)) return null;
-    return /^(KG)$/i.test(String(unit.symbol ?? '').trim()) || /^KILOGRAMOS?$/i.test(String(unit.name ?? '').trim())
-        ? 'KILOGRAMOS' : 'METRO LINEAL';
-};
+export const isFixedUnitPresentation = (presentation = {}) =>
+    /^(KILOGRAMOS?|METRO LINEAL)$/.test(String(presentation.name ?? '').trim().toUpperCase());
 
-export const getConsumableUnitError = (unit, { base, height } = {}, presentation = {}) => {
-    const expected = getConsumableUnitPresentation(unit);
-    if (!expected) return null;
-    if (Number(base) !== 1 || Number(height) !== 1) return 'Los consumibles en kg o metros lineales requieren medidas 1 × 1.';
-    return String(presentation.name ?? '').trim().toUpperCase() === expected
-        ? null : `La presentación de este consumible debe ser ${expected}.`;
+export const applyUnitPresentationMeasurements = (data, presentation) => isFixedUnitPresentation(presentation)
+    ? { ...data, base: data.base ?? 1, height: data.height ?? 1 } : data;
+
+export const getUnitPresentationMeasurementsError = ({ base, height } = {}, presentation = {}) => {
+    if (!isFixedUnitPresentation(presentation)) return null;
+    return Number(base) === 1 && Number(height) === 1
+        ? null : 'La presentación KILOGRAMOS o METRO LINEAL requiere medidas 1 × 1.';
 };

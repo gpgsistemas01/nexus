@@ -139,16 +139,16 @@ describe('registro de materiales con y sin medidas', () => {
     expect(await prisma.supplierMaterial.count({ where: { supplierId: ids.supplier, material: { name: data.name } } })).toBe(0);
   });
 
-  it.each(['kilograms', 'linear'].flatMap(unit => ['direct', 'goodsReceipt'].map(context => ({ unit, context }))))('consumible $unit desde $context persiste unidad 1 × 1 y rechaza CAJA o factores arbitrarios', async ({ unit, context }) => {
+  it.each(['kilograms', 'linear'].flatMap(unit => ['direct', 'goodsReceipt'].map(context => ({ unit, context }))))('consumible $unit desde $context persiste unidad 1 × 1 y deriva las medidas de la presentación y rechaza factores arbitrarios', async ({ unit, context }) => {
     const presentationName = unit === 'kilograms' ? 'KILOGRAMOS' : 'METRO LINEAL';
     const presentation = await prisma.presentation.upsert({ where: { name: presentationName }, update: {}, create: { name: presentationName } });
     const data = { ...body(`unit-${unit}-${context}`), unitMeasureId: ids[unit], presentationId: presentation.id,
       base: 1, height: 1, newStock: 7.5, ...(context === 'goodsReceipt' ? { creationContext: context } : {}) };
-    for (const invalid of [{ height: 2 }, { presentationId: ids.presentation }]) {
+    for (const invalid of [{ height: 2 }]) {
       await request(app).post('/consumables').send({ ...data, ...invalid }).expect(400);
       expect(await prisma.material.count({ where: { name: data.name } })).toBe(0);
     }
-    await request(app).post('/consumables').send(data).expect(200);
+    await request(app).post('/consumables').send({ ...data, base: null, height: null }).expect(200);
     const saved = await prisma.supplierMaterial.findFirstOrThrow({ where: { supplierId: ids.supplier, material: { name: data.name } }, include: { material: true } });
     expect(Number(saved.material.base)).toBe(1);
     expect(Number(saved.material.height)).toBe(1);
