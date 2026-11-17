@@ -76,7 +76,7 @@ no aparece el botón.
 
 <!-- module:end -->
 
-Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: para KILOGRAMO o METRO LINEAL, el multiplicador es 1 y se captura la medida por pieza. Al volver a Compras, el artículo seleccionado muestra sus medidas, unidad y cantidad convertida prevista antes de pulsar **Agregar**. El artículo nuevo queda seleccionado;
+Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: para KILOGRAMO o METRO LINEAL, ambas medidas son 1 × 1 y la presentación es KILOGRAMOS o METRO LINEAL, respectivamente. Después de pulsar **Agregar**, la tabla de detalles muestra medidas, unidad y cantidad convertida. El artículo nuevo queda seleccionado;
 todavía debe capturar **Cantidad** y **Costo por Presentación**,
 pulsar **Agregar** y guardar la compra. El alta auxiliar no recibe la mercancía:
 la existencia de esta recepción se registra al guardar la compra.
@@ -158,3 +158,5 @@ ni se suman en los reportes de compras activas.
 Pulse **Exportar Excel**, seleccione el alcance y confirme **Descargar Excel**.
 Consulte [Reportes](14-reports.md) para elegir periodo o filtros.
 <!-- manual:end -->
+
+El importe sin IVA es Cantidad comprada × Costo por Presentación. Las medidas sólo representan la conversión de la unidad; no multiplican el precio capturado.

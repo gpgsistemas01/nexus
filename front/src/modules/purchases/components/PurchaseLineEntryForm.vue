@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { isRecord } from '../../../shared/utils/isRecord.js';
-import { numberText, convertedQuantityText } from '../../../shared/utils/formatNumbers.js';
-import { calculateGoodsReceiptDetailAmounts } from '@nexus/purchase-calculations';
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VBtn } from 'vuetify/components/VBtn';
@@ -10,7 +6,7 @@ import { isPiecePresentation } from '@nexus/piece-quantity';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
-const props = defineProps<{
+defineProps<{
     itemLabel: string;
     values: { materialId: string; quantity: string; costPerUnitType: string };
     errors: Partial<Record<'materialId' | 'quantity' | 'costPerUnitType', string>>;
@@ -30,26 +26,6 @@ const emit = defineEmits<{
     create: [search: string];
     add: [];
 }>();
-const measurements = computed(() => {
-    const data = props.selected?.data;
-    const material = data && isRecord(data.material) ? data.material : data;
-    if (!material) return null;
-
-    const unit = isRecord(material.unitMeasure) ? material.unitMeasure : {};
-    const symbol = String(unit.symbol || unit.name || '');
-    const { convertedQuantity } = calculateGoodsReceiptDetailAmounts({
-        base: material.base,
-        height: material.height,
-        quantity: Number(props.values.quantity) || 0,
-        costPerUnitType: 0,
-    });
-    return {
-        base: numberText(material.base == null ? null : Number(material.base)),
-        height: numberText(material.height == null ? null : Number(material.height)),
-        unit: symbol,
-        converted: convertedQuantityText(convertedQuantity, symbol),
-    };
-});
 </script>
 
 <template>
@@ -78,52 +54,6 @@ const measurements = computed(() => {
                     @retry="emit('retry')"
                 />
             </VCol>
-            <template v-if="measurements">
-                <VCol
-                    cols="12"
-                    md="3"
-                >
-                    <VTextField
-                        label="Base / multiplicador"
-                        :model-value="measurements.base"
-                        readonly
-                        tabindex="-1"
-                    />
-                </VCol>
-                <VCol
-                    cols="12"
-                    md="3"
-                >
-                    <VTextField
-                        label="Altura / medida por pieza"
-                        :model-value="measurements.height"
-                        readonly
-                        tabindex="-1"
-                    />
-                </VCol>
-                <VCol
-                    cols="12"
-                    md="3"
-                >
-                    <VTextField
-                        label="Unidad de conversión"
-                        :model-value="measurements.unit"
-                        readonly
-                        tabindex="-1"
-                    />
-                </VCol>
-                <VCol
-                    cols="12"
-                    md="3"
-                >
-                    <VTextField
-                        label="Cantidad convertida prevista"
-                        :model-value="measurements.converted"
-                        readonly
-                        tabindex="-1"
-                    />
-                </VCol>
-            </template>
             <VCol
                 cols="12"
                 md="2"

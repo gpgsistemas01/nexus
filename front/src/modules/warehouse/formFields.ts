@@ -115,6 +115,10 @@ export const inventorySections = (
             {
                 name: 'presentationId',
                 label: 'Presentación',
+                hint:
+                    isCreating && resource === 'consumables' && options.isPerPiece
+                        ? 'Selecciona KILOGRAMOS para kg o METRO LINEAL para metros lineales.'
+                        : undefined,
                 type: isCreating && !isWaste ? 'lookup' : undefined,
                 isReadOnly: !isCreating || isWaste,
                 displayValue:
@@ -221,7 +225,9 @@ export const inventorySections = (
         sections.push({
             id: 'measurements',
             title: options.isPerPiece
-                ? 'Medida por pieza'
+                ? resource === 'consumables'
+                    ? 'Medidas de la unidad (1 × 1)'
+                    : 'Medida por pieza'
                 : resource === 'consumables'
                   ? 'Medidas del consumible'
                   : isWaste
@@ -236,13 +242,17 @@ export const inventorySections = (
                 label: options.isPerPiece
                     ? name === 'base'
                         ? 'Multiplicador fijo'
-                        : 'Medida por pieza (kg o m)'
+                        : resource === 'consumables'
+                          ? 'Unidad fija (1)'
+                          : 'Medida por pieza (kg o m)'
                     : name === 'base'
                       ? 'Base (m)'
                       : 'Altura (m)',
                 type: 'number',
                 isReadOnly:
-                    !isCreating || (isWaste && isRoll) || (options.isPerPiece && name === 'base'),
+                    !isCreating ||
+                    (isWaste && isRoll) ||
+                    (options.isPerPiece && (resource === 'consumables' || name === 'base')),
                 ...(isCreating && isWaste && isRoll
                     ? { displayValue: String(preview[name] ?? '') }
                     : {}),

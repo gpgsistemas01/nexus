@@ -403,7 +403,7 @@ it.each([false, true])(
     });
     const fields = sections.find((section) => section.id === 'measurements')?.fields;
     expect(fields?.map((field) => field.name)).toEqual(['base', 'height']);
-    expect(fields?.find((field) => field.name === 'height')?.isReadOnly).toBe(false);
+    expect(fields?.find((field) => field.name === 'height')?.isReadOnly).toBe(isPerPiece);
     if (isPerPiece) expect(fields?.find((field) => field.name === 'base')?.isReadOnly).toBe(true);
   },
 );
