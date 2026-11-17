@@ -8,7 +8,7 @@ la [vista de procesos](../processes/index.md).
 
 **Componentes y contratos con clasificadores UML en Mermaid:** `DIA-ARQ-CMP-001`.
 
-### Contratos HTTP entre frontend y backend
+### Consumidor y contrato HTTP
 
 ```mermaid
 ---
@@ -18,7 +18,7 @@ config:
 ---
 classDiagram
     direction TB
-    namespace Navegador {
+    namespace ConsumidorAPI {
         class HttpClient { <<component>> }
     }
     namespace Backend {
@@ -77,8 +77,9 @@ classDiagram
 
 `<<component>>` identifica componentes y `<<interface>>` contratos. `<|..` indica
 realización y `..>` dependencia. Mermaid aproxima esta vista con clasificadores;
-no dibuja puertos ni conectores de componente UML nativos. Vue consume el contrato HTTP; su alojamiento y composición visual quedan fuera
-del proceso Express.
+no dibuja puertos ni conectores de componente UML nativos. El cliente Vue actual
+consume el contrato HTTP; su alojamiento y composición visual quedan fuera del
+proceso Express.
 
 | Componente | Responsabilidad |
 | --- | --- |
@@ -97,9 +98,8 @@ consulta de datos del listado.
 
 ## Reutilización y mantenimiento
 
-Las factories y consumidores se detallan en los
-[diagramas de reutilización](../development/reuse-and-refactoring/index.md)
-y en el [patrón de composición visual](../development/design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md).
+Las factories y consumidores de servicios se detallan en los
+[diagramas de reutilización](../development/reuse-and-refactoring/index.md).
 Las [colaboraciones por dominio](../development/code-structure/03-backend-domains-and-dependencies.md)
 amplían las dependencias y [OpenAPI](../../openapi/openapi.json) define los contratos HTTP.
 

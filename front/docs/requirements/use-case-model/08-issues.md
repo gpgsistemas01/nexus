@@ -12,17 +12,10 @@ registran y editan sus solicitudes; Personal de almacén también surte, devuelv
 reportes. El Administrador del sistema hereda las funciones de almacén. Una consulta no
 concede por sí misma acceso a las demás operaciones.
 
-Crear cliente se relaciona mediante `«extend»` con Crear salida y Editar encabezado.
-La salida puede completarse con un cliente existente; el alta auxiliar es opcional.
-Surtir y Devolver conservan su actor específico y se inician según estado y permiso;
-no son inclusiones obligatorias de Consulta ni de Crear salida.
-
-El punto de extensión es la selección de Cliente del paso 3 al crear una salida
-o editar su encabezado. Con permisos de lectura/alta de Directorio y cliente
-editable, se escribe un nombre sin coincidencia y se elige **Registrar cliente**.
-`CU-CAT-06` devuelve el cliente activo y retoma la captura; cancelar conserva la
-selección anterior. El alta auxiliar no guarda la salida. Las áreas operativas,
-el surtimiento y la devolución no permiten esta extensión.
+El alta contextual de cliente se representa una sola vez en [Altas desde selectores](09-contextual-creation.md#cliente-durante-una-salida).
+Aquí no se repite ese caso. Surtir, devolver y generar reportes son objetivos
+independientes con participación de Personal de almacén. Sus líneas desde Consulta
+siguen la convención de acceso del modelo, sin afirmar `«include»` ni `«extend»`.
 
 ## Salidas de materiales
 
@@ -47,7 +40,6 @@ direction LR
         ucMaterialSupply("CU-SAL-05 Surtir material")
         ucMaterialReturn("CU-SAL-06 Devolver material surtido")
         ucMaterialIssueReport("CU-SAL-07 Generar reporte de salidas de material")
-        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     operational -- ucMaterialIssueQuery
@@ -55,12 +47,12 @@ direction LR
     ucMaterialIssueQuery -- ucMaterialIssueDetails
     ucMaterialIssueQuery -- ucMaterialIssueHeader
     ucMaterialIssueQuery -- ucMaterialIssueCreate
+    ucMaterialIssueQuery -- ucMaterialSupply
+    ucMaterialIssueQuery -- ucMaterialReturn
+    ucMaterialIssueQuery -- ucMaterialIssueReport
     warehouse -- ucMaterialSupply
     warehouse -- ucMaterialReturn
     warehouse -- ucMaterialIssueReport
-    warehouse -- clientExtension
-    clientExtension ..>:extend ucMaterialIssueCreate
-    clientExtension ..>:extend ucMaterialIssueHeader
 ```
 
 ## Salidas de mermas
@@ -86,7 +78,6 @@ direction LR
         ucWasteSupply("CU-SAL-12 Surtir merma")
         ucWasteReturn("CU-SAL-13 Devolver merma surtida")
         ucWasteIssueReport("CU-SAL-14 Generar reporte de salidas de merma")
-        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     operational -- ucWasteIssueQuery
@@ -94,12 +85,12 @@ direction LR
     ucWasteIssueQuery -- ucWasteIssueDetails
     ucWasteIssueQuery -- ucWasteIssueHeader
     ucWasteIssueQuery -- ucWasteIssueCreate
+    ucWasteIssueQuery -- ucWasteSupply
+    ucWasteIssueQuery -- ucWasteReturn
+    ucWasteIssueQuery -- ucWasteIssueReport
     warehouse -- ucWasteSupply
     warehouse -- ucWasteReturn
     warehouse -- ucWasteIssueReport
-    warehouse -- clientExtension
-    clientExtension ..>:extend ucWasteIssueCreate
-    clientExtension ..>:extend ucWasteIssueHeader
 ```
 
 ## Salidas de consumibles
@@ -125,7 +116,6 @@ direction LR
         ucConsumableSupply("CU-SAL-19 Surtir consumible")
         ucConsumableReturn("CU-SAL-20 Devolver consumible surtido")
         ucConsumableIssueReport("CU-SAL-21 Generar reporte de salidas de consumible")
-        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     operational -- ucConsumableIssueQuery
@@ -133,10 +123,10 @@ direction LR
     ucConsumableIssueQuery -- ucConsumableIssueDetails
     ucConsumableIssueQuery -- ucConsumableIssueHeader
     ucConsumableIssueQuery -- ucConsumableIssueCreate
+    ucConsumableIssueQuery -- ucConsumableSupply
+    ucConsumableIssueQuery -- ucConsumableReturn
+    ucConsumableIssueQuery -- ucConsumableIssueReport
     warehouse -- ucConsumableSupply
     warehouse -- ucConsumableReturn
     warehouse -- ucConsumableIssueReport
-    warehouse -- clientExtension
-    clientExtension ..>:extend ucConsumableIssueCreate
-    clientExtension ..>:extend ucConsumableIssueHeader
 ```

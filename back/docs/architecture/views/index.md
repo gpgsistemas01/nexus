@@ -1,59 +1,59 @@
 # Vistas de arquitectura de la API
 
-[ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) es la referencia
-para describir la arquitectura: interesados, preocupaciones, puntos de vista y modelos.
-Se aplica como guía; no se declara conformidad integral.
+[ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) guía la selección
+de puntos de vista según las preocupaciones de quienes integran, mantienen y operan
+la API. Se usa como referencia; no se declara conformidad integral.
 
-## Estilos arquitectónicos identificados
+## Estilo y estructura de la API
 
-| Estilo o estructura | Evidencia en el sistema | Cómo se documenta |
+| Aspecto | Evidencia en el código | Vista adecuada |
 | --- | --- | --- |
-| Cliente-servidor | Vue consume contratos HTTP de Express; PostgreSQL es una dependencia externa. | Contexto C4 y despliegue; contratos en OpenAPI. |
-| Monolito modular por dominio con capas | Rutas/controladores, servicios y persistencia viven en una aplicación Node y se agrupan por dominio. | Componentes UML y dependencias entre capas y módulos. |
-| Persistencia relacional | Prisma define el acceso a PostgreSQL y las transacciones coordinan escrituras. | Modelo ER y secuencias de confirmación, conflicto y rollback. |
-| Procesamiento concurrente acotado | El análisis de Excel usa workers temporales `worker_threads` dentro del mismo backend. | Secuencias de ejecución que distinguen el hilo HTTP del worker; no se dibuja como servicio independiente. |
-| Notificación complementaria | El backend publica eventos por Socket.IO después de completar operaciones; el cliente Vue actual no mantiene una suscripción. | Mostrar el canal como contrato secundario en componentes y despliegue, sin clasificar el sistema como arquitectura dirigida por eventos. |
+| Interfaz cliente-servidor | Express recibe HTTP del cliente Vue y responde con JSON, errores o archivos; no sirve la SPA. Swagger UI sólo se habilita en desarrollo. | Contexto API y contratos OpenAPI. |
+| Solicitud-respuesta HTTP | Las rutas agrupan operaciones por dominio (`/api/auth`, `/api/warehouse`, `/api/admin`). No se declara conformidad REST estricta. | OpenAPI para métodos y esquemas; secuencias para el recorrido de cada operación. |
+| Monolito modular por dominio y capas | Rutas, controladores, servicios y persistencia colaboran en una aplicación Node. | Componentes y dependencias; las capas no son servicios desplegables. |
+| Persistencia relacional | Repositories y Prisma consultan PostgreSQL; las escrituras compuestas usan transacciones. | Modelo ER y secuencias de confirmación, conflicto y rollback. |
+| Procesamiento de archivos | El análisis de Excel crea workers temporales `worker_threads` dentro del backend. | Secuencia de la operación; el worker no es un servicio independiente. |
+| Notificación complementaria | La API publica eventos Socket.IO después de operaciones; el cliente Vue actual no se suscribe a ese canal. | Contrato de tiempo real separado de HTTP y mostrado sólo donde sea relevante. |
 
-## Métodos para describirla
+## Métodos de descripción
 
-Los estilos describen cómo está construido el sistema; estas referencias describen
-cómo comunicar esa estructura. No son alternativas excluyentes.
+Estas referencias organizan preguntas sobre la API; no se adoptan como plantillas
+completas ni describen la arquitectura interna de Vue.
 
-| Método o notación | Uso en esta documentación |
+| Método o notación | Aplicación a estas vistas |
 | --- | --- |
-| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Guía para relacionar interesados, preocupaciones, puntos de vista y modelos; se usa como referencia, sin declarar conformidad integral. |
-| [4+1 de Kruchten](https://philippe.kruchten.com/architecture/) | Organiza las vistas lógica, procesos, desarrollo y física que ya corresponden a los lectores y al sistema. |
-| [C4](https://c4model.com/diagrams) | Contexto y unidades ejecutables para los límites externos; componentes cuando aclaren responsabilidades. No se exige dibujar todos sus niveles. |
-| UML y ER | Componentes/dependencias, despliegue, secuencias y modelo relacional. Mermaid es la herramienta de renderizado, no el estándar de arquitectura. |
-| [arc42](https://arc42.org/overview/) | Referencia para comprobar cobertura de contexto, ejecución y despliegue; no se adopta la plantilla completa. |
+| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Seleccionar vistas para integradores de la API, mantenedores y operación. |
+| [C4](https://c4model.com/diagrams) | Contexto para ubicar consumidor, frontera API y PostgreSQL; contenedor para el proceso desplegable. No se requieren todos los niveles C4. |
+| UML | Componentes para módulos internos, despliegue para proceso y dependencias, secuencias para solicitudes y fallos. Mermaid renderiza las figuras, pero no es el estándar. |
+| OpenAPI 3.1 | Contrato HTTP de rutas, parámetros, cuerpos, seguridad y respuestas; no sustituye las vistas internas. |
+| ER | Modelo relacional persistido por la API. |
 
-La arquitectura general se comunica con una vista de contexto cliente-servidor y una
-vista lógica de módulos y capas. Las vistas de procesos, desarrollo y despliegue
-completan preguntas concretas; los diagramas se vinculan a código y contratos vigentes.
+El diagrama de contexto del [sistema completo](../../../../front/docs/architecture/views/overview.md#arquitectura-general-aplicada)
+ubica Vue como consumidor. Estas vistas delimitan la API y explican sus contratos,
+estructura interna, ejecución y dependencias de persistencia.
 
-## Vistas y lectores
+## Vistas por preocupación
 
-| Lector y preocupación | Vista | Contenido verificable |
+| Pregunta sobre la API | Vista | Contenido |
 | --- | --- | --- |
-| Integrador: límites y dependencias | [Física](physical/index.md) | Vue como cliente externo, API Express, PostgreSQL y conexiones; distinguir configuración del repositorio y despliegue documentado. |
-| Mantenedor: responsabilidades y acceso | [Lógica](logical/index.md) | Dominios, rutas/controladores, servicios, repositories, identidad y persistencia. |
-| Desarrollador: transacciones y fallos | [Procesos](processes/index.md) | Secuencias HTTP, workers, validaciones, bloqueos, confirmación, rechazo y auditoría. |
-| Desarrollador: ubicación e impacto de cambios | [Desarrollo](development/index.md) | Archivos, imports, patrones y mapa generado. |
-| Operación: recuperación y disponibilidad | [Física](physical/index.md) | Arranque, salud, cierre, conexión, migraciones y respaldo/restauración. |
-| Integrador: entradas y salidas HTTP | [OpenAPI](../openapi/index.md) | Métodos, rutas, autenticación, cuerpos, respuestas y errores. |
+| ¿Qué operaciones puede solicitar un consumidor? | [OpenAPI](../openapi/index.md) | Rutas, métodos, autenticación, formatos, respuestas y errores públicos. |
+| ¿Qué atiende una ruta? | [Lógica](logical/index.md) | Middleware, controladores, servicios de dominio y persistencia. |
+| ¿Qué ocurre en una operación? | [Procesos](processes/index.md) | Validación, autorización, transacción, worker y respuesta HTTP. |
+| ¿Dónde vive la implementación? | [Desarrollo](development/index.md) | Módulos, imports, patrones y mapa generado. |
+| ¿Cómo se ejecuta la API? | [Física](physical/index.md) | Proceso Node, rutas de salud, conexión PostgreSQL, migraciones y despliegue. |
+| ¿Qué datos persiste? | [Modelo persistente](logical/data-and-persistence/index.md) | Entidades, claves, relaciones e índices. |
 
-## Criterios de documentación
+## Criterios
 
-- Cada figura responde una pregunta, indica su alcance y distingue dependencia,
-  llamada, despliegue o relación de datos mediante su notación y leyenda.
-- Separar aplicaciones ejecutables de módulos internos; mostrar protocolos y fronteras
-  de confianza donde haya comunicación o acceso a datos.
-- En cada escenario técnico, identificar autorización, transacción y resultado ante
-  conflicto o fallo. Las notificaciones posteriores no forman parte de la confirmación.
-- Contrastar componentes con archivos y rutas existentes. Declarar como propuesta una
-  topología que no esté implementada; una configuración local no acredita el estado del proveedor.
-- Mantener las reglas de negocio en requisitos de `front/`, los contratos en OpenAPI
-  y los comandos de preparación y ejecución en Desarrollo.
+- Separar contratos HTTP públicos de las llamadas internas; mostrar autenticación,
+  autorización y formato de error en el nivel que corresponda.
+- Distinguir el proceso API de módulos, workers temporales, PostgreSQL y el cliente.
+- En escrituras, identificar validación, transacción, respuesta y resultado ante
+  conflicto o fallo. Los eventos posteriores no confirman la solicitud.
+- Vincular cada figura con rutas, código o contratos vigentes; marcar como propuesta
+  cualquier topología que no esté desplegada.
+- Mantener requisitos y navegación en `front/`, contratos HTTP en OpenAPI y comandos
+  de ejecución en Desarrollo.
 
-El detalle de funciones se consulta en el mapa generado. Los diagramas de contexto y
-componentes resumen responsabilidades, sin repetir cada función o endpoint.
+OpenAPI es la referencia de cada endpoint. Los diagramas explican sólo los límites y
+colaboraciones que el contrato no expresa.

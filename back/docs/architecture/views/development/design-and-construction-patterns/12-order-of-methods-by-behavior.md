@@ -1,4 +1,4 @@
-# 13. Orden de métodos por comportamiento
+# 12. Orden de métodos por comportamiento
 
 **Identificador:** `DIA-PAT-ORD-001`. **Pregunta:** ¿en qué orden se localizan las
 operaciones equivalentes a través de las capas?

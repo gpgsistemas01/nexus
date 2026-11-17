@@ -38,6 +38,6 @@ y validar la API. Las convenciones están en el [estándar de código](../../cod
 
 `npm start` ejecuta `src/server.js`; `src/app.js` construye Express sin escuchar.
 Para comprobar disponibilidad use `/health/ready`; `/health/live` sólo comprueba
-que HTTP responde. El [README del backend](../../../../README.md#salud-y-cierre-del-servidor)
-describe resultados y cierre con señales. No use el estado de una página de login
+que HTTP responde. La vista de [disponibilidad y ciclo de vida de la API](../physical/01-system-runtime-and-deployment.md#disponibilidad-y-ciclo-de-vida)
+describe readiness y cierre con señales. No use el estado de una página de login
 como evidencia de acceso a PostgreSQL.

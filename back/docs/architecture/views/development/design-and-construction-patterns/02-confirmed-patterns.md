@@ -1,4 +1,4 @@
-# 2. Resumen de patrones confirmados
+# 2. Resumen de patrones confirmados de la API
 
 | Frontera | Decisión aplicada | Evidencia |
 | --- | --- | --- |
@@ -11,8 +11,7 @@
 | Auditoría | Registro transversal después de la respuesta. | `auditWrites`, `persistWriteAudit`. |
 | Pruebas | Harness HTTP y fixtures de PostgreSQL aislado. | `createControllerTestApp` y `tests/helpers`. |
 
-La [colección de Vue](../../../../../../front/docs/architecture/views/development/design-and-construction-patterns/index.md)
-conserva componentes, composables, callbacks, adaptadores HTTP, sesión e incorporación
-contextual. Las constantes públicas permanecen en `src/shared`; las reglas privadas,
-en el servidor. La [evaluación SOLID](16-solid-principles.md)
-explica principios y límites de estas decisiones.
+El cliente Vue queda fuera de estos patrones; consume el contrato HTTP y los módulos
+públicos de `src/shared`, mientras la API conserva validación y autorización.
+La [evaluación SOLID](15-solid-principles.md) explica principios y límites de estas
+decisiones.

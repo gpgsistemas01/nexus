@@ -1,36 +1,27 @@
-# Organización e integración del código
+# Organización del código de la API
 
-Esta colección sigue siendo la entrada general de la vista de desarrollo. Describe
-la distribución del repositorio, el registro HTTP, las fronteras entre servidor y
-navegador y la integración con Prisma. La carpeta técnica `code-structure` conserva
-su ubicación; su alcance es el conjunto del software.
+Esta colección documenta cómo la API registra rutas, distribuye controladores y
+servicios por dominio y accede a PostgreSQL mediante Prisma. Vue está fuera de esta
+frontera; sólo se considera consumidor del contrato HTTP y de los tipos compartidos.
 
-Los archivos, imports y particularidades de cada recurso pertenecen a las referencias
-técnicas de [backend](../backend-technical-documentation/index.md#módulos) y
-[frontend](../../../../../../front/docs/architecture/views/development/code-structure.md). Las decisiones
-que se repiten entre recursos se justifican en [patrones](../design-and-construction-patterns/index.md),
-y los contratos de sus núcleos se detallan en [reutilización](../reuse-and-refactoring/index.md).
-Los mapas generales se amplían mediante enlaces, sin reproducir aquí cada módulo.
+Los archivos y dependencias por recurso pertenecen a las referencias técnicas de
+[módulos API](../backend-technical-documentation/index.md#módulos). Las decisiones
+repetidas se explican en [patrones](../design-and-construction-patterns/index.md),
+y los contratos de los núcleos en [reutilización](../reuse-and-refactoring/index.md).
 
 ## Capítulos
 
 1. [Repositorio y distribución de fuentes](01-repository-and-source-layout.md).
 2. [Entradas HTTP y registro de routers](02-http-entry-points.md).
-3. [Backend: dominios y dependencias](03-backend-domains-and-dependencies.md).
-4. [Frontend: plantillas, módulos y composición](04-frontend-modules-and-composition.md).
-5. [Contratos entre capas](05-cross-layer-contracts.md).
+3. [Dominios y dependencias de la API](03-backend-domains-and-dependencies.md).
+4. [Contratos compartidos consumidos por Vue](04-shared-contracts-consumed-by-vue.md).
+5. [Contratos entre capas de la API](05-cross-layer-contracts.md).
 6. [Prisma: cliente, consultas, transacciones y migraciones](06-prisma-and-persistence.md).
-7. [Lista de revisión del código y sus diagramas](07-review-checklist.md).
+7. [Revisión de cambios de código y diagramas](07-review-checklist.md).
 
-Cada flecha de un mapa declara **uso, import o configuración**; no representa orden
-temporal. Un subgrafo agrupa archivos del repositorio y no supone un servicio desplegado
-por separado. Los mapas son proyecciones de módulos ES en Mermaid `flowchart`, no
-diagramas UML de clases: las funciones exportadas no se representan como objetos con
-herencia. Las secuencias tienen llamadas numeradas y retornos y pertenecen a
-[procesos](../../processes/index.md) cuando explican una operación completa.
+Las flechas de los mapas declaran import, uso, agrupación o configuración; no indican
+orden temporal ni implican unidades de despliegue separadas. Las secuencias de una
+solicitud pertenecen a [procesos](../../processes/index.md).
 
-La [reutilización y refactorización](../reuse-and-refactoring/index.md) explica los
-contratos compartidos; [patrones](../design-and-construction-patterns/index.md) explica
-la decisión de diseño. El [mapa generado](../code-map.md) conserva el inventario de
-rutas e imports. Las figuras curadas se revisan al cambiar sus módulos y no se generan
-automáticamente a partir de decisiones supuestas.
+El [mapa generado](../code-map.md) conserva el inventario de rutas e imports. Las
+figuras curadas se revisan cuando cambian las fuentes que representan.

@@ -50,7 +50,7 @@ desplegados por separado. El worker se crea durante el procesamiento de Excel y 
 es otro servicio. Socket.IO se muestra como publicación del backend; la versión actual
 de Vue no se suscribe a ese canal. Para la distribución de procesos y alojamiento,
 consulte la [vista física](physical/index.md); para detalles de la API, su
- [arquitectura backend](../../../../back/docs/architecture/index.md#capas-y-componentes-del-backend).
+ [arquitectura backend](../../../../back/docs/architecture/index.md#arquitectura-aplicada-a-la-api).
 
 ## Componentes de aplicación y módulos funcionales
 

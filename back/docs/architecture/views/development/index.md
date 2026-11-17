@@ -1,65 +1,49 @@
-# Vista de desarrollo
+# Vista de desarrollo de la API
 
-Esta vista explica la organización del software, la implementación de sus módulos y
-las decisiones que permiten compartir código. Las secuencias y estados pertenecen a
-[procesos](../processes/index.md), el despliegue a [física](../physical/index.md) y las
-capacidades y trazabilidad a [lógica](../logical/index.md).
+Esta vista explica cómo se organizan e implementan los módulos que atienden la API.
+Vue aparece sólo como consumidor de contratos compartidos; su implementación pertenece
+a `front/docs`. Las secuencias están en [procesos](../processes/index.md), el despliegue
+en [física](../physical/index.md) y las responsabilidades en [lógica](../logical/index.md).
 
 ## Organización y recorrido de lectura
 
-| Nivel | Fuente propietaria | Pregunta y contenido |
+| Nivel | Fuente | Pregunta |
 | --- | --- | --- |
-| 1. Conjunto del software | [Organización e integración del código](code-structure/index.md) | ¿Cómo se distribuyen servidor, navegador y persistencia? Estructura del repositorio, registros HTTP, fronteras y Prisma. |
-| 2. Implementación de un módulo | Referencias técnicas de [backend](backend-technical-documentation/index.md) y [Vue](../../../../../front/docs/architecture/views/development/code-structure.md) | ¿Qué archivos lo implementan? Imports, configuración, contratos y particularidades del recurso. |
-| 3. Patrón compartido | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | ¿Qué estructura comparten los módulos y dónde aplica? Implementación, variantes y límites. |
-| 4. Mecanismo reutilizable | [Reutilización y refactorización](reuse-and-refactoring/index.md) | ¿Qué núcleo se comparte y qué configura cada consumidor? Contratos de extensión e impacto de una extracción. |
-| Evidencia técnica | [Mapa generado](code-map.md) | Inventario de rutas, imports y símbolos derivado de `src`. |
+| Estructura de la API | [Organización del código](code-structure/index.md) | ¿Cómo se registran las rutas, se distribuyen los dominios y se conecta Prisma? |
+| Módulos API | [Referencias técnicas](backend-technical-documentation/index.md) | ¿Qué rutas, controladores, servicios, validaciones y pruebas implementan una capacidad? |
+| Patrones del servidor | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | ¿Qué colaboraciones se comparten entre módulos API y cuáles son sus límites? |
+| Código reutilizable | [Reutilización y refactorización](reuse-and-refactoring/index.md) | ¿Qué núcleo se comparte y qué configura cada consumidor del servidor? |
+| Evidencia técnica | [Mapa generado](code-map.md) | ¿Qué rutas, imports y símbolos existen en `src`? |
 
-Para conocer Nexus se empieza por el nivel 1. Para cambiar un módulo se entra
-directamente en su referencia backend/frontend y se siguen los enlaces a Prisma,
-patrones o reutilización que expliquen sus dependencias. No es necesario recorrer
-primero todos los patrones para localizar el código de un recurso.
+Para cambiar una operación, localice su ruta y siga los enlaces del módulo hacia
+controller, servicio, persistencia y pruebas. Los contratos públicos pertenecen a
+[OpenAPI](../../openapi/index.md); la documentación de Vue explica cómo el cliente
+consume esos contratos.
 
 ## Propiedad de la información
 
-La carpeta `code-structure` conserva la visión general: sus mapas agrupan áreas y
-fronteras. Las referencias técnicas poseen los mapas detallados por módulo y sus tablas
-de archivos. Los patrones justifican una decisión que aparece en varios módulos y
-referencian esos mapas; reutilización posee las figuras del núcleo y sus configuradores.
-Una misma implementación tiene una fuente de detalle y enlaces desde las demás colecciones.
-
-Por ejemplo, Catálogos se localiza en las referencias de
-[backend](backend-technical-documentation/16-catalogs-code.md) y
-[frontend](../../../../../front/docs/architecture/views/development/code-structure.md). El
-[patrón de registro con lista blanca](design-and-construction-patterns/08-catalog-registry-and-allowlist.md)
-explica por qué comparte configuración, y la
-[factory CRUD](reuse-and-refactoring/02-browser-applications-and-requests.md) explica
-el núcleo reutilizado por su aplicación del navegador.
+La carpeta `code-structure` conserva la organización del código API. Las referencias
+técnicas poseen los mapas detallados por módulo; los patrones documentan decisiones
+repetidas y reutilización conserva los núcleos y configuradores. Cada implementación
+tiene una fuente de detalle y enlaces desde las demás colecciones.
 
 ```text
 development/
-├── code-structure/                   # Organización general, fronteras e integración Prisma
-├── backend-technical-documentation/  # Implementación y contratos de módulos del servidor
-├── design-and-construction-patterns/ # Decisiones compartidas y sus límites
-├── reuse-and-refactoring/            # Núcleos, configuradores y contratos de extensión
-└── code-map.md                       # Evidencia generada
+├── code-structure/                   # Rutas, módulos API e integración Prisma
+├── backend-technical-documentation/  # Implementación por módulo
+├── design-and-construction-patterns/ # Colaboraciones del servidor
+├── reuse-and-refactoring/            # Núcleos y configuradores
+└── code-map.md                       # Inventario generado
 ```
 
-## Diagramas de desarrollo
-
-Las figuras representan módulos, imports, configuración, composición y contratos.
-Cada una declara pregunta, alcance, leyenda y fuente de código. Las flechas distinguen
-import, uso, agrupación o configuración; no presuponen orden de ejecución ni unidades
-de despliegue independientes. Los recorridos HTTP, reintentos, estados y límites
-temporales se consultan en procesos, sin repetirlos con otras etiquetas.
-
-Al cambiar un recurso se revisan sus archivos y contrato; al cambiar una pieza compartida,
-se revisan sus configuradores y consumidores. Esta vista describe la implementación
-vigente; los cambios se pueden rastrear en Git.
+Los diagramas representan módulos, imports y configuración; cada uno indica alcance,
+leyenda y fuente de código. Los recorridos HTTP, reintentos, estados y límites
+temporales pertenecen a [procesos](../processes/index.md). El [mapa generado](code-map.md)
+sirve para localizar rutas e imports.
 
 Para comenzar a contribuir, consulte la [guía de incorporación](developer-onboarding.md).
 
-## Archivos Excel
+## Procesamiento Excel
 
-El [motor Excel](excel-library-decision.md) describe la lectura y escritura en workers,
-los límites de recursos y la compatibilidad del binario nativo.
+El [motor Excel](excel-library-decision.md) explica cómo la API procesa libros en
+workers temporales y qué límites de recursos aplican a la solicitud.

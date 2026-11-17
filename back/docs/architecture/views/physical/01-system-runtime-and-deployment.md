@@ -1,4 +1,4 @@
-# 1. Distribución y despliegue de Nexus
+# 1. Ejecución y despliegue de la API
 
 Ejecuta `docker compose` desde la raíz del repositorio. El contexto de construcción
 es esa raíz y el Dockerfile copia la aplicación de `back/` a `/app`. En el host,
@@ -6,10 +6,10 @@ los comandos npm y Prisma se ejecutan desde `back/`; dentro de la imagen, desde 
 
 ## Alcance y fuentes
 
-Esta vista explica dónde se ejecuta cada parte de Nexus, cómo se comunica y qué
-necesita para arrancar. El contexto y los contenedores introducen los límites del
-sistema; la topología de despliegue muestra su distribución en infraestructura.
-Las capas de código se mantienen en la [vista lógica](../logical/01-components-and-reuse.md).
+Esta vista describe el proceso que expone la API, sus consumidores y sus dependencias
+de infraestructura. El servidor de archivos Vue queda fuera de esta frontera; el
+cliente sólo aparece para mostrar el protocolo y el límite HTTP. Las capas se describen
+en la [vista lógica](../logical/01-components-and-reuse.md).
 
 | Aspecto | Fuente | Qué permite afirmar |
 | --- | --- | --- |
@@ -20,27 +20,23 @@ Las capas de código se mantienen en la [vista lógica](../logical/01-components
 | Conexiones a PostgreSQL | `src/lib/prisma.js`, `src/lib/databaseUrl.js` y `prisma.config.ts` | La aplicación usa `DATABASE_URL`; el CLI prefiere `DIRECT_URL`. |
 | Ejecución en un host | `../docker-compose.yml` (raíz del repositorio) | Reproduce el contenedor de aplicación; no crea PostgreSQL ni configura Render. |
 
-## Contexto del sistema
+## Contexto de la API
 
-Las personas están fuera del límite de Nexus. Las flechas resumen interacciones de
-negocio, sin representar permisos individuales, herencia entre actores ni pasos de
-un caso de uso. Supabase aparece como dependencia externa de persistencia; Render
-se incorpora después como alojamiento de la aplicación.
+El cliente Vue consume la interfaz HTTP; los usuarios interactúan con la aplicación,
+no directamente con Express. La API autentica y autoriza las solicitudes. Supabase es
+una dependencia de persistencia y Render se incorpora en la vista de despliegue.
 
 ```mermaid
 flowchart TB
-    warehouse["Personal de almacén"]
-    administrator["Administrador del sistema"]
-    nexus["Nexus<br/>Control operativo de inventario"]
-    supabase[("Supabase<br/>PostgreSQL administrado")]
-    warehouse -->|"Consulta y registra<br/>compras, salidas y devoluciones"| nexus
-    administrator -->|"Operación y administración<br/>de accesos, catálogos y ajustes"| nexus
-    nexus -->|"Consulta y persiste<br/>datos operativos"| supabase
+    client["Cliente Vue<br/>en navegador"]
+    api["API Nexus<br/>Express · HTTP"]
+    supabase[("PostgreSQL<br/>administrado por Supabase")]
+    client -->|"Solicitudes y respuestas<br/>JSON, cargas y descargas"| api
+    api -->|"Consultas y transacciones"| supabase
 ```
 
-Estos son los dos actores con acceso vigente. La supervisión por coordinación y
-dirección permanece como alcance pendiente en requisitos, sin un acceso adicional
-implementado. ERP, CRM y transportistas tampoco son integraciones vigentes.
+Swagger UI y `curl` pueden consumir el contrato en desarrollo; la aplicación Vue es
+el consumidor web vigente. No se documentan integraciones externas activas.
 
 ## Contenedores de ejecución
 
@@ -51,35 +47,33 @@ aplicación y no son servicios desplegados por separado.
 
 ```mermaid
 flowchart TB
-    browser["Navegador<br/>HTML y JavaScript"]
-    application["Aplicación Node.js<br/>Express · Socket.IO · Prisma"]
+    browser["Navegador<br/>Vue se ejecuta en el cliente"]
+    application["Proceso API Node.js<br/>HTTP · Express · Socket.IO · Prisma"]
     database[("PostgreSQL<br/>Datos operativos")]
-    browser -->|"Páginas y API<br/>HTTP(S)"| application
-    application -->|"HTML, JSON y archivos"| browser
-    application -->|"Eventos Socket.IO"| browser
+    browser -->|"Solicitudes API<br/>HTTP(S) · JSON y archivos"| application
+    application -->|"Respuestas API<br/>JSON, errores y archivos"| browser
     application -->|"Consultas y transacciones<br/>protocolo PostgreSQL"| database
 ```
 
 | Unidad | Responsabilidad y límite |
 | --- | --- |
-| Navegador | Presenta el HTML recibido, ejecuta JavaScript, envía solicitudes y recibe avisos de actualización. Ejecuta Vue y se comunica con la API. |
-| Aplicación | Autentica y autoriza las peticiones HTTP y ejecuta las reglas y transacciones mediante Prisma. Los controladores notifican cambios por Socket.IO después de completar la operación correspondiente. |
-| Base de datos | Conserva documentos, detalles, existencias e historia. Las cuentas PostgreSQL son identidades de infraestructura, distintas de los usuarios y roles funcionales de Nexus. |
+| Cliente | Ejecuta Vue y llama la API; los assets y su alojamiento son externos al proceso Express. |
+| Proceso API | Recibe HTTP, aplica autenticación, autorización y reglas, responde con JSON o archivos y coordina transacciones mediante Prisma. Socket.IO comparte el servidor, pero Vue no está suscrito actualmente. |
+| PostgreSQL | Persiste los datos operativos; las cuentas de base de datos son identidades de infraestructura y no roles de la API. |
 
-Socket.IO usa el mismo servidor que Express. Los avisos permiten actualizar los
-listados; la consulta API sigue siendo la fuente de datos de la pantalla. La figura
-no presupone un servicio de mensajería ni una segunda aplicación de tiempo real.
+La API es quien posee este proceso y escucha HTTP y Socket.IO. La figura no atribuye
+al backend la entrega de los assets de Vue ni presupone un servicio de mensajería separado.
 
 ## Despliegue actual: Render y Supabase
 
-Render publica el servicio web y aloja el contenedor de Nexus. Supabase administra
+Render publica el servicio web de la API y aloja su contenedor. Supabase administra
 PostgreSQL. Las flechas de esta figura son canales de comunicación; el orden de
 arranque se representa por separado. Las credenciales se suministran como variables
 de entorno, sin mostrarlas en los diagramas.
 
 ```mermaid
 flowchart TB
-    browser["Navegador del usuario"]
+    browser["Navegador<br/>cliente Vue"]
     subgraph render["«node» Render · servicio web"]
         endpoint["Acceso público HTTPS"]
         subgraph container["«executionEnvironment»<br/>Contenedor Nexus"]
@@ -90,7 +84,7 @@ flowchart TB
     subgraph supabase["«node» Supabase · servicio administrado"]
         database[("PostgreSQL<br/>Acceso directo o pooler")]
     end
-    browser -->|"HTTPS · páginas, API y Socket.IO"| endpoint
+    browser -->|"HTTPS · solicitudes y respuestas API"| endpoint
     application -->|"DATABASE_URL<br/>protocolo PostgreSQL"| database
 ```
 
@@ -112,7 +106,7 @@ sano. Publicar Vue no requiere cambiar sus rutas, secretos ni base de datos.
 | Dockerfile Path | `./Dockerfile`. |
 | Docker Build Context Directory | `.`. |
 | Docker Command | Sin sobrescribir; ejecuta el entrypoint y `npm start`. |
-| Rama | La elegida para publicar; debe contener la versión compatible con Vue. |
+| Rama | La elegida para publicar; debe contener la versión de API compatible con el contrato consumido por Vue. |
 | Build Filters, si se usan | `back/**`, `Dockerfile` y `.dockerignore`. |
 | Health Check Path | Vacío usa la comprobación TCP de Render. `/api/auth/me` puede responder 401 y no sirve como health check. |
 
@@ -137,7 +131,7 @@ utiliza una conexión directa accesible o el pooler en modo **sesión**, puerto 
 el pooler transaccional no sustituye la conexión de migración. Mantén ambos destinos
 en la misma base. Véase [Render y Supabase](https://render.com/articles/how-to-connect-a-render-service-to-supabase-postgres).
 
-La publicación y el proxy de Vue se configuran en la
+El alojamiento estático y el proxy del cliente Vue se configuran en la
 [guía del frontend](../../../../../front/docs/development/03-build-and-deployment.md#render-conservar-la-api-y-publicar-vue).
 
 ## Arranque y migraciones

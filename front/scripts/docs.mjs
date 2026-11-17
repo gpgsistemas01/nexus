@@ -15,12 +15,12 @@ const runExport = (exportArgs, section = null) => {
         process.execPath,
         [
             'scripts/exportDocs.js',
-            section === 'manual' ? 'manual-vue' : 'arquitectura',
+            section === 'manual' ? 'manual-vue' : 'documentacion-vue',
             section === 'manual'
                 ? 'manual-usuario'
                 : section
-                  ? `frontend-vue-${section}`
-                  : 'frontend-vue',
+                  ? `vue-${section}`
+                  : 'vue',
             ...exportArgs,
         ],
         {
