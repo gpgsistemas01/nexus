@@ -95,8 +95,9 @@ El [capítulo de reportes](14-reports.md) explica su alcance.
 
 ## Unidad del consumible en el alta
 
-Para **KILOGRAMO**, seleccione presentación **KILOGRAMOS**. Para **METRO LINEAL**,
-seleccione presentación **METRO LINEAL**. Ambas medidas quedan fijas en **1 × 1**.
+Seleccione la presentación **KILOGRAMOS** o **METRO LINEAL**: esa elección fija
+ambas medidas en **1 × 1**, independientemente de la unidad de medida seleccionada.
 La cantidad comprada expresa kg o metros, respectivamente: 4 kilos a $20 por kilo
 suman $80 antes de IVA. Las medidas representan la unidad y no multiplican el precio.
-Esta regla también aplica al alta desde Compras y Excel (Base = 1, Altura = 1).
+Esta regla también aplica al alta desde Compras y Excel. En Excel, Base y Altura
+vacías se completan en 1; los valores distintos de 1 se rechazan.

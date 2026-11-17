@@ -1,4 +1,4 @@
-import { getPerPieceMeasureError, getConsumableUnitError } from '../../../shared/inventory/wasteMeasurements.js';
+import { getPerPieceMeasureError, getUnitPresentationMeasurementsError, isFixedUnitPresentation, applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
 import { AppError } from '../../../errors/AppError.js';
 import { ExcededMaxRetriesSkuError, MaterialRollReferenceReadOnly } from "../../../errors/warehouse/materialError.js";
 import { findUniquePresentation } from "../presentationService.js";
@@ -23,13 +23,14 @@ export const assertMaterialRollReference = ({ referenceConeWeightKg, referenceRo
 
 export const prepareMaterialData = async ({ tx, materialDto, materialId = null, context = null }) => {
 
-    const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...rest } = materialDto;
+    const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...input } = materialDto;
 
     // La transacción comparte una conexión: cada consulta debe terminar antes de enviar la siguiente.
     const unit = context?.units?.get(unitMeasureId) ?? await findUniqueUnitMeasure({ tx, id: unitMeasureId });
     const presentation = context?.presentations?.get(presentationId) ?? await findUniquePresentation({ tx, id: presentationId });
-    const measureError = rest.type === 'CONSUMABLE'
-        ? getConsumableUnitError(unit, rest, presentation) : getPerPieceMeasureError(unit, rest);
+    const rest = applyUnitPresentationMeasurements(input, presentation);
+    const measureError = rest.type === 'CONSUMABLE' || isFixedUnitPresentation(presentation)
+        ? getUnitPresentationMeasurementsError(rest, presentation) : getPerPieceMeasureError(unit, rest);
     if (measureError) throw new AppError(measureError, 'PER_PIECE_MEASURE_INVALID', 400);
     const supplier = context?.suppliers?.get(supplierId) ?? await findUniqueSupplier({ tx, id: supplierId });
 

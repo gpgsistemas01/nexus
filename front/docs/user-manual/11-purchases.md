@@ -76,7 +76,7 @@ no aparece el botón.
 
 <!-- module:end -->
 
-Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: para KILOGRAMO o METRO LINEAL, ambas medidas son 1 × 1 y la presentación es KILOGRAMOS o METRO LINEAL, respectivamente. Después de pulsar **Agregar**, la tabla de detalles muestra medidas, unidad y cantidad convertida. El artículo nuevo queda seleccionado;
+Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: seleccionar la presentación KILOGRAMOS o METRO LINEAL fija ambas medidas en 1 × 1. Después de pulsar **Agregar**, la tabla de detalles muestra medidas, unidad y cantidad convertida. El artículo nuevo queda seleccionado;
 todavía debe capturar **Cantidad** y **Costo por Presentación**,
 pulsar **Agregar** y guardar la compra. El alta auxiliar no recibe la mercancía:
 la existencia de esta recepción se registra al guardar la compra.

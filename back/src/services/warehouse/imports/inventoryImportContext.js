@@ -1,3 +1,4 @@
+import { applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
 import { INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { importUnitLabel } from './inventoryImportConfig.js';
@@ -71,8 +72,11 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
         const identities = values.flatMap(row => {
             const presentationId = row.presentationId || context.presentationNames.get(importKey(row.presentationName))?.id;
             const unitMeasureId = row.unitMeasureId || context.unitLabels.get(importKey(row.unitLabel))?.id;
-            const base = row.base === '' || row.base == null ? null : Number(row.base);
-            const height = row.height === '' || row.height == null ? null : Number(row.height);
+            const dimensions = applyUnitPresentationMeasurements({
+                base: row.base === '' || row.base == null ? null : Number(row.base),
+                height: row.height === '' || row.height == null ? null : Number(row.height)
+            }, context.presentations.get(presentationId));
+            const { base, height } = dimensions;
             if (!presentationId || !unitMeasureId || !Number.isFinite(base ?? 0) || !Number.isFinite(height ?? 0)) return [];
             return [{ name: { equals: importText(row.name), mode: 'insensitive' }, presentationId, unitMeasureId,
                 type: config.type, base, height }];
@@ -91,7 +95,7 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
             const presentationId = row.presentationId || context.presentationNames.get(importKey(row.presentationName))?.id;
             const unitMeasureId = row.unitMeasureId || context.unitLabels.get(importKey(row.unitLabel))?.id;
             materialId = context.identities.get(materialImportIdentity({ ...row, type: config.type, presentationId, unitMeasureId,
-                base: row.base === '' ? null : row.base, height: row.height === '' ? null : row.height }))?.id;
+                ...applyUnitPresentationMeasurements({ base: row.base === '' ? null : row.base, height: row.height === '' ? null : row.height }, context.presentations.get(presentationId)) }))?.id;
         }
         if (UUID_V4_PATTERN.test(supplierId ?? '') && UUID_V4_PATTERN.test(materialId ?? '')) pairs.push({ materialId, supplierId });
     }

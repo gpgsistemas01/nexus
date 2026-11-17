@@ -18,10 +18,16 @@ import type {
   InventoryResource,
 } from '../../../../src/modules/warehouse/inventory.js';
 
-const openEditor = (resource: InventoryResource, target: EditorTarget) => {
+const openEditor = (
+  resource: InventoryResource,
+  target: EditorTarget,
+  lookup?: typeof inventoryCatalogService.lookup,
+) => {
   let editor!: ReturnType<typeof useInventoryEditor>;
   const saved = vi.fn();
-  vi.spyOn(inventoryCatalogService, 'lookup').mockResolvedValue(pageOf([]));
+  const catalog = vi.spyOn(inventoryCatalogService, 'lookup');
+  if (lookup) catalog.mockImplementation(lookup);
+  else catalog.mockResolvedValue(pageOf([]));
   const request = vi
     .spyOn(inventoryService, 'mutate')
     .mockResolvedValue({ code: 'UPDATED_MATERIAL' });
@@ -405,5 +411,41 @@ it.each([false, true])(
     expect(fields?.map((field) => field.name)).toEqual(['base', 'height']);
     expect(fields?.find((field) => field.name === 'height')?.isReadOnly).toBe(isPerPiece);
     if (isPerPiece) expect(fields?.find((field) => field.name === 'base')?.isReadOnly).toBe(true);
+  },
+);
+
+it.each(['KILOGRAMOS', 'METRO LINEAL'])(
+  'la presentación %s fija 1 × 1 sin depender de la unidad seleccionada',
+  async (name) => {
+    const { editor, wrapper } = openEditor('consumables', { action: 'create' }, async (query) =>
+      pageOf(
+        query.path === 'presentations'
+          ? [{ id: ids.presentation, title: name, data: { id: ids.presentation, name } }]
+          : query.path === 'unit-measures'
+            ? [
+                {
+                  id: ids.unit,
+                  title: 'OTRA UNIDAD',
+                  data: { id: ids.unit, name: 'OTRA UNIDAD', symbol: 'u' },
+                },
+              ]
+            : [],
+      ),
+    );
+    await flushPromises();
+    editor.searchLookup('presentationId', '');
+    editor.searchLookup('unitMeasureId', '');
+    await flushPromises();
+    editor.update('presentationId', ids.presentation);
+    await flushPromises();
+    expect(editor.values.base).toBe('1');
+    expect(editor.values.height).toBe('1');
+    expect(editor.isPerPiece.value).toBe(true);
+    editor.update('unitMeasureId', ids.unit);
+    await flushPromises();
+    expect(editor.values.base).toBe('1');
+    expect(editor.values.height).toBe('1');
+    expect(editor.values.presentationId).toBe(ids.presentation);
+    wrapper.unmount();
   },
 );

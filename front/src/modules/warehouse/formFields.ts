@@ -117,7 +117,7 @@ export const inventorySections = (
                 label: 'Presentación',
                 hint:
                     isCreating && resource === 'consumables' && options.isPerPiece
-                        ? 'Selecciona KILOGRAMOS para kg o METRO LINEAL para metros lineales.'
+                        ? 'Esta presentación fija ambas medidas en 1.'
                         : undefined,
                 type: isCreating && !isWaste ? 'lookup' : undefined,
                 isReadOnly: !isCreating || isWaste,
@@ -249,10 +249,7 @@ export const inventorySections = (
                       ? 'Base (m)'
                       : 'Altura (m)',
                 type: 'number',
-                isReadOnly:
-                    !isCreating ||
-                    (isWaste && isRoll) ||
-                    (options.isPerPiece && (resource === 'consumables' || name === 'base')),
+                isReadOnly: !isCreating || (isWaste && isRoll) || options.isPerPiece,
                 ...(isCreating && isWaste && isRoll
                     ? { displayValue: String(preview[name] ?? '') }
                     : {}),
