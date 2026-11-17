@@ -43,7 +43,15 @@ export const materialStockValidation = [
     validateRecordVersion()
 ];
 
+const dimensionsValidation = [
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
+    validatePositiveNumberOptional('base'),
+    validatePositiveNumberOptional('height')
+];
+
 export const consumableValidation = [
+    ...dimensionsValidation,
     validateUUID('presentationId'),
     validateUUID('unitMeasureId'),
     ...materialDataValidation,
@@ -52,10 +60,4 @@ export const consumableValidation = [
     createInventoryObservationsValidation()
 ];
 
-export const materialValidation = [
-    ...consumableValidation,
-    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
-    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
-    validatePositiveNumberOptional('base'),
-    validatePositiveNumberOptional('height')
-];
+export const materialValidation = consumableValidation;

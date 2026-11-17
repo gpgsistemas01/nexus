@@ -1,3 +1,4 @@
+import { isPerPieceMeasure } from '@nexus/waste-measurements';
 import { computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
@@ -78,7 +79,7 @@ export const useInventorySelection = (options: {
     );
     const usesMeasurements = computed(
         () =>
-            resource === 'materials' &&
+            resource !== 'wastes' &&
             (isCreating
                 ? unitUsesMeasurements(selectedUnit.value?.data)
                 : unitUsesMeasurements({
@@ -87,8 +88,15 @@ export const useInventorySelection = (options: {
                   })),
     );
     watch(selectedUnit, (unit) => {
-        if (resource !== 'materials' || !isCreating || !unit || unitUsesMeasurements(unit.data))
+        if (resource === 'wastes' || !isCreating || !unit) return;
+
+        if (isPerPieceMeasure(unit.data)) {
+            options.setValue('base', '1');
+            options.clearError('base');
             return;
+        }
+
+        if (unitUsesMeasurements(unit.data)) return;
 
         for (const field of ['base', 'height'] as const) {
             options.setValue(field, '');
@@ -130,6 +138,16 @@ export const useInventorySelection = (options: {
         selectedTemplate,
         presentationName,
         usesMeasurements,
+        isPerPiece: computed(() =>
+            isPerPieceMeasure(
+                isCreating
+                    ? selectedUnit.value?.data
+                    : {
+                          name: target.row?.unitMeasure,
+                          symbol: target.row?.unitMeasure,
+                      },
+            ),
+        ),
         refreshSuppliers,
         searchLookup: (field: InventoryField, search: string) =>
             lookupByField[field]?.updateSearch(search),

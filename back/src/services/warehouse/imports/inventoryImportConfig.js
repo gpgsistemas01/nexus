@@ -36,7 +36,7 @@ export const getImportConfig = (resource, mode = modes.CREATE) => {
         : mode === modes.UPDATE ? ['name', 'minStock', 'maxUnitCost', 'isActive']
             : ['supplierCode', 'name', 'minStock', 'maxUnitCost', 'isActive', 'observations', 'newStock', 'initialQuantity',
                 ...(resource === resources.WASTES ? ['materialId', 'base', 'height', ...weights.map(([, key]) => key)]
-                    : ['presentationName', 'unitLabel', ...(resource === resources.MATERIALS ? ['base', 'height'] : [])])];
+                    : ['presentationName', 'unitLabel', 'base', 'height'])];
     return { ...configs[resource], resource, mode, columns,
         readonlyFields: columns.map(([, key]) => key).filter(key => !editable.includes(key)) };
 };

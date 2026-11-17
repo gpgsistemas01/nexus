@@ -286,6 +286,7 @@ export const useInventoryEditor = (options: {
         selectedSupplier: selection.selectedSupplier,
         selectCreatedSupplier,
         usesMeasurements: selection.usesMeasurements,
+        isPerPiece: selection.isPerPiece,
         submit,
         update,
         blur,

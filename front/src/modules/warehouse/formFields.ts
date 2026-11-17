@@ -37,6 +37,7 @@ export const inventorySections = (
         template?: LookupItem;
         presentationName?: string;
         usesMeasurements: boolean;
+        isPerPiece?: boolean;
         hasSupplier: boolean;
         creationContext?: 'goodsReceipt';
         supplier?: LookupItem;
@@ -219,16 +220,27 @@ export const inventorySections = (
     if (isWaste || options.usesMeasurements)
         sections.push({
             id: 'measurements',
-            title: isWaste ? 'Medidas de la merma' : 'Medidas del material',
+            title: options.isPerPiece
+                ? 'Medida por pieza'
+                : isWaste
+                  ? 'Medidas de la merma'
+                  : 'Medidas del material',
             description:
                 isWaste && isRoll && isCreating
                     ? 'Se calculan a partir de los pesos y del material de origen.'
                     : undefined,
             fields: (['base', 'height'] as const).map((name) => ({
                 name,
-                label: name === 'base' ? 'Base (m)' : 'Altura (m)',
+                label: options.isPerPiece
+                    ? name === 'base'
+                        ? 'Multiplicador fijo'
+                        : 'Medida por pieza (kg o m)'
+                    : name === 'base'
+                      ? 'Base (m)'
+                      : 'Altura (m)',
                 type: 'number',
-                isReadOnly: !isCreating || (isWaste && isRoll),
+                isReadOnly:
+                    !isCreating || (isWaste && isRoll) || (options.isPerPiece && name === 'base'),
                 ...(isCreating && isWaste && isRoll
                     ? { displayValue: String(preview[name] ?? '') }
                     : {}),

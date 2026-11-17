@@ -72,7 +72,7 @@ describe('catalogService', () => {
     });
 
     expect(database.unitMeasure.create).toHaveBeenCalledWith({
-      data: { name: 'Metro', symbol: 'm', isActive: false }
+      data: { name: 'METRO', symbol: 'm', isActive: false }
     });
   });
 

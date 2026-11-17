@@ -15,9 +15,9 @@ También puede consultar el costo unitario.
 ## Importar desde Excel
 
 Pulse **Importar Excel** y siga el [procedimiento de materiales y consumibles](03-materials.md#importar-materiales-o-consumibles-desde-excel).
-El selector asigna una sola operación a todo el archivo. Base y Altura permanecen
-como referencias vacías en la estructura de consulta; los consumibles no capturan
-dimensiones. Conserve los IDs/versiones incluidos para editar o ajustar.
+El selector asigna una sola operación a todo el archivo. En altas con KILOGRAMO
+o METRO LINEAL capture Base = 1 y Altura = medida por pieza. Conserve los
+IDs/versiones incluidos para editar o ajustar.
 
 ![Importación de consumibles con la operación y sus instrucciones.](images/06a-consumable-import.png)
 
@@ -59,8 +59,7 @@ se recibe al guardar la compra; no la duplique como cantidad inicial.
 
 Pulse **Editar** y cambie **Nombre**, **Stock mínimo**, **Costo máximo unitario**
 o **Activo**; después pulse **Guardar**. Proveedor, presentación y unidad son de
-consulta. El stock y su conversión permanecen sin cambios y no hay campos de
-dimensiones. Nombre y mínimo se comparten entre proveedores; costo y Activo
+consulta. El stock, su conversión y la medida por pieza del alta se conservan. Nombre y mínimo se comparten entre proveedores; costo y Activo
 afectan la oferta seleccionada.
 <!-- manual:end -->
 
@@ -93,3 +92,11 @@ conflicto o un envío sin respuesta, siga [Errores y recuperación](15-errors-an
 Pulse **Exportar Excel** después de revisar la consulta.
 El [capítulo de reportes](14-reports.md) explica su alcance.
 <!-- manual:end -->
+
+## Medida por pieza en el alta
+
+Con unidad **KILOGRAMO** o **METRO LINEAL**, el multiplicador se fija en **1**.
+Capture en la otra medida los kg o metros que contiene cada pieza. Por ejemplo,
+4 piezas de 2.5 kg generan una cantidad convertida de 10 kg. Esta medida se define
+al registrar el consumible, también desde Compras o desde la plantilla Excel
+(**Base = 1**, **Altura = medida por pieza**).
