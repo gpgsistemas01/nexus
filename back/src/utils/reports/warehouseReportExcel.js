@@ -90,10 +90,11 @@ export const buildGoodsReceiptReportData = async function* (rows, { isConsumable
         'Presentación',
         'Cantidad convertida',
         'Unidad de conversión',
-        'Costo unitario de conversión',
+        'Costo unitario',
         'Costo por presentación',
         'Monto s/ IVA',
-        'Monto c/ IVA'
+        'Monto c/ IVA',
+        'Alcance del costo'
     ];
     for await (const row of rows) {
         summary.add(row);
@@ -111,10 +112,11 @@ export const buildGoodsReceiptReportData = async function* (rows, { isConsumable
             row.presentationName,
             row.convertedQuantity,
             row.unitMeasureName,
-            createFormulaCell(`IFERROR(O${ excelRow }/K${ excelRow },0)`, row.conversionUnitCost),
+            createFormulaCell(row.costIsTotal ? `IFERROR(N${ excelRow }/I${ excelRow },0)` : `IFERROR(O${ excelRow }/K${ excelRow },0)`, row.conversionUnitCost),
             row.costPerUnitType,
-            createFormulaCell(`I${ excelRow }*N${ excelRow }`, row.netPurchaseAmount),
-            createFormulaCell(`O${ excelRow }*${ VAT_MULTIPLIER }`, row.grossPurchaseAmount)
+            createFormulaCell(row.costIsTotal ? `N${ excelRow }` : `I${ excelRow }*N${ excelRow }`, row.netPurchaseAmount),
+            createFormulaCell(`O${ excelRow }*${ VAT_MULTIPLIER }`, row.grossPurchaseAmount),
+            row.costIsTotal ? 'Total del detalle' : 'Por presentación'
         ];
     }
 
@@ -148,7 +150,7 @@ export const buildGoodsReceiptReportData = async function* (rows, { isConsumable
         ],
         [],
         [`Resumen ${ summaryScope } por ${ isConsumableReport ? 'consumible' : 'material' }`],
-        [inventoryLabel, 'Cantidad convertida', 'Costo unitario de conversión', 'Costo total s/ IVA', `Cantidad total de ${ isConsumableReport ? 'consumible' : 'material' }`],
+        [inventoryLabel, 'Cantidad convertida', 'Costo unitario', 'Costo total s/ IVA', `Cantidad total de ${ isConsumableReport ? 'consumible' : 'material' }`],
         ...materialRows.map((row, index) => {
             const excelRow = materialFirstRow + index;
 

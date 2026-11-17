@@ -19,6 +19,7 @@ export const mapPurchaseFormToRequest = (
                       materialId: row.materialId,
                       quantity: Number(row.quantity),
                       costPerUnitType: Number(row.costPerUnitType),
+                      ...(row.costIsTotal && { costIsTotal: true }),
                   })),
               }
             : {}),

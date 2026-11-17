@@ -36,6 +36,7 @@ export interface PurchaseDetail {
     unitMeasure: string;
     quantity: Decimal;
     convertedQuantity: Decimal;
+    costIsTotal?: boolean;
     costPerUnitType: Decimal;
     conversionUnitCost: Decimal;
     netPurchaseAmount: Decimal;

@@ -280,6 +280,7 @@ usuarios y responsables se mantiene en el
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `goodsReceiptId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `costIsTotal` | `Boolean` | Sí | — | `false` | — |
 | `conversionUnitCost` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `costPerUnitType` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |

@@ -159,4 +159,14 @@ Pulse **Exportar Excel**, seleccione el alcance y confirme **Descargar Excel**.
 Consulte [Reportes](14-reports.md) para elegir periodo o filtros.
 <!-- manual:end -->
 
-El importe sin IVA es Cantidad comprada × Costo por Presentación. Las medidas sólo representan la conversión de la unidad; no multiplican el precio capturado.
+Sin la opción de costo total, el importe sin IVA es Cantidad comprada × Costo por Presentación. Las medidas representan la conversión de la unidad.
+
+### Capturar el costo total del detalle
+
+Marque **El costo capturado corresponde al total** cuando el importe ingresado
+cubra toda la cantidad de esa partida, para cualquier presentación.
+Por ejemplo, cantidad 10 y costo total sin IVA $500 dan costo unitario $50,
+subtotal $500 y total con IVA $580. Las medidas no alteran este reparto del costo.
+Sin marcar, el costo se interpreta por presentación y el subtotal es cantidad × costo.
+La tabla y el Excel identifican el alcance del costo. La corrección conserva el modo
+registrado; su campo de costo muestra si corresponde al total o por presentación.

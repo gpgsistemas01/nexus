@@ -66,6 +66,7 @@ const normalizePurchaseDetail = (value: unknown, resource: PurchaseResource): Pu
         !isRecord(value) ||
         typeof value.id !== 'string' ||
         !value.id ||
+        (value.costIsTotal !== undefined && typeof value.costIsTotal !== 'boolean') ||
         !isRecord(value.material) ||
         value.material.type !== PURCHASE_CONFIG[resource].type ||
         !Object.values(GOODS_RECEIPT_DETAIL_STATUSES).some((status) => status === value.status)
@@ -85,6 +86,7 @@ const normalizePurchaseDetail = (value: unknown, resource: PurchaseResource): Pu
             readText(readOptionalRelation(material.unitMeasure), 'name'),
         quantity: readPurchaseDecimal(value.quantity),
         convertedQuantity: readPurchaseDecimal(value.convertedQuantity),
+        ...(value.costIsTotal === true && { costIsTotal: true }),
         costPerUnitType: readPurchaseDecimal(value.costPerUnitType),
         conversionUnitCost: readPurchaseDecimal(value.conversionUnitCost),
         netPurchaseAmount: readPurchaseDecimal(value.netPurchaseAmount),

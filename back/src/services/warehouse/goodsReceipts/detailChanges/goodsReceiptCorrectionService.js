@@ -53,7 +53,7 @@ export const correctGoodsReceiptDetailLine = async ({
             });
             const correctedDetail = calculateGoodsReceiptDetail({
                 material: currentDetail.material,
-                detail: { quantity, costPerUnitType }
+                detail: { quantity, costPerUnitType, costIsTotal: currentDetail.costIsTotal }
             });
             const correctedQuantity = normalizeDecimal(correctedDetail.quantity);
             const currentQuantity = normalizeDecimal(currentDetail.quantity);

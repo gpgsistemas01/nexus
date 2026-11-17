@@ -348,3 +348,15 @@ Los rechazos de reportes por clave de mes inválida usan `ReportMonthInvalid` y
 `REPORT_MONTH_INVALID` (500), liberando temporales; ver `reportExcelUtilsTest.js`.
 El caso de aislamiento del histórico exige `HISTORICAL_DELIVERY_NOT_FOUND` (404),
 sin confirmar documentos de otro contexto; ver `historicalDeliveryControllerDbTest.js`.
+
+## Modo de costo por detalle de compra
+
+`costIsTotal` distingue costo por presentación de total capturado. Las particiones
+false/true se verifican en `goodsReceiptCalculationsTest.js` y `purchaseTest.ts`;
+`goodsReceiptDetailsValidationTest.js` rechaza valores no booleanos.
+`goodsReceiptContextDbTest.js` verifica persistencia, lectura, corrección con el mismo
+modo, reporte y cancelación para materiales y consumibles. La compra de 10 unidades
+con total 500 produce costo unitario 50, subtotal 500 e importe con IVA 580.
+`reportExcelUtilsTest.js` verifica las fórmulas por cantidad comprada en el modo total.
+Los casos de navegador de costo total en `purchases.spec.ts` comprueban checkbox,
+importe, payload y conservación del flujo normal.

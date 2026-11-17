@@ -12,6 +12,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- |
 | `context` | `context: string;` |
 | `presentation` | `presentation: string;` |
+| `costIsTotal` | `costIsTotal?: boolean;` |
 | `quantityLimit` | `quantityLimit: number;` |
 | `totals` | `totals: { quantity: number; net: number; gross: number } \| null;` |
 | `values` | `values: { quantity: string; costPerUnitType: string };` |
@@ -22,7 +23,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseCorrectionForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseCorrectionForm.vue](../../../../../src/modules/purchases/components/PurchaseCorrectionForm.vue) · línea 18, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseCorrectionForm.vue](../../../../../src/modules/purchases/components/PurchaseCorrectionForm.vue) · línea 19, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -164,7 +165,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 9, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 10, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -174,6 +175,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `items` | `items: LookupState;` |
 | `selected` | `selected?: LookupItem;` |
 | `presentation` | `presentation: string;` |
+| `costIsTotal` | `costIsTotal?: boolean;` |
 | `isDisabled` | `isDisabled: boolean;` |
 | `canRead` | `canRead: boolean;` |
 | `canCreate` | `canCreate: boolean;` |
@@ -185,7 +187,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 20, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 22, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -196,6 +198,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `retry` | `retry: [];` |
 | `create` | `create: [search: string];` |
 | `add` | `add: [];` |
+| `update:costIsTotal` | `'update:costIsTotal': [value: boolean];` |
 
 ## PurchaseTable.defineProps
 
@@ -469,6 +472,7 @@ RecordQuery & PurchaseFilters
 | `unitMeasure` | `unitMeasure: string;` |
 | `quantity` | `quantity: Decimal;` |
 | `convertedQuantity` | `convertedQuantity: Decimal;` |
+| `costIsTotal` | `costIsTotal?: boolean;` |
 | `costPerUnitType` | `costPerUnitType: Decimal;` |
 | `conversionUnitCost` | `conversionUnitCost: Decimal;` |
 | `netPurchaseAmount` | `netPurchaseAmount: Decimal;` |
@@ -489,7 +493,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseDocument
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 46, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 47, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends PurchaseRow`.
 
@@ -505,7 +509,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseValues
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 50, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 51, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -523,7 +527,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseField
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 59, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 60, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -537,7 +541,7 @@ keyof PurchaseValues
 
 ## PurchaseTarget
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 60, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 61, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -553,7 +557,7 @@ keyof PurchaseValues
 
 ## PurchaseWriteTarget
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 64, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 65, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -567,7 +571,7 @@ Exclude<PurchaseTarget, { action: 'view' }>
 
 ## PurchaseDetailChange
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 65, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 66, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -577,7 +581,7 @@ Exclude<PurchaseTarget, { action: 'view' }>
 
 ## ItemCreation
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 67, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 68, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupCreation`.
 

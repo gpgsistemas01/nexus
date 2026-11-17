@@ -167,7 +167,8 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
       { formula: 'IFERROR(O2/K2,0)', result: 25 },
       50,
       { formula: 'I2*N2', result: 100 },
-      { formula: 'O2*1.16', result: 116 }
+      { formula: 'O2*1.16', result: 116 },
+      'Por presentación'
     ]);
     expect(data[5].slice(2)).toEqual([
       { formula: 'B6*0.16', result: 16 },

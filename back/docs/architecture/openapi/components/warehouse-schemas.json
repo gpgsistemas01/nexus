@@ -680,7 +680,7 @@
           "number",
           "string"
         ],
-        "description": "Decimal persistido; puede recibirse como texto JSON."
+        "description": "Costo capturado: por presentación si costIsTotal=false, o total sin IVA del detalle si costIsTotal=true."
       },
       "materialName": {
         "type": "string"
@@ -724,6 +724,11 @@
         "type": "object",
         "description": "Artículo con sus relaciones presentation y unitMeasure.",
         "additionalProperties": true
+      },
+      "costIsTotal": {
+        "type": "boolean",
+        "default": false,
+        "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. Se conserva en las correcciones."
       }
     },
     "additionalProperties": true,
@@ -1519,10 +1524,15 @@
                 "string"
               ],
               "exclusiveMinimum": 0,
-              "description": "Costo positivo; hasta 8 enteros y 6 decimales.",
+              "description": "Costo capturado: por presentación si costIsTotal=false, o total sin IVA del detalle si costIsTotal=true.",
               "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
               "multipleOf": 1e-06,
               "exclusiveMaximum": 100000000
+            },
+            "costIsTotal": {
+              "type": "boolean",
+              "default": false,
+              "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. Se conserva en las correcciones."
             }
           },
           "additionalProperties": false,
@@ -2023,10 +2033,15 @@
                 "string"
               ],
               "exclusiveMinimum": 0,
-              "description": "Costo positivo; hasta 8 enteros y 6 decimales.",
+              "description": "Costo capturado: por presentación si costIsTotal=false, o total sin IVA del detalle si costIsTotal=true.",
               "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
               "multipleOf": 1e-06,
               "exclusiveMaximum": 100000000
+            },
+            "costIsTotal": {
+              "type": "boolean",
+              "default": false,
+              "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. Se conserva en las correcciones."
             }
           },
           "additionalProperties": false,

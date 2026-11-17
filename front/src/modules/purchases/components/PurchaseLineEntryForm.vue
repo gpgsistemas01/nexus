@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
+import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VBtn } from 'vuetify/components/VBtn';
 import { isPiecePresentation } from '@nexus/piece-quantity';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
@@ -13,6 +14,7 @@ defineProps<{
     items: LookupState;
     selected?: LookupItem;
     presentation: string;
+    costIsTotal?: boolean;
     isDisabled: boolean;
     canRead: boolean;
     canCreate: boolean;
@@ -25,6 +27,7 @@ const emit = defineEmits<{
     retry: [];
     create: [search: string];
     add: [];
+    'update:costIsTotal': [value: boolean];
 }>();
 </script>
 
@@ -76,7 +79,9 @@ const emit = defineEmits<{
                 md="4"
             >
                 <VTextField
-                    label="Costo por Presentación"
+                    :label="
+                        costIsTotal ? 'Costo total del detalle sin IVA' : 'Costo por Presentación'
+                    "
                     type="number"
                     min="0"
                     step="0.000001"
@@ -97,6 +102,16 @@ const emit = defineEmits<{
                     :model-value="presentation"
                     readonly
                     tabindex="-1"
+                />
+            </VCol>
+            <VCol cols="12">
+                <VCheckbox
+                    label="El costo capturado corresponde al total"
+                    hint="Calcula el costo unitario dividiendo este importe entre la cantidad. El IVA se agrega al total."
+                    persistent-hint
+                    :model-value="costIsTotal ?? false"
+                    :disabled="isDisabled"
+                    @update:model-value="emit('update:costIsTotal', $event === true)"
                 />
             </VCol>
             <VCol

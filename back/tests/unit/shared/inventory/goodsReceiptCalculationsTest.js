@@ -20,3 +20,10 @@ describe('importes compartidos de compras', () => {
         expect(calculateGoodsReceiptDetailAmounts({ quantity: 1, costPerUnitType: 1, base, height: 0.0001 }).convertedQuantity).toBe(convertedQuantity);
     });
 });
+
+it.each([1, 2.5])('costo total divide por cantidad comprada aunque la medida sea %s', height => {
+    expect(calculateGoodsReceiptDetailAmounts({ quantity: 10, costPerUnitType: 500, base: 1, height, costIsTotal: true })).toMatchObject({
+        costIsTotal: true, conversionUnitCost: 50, netPurchaseAmount: 500, grossPurchaseAmount: 580,
+        convertedQuantity: 10 * height
+    });
+});

@@ -30,6 +30,7 @@ const mapGoodsReceiptDetailRows = function* (goodsReceipts = [], { materialId = 
                 unitMeasureName: detail.material?.unitMeasure?.symbol || detail.material?.unitMeasure?.name,
                 conversionUnitCost: toNumber(detail.conversionUnitCost),
                 costPerUnitType: toNumber(detail.costPerUnitType),
+                costIsTotal: detail.costIsTotal,
                 netPurchaseAmount: toNumber(detail.netPurchaseAmount),
                 grossPurchaseAmount: toNumber(detail.grossPurchaseAmount)
             };

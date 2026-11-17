@@ -26,7 +26,7 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         };
         const report = await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js');
         app = createControllerTestApp({ registerRoutes: router => {
-            router.use((req, _res, next) => { req.user = { id: null }; next(); });
+            router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
             router.get('/purchase-report', report.exportMaterialGoodsReceiptReportExcel);
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
                 const controller = controllers[resource];
@@ -44,6 +44,7 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
             codeNumber: Number.parseInt(Date.now().toString().slice(-8)), code: `RC${suffix}`,
             legalName: `RC legal ${suffix}`, tradeName: `RC supplier ${suffix}`
         } })).id;
+        ids.user = (await prisma.user.create({ data: { name: `RC user ${suffix}`, password: 'integration-only' } })).id;
         ids.person = (await prisma.person.create({ data: { fullName: `RC person ${suffix}` } })).id;
         ids.status = (await prisma.status.upsert({ where: { name: 'Aprobada' }, update: {}, create: { name: 'Aprobada' } })).id;
         await prisma.status.upsert({ where: { name: 'Confirmada' }, update: {}, create: { name: 'Confirmada' } });
@@ -77,6 +78,7 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         const receiptIds = (await prisma.goodsReceipt.findMany({ where: { supplierId: ids.supplier }, select: { id: true } }))
             .map(receipt => receipt.id);
         const movements = await prisma.inventoryMovement.findMany({ where: { goodsReceiptId: { in: receiptIds } }, select: { id: true } });
+        await prisma.goodsReceiptDetailChange.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
         await prisma.movementDetail.deleteMany({ where: { movementId: { in: movements.map(row => row.id) } } });
         await prisma.inventoryMovement.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
         await prisma.goodsReceiptDetail.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
@@ -87,6 +89,7 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         await prisma.person.delete({ where: { id: ids.person } });
         await prisma.presentation.delete({ where: { id: ids.presentation } });
         await prisma.unitMeasure.delete({ where: { id: ids.unit } });
+        await prisma.user.delete({ where: { id: ids.user } });
     });
 
     it.each([['material', 'Material'], ['consumable', 'Consumable']])('lista y reporta solo compras homogéneas de %s', async (resource, label) => {
@@ -171,6 +174,36 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
     });
     const getCounter = prefix => prisma.referenceNumberCounter.findUnique({
         where: { prefix_year: { prefix, year: new Date().getFullYear() } }
+    });
+
+    it.each(['material', 'consumable'])('conserva el costo total en alta, lectura, corrección, reporte y cancelación de %s', async resource => {
+        for (const name of ['Corrección de detalle de compra', 'Cancelación de detalle de compra'])
+            await prisma.stockAdjustmentReason.upsert({ where: { name }, update: {}, create: { name } });
+        const response = await request(app).post(path(resource)).send({ ...purchaseBody(resource),
+            details: [{ materialId: ids[resource], quantity: 10, costPerUnitType: 500, costIsTotal: true }] }).expect(200);
+        const receipt = response.body.goodsReceipt;
+        const detail = await prisma.goodsReceiptDetail.findFirstOrThrow({ where: { goodsReceiptId: receipt.id } });
+        expect(detail.costIsTotal).toBe(true);
+        expect(Number(detail.conversionUnitCost)).toBe(50);
+        expect(Number(detail.netPurchaseAmount)).toBe(500);
+        expect(Number(detail.grossPurchaseAmount)).toBe(580);
+        await request(app).get(`${path(resource)}/${receipt.id}`).expect(200).expect(result => {
+            expect(result.body.goodsReceipt.details[0].costIsTotal).toBe(true);
+        });
+        await request(app).patch(`${path(resource)}/${receipt.id}/details/${detail.id}/corrections`)
+            .send({ quantity: 5, costPerUnitType: 400 }).expect(200);
+        const corrected = await prisma.goodsReceiptDetail.findUniqueOrThrow({ where: { id: detail.id } });
+        expect(corrected.costIsTotal).toBe(true);
+        expect(Number(corrected.conversionUnitCost)).toBe(80);
+        expect(Number(corrected.netPurchaseAmount)).toBe(400);
+        const label = resource === 'material' ? 'Material' : 'Consumable';
+        const rows = await Array.fromAsync(services[resource][`find${label}GoodsReceiptReportRows`]({ supplierId: ids.supplier }));
+        expect(rows.find(row => row.referenceNumber === receipt.referenceNumber)).toMatchObject({ costIsTotal: true, netPurchaseAmount: 400 });
+        await request(app).patch(`${path(resource)}/${receipt.id}/details/${detail.id}/cancel`).send({}).expect(200);
+        const canceled = await prisma.goodsReceiptDetail.findUniqueOrThrow({ where: { id: detail.id } });
+        expect(canceled.costIsTotal).toBe(true);
+        expect(canceled.status).toBe('CANCELED');
+        expect(Number(canceled.netPurchaseAmount)).toBe(400);
     });
 
     it('emite CMA y CCO concurrentes con contadores independientes e inventario del contexto correcto', async () => {

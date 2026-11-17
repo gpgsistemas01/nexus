@@ -513,3 +513,33 @@ it('selector de compras admite el contrato de inventario sin type y rechaza un t
     ),
   ).toThrow();
 });
+
+it('costo capturado total conserva el modo, divide por compra y se envía sin totales derivados', () => {
+  const item = mapPurchaseItemOption(purchaseItem, 'materials');
+  const detail = createPurchaseDetailDraft(item, 10, 500, true);
+  expect(detail).toMatchObject({
+    costIsTotal: true,
+    conversionUnitCost: 50,
+    netPurchaseAmount: 500,
+    grossPurchaseAmount: 580,
+  });
+  const values = { ...createInitialPurchaseValues(), details: [detail] };
+  const payload = mapPurchaseFormToRequest(values);
+  expect(payload.details).toEqual([
+    { materialId: detail.materialId, quantity: 10, costPerUnitType: 500, costIsTotal: true },
+  ]);
+});
+
+it('la consulta conserva el modo total y rechaza un modo ambiguo recibido de la API', () => {
+  const data = {
+    ...purchase,
+    details: purchase.details.map((detail) => ({ ...detail, costIsTotal: true })),
+  };
+  expect(normalizePurchaseDocument(data, 'materials').details[0]?.costIsTotal).toBe(true);
+  expect(() =>
+    normalizePurchaseDocument(
+      { ...data, details: data.details.map((detail) => ({ ...detail, costIsTotal: 'false' })) },
+      'materials',
+    ),
+  ).toThrow();
+});

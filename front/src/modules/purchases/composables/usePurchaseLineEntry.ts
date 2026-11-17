@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { addGoodsReceiptMaterialValidation } from '@nexus/form-validation';
 import { getPieceQuantityError } from '@nexus/piece-quantity';
@@ -19,6 +19,7 @@ export const usePurchaseLineEntry = (options: {
     onAdded: (line: PurchaseDetail) => void;
 }) => {
     type Field = 'materialId' | 'quantity' | 'costPerUnitType';
+    const costIsTotal = ref(false);
     let isDisposed = false;
     onBeforeUnmount(() => {
         isDisposed = true;
@@ -88,9 +89,11 @@ export const usePurchaseLineEntry = (options: {
                 item.value,
                 Number(values.quantity),
                 Number(values.costPerUnitType),
+                costIsTotal.value,
             ),
         );
         form.resetForm();
+        costIsTotal.value = false;
         items.updateSearch('');
     });
 
@@ -106,6 +109,7 @@ export const usePurchaseLineEntry = (options: {
         items,
         item,
         selectCreatedItem,
+        costIsTotal,
         add,
     };
 };
