@@ -20,10 +20,10 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage1["Nexus · Proveedores"]
-        ucSupplierQuery("CU-CAT-01 Consultar")
-        ucSupplierCreate("CU-CAT-02 Crear")
-        ucSupplierEdit("CU-CAT-03 Editar")
-        ucSupplierReport("CU-CAT-04 Generar reporte")
+        ucSupplierQuery("CU-CAT-01 Consultar proveedores")
+        ucSupplierCreate("CU-CAT-02 Crear proveedor")
+        ucSupplierEdit("CU-CAT-03 Editar proveedor")
+        ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
     admin -- ucSupplierQuery
@@ -45,10 +45,10 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage2["Nexus · Clientes"]
-        ucClientQuery("CU-CAT-05 Consultar")
-        ucClientCreate("CU-CAT-06 Crear")
-        ucClientEdit("CU-CAT-07 Editar")
-        ucClientReport("CU-CAT-08 Generar reporte")
+        ucClientQuery("CU-CAT-05 Consultar clientes")
+        ucClientCreate("CU-CAT-06 Crear cliente")
+        ucClientEdit("CU-CAT-07 Editar cliente")
+        ucClientReport("CU-CAT-08 Generar reporte de clientes")
     end
 
     admin -- ucClientQuery

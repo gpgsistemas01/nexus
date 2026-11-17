@@ -17,8 +17,8 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary materialMovementsPackage["Nexus · Movimientos de materiales"]
-        ucMaterialMovements("CU-ALM-07 Consultar")
-        ucMaterialMovementReport("CU-ALM-08 Generar reporte")
+        ucMaterialMovements("CU-ALM-07 Consultar movimientos de materiales")
+        ucMaterialMovementReport("CU-ALM-08 Generar reporte de movimientos de materiales")
     end
 
     admin -- ucMaterialMovements
@@ -39,8 +39,8 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary wasteMovementsPackage["Nexus · Movimientos de mermas"]
-        ucWasteMovements("CU-ALM-15 Consultar")
-        ucWasteMovementReport("CU-ALM-16 Generar reporte")
+        ucWasteMovements("CU-ALM-15 Consultar movimientos de mermas")
+        ucWasteMovementReport("CU-ALM-16 Generar reporte de movimientos de mermas")
     end
 
     admin -- ucWasteMovements
@@ -60,8 +60,8 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
     systemBoundary consumableMovementsPackage["Nexus · Movimientos de consumibles"]
-        query("CU-ALM-23 Consultar")
-        report("CU-ALM-24 Generar reporte")
+        query("CU-ALM-23 Consultar movimientos de consumibles")
+        report("CU-ALM-24 Generar reporte de movimientos de consumibles")
     end
     admin -- query
 

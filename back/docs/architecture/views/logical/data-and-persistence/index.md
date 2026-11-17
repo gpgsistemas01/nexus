@@ -14,7 +14,7 @@
    valores predeterminados y relaciones.
 
 Prisma y sus migraciones son la fuente técnica. El
-[modelo conceptual](../../../../requirements/domain-and-use-cases/01-conceptual-domain-model.md)
+[modelo conceptual](../../../../../../front/docs/requirements/domain-model/index.md)
 define el significado de negocio; los procedimientos de migración y cuentas pertenecen
 a la [vista física](../../physical/index.md).
 
@@ -81,7 +81,7 @@ no elimina los casos de uso propios de cada tipo de inventario.
 ## Trazabilidad y mantenimiento
 
 Revisar el requisito o caso de uso, confirmar su significado en el
-[glosario](../../../../requirements/business-glossary.md) y contrastar campos y
+[glosario](../../../../../../front/docs/requirements/business-glossary.md) y contrastar campos y
 restricciones con Prisma. El [contrato HTTP](../../../openapi/api-contract.md) explica
 cómo se intercambian esos datos; las [decisiones de acceso](../02-identity-access-and-audit.md)
 explican quién puede operarlos.
@@ -153,7 +153,7 @@ con tipo `DECIMAL(5,2)` nullable. El neto se calcula como total con cono menos c
 forma parte de la clave. Los pesos desconocidos conservan la identidad anterior mediante
 un índice parcial; véase la migración física.
 
-El [recorrido de negocio](../../../../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma)
+El [recorrido de negocio](../../../../../../front/docs/requirements/requirements-specification/index.md)
 define la captura y consulta. La implementación distribuye sus responsabilidades:
 
 | Componente | Responsabilidad |

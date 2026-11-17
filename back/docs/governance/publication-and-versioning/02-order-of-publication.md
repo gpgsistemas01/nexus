@@ -1,53 +1,16 @@
 # 2. Orden de publicación
 
-Cada entrega exportable conserva este orden:
+Cada paquete comienza con título y tabla de datos generales: versión documental,
+versión del sistema, estado, fecha y responsable. El exportador añade la tabla de
+contenido. Los capítulos no repiten los datos generales de la entrada.
 
-1. portada: producto, título del documento, versión del sistema, versión documental, fecha,
-   estado y responsable;
-2. tabla **Datos generales del documento**;
-3. control de cambios y aprobaciones;
-4. tabla de contenido generada;
-5. propósito, audiencia, alcance y exclusiones;
-6. contenido principal;
-7. trazabilidad, glosario, referencias y anexos.
+| Paquete | Contenido |
+| --- | --- |
+| Arquitectura | Vistas, referencias técnicas, contrato HTTP y secuencias. |
+| Datos | Esquema y diccionario derivados de Prisma. |
+| Pruebas | Plan, diseño y casos documentados. |
+| Gobernanza | Reglas documentales y preparación de publicaciones técnicas. |
 
-La tabla **Datos generales del documento** pertenece únicamente al archivo de entrada de
-cada paquete exportable y se ubica inmediatamente después de su título. Registra versión
-documental, versión del sistema, estado, fecha y responsable. El exportador inserta la
-tabla de contenido después de estos datos generales; los capítulos, anexos y artefactos
-generados no repiten la tabla porque forman parte del mismo documento publicado.
-
-Los paquetes recomendados son **Requisitos**, **Datos**, **Diseño y
-arquitectura**, **Plan y evidencia de pruebas** y **Manual de usuario**. Cada paquete tiene su
-propio archivo de entrada y carpeta de imágenes; no se exporta toda la carpeta `docs` como un
-único documento. El paquete de datos incorpora la entrada del modelo persistente, el
-esquema y el diccionario de `docs/architecture/views/logical/data-and-persistence/generated/`;
-estos últimos se regeneran desde Prisma antes de exportar y no se editan manualmente. El contrato API pertenece al paquete de arquitectura
-porque describe la interfaz HTTP y el transporte JSON; no se incluye en datos por el solo hecho de
-que sus cuerpos transporten información.
-
-Los manuales por actor conservan su propia entrada. Cada actor recibe un documento común que
-ensambla `overview.md`, `procedures.md`, la matriz de validación y el catálogo de errores una sola
-vez; los documentos modulares no duplican esos anexos y conservan la portada del actor. Sus
-documentos siguen los módulos y destinos
-visibles de `../front/src/shared` y filtran los procedimientos según los permisos del
-área; la carpeta técnica donde vive un caso no determina el nombre ni el alcance del entregable.
-Las exportaciones y sus secuencias pertenecen al módulo que inicia la consulta, por lo que no se
-publica un documento independiente de reportes sin recorrido propio en la navegación.
-
-Las colecciones extensas de requisitos se mantienen en Markdown por grupo funcional bajo
-`requirements/use-cases/`, con un archivo por cada `CU-*`. Los diagramas normativos se
-mantienen junto al capítulo de dominio que explican y cada procedimiento del manual se separa
-bajo `user-manual/cases/<área>/`. Esta división permite revisar y navegar un caso sin cargar
-las demás fichas, figuras o instrucciones, mientras el manifiesto `requisitos` conserva la
-entrega completa requerida para auditoría como una carpeta de documentos por sección y grupo
-funcional, en lugar de ensamblar un único archivo difícil de revisar. Arquitectura sigue el mismo
-criterio: separa vistas, documentación técnica, contrato, trazabilidad y las
-secuencias por perspectiva y grupo. Su exportación de visión incorpora el diagrama
-canónico de casos de uso desde requisitos como parte de la vista de escenarios, sin
-duplicar su fuente ni incorporar todas las actividades por caso. Dividir la fuente o la salida no crea copias normativas ni cambia
-los identificadores `CU-*` y `DIA-*`.
-
-No se publica un catálogo separado de diagramas. Cada figura pertenece al capítulo que
-responde su pregunta y declara allí su propósito, semántica y fuente de verdad; los
-índices de requisitos y arquitectura proporcionan la navegación necesaria.
+Los casos mantienen un archivo por `CU-*`; arquitectura se publica por sección.
+Cada diagrama pertenece al capítulo cuya estructura o comportamiento describe.
+Los identificadores permanecen estables entre las fuentes y sus exportaciones.

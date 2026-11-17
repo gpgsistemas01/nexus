@@ -40,13 +40,13 @@ direction LR
     admin --|> warehouse
 
     systemBoundary issuePackage1["Nexus · Salidas de materiales"]
-        ucMaterialIssueQuery("CU-SAL-01 Consultar")
-        ucMaterialIssueCreate("CU-SAL-02 Crear")
-        ucMaterialIssueHeader("CU-SAL-03 Editar encabezado")
-        ucMaterialIssueDetails("CU-SAL-04 Editar detalles")
-        ucMaterialSupply("CU-SAL-05 Surtir")
-        ucMaterialReturn("CU-SAL-06 Devolver")
-        ucMaterialIssueReport("CU-SAL-07 Generar reporte")
+        ucMaterialIssueQuery("CU-SAL-01 Consultar salidas de material")
+        ucMaterialIssueCreate("CU-SAL-02 Crear salida de material")
+        ucMaterialIssueHeader("CU-SAL-03 Editar encabezado de salida de material")
+        ucMaterialIssueDetails("CU-SAL-04 Editar detalles de material de una salida")
+        ucMaterialSupply("CU-SAL-05 Surtir material")
+        ucMaterialReturn("CU-SAL-06 Devolver material surtido")
+        ucMaterialIssueReport("CU-SAL-07 Generar reporte de salidas de material")
         clientExtension("CU-CAT-06 Crear cliente")
     end
 
@@ -79,13 +79,13 @@ direction LR
     admin --|> warehouse
 
     systemBoundary issuePackage2["Nexus · Salidas de mermas"]
-        ucWasteIssueQuery("CU-SAL-08 Consultar")
-        ucWasteIssueCreate("CU-SAL-09 Crear")
-        ucWasteIssueHeader("CU-SAL-10 Editar encabezado")
-        ucWasteIssueDetails("CU-SAL-11 Editar detalles")
-        ucWasteSupply("CU-SAL-12 Surtir")
-        ucWasteReturn("CU-SAL-13 Devolver")
-        ucWasteIssueReport("CU-SAL-14 Generar reporte")
+        ucWasteIssueQuery("CU-SAL-08 Consultar salidas de merma")
+        ucWasteIssueCreate("CU-SAL-09 Crear salida de merma")
+        ucWasteIssueHeader("CU-SAL-10 Editar encabezado de salida de merma")
+        ucWasteIssueDetails("CU-SAL-11 Editar detalles de merma de una salida")
+        ucWasteSupply("CU-SAL-12 Surtir merma")
+        ucWasteReturn("CU-SAL-13 Devolver merma surtida")
+        ucWasteIssueReport("CU-SAL-14 Generar reporte de salidas de merma")
         clientExtension("CU-CAT-06 Crear cliente")
     end
 
@@ -118,13 +118,13 @@ direction LR
     admin --|> warehouse
 
     systemBoundary issuePackage3["Nexus · Salidas de consumibles"]
-        ucConsumableIssueQuery("CU-SAL-15 Consultar")
-        ucConsumableIssueCreate("CU-SAL-16 Crear")
-        ucConsumableIssueHeader("CU-SAL-17 Editar encabezado")
-        ucConsumableIssueDetails("CU-SAL-18 Editar detalles")
-        ucConsumableSupply("CU-SAL-19 Surtir")
-        ucConsumableReturn("CU-SAL-20 Devolver")
-        ucConsumableIssueReport("CU-SAL-21 Generar reporte")
+        ucConsumableIssueQuery("CU-SAL-15 Consultar salidas de consumible")
+        ucConsumableIssueCreate("CU-SAL-16 Crear salida de consumible")
+        ucConsumableIssueHeader("CU-SAL-17 Editar encabezado de salida de consumible")
+        ucConsumableIssueDetails("CU-SAL-18 Editar detalles de consumible de una salida")
+        ucConsumableSupply("CU-SAL-19 Surtir consumible")
+        ucConsumableReturn("CU-SAL-20 Devolver consumible surtido")
+        ucConsumableIssueReport("CU-SAL-21 Generar reporte de salidas de consumible")
         clientExtension("CU-CAT-06 Crear cliente")
     end
 

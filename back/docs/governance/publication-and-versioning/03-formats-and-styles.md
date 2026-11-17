@@ -52,7 +52,7 @@ el índice y asociada a la misma referencia interna que la imagen. La numeració
 durante cada exportación, en vez de depender de campos `SEQ` de Word, para que DOCX y PDF
 publiquen el mismo número y para que los paquetes generados sin Microsoft Word sean completos.
 Cada figura se ajusta como máximo al `90 %` del ancho disponible o a `7 in` de alto, según cuál
-límite alcance primero, y conserva su proporción para evitar que una captura o un diagrama
+límite alcance primero, y conserva su proporción para evitar que un diagrama
 sobrepase los márgenes de la página.
 
 Las anclas explícitas que preceden a un encabezado se preparan como un bloque independiente.
@@ -62,9 +62,7 @@ los identificadores sirven sólo para navegación y no forman parte del título 
 Al repetir una exportación, el archivo de la misma combinación de paquete y formato se reemplaza;
 no se exige una limpieza manual previa. Los DOCX permanecen en `build/docs/docx/` y los PDF en
 `build/docs/pdf/` hasta que se retiren de forma intencional. Esta separación distingue los
-editables de revisión de las entregas no editables sin duplicar la estructura por paquete. El flujo
-de capturas es distinto: el script elimina automáticamente el inventario anterior y lo genera
-completo para impedir que una publicación mezcle ejecuciones.
+editables de revisión de las entregas no editables sin duplicar la estructura por paquete.
 
 La preparación del entorno y los comandos no se duplican en esta norma. Se mantienen en la
 [guía operativa de exportación](../document-export-guide/index.md), que es la entrada para

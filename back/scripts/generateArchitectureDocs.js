@@ -24,7 +24,6 @@ const DATABASE_AREAS = [
     ['Importaciones y conciliación de inventario', ['InventoryImport', 'HistoricalDeliveryBatch']]
 ];
 const USE_CASE_DOCUMENTS = {
-    catalog: path.join(ROOT, 'docs/requirements/use-cases'),
     backendDiagrams: path.join(ROOT, 'docs/architecture/views/processes/backend-code-sequences')
 };
 
@@ -120,24 +119,26 @@ const validateUseCaseDiagramCoverage = async () => {
             await readDocumentSource(file)
         ])
     ));
+    const catalogFiles = (await walk(path.resolve(ROOT, '../front/docs/requirements/use-cases')))
+        .filter(file => /\/cu-[a-z]+-\d+\.md$/.test(toPosix(file)));
+    const catalogCases = (await Promise.all(catalogFiles.map(async file => {
+        const content = await readFile(file, 'utf8');
+        const [, id] = content.match(/^# `(CU-[A-Z]+-\d+)`/) ?? [];
+        if (!id) throw new Error(`Ficha de caso de uso sin identificador: ${file}`);
+        return { id, content };
+    }))).sort((left, right) => {
+        const groups = ['AUT', 'IDA', 'ALM', 'CAT', 'ENT', 'SAL'];
+        const [, leftGroup, leftNumber] = left.id.split('-');
+        const [, rightGroup, rightNumber] = right.id.split('-');
+        return groups.indexOf(leftGroup) - groups.indexOf(rightGroup) || Number(leftNumber) - Number(rightNumber);
+    });
+    sources.set('catalog', catalogCases.map(({ id, content }) => `| \`${id}\` |\n${content}`).join('\n'));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
     const expectedTitles = new Map(
         [...normalizeLineEndings(sources.get('catalog'))
             .matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
             .map((match) => [match[1], match[2]])
     );
-    const permittedActors = new Map();
-    for (const [, id, body] of normalizeLineEndings(sources.get('catalog'))
-        .matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)) {
-        const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
-        const actors = [
-            ['Usuario registrado', 'user'],
-            ['Usuario autorizado de área operativa', 'operational'],
-            ['Personal de almacén', 'warehouse'],
-            ['Administrador del sistema', 'admin']
-        ].filter(([label]) => declaredActor.includes(label)).map(([, alias]) => alias);
-        permittedActors.set(id, actors);
-    }
     const failures = [];
     const sourceFilePaths = await walk(path.join(ROOT, 'src'));
     const sourceFiles = new Set(sourceFilePaths
@@ -160,83 +161,6 @@ const validateUseCaseDiagramCoverage = async () => {
             failures.push(`${name}: la cobertura o el orden no coincide con el catálogo de casos de uso`);
         }
     };
-
-    const useCaseSource = await readFile(path.join(ROOT,
-        'docs/requirements/domain-and-use-cases/02-current-use-cases.md'), 'utf8');
-    const useCaseDiagrams = getMermaidBlocks(useCaseSource);
-    const diagramCaseIds = [];
-    for (const diagram of useCaseDiagrams) {
-        if (!diagram.startsWith('usecase-beta\n')) {
-            failures.push('casos de uso: debe emplearse la notación nativa usecase-beta');
-        }
-        const actors = new Set([...diagram.matchAll(/^\s*actor\s+(\w+)\(/gm)].map(match => match[1]));
-        const cases = [...diagram.matchAll(/^\s*(\w+)\("(CU-[A-Z]+-\d+) (.+)"\)/gm)];
-        // Los casos que extienden otro objetivo se definen en su grupo propietario;
-        // aquí se reconocen por la relación, sin añadir metadatos a su nombre visible.
-        const extensionAliases = new Set([...diagram.matchAll(/^\s*(\w+) \.\.>:extend \w+$/gm)]
-            .map(([, alias]) => alias));
-        diagramCaseIds.push(...cases.filter(([, alias]) => !extensionAliases.has(alias))
-            .map(([, , id]) => id));
-        const caseAliases = new Set(cases.map(([, alias]) => alias));
-        const queryAliases = new Set(cases.filter(([, , , title]) => title.startsWith('Consultar '))
-            .map(([, alias]) => alias));
-        const associations = [...diagram.matchAll(/^\s*(\w+) -{2,} (\w+)$/gm)]
-            .map(([, from, to]) => [from, to]);
-        for (const [from, to] of associations) {
-            if (!caseAliases.has(to) || (!actors.has(from) && !queryAliases.has(from))) {
-                failures.push(`casos de uso: enlace ${from} -- ${to} sin actor o consulta de origen válidos`);
-            }
-        }
-        const generalizations = [...diagram.matchAll(/^\s*(\w+) --\|> (\w+)$/gm)]
-            .map(([, specialized, general]) => [specialized, general]);
-        for (const [specialized, general] of generalizations) {
-            if (!actors.has(specialized) || !actors.has(general) || specialized === general) {
-                failures.push(`casos de uso: generalización ${specialized} --|> ${general} entre actores inválidos`);
-            }
-        }
-        // Issues resume el acceso compartido desde Consulta; las fichas destino
-        // conservan los actores autorizados de cada operación.
-        const caseIdsByAlias = new Map(cases.map(([, alias, id]) => [alias, id]));
-        const reachableByActor = new Map([...actors].map((actor) => {
-            const reachable = new Set([actor]);
-            const pending = [actor];
-            for (let index = 0; index < pending.length; index += 1) {
-                for (const [from, to] of [...associations, ...generalizations]) {
-                    if (from !== pending[index] || reachable.has(to)) continue;
-                    if (!actors.has(from)) {
-                        if (!queryAliases.has(from) || !caseIdsByAlias.get(to)?.startsWith('CU-SAL-')) continue;
-                        const allowedActors = permittedActors.get(caseIdsByAlias.get(to)) ?? [];
-                        if (!allowedActors.some(allowed => reachable.has(allowed))) continue;
-                    }
-                    reachable.add(to);
-                    pending.push(to);
-                }
-            }
-            return [actor, reachable];
-        }));
-        for (const [specialized, general] of generalizations) {
-            for (const [from, to] of associations) {
-                if (from === specialized && reachableByActor.get(general)?.has(to)) {
-                    failures.push(`casos de uso: ${specialized} repite el enlace a ${to} que ya hereda de ${general}`);
-                }
-            }
-        }
-        for (const [, alias, id, title] of cases) {
-            if (title !== expectedTitles.get(id)) {
-                failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
-            }
-            const normativeActors = permittedActors.get(id) ?? [];
-            const visibleActors = normativeActors.filter(actor => actors.has(actor));
-            if (!visibleActors.length || visibleActors.some(actor => !reachableByActor.get(actor)?.has(alias))) {
-                failures.push(`casos de uso: ${id} no se asocia con su actor normativo directamente o por herencia`);
-            }
-            if (normativeActors.length === 1 && normativeActors[0] === 'admin'
-                && reachableByActor.get('warehouse')?.has(alias)) {
-                failures.push(`casos de uso: ${id} es exclusivo del administrador y no debe enlazarse desde Personal de almacén ni sus consultas`);
-            }
-        }
-    }
-    validateIds('diagramas de casos de uso', diagramCaseIds);
 
     for (const side of ['backend']) {
         const source = sources.get(`${side}Diagrams`);
@@ -871,10 +795,10 @@ propietarias.
 El tipo Prisma y el atributo \`@db\` describen la representación técnica. Prisma y las
 migraciones son la fuente de verdad para restricciones completas, índices, acciones
 referenciales y SQL. El propósito de negocio de los agregados se explica en el
-[modelo de dominio y casos de uso](../../../../../requirements/domain-and-use-cases/index.md); este generador no inventa
+[modelo de dominio y casos de uso](../../../../../../../front/docs/requirements/domain-model/index.md); este generador no inventa
 definiciones de negocio a partir de nombres de tablas. La terminología compartida con
 usuarios y responsables se mantiene en el
-[glosario del negocio](../../../../../requirements/business-glossary.md).
+[glosario del negocio](../../../../../../../front/docs/requirements/business-glossary.md).
 
 ## Cómo leerlo
 

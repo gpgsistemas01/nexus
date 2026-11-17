@@ -22,12 +22,12 @@ direction LR
     admin --|> warehouse
 
     systemBoundary warehousePackage1["Nexus · Materiales"]
-        ucMaterialQuery("CU-ALM-01 Consultar")
-        ucMaterialCreate("CU-ALM-02 Crear")
-        ucMaterialEdit("CU-ALM-03 Editar")
-        ucMaterialRemove("CU-ALM-04 Retirar oferta")
-        ucMaterialInventoryReport("CU-ALM-06 Generar reporte")
-        ucMaterialStock("CU-ALM-05 Ajustar existencia")
+        ucMaterialQuery("CU-ALM-01 Consultar materiales")
+        ucMaterialCreate("CU-ALM-02 Crear material")
+        ucMaterialEdit("CU-ALM-03 Editar material")
+        ucMaterialRemove("CU-ALM-04 Retirar material")
+        ucMaterialInventoryReport("CU-ALM-06 Generar reporte de inventario de materiales")
+        ucMaterialStock("CU-ALM-05 Ajustar existencia de material")
     end
 
     warehouse -- ucMaterialQuery
@@ -57,12 +57,12 @@ direction LR
     admin --|> warehouse
 
     systemBoundary warehousePackage2["Nexus · Mermas"]
-        ucWasteQuery("CU-ALM-09 Consultar")
+        ucWasteQuery("CU-ALM-09 Consultar mermas")
         ucWasteCreate("CU-ALM-10 Registrar merma")
-        ucWasteEdit("CU-ALM-11 Editar")
-        ucWasteAddStock("CU-ALM-13 Agregar existencia")
-        ucWasteReport("CU-ALM-14 Generar reporte")
-        ucWasteStock("CU-ALM-12 Ajustar existencia")
+        ucWasteEdit("CU-ALM-11 Editar merma")
+        ucWasteAddStock("CU-ALM-13 Agregar existencia de merma")
+        ucWasteReport("CU-ALM-14 Generar reporte de mermas")
+        ucWasteStock("CU-ALM-12 Ajustar existencia de merma")
     end
 
     warehouse -- ucWasteQuery
@@ -92,12 +92,12 @@ direction LR
     admin --|> warehouse
 
     systemBoundary warehousePackage3["Nexus · Consumibles"]
-        ucConsumableQuery("CU-ALM-17 Consultar")
-        ucConsumableCreate("CU-ALM-18 Crear")
-        ucConsumableEdit("CU-ALM-19 Editar")
-        ucConsumableRemove("CU-ALM-20 Retirar oferta")
-        ucConsumableReport("CU-ALM-22 Generar reporte")
-        ucConsumableStock("CU-ALM-21 Ajustar existencia")
+        ucConsumableQuery("CU-ALM-17 Consultar consumibles")
+        ucConsumableCreate("CU-ALM-18 Crear consumible")
+        ucConsumableEdit("CU-ALM-19 Editar consumible")
+        ucConsumableRemove("CU-ALM-20 Retirar consumible")
+        ucConsumableReport("CU-ALM-22 Generar reporte de inventario de consumibles")
+        ucConsumableStock("CU-ALM-21 Ajustar existencia de consumible")
     end
 
     warehouse -- ucConsumableQuery

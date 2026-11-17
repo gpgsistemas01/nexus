@@ -1,8 +1,7 @@
 # 1. Referencias documentales
 
-[ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) orienta la
-especificación de requisitos. La [estructura de las fichas](../../requirements/use-cases/index.md#estructura-de-las-fichas)
-define el formato de los casos de uso de Nexus.
+La arquitectura toma ISO/IEC/IEEE 42010 como referencia; OpenAPI 3.1 define el
+contrato HTTP. El plan de pruebas adapta ISO/IEC/IEEE 29119 para diseño y evidencia.
 
-Las normas aplicadas a cada documento están en
-[Aplicación de normas](../standards-application/index.md).
+Los requisitos y sus criterios documentales se mantienen en `front/docs/requirements/`
+y `front/docs/governance/`, desde la raíz del repositorio.

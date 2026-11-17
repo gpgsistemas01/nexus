@@ -20,7 +20,7 @@ Una página visible no autoriza todas sus operaciones. Consulte las políticas d
 
 ## Seguir una recepción de materiales
 
-1. Lea `CU-ENT-02` en [casos de uso de compras](../../../requirements/use-cases/purchases/index.md): explica por qué el operador registra la recepción y qué resultado debe conservar.
+1. Lea `CU-ENT-02` en [casos de uso de compras](../../../../../front/docs/requirements/use-cases/purchases/index.md): explica por qué el operador registra la recepción y qué resultado debe conservar.
 2. Localice la página `/compras/materiales` en la [navegación web](../../../../../front/docs/architecture/views/scenarios/navigation-and-screens.md) y siga su formulario en la [referencia frontend](../../../../../front/docs/architecture/views/development/code-structure.md). El selector puede crear un material con existencia cero; abrir o guardar ese catálogo no debe registrar lo recibido.
 3. Revise la solicitud en el [contrato API](../../openapi/api-contract.md) y la ruta registrada. La ruta fija el contexto de materiales o consumibles; la entrada del navegador no debe cambiarlo.
 4. Siga el controlador y el servicio en la [secuencia backend de la recepción](../processes/backend-code-sequences/purchases/cu-ent-02.md). Al confirmar la compra, documento, detalles, existencias y movimientos deben conservarse juntos; un fallo no debe dejar una recepción parcial.

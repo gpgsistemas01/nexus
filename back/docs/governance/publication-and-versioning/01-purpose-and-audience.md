@@ -1,6 +1,8 @@
 # 1. Propósito y audiencia
 
-El `README.md` raíz es la guía operativa de la aplicación (requisitos técnicos, configuración,
-inicio y pruebas). `docs/README.md` es el índice del cuerpo documental. No deben fusionarse:
-una persona que despliega no necesita recorrer la especificación completa y una persona que
-audita requisitos necesita una entrada estable, independiente de los comandos cotidianos.
+La publicación técnica del backend reúne las fuentes necesarias para revisar su
+contrato HTTP, organización, persistencia y pruebas. Cada entrega identifica versión,
+fecha, responsable y estado de revisión.
+
+El índice documental localiza las colecciones; Desarrollo contiene la preparación
+y ejecución de la API; gobernanza define su mantenimiento y publicación.

@@ -14,8 +14,8 @@ notación y la convención de enlaces de acceso desde consulta. Las
 y las fichas de cada objetivo precisan permisos y alcance.
 
 La notación `usecase-beta` requiere Mermaid 12. Cada figura es un corte del mismo
-sistema. Los óvalos conservan el ID y omiten el nombre del recurso cuando el límite
-del sistema ya lo identifica; las fichas mantienen el nombre completo.
+sistema. Los óvalos conservan el ID y el nombre completo de la ficha: verbo en infinitivo
+y objeto concreto, por ejemplo, «Consultar salidas de material».
 
 ## Áreas funcionales
 

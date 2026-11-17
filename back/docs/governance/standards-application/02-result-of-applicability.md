@@ -2,8 +2,6 @@
 
 | Referencia | Decisión | Aplicación en Nexus | No se afirma ni se aplica |
 | --- | --- | --- | --- |
-| ISO/IEC/IEEE 29148:2018 | Principal para requisitos. | Identificación estable, redacción verificable, atributos, estado, trazabilidad, revisión y control de cambios. | No se declara conformidad integral ni se reproduce una plantilla normativa. |
-| ISO/IEC 25010:2023 | Complementaria para calidad del producto. | Vocabulario para clasificar seguridad, fiabilidad, eficiencia de desempeño, capacidad de interacción y mantenibilidad cuando existe una necesidad comprobable. | No se inventan métricas, umbrales ni prioridades; tampoco se afirma una evaluación completa del producto. |
 | ISO/IEC/IEEE 15289:2019 | Complementaria para información del ciclo de vida. | Responsabilidad de cada artefacto, índice, fuente de verdad, mantenimiento curado/generado y relación entre documentos. | No se exige un documento separado por cada proceso ni un paquete contractual. |
 | [IEEE 1016-2009](https://standards.ieee.org/ieee/1016/4502/) | Referencia histórica complementaria para descripción de diseño de software; estado Inactive-Reserved según IEEE. | La guía técnica identifica elementos implementados, responsabilidades, interfaces, relaciones, vistas dinámicas y condiciones de mantenimiento. | No se afirma una descripción de diseño completa ni se atribuye a la norma la plantilla local de nombres, métodos o fragmentos. |
 | ISO/IEC/IEEE 42010:2022 | Sólo arquitectura. | Interesados, preocupaciones, alcance y semántica de las vistas arquitectónicas. | No gobierna la redacción de requisitos ni convierte Mermaid en UML o C4 formal. |
@@ -17,7 +15,7 @@ concreta, sin convertir cada archivo en un documento independiente.
 
 | Concepto adoptado | Aplicación vigente | Evidencia |
 | --- | --- | --- |
-| Elemento de diseño | Se identifican archivo, símbolo o ruta con un nombre literal y una responsabilidad. | Tablas de las referencias técnicas de backend y frontend. |
+| Elemento de diseño | Se identifican archivo, símbolo o ruta con un nombre literal y una responsabilidad. | Tablas de las referencias técnicas del backend. |
 | Relación e interfaz | Se documentan llamadas entre router, middleware, DTO, controller, servicio, inventario y persistencia. | Tabla de operaciones y diagrama de secuencia del surtimiento. |
 | Vista | Cada diagrama declara alcance y semántica junto a la propia vista. | Diagramas de montaje, secuencia y decisiones. |
 | Justificación | La prosa explica separación entre transporte y dominio, reutilización y límite transaccional cuando no son evidentes por el nombre. | Bloques explicados y referencias al patrón propietario. |
