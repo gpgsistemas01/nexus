@@ -5,111 +5,117 @@ import { ids } from '../fixtures/inventory.js';
 import { historicalPreview, historicalReceipt } from '../fixtures/historicalDelivery.js';
 
 for (const width of [1280, 600, 599, 390]) {
-  test(`entregas históricas: selección, declaración y recuperación a ${width}px`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width, height: 900 });
-    await mockIssues(page, [...issuePermissions, 'issues:reconcile']);
-    const writes: Record<string, unknown>[] = [];
-    let previewCutoffDate = '';
-    await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
-      if (route.request().method() === 'GET') {
-        previewCutoffDate = new URL(route.request().url()).searchParams.get('cutoffDate') ?? '';
+  test(
+    `entregas históricas: selección, declaración y recuperación a ${width}px`,
+    { tag: '@essential' },
+    async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await mockIssues(page, [...issuePermissions, 'issues:reconcile']);
+      const writes: Record<string, unknown>[] = [];
+      let previewCutoffDate = '';
+      await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
+        if (route.request().method() === 'GET') {
+          previewCutoffDate = new URL(route.request().url()).searchParams.get('cutoffDate') ?? '';
+          return route.fulfill({
+            json: { preview: { ...historicalPreview(), cutoffDate: previewCutoffDate } },
+          });
+        }
+        writes.push(route.request().postDataJSON());
+        if (writes.length === 1) return route.abort('failed');
         return route.fulfill({
-          json: { preview: { ...historicalPreview(), cutoffDate: previewCutoffDate } },
+          json: {
+            code: 'HISTORICAL_DELIVERY_COMPLETED',
+            receipt: historicalReceipt(),
+            replayed: true,
+          },
         });
-      }
-      writes.push(route.request().postDataJSON());
-      if (writes.length === 1) return route.abort('failed');
-      return route.fulfill({
-        json: {
-          code: 'HISTORICAL_DELIVERY_COMPLETED',
-          receipt: historicalReceipt(),
-          replayed: true,
-        },
       });
-    });
-    await page.goto('/salidas/materiales');
-    await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
-    let dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
-    await expect(dialog.getByText('Registros 1–1 de 1', { exact: true })).toBeVisible();
-    await expect(dialog.getByText('1 registro en esta página', { exact: true })).toBeVisible();
-    await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
-    await expect(dialog.getByLabel('Fecha real de entrega (opcional)')).toHaveCount(0);
-    await expect(
-      dialog.getByRole('checkbox', {
+      await page.goto('/salidas/materiales');
+      await page
+        .getByRole('button', { name: 'Registrar entregas históricas', exact: true })
+        .click();
+      let dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+      await expect(dialog.getByText('Registros 1–1 de 1', { exact: true })).toBeVisible();
+      await expect(dialog.getByText('1 registro en esta página', { exact: true })).toBeVisible();
+      await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
+      await expect(dialog.getByLabel('Fecha real de entrega (opcional)')).toHaveCount(0);
+      await expect(
+        dialog.getByRole('checkbox', {
+          name: 'Seleccionar todas las salidas de todas las páginas',
+        }),
+      ).toHaveCount(1);
+      if (width < 600) {
+        const cards = dialog.locator('.responsive-table-cards');
+        await expect(cards).toBeVisible();
+        await expect(dialog.getByRole('table')).toBeHidden();
+        await expect(cards.getByText(/Lona: 3 por registrar/)).toBeVisible();
+      } else {
+        const table = dialog.getByRole('table', {
+          name: 'Salidas pendientes y parcialmente surtidas',
+        });
+        await expect(table).toBeVisible();
+        await expect(dialog.locator('.responsive-table-cards')).toBeHidden();
+        await expect(table.getByText(/Lona: 3 por registrar/)).toBeVisible();
+        if (width < 900) {
+          await expect(
+            dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' }),
+          ).toBeVisible();
+          await expect(dialog.locator('.table-frame__scroll-controls')).toBeVisible();
+        }
+      }
+      const selectAll = dialog.getByRole('checkbox', {
         name: 'Seleccionar todas las salidas de todas las páginas',
-      }),
-    ).toHaveCount(1);
-    if (width < 600) {
-      const cards = dialog.locator('.responsive-table-cards');
-      await expect(cards).toBeVisible();
-      await expect(dialog.getByRole('table')).toBeHidden();
-      await expect(cards.getByText(/Lona: 3 por registrar/)).toBeVisible();
-    } else {
-      const table = dialog.getByRole('table', {
-        name: 'Salidas pendientes y parcialmente surtidas',
       });
-      await expect(table).toBeVisible();
-      await expect(dialog.locator('.responsive-table-cards')).toBeHidden();
-      await expect(table.getByText(/Lona: 3 por registrar/)).toBeVisible();
-      if (width < 900) {
-        await expect(
-          dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' }),
-        ).toBeVisible();
-        await expect(dialog.locator('.table-frame__scroll-controls')).toBeVisible();
-      }
-    }
-    const selectAll = dialog.getByRole('checkbox', {
-      name: 'Seleccionar todas las salidas de todas las páginas',
-    });
-    await selectAll.check();
-    const rowCheckbox = dialog.getByRole('checkbox', {
-      name: 'Seleccionar salida SMA-HIST-001',
-      exact: true,
-    });
-    await expect(rowCheckbox).toBeChecked();
-    await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
-    await selectAll.uncheck();
-    await expect(rowCheckbox).not.toBeChecked();
-    await dialog.getByRole('checkbox', { name: /SMA-HIST-001/ }).check();
-    await dialog
-      .getByLabel('Motivo y evidencia de la entrega histórica', { exact: true })
-      .fill('Entrega física comprobada');
-    const submit = dialog.getByRole('button', {
-      name: 'Registrar entregas seleccionadas',
-      exact: true,
-    });
-    await expect(submit).toBeDisabled();
-    await dialog.getByRole('checkbox', { name: /Confirmo que todas las partidas/ }).check();
-    await expect(submit).toBeEnabled();
-    expect(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
-      true,
-    );
-    await dialog.screenshot({
-      path: test.info().outputPath('historical-delivery-review.png'),
-      animations: 'disabled',
-    });
-    await submit.click();
-    await expect(
-      dialog.getByRole('button', { name: 'Revisar y reintentar registro', exact: true }),
-    ).toBeVisible();
-    await page.reload();
-    await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
-    dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
-    await dialog
-      .getByRole('button', { name: 'Revisar y reintentar registro', exact: true })
-      .click();
-    await expect(dialog.getByText(/Se registraron 1 entregas/)).toBeVisible();
-    expect(writes).toHaveLength(2);
-    expect(writes[1]).toEqual(writes[0]);
-    expect(writes[0]).toMatchObject({
-      cutoffDate: previewCutoffDate,
-      deliveredAt: null,
-      declaredDelivered: true,
-      documents: [{ id: historicalPreview().documents[0]!.id, revision: 'a'.repeat(64) }],
-    });
-  });
+      await selectAll.check();
+      const rowCheckbox = dialog.getByRole('checkbox', {
+        name: 'Seleccionar salida SMA-HIST-001',
+        exact: true,
+      });
+      await expect(rowCheckbox).toBeChecked();
+      await expect(dialog.getByText('1 salida seleccionada en todas las páginas')).toBeVisible();
+      await selectAll.uncheck();
+      await expect(rowCheckbox).not.toBeChecked();
+      await dialog.getByRole('checkbox', { name: /SMA-HIST-001/ }).check();
+      await dialog
+        .getByLabel('Motivo y evidencia de la entrega histórica', { exact: true })
+        .fill('Entrega física comprobada');
+      const submit = dialog.getByRole('button', {
+        name: 'Registrar entregas seleccionadas',
+        exact: true,
+      });
+      await expect(submit).toBeDisabled();
+      await dialog.getByRole('checkbox', { name: /Confirmo que todas las partidas/ }).check();
+      await expect(submit).toBeEnabled();
+      expect(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
+        true,
+      );
+      await dialog.screenshot({
+        path: test.info().outputPath('historical-delivery-review.png'),
+        animations: 'disabled',
+      });
+      await submit.click();
+      await expect(
+        dialog.getByRole('button', { name: 'Revisar y reintentar registro', exact: true }),
+      ).toBeVisible();
+      await page.reload();
+      await page
+        .getByRole('button', { name: 'Registrar entregas históricas', exact: true })
+        .click();
+      dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+      await dialog
+        .getByRole('button', { name: 'Revisar y reintentar registro', exact: true })
+        .click();
+      await expect(dialog.getByText(/Se registraron 1 entregas/)).toBeVisible();
+      expect(writes).toHaveLength(2);
+      expect(writes[1]).toEqual(writes[0]);
+      expect(writes[0]).toMatchObject({
+        cutoffDate: previewCutoffDate,
+        deliveredAt: null,
+        declaredDelivered: true,
+        documents: [{ id: historicalPreview().documents[0]!.id, revision: 'a'.repeat(64) }],
+      });
+    },
+  );
 }
 
 test('seleccionar todo abarca todas las páginas y conserva selecciones al navegar', async ({
@@ -247,14 +253,18 @@ for (const width of [1280, 390]) {
   });
 }
 
-test('surtir no concede el permiso de regularización histórica', async ({ page }) => {
-  await mockIssues(page);
-  await page.goto('/salidas/materiales');
-  await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }),
-  ).toHaveCount(0);
-});
+test(
+  'surtir no concede el permiso de regularización histórica',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockIssues(page);
+    await page.goto('/salidas/materiales');
+    await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }),
+    ).toHaveCount(0);
+  },
+);
 
 test('la devolución de una entrega histórica exige declarar la entrada física actual', async ({
   page,

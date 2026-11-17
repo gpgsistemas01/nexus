@@ -70,7 +70,8 @@ están en la [guía de rendimiento](../../../back/docs/testing/backend-performan
 | Unitarias API | `npm --prefix back run test:unit` |
 | Unitarias interactivas | `npm --prefix front run test:watch` / `npm --prefix back run test:watch` |
 | Instalar Chromium | `npm exec --prefix front -- playwright install chromium` |
-| Navegador con API simulada | `npm --prefix front run test:e2e` |
+| Navegador esencial (push/PR) | `npm --prefix front run test:e2e:essential` |
+| Navegador completo con API simulada | `npm --prefix front run test:e2e` |
 | Sistema Vue + API + PostgreSQL | `npm --prefix front run test:e2e:system` |
 | Verificar base aislada | `npm --prefix back run test:db:verify` |
 | Migrar base aislada y generar Prisma | `npm --prefix back run test:db:migrate` |

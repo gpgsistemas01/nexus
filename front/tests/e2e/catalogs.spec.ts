@@ -84,28 +84,30 @@ for (const catalog of catalogs) {
   });
 }
 
-test('catálogos: edición usa PUT con la versión leída y conserva símbolo y estado', async ({
-  page,
-}) => {
-  const { writes } = await mockCatalogs(page);
-  await page.goto('/catalogos/unit-measures');
-  await page.getByRole('button', { name: 'Editar registro', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: 'Editar unidad de medida', exact: true });
-  await expect(dialog.getByRole('textbox', { name: 'Símbolo', exact: true })).toHaveValue('m');
-  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Metro nuevo');
-  await dialog.getByRole('textbox', { name: 'Símbolo', exact: true }).fill('mt');
-  await dialog.getByRole('checkbox', { name: 'Activo', exact: true }).uncheck();
-  await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes).toEqual([
-    {
-      method: 'PUT',
-      catalog: 'unit-measures',
-      data: { name: 'Metro nuevo', symbol: 'mt', isActive: false, expectedVersion: 7 },
-    },
-  ]);
-  await expect(page.getByRole('cell', { name: 'Metro nuevo', exact: true })).toBeVisible();
-});
+test(
+  'catálogos: edición usa PUT con la versión leída y conserva símbolo y estado',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { writes } = await mockCatalogs(page);
+    await page.goto('/catalogos/unit-measures');
+    await page.getByRole('button', { name: 'Editar registro', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Editar unidad de medida', exact: true });
+    await expect(dialog.getByRole('textbox', { name: 'Símbolo', exact: true })).toHaveValue('m');
+    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Metro nuevo');
+    await dialog.getByRole('textbox', { name: 'Símbolo', exact: true }).fill('mt');
+    await dialog.getByRole('checkbox', { name: 'Activo', exact: true }).uncheck();
+    await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes).toEqual([
+      {
+        method: 'PUT',
+        catalog: 'unit-measures',
+        data: { name: 'Metro nuevo', symbol: 'mt', isActive: false, expectedVersion: 7 },
+      },
+    ]);
+    await expect(page.getByRole('cell', { name: 'Metro nuevo', exact: true })).toBeVisible();
+  },
+);
 
 test('catálogos: conflicto conserva captura, impide reenvío y exige nueva lectura', async ({
   page,
@@ -271,19 +273,21 @@ test('catálogos: búsqueda, paginación, recuperación de lectura y vista móvi
   }
 });
 
-test('catálogos: acceso directo sin permiso no consulta la API administrativa', async ({
-  page,
-}) => {
-  const { reads } = await mockCatalogs(page, ['materials:read']);
-  await page.goto('/catalogos/roles');
-  await expect(
-    page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),
-  ).toBeVisible();
-  expect(reads).toEqual([]);
-  await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Menú', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Catálogos', exact: true })).toBeHidden();
-});
+test(
+  'catálogos: acceso directo sin permiso no consulta la API administrativa',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { reads } = await mockCatalogs(page, ['materials:read']);
+    await page.goto('/catalogos/roles');
+    await expect(
+      page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),
+    ).toBeVisible();
+    expect(reads).toEqual([]);
+    await page.goto('/almacen/materiales');
+    await page.getByRole('button', { name: 'Menú', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Catálogos', exact: true })).toBeHidden();
+  },
+);
 
 for (const status of [401, 403])
   test(`catálogos: revocación ${status} durante la escritura cierra el acceso`, async ({

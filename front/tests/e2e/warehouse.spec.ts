@@ -224,162 +224,172 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await expect(page).toHaveURL(/inicio-sesion\?returnTo=/);
 });
 
-test('consumibles: alta validada con catálogos y sin medidas', async ({ page }) => {
-  await mockWarehouse(page);
-  const writes: unknown[] = [];
-  await page.route('**/api/warehouse/consumables', async (route) => {
-    writes.push(route.request().postDataJSON());
-    await route.fulfill({ json: { code: 'CREATED_MATERIAL' } });
-  });
-  await page.goto('/almacen/consumibles');
-  await page.getByRole('button', { name: 'Nuevo consumible' }).click();
-  const dialog = page.getByRole('dialog', { name: 'Crear consumible', exact: true });
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  expect(writes).toEqual([]);
-  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Cinta adhesiva');
-  await chooseOption(page, 'Proveedor', 'Proveedor Central');
-  await chooseOption(page, 'Presentación', 'ROLLO');
-  await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
-  await dialog.getByRole('spinbutton', { name: 'Costo máximo unitario' }).fill('12.5');
-  await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('4');
-  await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toBeHidden();
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes).toEqual([
-    {
-      name: 'Cinta adhesiva',
-      supplierId: ids.supplier,
-      presentationId: ids.presentation,
-      unitMeasureId: ids.unit,
-      maxUnitCost: 12.5,
-      newStock: 4,
-      isActive: true,
-      observations: '',
-    },
-  ]);
-});
-
-test('materiales: conflicto de stock exige actualizar y no pierde la versión original', async ({
-  page,
-}) => {
-  await mockWarehouse(page);
-  const writes: Record<string, unknown>[] = [];
-  await page.route(`**/api/warehouse/materials/${ids.material}/stock`, async (route) => {
-    writes.push(route.request().postDataJSON());
-    await route.fulfill({ status: 409, json: { code: 'RECORD_VERSION_CONFLICT' } });
-  });
-  await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Ajustar stock', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: 'Ajustar stock de material', exact: true });
-  await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
-    'Proveedor Central',
-  );
-  await expect(dialog.getByRole('textbox', { name: 'Nombre', exact: true })).not.toBeEditable();
-  await expect(dialog.getByRole('textbox', { name: 'Stock actual', exact: true })).toHaveValue(
-    '10',
-  );
-  await dialog.getByRole('spinbutton', { name: 'Nuevo stock' }).fill('8');
-  await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await acknowledgeFormError(page, 'El registro cambió');
-  await expect(dialog.getByRole('button', { name: 'Guardar', exact: true })).toBeDisabled();
-  expect(writes).toEqual([
-    {
-      expectedVersion: 3,
-      supplierId: ids.supplier,
-      newStock: 8,
-      reasonId: ids.reason,
-      observations: '',
-    },
-  ]);
-  await expect(dialog.getByRole('spinbutton', { name: 'Nuevo stock' })).toHaveValue('8');
-  await dialog.getByRole('button', { name: 'Cerrar y actualizar inventario' }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes).toHaveLength(1);
-});
-
-test('materiales: alta con medidas, edición versionada y baja de la relación correcta', async ({
-  page,
-}) => {
-  await mockWarehouse(page);
-  const writes: { url: string; method: string; body: unknown }[] = [];
-  await page.route('**/api/warehouse/materials**', async (route) => {
-    if (route.request().method() === 'GET') return route.fallback();
-    const method = route.request().method();
-    writes.push({
-      url: new URL(route.request().url()).pathname,
-      method,
-      body: method === 'DELETE' ? null : route.request().postDataJSON(),
+test(
+  'consumibles: alta validada con catálogos y medidas opcionales',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    const writes: unknown[] = [];
+    await page.route('**/api/warehouse/consumables', async (route) => {
+      writes.push(route.request().postDataJSON());
+      await route.fulfill({ json: { code: 'CREATED_MATERIAL' } });
     });
-    await route.fulfill({
-      json: {
-        code:
-          method === 'POST'
-            ? 'CREATED_MATERIAL'
-            : method === 'DELETE'
-              ? 'DELETED_MATERIAL'
-              : 'UPDATED_MATERIAL',
+    await page.goto('/almacen/consumibles');
+    await page.getByRole('button', { name: 'Nuevo consumible' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Crear consumible', exact: true });
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    expect(writes).toEqual([]);
+    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Cinta adhesiva');
+    await chooseOption(page, 'Proveedor', 'Proveedor Central');
+    await chooseOption(page, 'Presentación', 'ROLLO');
+    await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
+    await dialog.getByRole('spinbutton', { name: 'Costo máximo unitario' }).fill('12.5');
+    await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('4');
+    await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toBeVisible();
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes).toEqual([
+      {
+        name: 'Cinta adhesiva',
+        supplierId: ids.supplier,
+        presentationId: ids.presentation,
+        unitMeasureId: ids.unit,
+        base: null,
+        height: null,
+        maxUnitCost: 12.5,
+        newStock: 4,
+        isActive: true,
+        observations: '',
+      },
+    ]);
+  },
+);
+
+test(
+  'materiales: conflicto de stock exige actualizar y no pierde la versión original',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    const writes: Record<string, unknown>[] = [];
+    await page.route(`**/api/warehouse/materials/${ids.material}/stock`, async (route) => {
+      writes.push(route.request().postDataJSON());
+      await route.fulfill({ status: 409, json: { code: 'RECORD_VERSION_CONFLICT' } });
+    });
+    await page.goto('/almacen/materiales');
+    await page.getByRole('button', { name: 'Ajustar stock', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Ajustar stock de material', exact: true });
+    await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
+      'Proveedor Central',
+    );
+    await expect(dialog.getByRole('textbox', { name: 'Nombre', exact: true })).not.toBeEditable();
+    await expect(dialog.getByRole('textbox', { name: 'Stock actual', exact: true })).toHaveValue(
+      '10',
+    );
+    await dialog.getByRole('spinbutton', { name: 'Nuevo stock' }).fill('8');
+    await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await acknowledgeFormError(page, 'El registro cambió');
+    await expect(dialog.getByRole('button', { name: 'Guardar', exact: true })).toBeDisabled();
+    expect(writes).toEqual([
+      {
+        expectedVersion: 3,
+        supplierId: ids.supplier,
+        newStock: 8,
+        reasonId: ids.reason,
+        observations: '',
+      },
+    ]);
+    await expect(dialog.getByRole('spinbutton', { name: 'Nuevo stock' })).toHaveValue('8');
+    await dialog.getByRole('button', { name: 'Cerrar y actualizar inventario' }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes).toHaveLength(1);
+  },
+);
+
+test(
+  'materiales: alta con medidas, edición versionada y baja de la relación correcta',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    const writes: { url: string; method: string; body: unknown }[] = [];
+    await page.route('**/api/warehouse/materials**', async (route) => {
+      if (route.request().method() === 'GET') return route.fallback();
+      const method = route.request().method();
+      writes.push({
+        url: new URL(route.request().url()).pathname,
+        method,
+        body: method === 'DELETE' ? null : route.request().postDataJSON(),
+      });
+      await route.fulfill({
+        json: {
+          code:
+            method === 'POST'
+              ? 'CREATED_MATERIAL'
+              : method === 'DELETE'
+                ? 'DELETED_MATERIAL'
+                : 'UPDATED_MATERIAL',
+        },
+      });
+    });
+    await page.goto('/almacen/materiales');
+    await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+    let dialog = page.getByRole('dialog', { name: 'Crear material', exact: true });
+    await chooseOption(page, 'Proveedor', 'Proveedor Central');
+    await chooseOption(page, 'Presentación', 'ROLLO');
+    await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
+    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona nueva');
+    await dialog.getByRole('spinbutton', { name: 'Base (m)' }).fill('2');
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(
+      dialog.getByRole('alert').filter({ hasText: 'altura', hasNotText: 'base' }),
+    ).toBeVisible();
+    expect(writes).toHaveLength(0);
+    await dialog.getByRole('spinbutton', { name: 'Altura (m)' }).fill('50');
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes[0]).toMatchObject({
+      method: 'POST',
+      body: { name: 'Lona nueva', base: 2, height: 50, newStock: 0 },
+    });
+    await page.getByRole('button', { name: 'Editar', exact: true }).click();
+    dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+    await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
+      'Proveedor Central',
+    );
+    await expect(dialog.getByRole('textbox', { name: 'Presentación', exact: true })).toHaveValue(
+      'ROLLO',
+    );
+    await expect(
+      dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true }),
+    ).toHaveValue('m²');
+    await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).not.toBeEditable();
+    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona revisada');
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes[1]).toEqual({
+      method: 'PATCH',
+      url: `/api/warehouse/materials/${ids.material}`,
+      body: {
+        name: 'Lona revisada',
+        minStock: 5,
+        maxUnitCost: 100,
+        isActive: true,
+        supplierId: ids.supplier,
+        expectedVersion: 3,
+        expectedMaterialVersion: 7,
       },
     });
-  });
-  await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-  let dialog = page.getByRole('dialog', { name: 'Crear material', exact: true });
-  await chooseOption(page, 'Proveedor', 'Proveedor Central');
-  await chooseOption(page, 'Presentación', 'ROLLO');
-  await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
-  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona nueva');
-  await dialog.getByRole('spinbutton', { name: 'Base (m)' }).fill('2');
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(
-    dialog.getByRole('alert').filter({ hasText: 'altura', hasNotText: 'base' }),
-  ).toBeVisible();
-  expect(writes).toHaveLength(0);
-  await dialog.getByRole('spinbutton', { name: 'Altura (m)' }).fill('50');
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes[0]).toMatchObject({
-    method: 'POST',
-    body: { name: 'Lona nueva', base: 2, height: 50, newStock: 0 },
-  });
-  await page.getByRole('button', { name: 'Editar', exact: true }).click();
-  dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
-  await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
-    'Proveedor Central',
-  );
-  await expect(dialog.getByRole('textbox', { name: 'Presentación', exact: true })).toHaveValue(
-    'ROLLO',
-  );
-  await expect(dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true })).toHaveValue(
-    'm²',
-  );
-  await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).not.toBeEditable();
-  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona revisada');
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes[1]).toEqual({
-    method: 'PATCH',
-    url: `/api/warehouse/materials/${ids.material}`,
-    body: {
-      name: 'Lona revisada',
-      minStock: 5,
-      maxUnitCost: 100,
-      isActive: true,
-      supplierId: ids.supplier,
-      expectedVersion: 3,
-      expectedMaterialVersion: 7,
-    },
-  });
-  await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
-  dialog = page.getByRole('dialog', { name: 'Eliminar material: Lona', exact: true });
-  await dialog.getByRole('button', { name: 'Confirmar eliminación' }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes[2]).toEqual({
-    method: 'DELETE',
-    url: `/api/warehouse/materials/${ids.offer}`,
-    body: null,
-  });
-});
+    await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
+    dialog = page.getByRole('dialog', { name: 'Eliminar material: Lona', exact: true });
+    await dialog.getByRole('button', { name: 'Confirmar eliminación' }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes[2]).toEqual({
+      method: 'DELETE',
+      url: `/api/warehouse/materials/${ids.offer}`,
+      body: null,
+    });
+  },
+);
 
 test('inventario: exportar respeta filtros y recupera una respuesta que no es Excel', async ({
   page,
@@ -497,74 +507,76 @@ for (const initialQuantity of ['3', '0']) {
   });
 }
 
-test('mermas: referencia de rollo, peso calculado y recuperación tras recargar sin duplicar la captura', async ({
-  page,
-}) => {
-  await mockWarehouse(page);
-  const writes: Record<string, unknown>[] = [];
-  await page.route('**/api/warehouse/wastes', async (route) => {
-    writes.push(route.request().postDataJSON());
-    if (writes.length === 1) return route.abort('failed');
-    return route.fulfill({ json: { code: 'CREATED_WASTE' } });
-  });
-  await page.goto('/almacen/mermas');
-  await page.getByRole('button', { name: 'Nueva merma' }).click();
-  let dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
-  await expect(
-    dialog.getByRole('combobox', { name: 'Material de referencia del proveedor', exact: true }),
-  ).toBeDisabled();
-  await chooseOption(page, 'Proveedor', 'Proveedor Central');
-  await chooseOption(page, 'Material de referencia del proveedor', 'Lona · ROLLO · 2 × 50');
-  await dialog.getByRole('textbox', { name: 'Nombre de la merma' }).fill('Sobrante nuevo');
-  await dialog
-    .getByRole('spinbutton', { name: 'Peso del rollo completo con cono (kg)' })
-    .fill('10.25');
-  await dialog.getByRole('spinbutton', { name: 'Peso del cono de la merma (kg)' }).fill('0.25');
-  await dialog.getByRole('spinbutton', { name: 'Peso de la merma con cono (kg)' }).fill('2.75');
-  await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('3');
-  await expect(dialog.getByRole('textbox', { name: 'Presentación', exact: true })).toHaveValue(
-    'ROLLO',
-  );
-  await expect(dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true })).toHaveValue(
-    'm²',
-  );
-  await expect(dialog.getByRole('textbox', { name: 'Peso neto de la merma (kg)' })).toHaveValue(
-    '2.5',
-  );
-  await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toHaveValue('2');
-  await expect(dialog.getByRole('spinbutton', { name: 'Altura (m)' })).toHaveValue('12.5');
-  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await acknowledgeFormError(page, 'No fue posible conectar');
-  await expect(dialog.getByRole('button', { name: 'Recuperar captura' })).toBeVisible();
-  const sent = writes[0]!;
-  expect(sent).toMatchObject({
-    name: 'Sobrante nuevo',
-    base: 2,
-    height: 12.5,
-    coneWeightKg: 0.25,
-    totalWeightKg: 2.75,
-    referenceRollTotalWeightKg: 10.25,
-    initialQuantity: 3,
-  });
-  expect(sent).not.toHaveProperty('weightKg');
-  expect(sent).not.toHaveProperty('sampleLengthM');
-  expect(sent.operationId).toMatch(/^[\da-f-]{36}$/);
-  await page.reload();
-  await page.getByRole('button', { name: 'Nueva merma' }).click();
-  dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
-  await expect(dialog).toContainText('Sobrante nuevo');
-  await dialog.getByRole('button', { name: 'Recuperar captura' }).click();
-  await expect(dialog).toBeHidden();
-  expect(writes).toHaveLength(2);
-  expect(writes[1]).toEqual(sent);
-  expect(
-    await page.evaluate(() =>
-      localStorage.getItem(
-        `nexus:waste-operation:${'88888888-8888-4888-8888-888888888888'}:create:`,
+test(
+  'mermas: referencia de rollo, peso calculado y recuperación tras recargar sin duplicar la captura',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    const writes: Record<string, unknown>[] = [];
+    await page.route('**/api/warehouse/wastes', async (route) => {
+      writes.push(route.request().postDataJSON());
+      if (writes.length === 1) return route.abort('failed');
+      return route.fulfill({ json: { code: 'CREATED_WASTE' } });
+    });
+    await page.goto('/almacen/mermas');
+    await page.getByRole('button', { name: 'Nueva merma' }).click();
+    let dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
+    await expect(
+      dialog.getByRole('combobox', { name: 'Material de referencia del proveedor', exact: true }),
+    ).toBeDisabled();
+    await chooseOption(page, 'Proveedor', 'Proveedor Central');
+    await chooseOption(page, 'Material de referencia del proveedor', 'Lona · ROLLO · 2 × 50');
+    await dialog.getByRole('textbox', { name: 'Nombre de la merma' }).fill('Sobrante nuevo');
+    await dialog
+      .getByRole('spinbutton', { name: 'Peso del rollo completo con cono (kg)' })
+      .fill('10.25');
+    await dialog.getByRole('spinbutton', { name: 'Peso del cono de la merma (kg)' }).fill('0.25');
+    await dialog.getByRole('spinbutton', { name: 'Peso de la merma con cono (kg)' }).fill('2.75');
+    await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('3');
+    await expect(dialog.getByRole('textbox', { name: 'Presentación', exact: true })).toHaveValue(
+      'ROLLO',
+    );
+    await expect(
+      dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true }),
+    ).toHaveValue('m²');
+    await expect(dialog.getByRole('textbox', { name: 'Peso neto de la merma (kg)' })).toHaveValue(
+      '2.5',
+    );
+    await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toHaveValue('2');
+    await expect(dialog.getByRole('spinbutton', { name: 'Altura (m)' })).toHaveValue('12.5');
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await acknowledgeFormError(page, 'No fue posible conectar');
+    await expect(dialog.getByRole('button', { name: 'Recuperar captura' })).toBeVisible();
+    const sent = writes[0]!;
+    expect(sent).toMatchObject({
+      name: 'Sobrante nuevo',
+      base: 2,
+      height: 12.5,
+      coneWeightKg: 0.25,
+      totalWeightKg: 2.75,
+      referenceRollTotalWeightKg: 10.25,
+      initialQuantity: 3,
+    });
+    expect(sent).not.toHaveProperty('weightKg');
+    expect(sent).not.toHaveProperty('sampleLengthM');
+    expect(sent.operationId).toMatch(/^[\da-f-]{36}$/);
+    await page.reload();
+    await page.getByRole('button', { name: 'Nueva merma' }).click();
+    dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
+    await expect(dialog).toContainText('Sobrante nuevo');
+    await dialog.getByRole('button', { name: 'Recuperar captura' }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes).toHaveLength(2);
+    expect(writes[1]).toEqual(sent);
+    expect(
+      await page.evaluate(() =>
+        localStorage.getItem(
+          `nexus:waste-operation:${'88888888-8888-4888-8888-888888888888'}:create:`,
+        ),
       ),
-    ),
-  ).toBeNull();
-});
+    ).toBeNull();
+  },
+);
 
 test('mermas: agregar stock y editar datos usan contratos independientes', async ({ page }) => {
   await mockWarehouse(page);
@@ -599,83 +611,89 @@ test('mermas: agregar stock y editar datos usan contratos independientes', async
   });
 });
 
-test('almacén: filtros y paginación se envían al servidor y permiten recuperarse de un fallo', async ({
-  page,
-}) => {
-  await mockWarehouse(page);
-  const queries: URLSearchParams[] = [];
-  await page.route('**/api/warehouse/materials?**', async (route) => {
-    const query = new URL(route.request().url()).searchParams;
-    queries.push(query);
-    if (query.get('search') === 'error') return route.fulfill({ status: 503, json: {} });
-    await route.fulfill({
-      json: {
-        ...pageOf([material]),
-        recordsTotal: 12,
-        recordsFiltered: query.get('search') ? 1 : 12,
-      },
+test(
+  'almacén: filtros y paginación se envían al servidor y permiten recuperarse de un fallo',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    const queries: URLSearchParams[] = [];
+    await page.route('**/api/warehouse/materials?**', async (route) => {
+      const query = new URL(route.request().url()).searchParams;
+      queries.push(query);
+      if (query.get('search') === 'error') return route.fulfill({ status: 503, json: {} });
+      await route.fulfill({
+        json: {
+          ...pageOf([material]),
+          recordsTotal: 12,
+          recordsFiltered: query.get('search') ? 1 : 12,
+        },
+      });
     });
-  });
-  await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
-  await expect(page.getByText('Registros 11–12 de 12', { exact: true })).toBeVisible();
-  expect(queries.at(-1)?.get('start')).toBe('10');
-  await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('error');
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
-  const requestError = page.getByRole('alert').filter({ hasText: 'No se pudo completar' });
-  await expect(requestError).toBeVisible();
-  await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('Lona');
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
-  await expect(requestError).toBeHidden();
-  expect(queries.at(-1)?.get('start')).toBe('0');
-  expect(queries.at(-1)?.get('search')).toBe('Lona');
-});
+    await page.goto('/almacen/materiales');
+    await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+    await expect(page.getByText('Registros 11–12 de 12', { exact: true })).toBeVisible();
+    expect(queries.at(-1)?.get('start')).toBe('10');
+    await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('error');
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    const requestError = page.getByRole('alert').filter({ hasText: 'No se pudo completar' });
+    await expect(requestError).toBeVisible();
+    await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('Lona');
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    await expect(requestError).toBeHidden();
+    expect(queries.at(-1)?.get('start')).toBe('0');
+    expect(queries.at(-1)?.get('search')).toBe('Lona');
+  },
+);
 
-test('selectores: carga automática al final, reintento y selección conservada', async ({
-  page,
-}) => {
-  await mockWarehouse(page);
-  const starts: number[] = [];
-  let isAvailable = false;
-  const suppliers = Array.from({ length: 45 }, (_, index) => ({
-    id: `99999999-9999-4999-8999-${String(index + 1).padStart(12, '0')}`,
-    tradeName: `Proveedor ${String(index + 1).padStart(3, '0')}`,
-  }));
-  await page.route('**/api/warehouse/suppliers?**', async (route) => {
-    const query = new URL(route.request().url()).searchParams;
-    const start = Number(query.get('start'));
-    starts.push(start);
-    if (start === 20 && !isAvailable) {
-      return route.fulfill({ status: 503, json: {} });
-    }
-    return route.fulfill({
-      json: { data: suppliers.slice(start, start + 20), recordsFiltered: 45, recordsTotal: 45 },
+test(
+  'selectores: carga automática al final, reintento y selección conservada',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    const starts: number[] = [];
+    let isAvailable = false;
+    const suppliers = Array.from({ length: 45 }, (_, index) => ({
+      id: `99999999-9999-4999-8999-${String(index + 1).padStart(12, '0')}`,
+      tradeName: `Proveedor ${String(index + 1).padStart(3, '0')}`,
+    }));
+    await page.route('**/api/warehouse/suppliers?**', async (route) => {
+      const query = new URL(route.request().url()).searchParams;
+      const start = Number(query.get('start'));
+      starts.push(start);
+      if (start === 20 && !isAvailable) {
+        return route.fulfill({ status: 503, json: {} });
+      }
+      return route.fulfill({
+        json: { data: suppliers.slice(start, start + 20), recordsFiltered: 45, recordsTotal: 45 },
+      });
     });
-  });
-  await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-  const field = page.getByRole('combobox', { name: 'Proveedor', exact: true });
-  await field.click();
-  const list = page.getByRole('listbox');
-  await list.hover();
-  await page.mouse.wheel(0, 1500);
-  await expect(
-    page.getByRole('button', { name: 'Reintentar catálogo', exact: true }),
-  ).toBeVisible();
-  expect(starts.filter((start) => start === 20)).toHaveLength(3);
-  isAvailable = true;
-  await page.getByRole('button', { name: 'Reintentar catálogo', exact: true }).click();
-  await expect.poll(() => starts.filter((start) => start === 20).length).toBe(4);
-  await list.hover();
-  await page.mouse.wheel(0, 1800);
-  await expect.poll(() => starts.includes(40)).toBe(true);
-  await expect(page.getByText('Desplázate para cargar más opciones', { exact: true })).toBeHidden();
-  await list.hover();
-  await page.mouse.wheel(0, 800);
-  await page.getByRole('option', { name: 'Proveedor 045', exact: true }).click();
-  await expect(field).toHaveValue('Proveedor 045');
-  expect(starts.filter((start) => start === 40)).toHaveLength(1);
-});
+    await page.goto('/almacen/materiales');
+    await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+    const field = page.getByRole('combobox', { name: 'Proveedor', exact: true });
+    await field.click();
+    const list = page.getByRole('listbox');
+    await list.hover();
+    await page.mouse.wheel(0, 1500);
+    await expect(
+      page.getByRole('button', { name: 'Reintentar catálogo', exact: true }),
+    ).toBeVisible();
+    expect(starts.filter((start) => start === 20)).toHaveLength(3);
+    isAvailable = true;
+    await page.getByRole('button', { name: 'Reintentar catálogo', exact: true }).click();
+    await expect.poll(() => starts.filter((start) => start === 20).length).toBe(4);
+    await list.hover();
+    await page.mouse.wheel(0, 1800);
+    await expect.poll(() => starts.includes(40)).toBe(true);
+    await expect(
+      page.getByText('Desplázate para cargar más opciones', { exact: true }),
+    ).toBeHidden();
+    await list.hover();
+    await page.mouse.wheel(0, 800);
+    await page.getByRole('option', { name: 'Proveedor 045', exact: true }).click();
+    await expect(field).toHaveValue('Proveedor 045');
+    expect(starts.filter((start) => start === 40)).toHaveLength(1);
+  },
+);
 
 test('selectores: páginas repetidas y conteo desactualizado no duplican opciones ni prolongan las consultas', async ({
   page,

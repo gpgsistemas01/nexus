@@ -258,7 +258,7 @@ aunque la terminal o el archivo local declaren otro entorno.
 | --- | --- |
 | Catálogos, clientes y proveedores | Mantener integraciones de alta y consulta; ampliar actualización o baja sólo al modificar esos flujos. |
 | Salidas de merma | Mantener registro, persistencia, movimiento y rollback existentes. |
-| Consumibles | Mantener unitarias por operación y altas sin medidas integradas en `materialControllerDbTest.js`; completar consulta, edición, retiro y ajuste HTTP de su propio inventario. |
+| Consumibles | Mantener unitarias por operación y altas integradas en `materialControllerDbTest.js`, con kg y metros lineales 1 × 1, presentación correspondiente y rechazo de medidas inválidas; completar consulta, edición, retiro y ajuste HTTP de su propio inventario. |
 | Salidas de material | Mantener `goodsIssueControllerDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: contexto, surtido, devolución parcial, concurrencia y rollback; completar fronteras de devolución. |
 | Entradas de compra | Mantener `goodsReceiptContextDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: aislamiento, alta, edición, corrección, cancelación, folios y fallos; ampliar sólo la regla afectada. |
 | Personas y usuarios | Incorporar persistencia de relaciones de rol y departamento. |

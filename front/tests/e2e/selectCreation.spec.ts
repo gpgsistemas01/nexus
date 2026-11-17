@@ -83,87 +83,89 @@ for (const [path, resource, title] of [
     expect(attempts).toBe(2);
   });
 
-  test(`select compras ${resource}: crea proveedor y artículo desde el desplegable con contexto de compra`, async ({
-    page,
-  }) => {
-    const { writes } = await mockPurchases(page);
-    const term = `Proveedor compra ${resource}`;
-    const name = `Artículo nuevo ${resource}`;
-    const captures: Record<string, unknown>[] = [];
-    await page.route('**/api/warehouse/suppliers', (route) =>
-      route.fulfill({
-        json: {
-          code: 'CREATED_SUPPLIER',
-          supplier: {
-            id: createdSupplierId,
-            version: 0,
-            tradeName: term,
-            legalName: 'Empresa',
-            isActive: true,
-          },
-        },
-      }),
-    );
-    await page.route(`**/api/warehouse/${resource}`, (route) => {
-      captures.push(route.request().postDataJSON());
-      return route.fulfill({
-        json: {
-          code: 'CREATED_MATERIAL',
-          material: {
-            ...purchaseItem,
-            version: 0,
-            supplier: { id: createdSupplierId, tradeName: term },
-            material: {
-              ...purchaseItem.material,
-              id: createdItemId,
-              name,
+  test(
+    `select compras ${resource}: crea proveedor y artículo desde el desplegable con contexto de compra`,
+    { tag: '@essential' },
+    async ({ page }) => {
+      const { writes } = await mockPurchases(page);
+      const term = `Proveedor compra ${resource}`;
+      const name = `Artículo nuevo ${resource}`;
+      const captures: Record<string, unknown>[] = [];
+      await page.route('**/api/warehouse/suppliers', (route) =>
+        route.fulfill({
+          json: {
+            code: 'CREATED_SUPPLIER',
+            supplier: {
+              id: createdSupplierId,
               version: 0,
-              type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
-              base: resource === 'materials' ? 2 : null,
-              height: resource === 'materials' ? 50 : null,
+              tradeName: term,
+              legalName: 'Empresa',
+              isActive: true,
             },
           },
-        },
+        }),
+      );
+      await page.route(`**/api/warehouse/${resource}`, (route) => {
+        captures.push(route.request().postDataJSON());
+        return route.fulfill({
+          json: {
+            code: 'CREATED_MATERIAL',
+            material: {
+              ...purchaseItem,
+              version: 0,
+              supplier: { id: createdSupplierId, tradeName: term },
+              material: {
+                ...purchaseItem.material,
+                id: createdItemId,
+                name,
+                version: 0,
+                type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+                base: resource === 'materials' ? 2 : null,
+                height: resource === 'materials' ? 50 : null,
+              },
+            },
+          },
+        });
       });
-    });
-    await page.goto(`/compras/${path}`);
-    await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
-    const parent = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
-    await parent.getByLabel('Observaciones', { exact: true }).fill('Compra sin guardar');
-    await openCreation(page, parent, 'Proveedor', 'Registrar proveedor', term);
-    const supplier = page.getByRole('dialog', { name: 'Registrar proveedor', exact: true });
-    await expect(supplier.getByLabel('Nombre comercial', { exact: true })).toHaveValue(term);
-    await supplier.getByLabel('Razón social', { exact: true }).fill('Empresa');
-    await supplier.getByRole('button', { name: 'Guardar', exact: true }).click();
-    await expect(supplier).toBeHidden();
-    const label = resource === 'materials' ? 'Material' : 'Consumible';
-    await openCreation(page, parent, label, `Registrar ${title}`, name);
-    const item = page.getByRole('dialog', { name: `Crear ${title}`, exact: true });
-    await expect(item.getByLabel('Nombre', { exact: true })).toHaveValue(name);
-    await expect(item.getByLabel('Proveedor', { exact: true })).toHaveValue(term);
-    await chooseOption(page, 'Presentación', 'ROLLO');
-    await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
-    if (resource === 'materials') {
-      await item.getByLabel('Base (m)', { exact: true }).fill('2');
-      await item.getByLabel('Altura (m)', { exact: true }).fill('50');
-    }
-    await item.getByRole('button', { name: 'Guardar', exact: true }).click();
-    await expect(item).toBeHidden();
-    await expect(parent.getByRole('combobox', { name: label, exact: true })).toHaveValue(
-      new RegExp(name),
-    );
-    await expect(parent.getByLabel('Observaciones', { exact: true })).toHaveValue(
-      'Compra sin guardar',
-    );
-    expect(captures).toHaveLength(1);
-    expect(captures[0]).toMatchObject({
-      supplierId: createdSupplierId,
-      creationContext: 'goodsReceipt',
-      name,
-    });
-    expect(captures[0]).not.toHaveProperty('newStock');
-    expect(writes).toHaveLength(0);
-  });
+      await page.goto(`/compras/${path}`);
+      await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
+      const parent = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
+      await parent.getByLabel('Observaciones', { exact: true }).fill('Compra sin guardar');
+      await openCreation(page, parent, 'Proveedor', 'Registrar proveedor', term);
+      const supplier = page.getByRole('dialog', { name: 'Registrar proveedor', exact: true });
+      await expect(supplier.getByLabel('Nombre comercial', { exact: true })).toHaveValue(term);
+      await supplier.getByLabel('Razón social', { exact: true }).fill('Empresa');
+      await supplier.getByRole('button', { name: 'Guardar', exact: true }).click();
+      await expect(supplier).toBeHidden();
+      const label = resource === 'materials' ? 'Material' : 'Consumible';
+      await openCreation(page, parent, label, `Registrar ${title}`, name);
+      const item = page.getByRole('dialog', { name: `Crear ${title}`, exact: true });
+      await expect(item.getByLabel('Nombre', { exact: true })).toHaveValue(name);
+      await expect(item.getByLabel('Proveedor', { exact: true })).toHaveValue(term);
+      await chooseOption(page, 'Presentación', 'ROLLO');
+      await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
+      if (resource === 'materials') {
+        await item.getByLabel('Base (m)', { exact: true }).fill('2');
+        await item.getByLabel('Altura (m)', { exact: true }).fill('50');
+      }
+      await item.getByRole('button', { name: 'Guardar', exact: true }).click();
+      await expect(item).toBeHidden();
+      await expect(parent.getByRole('combobox', { name: label, exact: true })).toHaveValue(
+        new RegExp(name),
+      );
+      await expect(parent.getByLabel('Observaciones', { exact: true })).toHaveValue(
+        'Compra sin guardar',
+      );
+      expect(captures).toHaveLength(1);
+      expect(captures[0]).toMatchObject({
+        supplierId: createdSupplierId,
+        creationContext: 'goodsReceipt',
+        name,
+      });
+      expect(captures[0]).not.toHaveProperty('newStock');
+      expect(writes).toHaveLength(0);
+    },
+  );
 }
 
 for (const path of ['materiales', 'consumibles', 'mermas']) {
@@ -209,39 +211,45 @@ for (const path of ['materiales', 'consumibles', 'mermas']) {
   });
 }
 
-test('select: permisos y catálogos de consulta no ofrecen altas', async ({ page }) => {
-  await mockWarehouse(page);
-  await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-  await page
-    .getByRole('combobox', { name: 'Proveedor', exact: true })
-    .fill('Proveedor sin permiso');
-  await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
-  await mockPurchases(
-    page,
-    purchasePermissions.filter((permission) => permission !== 'materials:write'),
-  );
-  await page.goto('/compras/materiales');
-  await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
-  await page
-    .getByRole('dialog', { name: 'Registrar compra', exact: true })
-    .getByRole('combobox', { name: 'Proveedor', exact: true })
-    .click();
-  await page.getByRole('option', { name: 'Proveedor Central', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Material', exact: true }).fill('Artículo sin permiso');
-  await expect(page.getByRole('button', { name: /Registrar material/ })).toHaveCount(0);
-  await mockIssues(
-    page,
-    issuePermissions.filter((permission) => permission !== 'clients:create'),
-  );
-  await page.goto('/salidas/materiales');
-  await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
-  await page
-    .getByRole('dialog', { name: 'Registrar salida', exact: true })
-    .getByRole('combobox', { name: 'Cliente', exact: true })
-    .fill('Cliente sin permiso');
-  await expect(page.getByRole('button', { name: /Registrar cliente/ })).toHaveCount(0);
-});
+test(
+  'select: permisos y catálogos de consulta no ofrecen altas',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    await page.goto('/almacen/materiales');
+    await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+    await page
+      .getByRole('combobox', { name: 'Proveedor', exact: true })
+      .fill('Proveedor sin permiso');
+    await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
+    await mockPurchases(
+      page,
+      purchasePermissions.filter((permission) => permission !== 'materials:write'),
+    );
+    await page.goto('/compras/materiales');
+    await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
+    await page
+      .getByRole('dialog', { name: 'Registrar compra', exact: true })
+      .getByRole('combobox', { name: 'Proveedor', exact: true })
+      .click();
+    await page.getByRole('option', { name: 'Proveedor Central', exact: true }).click();
+    await page
+      .getByRole('combobox', { name: 'Material', exact: true })
+      .fill('Artículo sin permiso');
+    await expect(page.getByRole('button', { name: /Registrar material/ })).toHaveCount(0);
+    await mockIssues(
+      page,
+      issuePermissions.filter((permission) => permission !== 'clients:create'),
+    );
+    await page.goto('/salidas/materiales');
+    await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
+    await page
+      .getByRole('dialog', { name: 'Registrar salida', exact: true })
+      .getByRole('combobox', { name: 'Cliente', exact: true })
+      .fill('Cliente sin permiso');
+    await expect(page.getByRole('button', { name: /Registrar cliente/ })).toHaveCount(0);
+  },
+);
 
 test('select: permite abrir el alta con teclado cuando la búsqueda no tiene resultados', async ({
   page,

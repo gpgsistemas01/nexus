@@ -110,36 +110,38 @@ test('movimientos: las fichas móviles etiquetan los datos y permiten ordenar po
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
 
-test('movimientos: proveedor primero, identidad del material, filtros aplicados, paginación y limpieza', async ({
-  page,
-}) => {
-  const { reads } = await mockMovements(page);
-  await page.goto('/movimientos/materiales');
-  await expect(page.getByRole('combobox', { name: 'Material', exact: true })).toBeDisabled();
-  await chooseOption(page, 'Proveedor', 'Proveedor Central');
-  await chooseOption(page, 'Material', 'Lona · ROLLO · 2 × 50');
-  await chooseSelect(page, 'Tipo de movimiento', 'Devolución');
-  await page.getByLabel('Fecha de inicio', { exact: true }).fill('2026-10-01');
-  await page.getByLabel('Fecha de fin', { exact: true }).fill('2026-10-22');
-  await page
-    .getByRole('textbox', { name: 'Buscar por material, proveedor o folio', exact: true })
-    .fill('SAL');
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
-  await expect.poll(() => reads.at(-1)?.searchParams.get('movementType')).toBe('RETURN');
-  expect(reads.at(-1)?.searchParams.get('materialId')).toBe(ids.material);
-  expect(reads.at(-1)?.searchParams.get('supplierId')).toBe(ids.supplier);
-  expect(reads.at(-1)?.searchParams.get('startDate')).toBe('2026-10-01');
-  expect(reads.at(-1)?.searchParams.get('endDate')).toBe('2026-10-22');
-  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
-  await expect(page.getByRole('cell', { name: 'SAL-011', exact: true })).toBeVisible();
-  expect(reads.at(-1)?.searchParams.get('start')).toBe('10');
-  await page.getByRole('columnheader', { name: 'Folio', exact: true }).click();
-  await expect.poll(() => reads.at(-1)?.searchParams.get('order[0][column]')).toBe('2');
-  await page.getByRole('button', { name: 'Limpiar filtros', exact: true }).click();
-  await expect.poll(() => reads.at(-1)?.searchParams.get('search')).toBe('');
-  expect(reads.at(-1)?.searchParams.get('materialId')).toBe('');
-  await expect(page.getByRole('combobox', { name: 'Material', exact: true })).toBeDisabled();
-});
+test(
+  'movimientos: proveedor primero, identidad del material, filtros aplicados, paginación y limpieza',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { reads } = await mockMovements(page);
+    await page.goto('/movimientos/materiales');
+    await expect(page.getByRole('combobox', { name: 'Material', exact: true })).toBeDisabled();
+    await chooseOption(page, 'Proveedor', 'Proveedor Central');
+    await chooseOption(page, 'Material', 'Lona · ROLLO · 2 × 50');
+    await chooseSelect(page, 'Tipo de movimiento', 'Devolución');
+    await page.getByLabel('Fecha de inicio', { exact: true }).fill('2026-10-01');
+    await page.getByLabel('Fecha de fin', { exact: true }).fill('2026-10-22');
+    await page
+      .getByRole('textbox', { name: 'Buscar por material, proveedor o folio', exact: true })
+      .fill('SAL');
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    await expect.poll(() => reads.at(-1)?.searchParams.get('movementType')).toBe('RETURN');
+    expect(reads.at(-1)?.searchParams.get('materialId')).toBe(ids.material);
+    expect(reads.at(-1)?.searchParams.get('supplierId')).toBe(ids.supplier);
+    expect(reads.at(-1)?.searchParams.get('startDate')).toBe('2026-10-01');
+    expect(reads.at(-1)?.searchParams.get('endDate')).toBe('2026-10-22');
+    await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+    await expect(page.getByRole('cell', { name: 'SAL-011', exact: true })).toBeVisible();
+    expect(reads.at(-1)?.searchParams.get('start')).toBe('10');
+    await page.getByRole('columnheader', { name: 'Folio', exact: true }).click();
+    await expect.poll(() => reads.at(-1)?.searchParams.get('order[0][column]')).toBe('2');
+    await page.getByRole('button', { name: 'Limpiar filtros', exact: true }).click();
+    await expect.poll(() => reads.at(-1)?.searchParams.get('search')).toBe('');
+    expect(reads.at(-1)?.searchParams.get('materialId')).toBe('');
+    await expect(page.getByRole('combobox', { name: 'Material', exact: true })).toBeDisabled();
+  },
+);
 
 test('movimientos: reporte mensual, mes específico validado y filtros aplicados sin borrador', async ({
   page,

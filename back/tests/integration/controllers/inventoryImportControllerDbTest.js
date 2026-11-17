@@ -12,6 +12,7 @@ import { getImportConfig } from '../../../src/services/warehouse/imports/invento
 import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
 
 let prisma, app, fixture, cookie, deniedCookie, previousSecret;
+const extraUnitIds = [];
 const preview = async (rows, resource = 'materials', mode = 'create') => {
     const buffer = await inventoryWorkbook({ resource, mode, rows });
     const response = await request(app).post(`/${resource}/preview`).query({ mode }).set('Cookie', cookie)
@@ -70,6 +71,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
     });
     afterAll(async () => {
         await fixture?.cleanup();
+        if (prisma) await prisma.unitMeasure.deleteMany({ where: { id: { in: extraUnitIds } } });
         if (previousSecret === undefined) delete process.env.JWT_SECRET_ACCESS;
         else process.env.JWT_SECRET_ACCESS = previousSecret;
     });
@@ -298,16 +300,35 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         });
     });
 
-    it('registra consumibles sin dimensiones y permite costo cero sólo en el alta', async () => {
+    it('registra medidas de consumibles y permite costo cero sólo en el alta', async () => {
         const row = fixture.row('Consumible', { maxUnitCost: 0 });
         const batch = await preview([row], 'consumables');
         expect(batch.preview.rows[0].warnings).toHaveLength(1);
         await confirm(batch).expect(200);
         const saved = await savedOffer(row.name);
-        expect(saved.material).toMatchObject({ type: 'CONSUMABLE', base: null, height: null });
-        expect(Number(saved.convertedQuantity)).toBe(2);
+        expect(saved.material.type).toBe('CONSUMABLE');
+        expect(Number(saved.material.base)).toBe(2);
+        expect(Number(saved.material.height)).toBe(3);
+        expect(Number(saved.convertedQuantity)).toBe(12);
         const invalid = await preview([updateRow(saved)], 'consumables', 'update');
         expect(invalid.preview.summary.errors).toBe(1);
+    });
+
+    it.each([['KILOGRAMO', 'KILOGRAMOS'], ['METRO LINEAL', 'METRO LINEAL']])('importa consumibles en %s sólo con unidad 1 × 1 y presentación %s', async (unitName, presentationName) => {
+        const unit = await prisma.unitMeasure.create({ data: { name: unitName, symbol: randomUUID().slice(0, 8) } });
+        extraUnitIds.push(unit.id);
+        await prisma.presentation.upsert({ where: { name: presentationName }, update: {}, create: { name: presentationName } });
+        const row = fixture.row(`Unidad ${unitName}`, { unitLabel: `${unit.symbol} · ${unit.name}`, presentationName, base: 1, height: 1 });
+        const invalid = await preview([{ ...row, height: 2 }], 'consumables');
+        expect(invalid.preview.summary.errors).toBe(1);
+        expect(await savedOffer(row.name)).toBeNull();
+        const batch = await preview([row], 'consumables');
+        expect(batch.preview.summary.errors).toBe(0);
+        await confirm(batch).expect(200);
+        const saved = await savedOffer(row.name);
+        expect(Number(saved.material.base)).toBe(1);
+        expect(Number(saved.material.height)).toBe(1);
+        expect(Number(saved.convertedQuantity)).toBe(Number(saved.currentStock));
     });
 
     it('crea y actualiza merma con referencia del proveedor y registra sólo las entradas positivas', async () => {
