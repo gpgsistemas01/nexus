@@ -1,3 +1,5 @@
+export const LOOKUP_SEARCH_DELAY_MS = 500;
+
 export interface LookupItem {
     id: string;
     title: string;

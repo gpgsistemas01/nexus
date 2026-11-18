@@ -560,7 +560,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## LookupItem
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 1, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 3, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -571,7 +571,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## LookupState
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 8, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 10, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -587,7 +587,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## LookupQuery
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 15, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 17, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -596,7 +596,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## LookupCreation
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 19, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 21, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -609,7 +609,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## ItemCreation
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 23, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 25, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupCreation`.
 
@@ -624,7 +624,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## OrganizationResource
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 26, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 28, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -634,7 +634,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## OrganizationState
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 27, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 29, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

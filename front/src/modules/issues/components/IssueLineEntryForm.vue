@@ -58,7 +58,7 @@ const supplierName = computed(() => {
                 v-if="supplierName"
                 class="d-block text-medium-emphasis"
             >
-                Proveedor: {{ supplierName }}
+                {{ supplierName }}
             </small>
         </template>
         <template #quantity>

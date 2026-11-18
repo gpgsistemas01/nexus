@@ -28,9 +28,6 @@ const emit = defineEmits<{
 }>();
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
     { title: props.itemLabel, key: 'name', align: 'start' as const, nowrap: true, fixed: 'start' },
-    ...(props.mode === 'view'
-        ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus', align: 'start' as const }]
-        : []),
     {
         title: 'Medidas',
         children: [
@@ -38,20 +35,8 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
             { title: 'Altura', key: 'height', align: 'end' as const },
         ],
     },
-    { title: 'Salida', key: 'quantity', align: 'end' as const },
-    ...(['supply', 'return', 'view'].includes(props.mode)
-        ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity', align: 'end' as const }]
-        : []),
-    ...(['return', 'view'].includes(props.mode)
-        ? [{ title: 'Cantidad devuelta', key: 'returnedQuantity', align: 'end' as const }]
-        : []),
-    ...(props.mode === 'view'
-        ? [
-              { title: 'Pendiente de surtir', key: 'pendingQuantity', align: 'end' as const },
-              { title: 'Saldo entregado', key: 'deliveredQuantity', align: 'end' as const },
-          ]
-        : []),
     { title: 'Presentación', key: 'presentation', align: 'start' as const },
+    { title: 'Salida', key: 'quantity', align: 'end' as const },
     {
         title: 'Conversión',
         children: [
@@ -59,6 +44,21 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
             { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
         ],
     },
+    ...(['supply', 'return', 'view'].includes(props.mode)
+        ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity', align: 'end' as const }]
+        : []),
+    ...(['supply', 'view'].includes(props.mode)
+        ? [{ title: 'Pendiente de surtir', key: 'pendingQuantity', align: 'end' as const }]
+        : []),
+    ...(['return', 'view'].includes(props.mode)
+        ? [
+              { title: 'Cantidad devuelta', key: 'returnedQuantity', align: 'end' as const },
+              { title: 'Saldo entregado', key: 'deliveredQuantity', align: 'end' as const },
+          ]
+        : []),
+    ...(props.mode === 'view'
+        ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus', align: 'start' as const }]
+        : []),
     ...(props.mode === 'supply'
         ? [
               { title: 'Costo unitario de Conversión', key: 'maxUnitCost', align: 'end' as const },
@@ -109,10 +109,7 @@ const cardValue = (item: IssueDetail, key: string) => {
     if (['base', 'height', 'quantity', 'suppliedQuantity', 'returnedQuantity'].includes(key))
         return numberText(item[key as keyof IssueDetail] as number | null);
 
-    if (key === 'name')
-        return [item.name, item.supplierName ? `Proveedor: ${item.supplierName}` : '']
-            .filter(Boolean)
-            .join('\n');
+    if (key === 'name') return [item.name, item.supplierName ?? ''].filter(Boolean).join('\n');
 
     if (key === 'convertedQuantity')
         return convertedQuantityText(item.convertedQuantity, item.unitMeasure);
@@ -194,7 +191,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                     v-if="item.supplierName"
                     class="detail-supplier"
                 >
-                    Proveedor: {{ item.supplierName }}
+                    {{ item.supplierName }}
                 </small>
             </template>
             <template #[`item.convertedQuantity`]="{ item }">
@@ -284,7 +281,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                     v-if="item.supplierName"
                     class="detail-supplier"
                 >
-                    Proveedor: {{ item.supplierName }}
+                    {{ item.supplierName }}
                 </small>
             </template>
             <template #[`item.fulfillmentStatus`]="{ item }">

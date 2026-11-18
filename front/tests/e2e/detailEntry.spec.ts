@@ -16,7 +16,7 @@ test(
     await chooseOption(page, 'Proveedor', 'Proveedor Central', dialog);
     await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO', dialog);
     await dialog.getByLabel('Cantidad', { exact: true }).fill('1.5');
-    await dialog.getByLabel('Costo por Presentación', { exact: true }).fill('12');
+    await dialog.getByLabel('Costo por presentación', { exact: true }).fill('12');
     await expect(dialog.getByRole('row', { name: 'Agregar detalle', exact: true })).toBeVisible();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -27,6 +27,7 @@ test(
     for (const [field, header] of [
       ['Material', 'Material'],
       ['Cantidad', 'Compra'],
+      ['Costo por presentación', 'Costo por presentación'],
     ] as const) {
       const cell = row.getByRole('cell').filter({
         has: page.getByRole(field === 'Material' ? 'combobox' : 'spinbutton', {
@@ -42,7 +43,7 @@ test(
       expect(Math.abs(cellBox!.width - headerBox!.width)).toBeLessThan(2);
     }
     await expect(dialog.getByLabel('Cantidad', { exact: true })).toHaveValue('1.5');
-    await expect(dialog.getByLabel('Costo por Presentación', { exact: true })).toHaveValue('12');
+    await expect(dialog.getByLabel('Costo por presentación', { exact: true })).toHaveValue('12');
     await page.screenshot({ path: info.outputPath('compra-desktop.png') });
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(dialog.getByRole('combobox', { name: 'Material', exact: true })).toHaveValue(
@@ -50,9 +51,7 @@ test(
     );
     await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     await expect(dialog.getByText('Lona', { exact: true }).filter({ visible: true })).toBeVisible();
-    await expect(
-      dialog.getByText('Proveedor: Proveedor Central', { exact: true }).filter({ visible: true }),
-    ).toHaveCount(0);
+    await expect(dialog.getByText(/^Proveedor:/)).toHaveCount(0);
   },
 );
 
@@ -79,21 +78,21 @@ test(
     await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
     const dialog = page.getByRole('dialog');
     await expect(
-      dialog.getByText('Proveedor: Proveedor Central', { exact: true }).filter({ visible: true }),
+      dialog.getByText('Proveedor Central', { exact: true }).filter({ visible: true }),
     ).toBeVisible();
     await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO · Proveedor Alterno', dialog);
     await dialog.getByLabel('Cantidad', { exact: true }).fill('0.75');
     await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     await expect(
-      dialog.getByText('Proveedor: Proveedor Alterno', { exact: true }).filter({ visible: true }),
+      dialog.getByText('Proveedor Alterno', { exact: true }).filter({ visible: true }),
     ).toBeVisible();
     await page.screenshot({ path: info.outputPath('salida-desktop.png') });
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(
-      dialog.getByText('Proveedor: Proveedor Central', { exact: true }).filter({ visible: true }),
+      dialog.getByText('Proveedor Central', { exact: true }).filter({ visible: true }),
     ).toBeVisible();
     await expect(
-      dialog.getByText('Proveedor: Proveedor Alterno', { exact: true }).filter({ visible: true }),
+      dialog.getByText('Proveedor Alterno', { exact: true }).filter({ visible: true }),
     ).toBeVisible();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),

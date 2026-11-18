@@ -44,3 +44,7 @@ Catálogo de Materiales: particiones sin/con proveedor para habilitación y payl
 `detailEntry.spec.ts` comprueba alineación con los encabezados, conservación de captura al cambiar el ancho y distinción de proveedores del mismo artículo en tabla y fichas. El nombre comercial es presentación; las solicitudes siguen usando los IDs del material y proveedor.
 
 El alta contextual de Almacén cubre Material/Consumible antes de elegir proveedor, tipo fijado, cancelación sin pérdida de stock capturado y selección del registro creado. El alta del proveedor mantiene su propio permiso y modal.
+
+La selección remota cubre escritura cada 300 ms, una sola consulta tras 500 ms de pausa, texto conservado al cambiar resultados y rechazo de respuestas tardías de una búsqueda sustituida.
+
+Compras y salidas contrastan un nombre histórico distinto del catálogo: la tabla muestra el nombre vigente sin modificar el original. La captura de compra verifica que el aviso del proveedor desaparece al seleccionarlo.

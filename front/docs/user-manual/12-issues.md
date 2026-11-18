@@ -46,8 +46,9 @@ Si dispone de una sola área, permanece seleccionada al limpiar filtros.
 
 <!-- module:end -->
 
-El proveedor se muestra debajo del nombre en cada detalle, para distinguir las ofertas del mismo artículo. Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida distinta. En móvil se conserva esta identificación en las fichas.
+El nombre, las medidas, la presentación y la unidad corresponden al catálogo del artículo. El proveedor se muestra debajo del nombre en cada detalle, para distinguir las ofertas del mismo artículo. Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida distinta. En móvil se conserva esta identificación en las fichas.
 Materiales y consumibles requieren al menos una unidad; merma admite cantidades positivas menores.
+Al surtir, revise **Cantidad surtida** y **Pendiente de surtir** antes de capturar la nueva entrega. Al devolver, revise **Cantidad devuelta** y **Saldo entregado**.
 Solicitar no descuenta inventario.
 
 Seleccione un cliente y artículos con proveedor ya registrado. Si su cuenta pertenece

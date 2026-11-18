@@ -194,6 +194,12 @@ const emit = defineEmits<{
         <section aria-label="Detalles de compra">
             <h3 class="purchase-section-title">Detalles de la compra</h3>
             <p
+                v-if="!isReadOnly && !supplier"
+                class="text-body-2 text-medium-emphasis mb-3"
+            >
+                Selecciona primero un proveedor para agregar detalles.
+            </p>
+            <p
                 v-if="isEditing"
                 class="mb-3"
             >

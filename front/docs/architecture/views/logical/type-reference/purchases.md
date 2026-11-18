@@ -35,7 +35,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 16, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 17, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -50,7 +50,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 22, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 23, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -165,7 +165,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 11, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 12, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -189,7 +189,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 26, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

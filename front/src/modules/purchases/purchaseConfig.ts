@@ -14,3 +14,5 @@ export const PURCHASE_CONFIG = {
         type: 'CONSUMABLE',
     },
 } as const;
+
+export const PURCHASE_DETAIL_LABELS = { costPerPresentation: 'Costo por presentación' } as const;

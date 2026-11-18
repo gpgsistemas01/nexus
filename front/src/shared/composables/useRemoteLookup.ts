@@ -1,6 +1,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { PageResult } from '../http/pageRequest.js';
+import { LOOKUP_SEARCH_DELAY_MS } from '../lookup.js';
 import type { LookupItem, LookupState } from '../lookup.js';
 import { isReadRetryable } from '../http/readFailure.js';
 
@@ -117,7 +118,7 @@ export const useRemoteLookup = (
         controller?.abort();
         timer = setTimeout(() => {
             void load();
-        }, 250);
+        }, LOOKUP_SEARCH_DELAY_MS);
     };
 
     onBeforeUnmount(() => {

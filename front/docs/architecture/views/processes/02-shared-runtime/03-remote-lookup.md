@@ -4,6 +4,10 @@
 
 `refresh(search)` cambia la búsqueda y recarga la primera página en una sola operación; cancela el debounce anterior. Sin argumento conserva la búsqueda. Las altas rápidas de Compras usan `refresh('')` para evitar dos solicitudes consecutivas.
 
+`RemoteSelect` conserva el texto controlado y `useRemoteLookup` espera 500 ms sin
+pulsaciones antes de consultar. Cada cambio reinicia la espera y cancela la petición
+anterior; una respuesta tardía no sustituye la búsqueda vigente.
+
 ## Primera apertura y reutilización
 
 **Identificador:** `DIA-VUE-SEQ-058`. Apertura sin texto de búsqueda. La
@@ -70,7 +74,7 @@ sequenceDiagram
     Lookup->>Lookup: nowrap: isLoading.value = isEnabled.value
     Lookup->>Lookup: nowrap: ++sequence
     Lookup->>Lookup: nowrap: controller?.abort()
-    Lookup->>Lookup: nowrap: setTimeout(() => load(), 250)
+    Lookup->>Lookup: nowrap: setTimeout(() => load(), LOOKUP_SEARCH_DELAY_MS)
     Lookup->>Editor: nowrap: request(search.value, nextPage,<br/>requestController.signal)
     Editor->>Service: nowrap: purchaseLookupService.list({<br/>kind: 'suppliers', resource: options.resource,<br/>search, page, capture: true }, signal)
     Service-->>Editor: nowrap: result

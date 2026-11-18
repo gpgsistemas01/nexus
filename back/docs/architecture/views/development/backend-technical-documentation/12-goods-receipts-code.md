@@ -100,3 +100,7 @@ en listado como por id, incluido `null` cuando no hay texto. `includeDetails`
 sólo controla la relación de partidas; no altera los campos del encabezado.
 La consulta por id recupera además los detalles para editar y conservar el
 documento completo, sin cambiar las reglas de escritura.
+
+Los reportes de compras y salidas muestran el nombre vigente de `Material`, junto
+con su presentación, unidad y medidas. Los documentos conservan el nombre
+capturado y sus importes; la exportación no modifica esos datos.

@@ -259,7 +259,7 @@ export const captureRecipe = async (
       await dialog.getByRole('radio', { name: 'Remisión', exact: true }).check();
       await chooseFirst(page, dialog, 'Material');
       await dialog.getByLabel('Cantidad', { exact: true }).fill('1');
-      await dialog.getByLabel('Costo por Presentación', { exact: true }).fill('100');
+      await dialog.getByLabel('Costo por presentación', { exact: true }).fill('100');
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     } else if (number >= 20) {
       if (number === 21) {

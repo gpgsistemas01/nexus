@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PURCHASE_DETAIL_LABELS } from '../purchaseConfig.js';
 import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
 import { computed, ref } from 'vue';
 import { VDataTable } from 'vuetify/components/VDataTable';
@@ -40,25 +41,34 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
             { title: 'Altura', key: 'height', align: 'end' as const },
         ],
     },
-    { title: 'Compra', key: 'quantity', align: 'end' as const },
     { title: 'Presentación', key: 'presentation', align: 'start' as const },
+    { title: 'Compra', key: 'quantity', align: 'end' as const },
     {
-        title: 'Conversión',
-        children: [
-            { title: 'Cantidad', key: 'convertedQuantity', align: 'end' as const },
-            { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
-        ],
+        title: PURCHASE_DETAIL_LABELS.costPerPresentation,
+        key: 'costPerUnitType',
+        align: 'end' as const,
     },
-    { title: 'Costo unitario', key: 'conversionUnitCost', align: 'end' as const },
-    { title: 'Costo capturado', key: 'costPerUnitType', align: 'end' as const },
     {
         title: 'Alcance del costo',
         key: 'costScope',
         sortable: false,
         value: (item) => (item.costIsTotal ? 'Total del detalle' : 'Por presentación'),
     },
-    { title: 'Monto s/ IVA', key: 'netPurchaseAmount', align: 'end' as const },
-    { title: 'Monto c/ IVA', key: 'grossPurchaseAmount', align: 'end' as const },
+    {
+        title: 'Conversión',
+        children: [
+            { title: 'Cantidad', key: 'convertedQuantity', align: 'end' as const },
+            { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
+            { title: 'Costo unitario', key: 'conversionUnitCost', align: 'end' as const },
+        ],
+    },
+    {
+        title: 'Importes',
+        children: [
+            { title: 'Monto s/ IVA', key: 'netPurchaseAmount', align: 'end' as const },
+            { title: 'Monto c/ IVA', key: 'grossPurchaseAmount', align: 'end' as const },
+        ],
+    },
     ...(props.canChange || props.canRemove
         ? [
               {
