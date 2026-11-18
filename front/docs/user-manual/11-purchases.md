@@ -163,10 +163,12 @@ Sin la opción de costo total, el importe sin IVA es Cantidad comprada × Costo 
 
 ### Capturar el costo total del detalle
 
-Marque **El costo capturado corresponde al total** cuando el importe ingresado
+Marque **Usar el costo por presentación como costo total** cuando el importe ingresado
 cubra toda la cantidad de esa partida, para cualquier presentación.
 Por ejemplo, cantidad 10 y costo total sin IVA $500 dan costo unitario $50,
 subtotal $500 y total con IVA $580. Las medidas no alteran este reparto del costo.
 Sin marcar, el costo se interpreta por presentación y el subtotal es cantidad × costo.
 La tabla y el Excel identifican el alcance del costo. La corrección conserva el modo
 registrado; su campo de costo muestra si corresponde al total o por presentación.
+
+Con presentación **KILOGRAMOS** o **METRO LINEAL**, las medidas son `1 × 1` y no se capturan. Puede comprar fracciones, por ejemplo `0.75`; el stock aumenta en esa misma cantidad. En KILOGRAMOS y METRO LINEAL con medidas `1 × 1`, la opción de costo total se activa automáticamente y no puede desmarcarse. En otras presentaciones se elige manualmente. Por ejemplo, `0.75 kg` con costo total de `$150` produce costo unitario de `$200`, subtotal de `$150` y total con IVA de `$174`.

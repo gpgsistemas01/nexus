@@ -728,7 +728,7 @@
       "costIsTotal": {
         "type": "boolean",
         "default": false,
-        "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. Se conserva en las correcciones."
+        "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. En nuevas partidas de KILOGRAMOS/METRO LINEAL con medidas persistidas 1 × 1, el servidor activa el modo automáticamente, incluso si se envía false. Para otras presentaciones es manual. Se conserva en las correcciones."
       }
     },
     "additionalProperties": true,
@@ -1265,7 +1265,7 @@
                 "number",
                 "string"
               ],
-              "minimum": 1,
+              "minimum": 0.01,
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
@@ -1512,8 +1512,8 @@
                 "number",
                 "string"
               ],
-              "minimum": 1,
-              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
+              "minimum": 0.01,
+              "description": "Cantidad por presentación, desde 0.01; hasta 8 enteros y 2 decimales. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000
@@ -1532,7 +1532,7 @@
             "costIsTotal": {
               "type": "boolean",
               "default": false,
-              "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. Se conserva en las correcciones."
+              "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. En nuevas partidas de KILOGRAMOS/METRO LINEAL con medidas persistidas 1 × 1, el servidor activa el modo automáticamente, incluso si se envía false. Para otras presentaciones es manual. Se conserva en las correcciones."
             }
           },
           "additionalProperties": false,
@@ -2021,8 +2021,8 @@
                 "number",
                 "string"
               ],
-              "minimum": 1,
-              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
+              "minimum": 0.01,
+              "description": "Cantidad por presentación, desde 0.01; hasta 8 enteros y 2 decimales. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000
@@ -2041,7 +2041,7 @@
             "costIsTotal": {
               "type": "boolean",
               "default": false,
-              "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. Se conserva en las correcciones."
+              "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. En nuevas partidas de KILOGRAMOS/METRO LINEAL con medidas persistidas 1 × 1, el servidor activa el modo automáticamente, incluso si se envía false. Para otras presentaciones es manual. Se conserva en las correcciones."
             }
           },
           "additionalProperties": false,

@@ -165,7 +165,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 10, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 11, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -176,6 +176,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `selected` | `selected?: LookupItem;` |
 | `presentation` | `presentation: string;` |
 | `costIsTotal` | `costIsTotal?: boolean;` |
+| `automaticTotalCost` | `automaticTotalCost?: boolean;` |
 | `isDisabled` | `isDisabled: boolean;` |
 | `canRead` | `canRead: boolean;` |
 | `canCreate` | `canCreate: boolean;` |
@@ -187,7 +188,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 22, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 24, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -252,7 +253,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## Field
 
-**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 21, columna 5. **Declaración:** type.
+**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 23, columna 5. **Declaración:** type.
 
 **Definición completa:**
 

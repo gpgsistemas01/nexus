@@ -216,7 +216,7 @@ export const validateGoodsReceiptDetailsArray = details => {
     for (const detail of details) {
         if (!detail || typeof detail !== 'object' || Array.isArray(detail)) return 'Cada detalle debe contener material, cantidad y costo por presentación.';
         const error = validateUUID(detail.materialId, 'El material')
-            || validateNumber(detail.quantity, 'La cantidad', { minimum: 1 })
+            || validateNumber(detail.quantity, 'La cantidad', { minimum: DECIMAL_INPUT_FORMAT.minimumPositive })
             || validatePositiveNumber(detail.costPerUnitType, 'El costo por presentación', { format: MONEY_INPUT_FORMAT });
         if (error) return error;
     }
@@ -229,7 +229,7 @@ export const validateGoodsIssueDetailsArray = details => {
         if (!detail || typeof detail !== 'object' || Array.isArray(detail)) return 'Cada detalle debe contener material, proveedor y cantidad.';
         const error = validateUUID(detail.materialId, 'El material')
             || validateUUID(detail.supplierId, 'El proveedor')
-            || validateNumber(detail.quantity, 'La cantidad', { minimum: 1 });
+            || validateNumber(detail.quantity, 'La cantidad', { minimum: DECIMAL_INPUT_FORMAT.minimumPositive });
         if (error) return error;
     }
     return null;

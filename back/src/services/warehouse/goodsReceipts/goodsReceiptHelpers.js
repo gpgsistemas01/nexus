@@ -1,5 +1,5 @@
 import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/warehouse/materialError.js";
-import { calculateGoodsReceiptDetailAmounts } from '../../../shared/inventory/goodsReceiptCalculations.js';
+import { calculateGoodsReceiptDetailAmounts, usesAutomaticTotalCost } from '../../../shared/inventory/goodsReceiptCalculations.js';
 import { findMaterialsSnapshot } from "../materials/materialService.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { GoodsReceiptNotFound } from "../../../errors/warehouse/goodsReceiptError.js";
@@ -47,7 +47,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId 
         if (type && material.type !== type) throw new MaterialNotFound();
         if (requireActive && !material.isActive) throw new MaterialInactiveConflict();
 
-        return calculateGoodsReceiptDetail({ material, detail });
+        return calculateGoodsReceiptDetail({ material, detail: { ...detail, costIsTotal: usesAutomaticTotalCost(material) || detail.costIsTotal === true } });
     });
 };
 

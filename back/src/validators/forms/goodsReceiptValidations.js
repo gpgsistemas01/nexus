@@ -30,7 +30,7 @@ const validateGoodsReceiptDetails = details => {
         const costPerUnitType = typeof detail.costPerUnitType === 'number' || typeof detail.costPerUnitType === 'string'
             ? Number(detail.costPerUnitType) : NaN;
 
-        if (!Number.isFinite(qty) || qty < 1 || !DECIMAL_INPUT_FORMAT.pattern.test(String(detail.quantity))) {
+        if (!Number.isFinite(qty) || qty < DECIMAL_INPUT_FORMAT.minimumPositive || !DECIMAL_INPUT_FORMAT.pattern.test(String(detail.quantity))) {
             throw new Error(errorMap.details.INVALID_FORMAT_QUANTITY);
         }
         if (!Number.isFinite(costPerUnitType) || costPerUnitType <= 0 || !MONEY_INPUT_FORMAT.pattern.test(String(detail.costPerUnitType))) {

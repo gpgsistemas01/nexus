@@ -405,7 +405,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
       signal: expect.any(AbortSignal),
     });
   });
-  it('agregar detalle valida el mínimo uno y selecciona altas recientes aunque no estén en la página', async () => {
+  it('agregar detalle rechaza cantidad cero y selecciona altas recientes aunque no estén en la página', async () => {
     vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) });
     vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
     const added = vi.fn();
@@ -419,7 +419,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
       }),
     );
     state.selectCreatedItem(mapPurchaseItemOption(purchaseItem, 'materials'));
-    state.update('quantity', '0.5');
+    state.update('quantity', '0');
     state.update('costPerUnitType', '100');
     await state.add();
     expect(added).not.toHaveBeenCalled();
@@ -543,3 +543,52 @@ it('la consulta conserva el modo total y rechaza un modo ambiguo recibido de la 
     ),
   ).toThrow();
 });
+
+it.each(['KILOGRAMOS', 'METRO LINEAL'])(
+  'compra %s fraccionario con costo total automático',
+  async (name) => {
+    vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
+    const added = vi.fn();
+    const { state, wrapper } = harness(() =>
+      usePurchaseLineEntry({
+        resource: 'consumables',
+        supplier: { id: ids.supplier, title: 'Proveedor', data: {} },
+        canRead: true,
+        isDisabled: () => false,
+        onAdded: added,
+      }),
+    );
+    state.selectCreatedItem(
+      mapPurchaseItemOption(
+        {
+          ...purchaseItem,
+          material: {
+            ...purchaseItem.material,
+            type: 'CONSUMABLE',
+            base: 1,
+            height: 1,
+            presentation: { ...purchaseItem.material.presentation, name },
+          },
+        },
+        'consumables',
+      ),
+    );
+    expect(state.costIsTotal.value).toBe(true);
+    state.costIsTotal.value = false;
+    expect(state.costIsTotal.value).toBe(true);
+    state.update('quantity', '0.75');
+    state.update('costPerUnitType', '150');
+    await state.add();
+    expect(added).toHaveBeenCalledWith(
+      expect.objectContaining({
+        quantity: 0.75,
+        convertedQuantity: 0.75,
+        costIsTotal: true,
+        conversionUnitCost: 200,
+        netPurchaseAmount: 150,
+        grossPurchaseAmount: 174,
+      }),
+    );
+    wrapper.unmount();
+  },
+);

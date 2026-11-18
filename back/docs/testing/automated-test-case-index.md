@@ -358,5 +358,10 @@ false/true se verifican en `goodsReceiptCalculationsTest.js` y `purchaseTest.ts`
 modo, reporte y cancelación para materiales y consumibles. La compra de 10 unidades
 con total 500 produce costo unitario 50, subtotal 500 e importe con IVA 580.
 `reportExcelUtilsTest.js` verifica las fórmulas por cantidad comprada en el modo total.
+`goodsReceiptHelpersTest.js` conserva el modo histórico al recalcular una partida; el alta automática no reinterpreta correcciones.
 Los casos de navegador de costo total en `purchases.spec.ts` comprueban checkbox,
 importe, payload y conservación del flujo normal.
+
+### Cantidades fraccionarias en KILOGRAMOS y METRO LINEAL
+
+`DP-QTY-002`: fronteras `0`, `0.001`, `0.01`, `0.5` y `1` en validación compartida/HTTP. `CP-INT-QTY-002`: compras de `0.75` en `1 × 1`, con costo capturado `150` y `costIsTotal=false` manipulado, activan el modo total automáticamente y aumentan stock y conversión en `0.75`, con costo unitario `200` y total con IVA `174`. Solicitudes de `0.75` no cambian stock; entregas de `0.25` y `0.5` descuentan exactamente `0.75`. Evidencia en `formValidationParityTest.js`, `goodsReceiptContextDbTest.js` y `goodsIssueControllerDbTest.js`; fixtures aisladas con restauración de presentación y medidas. La cobertura existente de PIEZA conserva el rechazo de fracciones.

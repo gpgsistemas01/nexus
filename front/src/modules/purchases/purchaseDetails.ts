@@ -1,5 +1,8 @@
 import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
-import { calculateGoodsReceiptDetailAmounts } from '@nexus/purchase-calculations';
+import {
+    calculateGoodsReceiptDetailAmounts,
+    usesAutomaticTotalCost,
+} from '@nexus/purchase-calculations';
 import { isRecord } from '../../shared/utils/isRecord.js';
 import { createUuid } from '../../shared/utils/createUuid.js';
 import type { LookupItem } from '../../shared/lookup.js';
@@ -25,7 +28,7 @@ export const createPurchaseDetailDraft = (
         ...calculateGoodsReceiptDetailAmounts({
             quantity,
             costPerUnitType,
-            costIsTotal,
+            costIsTotal: usesAutomaticTotalCost(material) || costIsTotal,
             base: material.base,
             height: material.height,
         }),

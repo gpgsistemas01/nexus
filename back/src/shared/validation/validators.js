@@ -1,4 +1,5 @@
 import {
+    DECIMAL_INPUT_FORMAT,
     FORM_FIELD_LIMITS,
     MIN_STOCK_INPUT_FORMAT,
     MONEY_INPUT_FORMAT,
@@ -141,19 +142,19 @@ export const wasteValidation = {
 
 export const addGoodsReceiptMaterialValidation = {
     materialId: (value) => validateUUID(value, 'El material'),
-    quantity: (value) => validateNumber(value, 'La cantidad', { minimum: 1 }),
+    quantity: (value) => validateNumber(value, 'La cantidad', { minimum: DECIMAL_INPUT_FORMAT.minimumPositive }),
     costPerUnitType: (value) => validatePositiveNumber(value, 'El costo por presentación', { format: MONEY_INPUT_FORMAT }),
 }
 
 export const addMaterialValidation = {
     materialId: (value) => validateUUID(value, 'El material'),
-    quantity: (value) => validateNumber(value, 'La cantidad', { minimum: 1 }),
+    quantity: (value) => validateNumber(value, 'La cantidad', { minimum: DECIMAL_INPUT_FORMAT.minimumPositive }),
 }
 
 export const addGoodsIssueMaterialValidation = {
     materialId: (value) => validateUUID(value, 'El material'),
     supplierId: (value) => validateUUID(value, 'El proveedor'),
-    quantity: (value) => validateNumber(value, 'La cantidad', { minimum: 1 }),
+    quantity: (value) => validateNumber(value, 'La cantidad', { minimum: DECIMAL_INPUT_FORMAT.minimumPositive }),
 }
 
 const goodsReceiptHeaderValidation = {

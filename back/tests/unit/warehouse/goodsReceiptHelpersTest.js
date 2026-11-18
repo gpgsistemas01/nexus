@@ -20,6 +20,12 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         expect(calculateGoodsReceiptDetail({ material, detail: { quantity: 2, costPerUnitType: 1.25 } }))
             .toMatchObject({ quantity: 2, costPerUnitType: 1.25, convertedQuantity: 2.5, netPurchaseAmount: 2.5 });
     });
+    it.each([false, true])('conserva el modo histórico %s al recalcular una partida con presentación unitaria', costIsTotal => {
+        const material = { id: 'kg', name: 'Producto', presentation: { name: 'KILOGRAMOS' }, base: 1, height: 1 };
+        const recalculated = calculateGoodsReceiptDetail({ material, detail: { quantity: 2, costPerUnitType: 150, costIsTotal } });
+        expect(recalculated.netPurchaseAmount).toBe(costIsTotal ? 150 : 300);
+        expect(recalculated.conversionUnitCost).toBe(costIsTotal ? 75 : 150);
+    });
     it('devuelve material y catálogos anidados para refrescar la tabla de compras', async () => {
         const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
         const tx = {

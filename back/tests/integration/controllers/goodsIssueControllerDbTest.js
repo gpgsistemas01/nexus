@@ -391,6 +391,35 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             where: { prefix: { in: ['SMA', 'SCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
         })).toEqual(beforeCounters);
     });
+    it.each(['KILOGRAMOS', 'METRO LINEAL'])('solicita y surte fracciones de %s descontando exactamente la cantidad entregada', async name => {
+        const where = { supplierId_materialId: { materialId: ids.consumable, supplierId: ids.supplier } };
+        const original = await prisma.material.findUniqueOrThrow({ where: { id: ids.consumable }, select: { presentationId: true, base: true, height: true } });
+        const presentation = await prisma.presentation.findUniqueOrThrow({ where: { name } });
+        try {
+            await prisma.material.update({ where: { id: ids.consumable }, data: { presentationId: presentation.id, base: 1, height: 1 } });
+            const before = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+            const created = await request(app).post(issuePath('consumable')).send({ ...header(), details: [{ ...detail('consumable'), quantity: 0.75 }] }).expect(200);
+            const issue = created.body.goodsIssue;
+            const line = issue.details[0];
+            expect(Number(line.convertedQuantity)).toBe(0.75);
+            expect(await prisma.supplierMaterial.findUniqueOrThrow({ where })).toEqual(before);
+            for (const [quantityToSupply, expectedSuppliedQuantity] of [[0.25, 0], [0.5, 0.25]]) {
+                await request(app).patch(`${issuePath('consumable')}/${issue.id}/details`).send({
+                    details: [{ id: line.id, isSupplied: true, projectConvertedQuantity: 0.75, quantityToSupply, expectedSuppliedQuantity }]
+                }).expect(200);
+                const supplied = quantityToSupply + expectedSuppliedQuantity;
+                const stock = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+                expect(Number(stock.currentStock)).toBe(Number(before.currentStock) - supplied);
+                expect(Number(stock.convertedQuantity)).toBe(Number(before.convertedQuantity) - supplied);
+            }
+            const saved = await prisma.goodsIssueDetail.findUniqueOrThrow({ where: { id: line.id } });
+            expect(Number(saved.suppliedQuantity)).toBe(0.75);
+            expect(saved.isSupplied).toBe(true);
+        } finally {
+            await prisma.material.update({ where: { id: ids.consumable }, data: original });
+        }
+    });
+
     it.each(['material', 'consumable'])('surte %s por entregas, conserva diferencias negativas y evita duplicados concurrentes', async resource => {
         const created = await createIssue(resource).expect(200);
         const issue = created.body.goodsIssue;

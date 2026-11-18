@@ -109,12 +109,14 @@ describe('captura coherente entre navegador y servidor (DP-VAL-004)', () => {
         data: { fullName: 'Persona válida' }
     }));
 
-    it.each([[1, true], [0.5, false], ['99999999.99', true], ['1.001', false], [true, false], [[2], false]])(
+    it.each([[0, false], [0.001, false], [0.01, true], [1, true], [0.5, true], ['99999999.99', true], ['1.001', false], [true, false], [[2], false]])(
         'cantidad de partida %j: válida=%s', async (quantity, valid) => {
             const value = [{ materialId: id, quantity, costPerUnitType: 2 }];
             await agrees({ rules: goodsReceiptValidation, validator: front.goodsReceiptValidation.details,
                 field: 'details', value, valid, data: { supplierId: id, receivedById: id, isInvoiced: false,
                     receptionDate: '2026-10-19T12:00:00Z' } });
+            await agrees({ rules: [fields.validateGoodsIssueDetailsArray()], validator: front.goodsIssueValidation.details,
+                field: 'details', value: [{ materialId: id, supplierId: otherId, quantity }], valid });
             expect(!front.addGoodsReceiptMaterialValidation.quantity(quantity)).toBe(valid);
             expect(!front.addGoodsIssueMaterialValidation.quantity(quantity)).toBe(valid);
         }

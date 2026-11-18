@@ -136,3 +136,5 @@ a Almacén y administración.
   detalles pendientes conforme a `RF-WST-005`; no permite enviar IDs de merma duplicados.
 
 Cada detalle de compra permite indicar si el costo capturado es el total sin IVA. En ese modo, el subtotal es ese costo, el costo unitario es costo ÷ cantidad comprada y el IVA se calcula sobre el subtotal. Sin marcar se conserva cantidad × costo. La selección persiste por detalle y se conserva en correcciones, consulta y Excel, para cualquier presentación.
+
+Para KILOGRAMOS y METRO LINEAL, las medidas son `1 × 1`: compras y surtidos suman o descuentan la cantidad capturada, incluidas fracciones desde `0.01`. Solicitar una salida no descuenta stock; cada entrega descuenta sólo lo surtido. En nuevas partidas de KILOGRAMOS y METRO LINEAL con medidas `1 × 1`, **Usar el costo por presentación como costo total** se activa automáticamente; el servidor resuelve presentación y medidas persistidas y aplica la regla aunque el cliente envíe `false`. En otras presentaciones la opción es manual. Las correcciones conservan el modo registrado en la partida original.

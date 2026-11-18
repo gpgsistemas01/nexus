@@ -270,3 +270,5 @@ inventario y movimientos: verifica sesión al conectar y permisos actuales antes
 de cada aviso. Es evidencia unitaria del canal, sin demostrar persistencia ni
 recorrido de navegador. `cookiesUtilsTest.js` mantiene la cobertura existente de
 cookies de alta y borrado en producción y desarrollo.
+
+`CP-INT-QTY-002` cubre compras y salidas de KILOGRAMOS/METRO LINEAL: medidas `1 × 1`, compra fraccionaria con costo total y surtidos parciales que actualizan stock y conversión por la cantidad efectiva.
