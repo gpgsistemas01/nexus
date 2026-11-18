@@ -1,6 +1,7 @@
 import { PUBLIC_CATALOGS } from '../shared/constants/catalogs.js';
 
 const storage = {
+    materials: { model: 'material' },
     departments: { model: 'department', hasStableKey: true },
     roles: { model: 'role', hasStableKey: true },
     presentations: { model: 'presentation' },

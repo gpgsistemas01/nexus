@@ -20,5 +20,8 @@ export interface LookupCreation {
     search: string;
     onCreated: (item: LookupItem) => void;
 }
+export interface ItemCreation extends LookupCreation {
+    supplier: LookupItem;
+}
 export type OrganizationResource = 'departments' | 'roles';
 export type OrganizationState = Record<OrganizationResource, LookupState>;

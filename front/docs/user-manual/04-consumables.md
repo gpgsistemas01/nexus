@@ -30,15 +30,14 @@ IDs/versiones incluidos para editar o ajustar.
 <!-- manual:any materials:write -->
 ## Registrar un consumible
 
-**Antes de empezar.** Identifique el proveedor, presentación y unidad del
-consumible. Compruebe que el registro no exista con los mismos datos.
-
 1. Pulse **Nuevo consumible**.
-2. En **Crear consumible**, capture **Nombre** y elija **Proveedor**,
-   **Presentación** y **Unidad de medida**.
-3. Complete **Stock mínimo**, **Costo máximo unitario** y **Activo**.
-4. Capture **Cantidad inicial** y las **Observaciones** de esa existencia.
-5. Pulse **Guardar** y compruebe el registro y su saldo en el listado.
+2. Elija **Proveedor** y **Consumible** del catálogo completo.
+3. Complete **Costo máximo unitario**, **Activo**, **Cantidad inicial** y **Observaciones**.
+4. Pulse **Guardar** y compruebe el saldo. Se crea la relación con el proveedor sin duplicar el artículo.
+
+Presentación, unidad, medidas y mínimo provienen del catálogo. PIEZA exige enteros; KILOGRAMOS y METRO LINEAL admiten decimales y representan una unidad `1 × 1`.
+
+Si falta el consumible, seleccione primero el proveedor, **escriba el nombre en Consumible** y pulse **Registrar artículo «texto escrito»** después de la búsqueda. Complete el modal; al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Catálogos → Materiales**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**

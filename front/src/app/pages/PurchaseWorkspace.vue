@@ -5,7 +5,8 @@ import { usePageAccess } from '../composables/usePageAccess.js';
 import PurchasePage from '../../modules/purchases/pages/PurchasePage.vue';
 import DirectoryCreationPage from './DirectoryCreationPage.vue';
 import InventoryEditorPage from '../../modules/warehouse/pages/InventoryEditorPage.vue';
-import type { PurchaseResource, ItemCreation } from '../../modules/purchases/purchase.js';
+import type { PurchaseResource } from '../../modules/purchases/purchase.js';
+import type { ItemCreation } from '../../shared/lookup.js';
 import type { LookupCreation, LookupItem } from '../../shared/lookup.js';
 
 const props = defineProps<{ resource: PurchaseResource }>();

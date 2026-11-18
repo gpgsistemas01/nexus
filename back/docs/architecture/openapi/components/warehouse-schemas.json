@@ -804,15 +804,7 @@
     ]
   },
   "MaterialCreateRequest": {
-    "description": "Seleccione el alta independiente o el contexto goodsReceipt.",
-    "oneOf": [
-      {
-        "$ref": "../openapi.json#/components/schemas/InventoryMaterialCreateRequest"
-      },
-      {
-        "$ref": "../openapi.json#/components/schemas/GoodsReceiptMaterialCreateRequest"
-      }
-    ],
+    "description": "El alta en Almacén usa materialId y datos de stock. El modal auxiliar goodsReceipt crea la identidad sin proveedor ni stock. También se admite el alta por identidad completa.",
     "examples": [
       {
         "name": "ARTICULO DE EJEMPLO",
@@ -830,6 +822,17 @@
         "unitMeasureId": "33333333-3333-4333-8333-333333333333",
         "isActive": true,
         "creationContext": "goodsReceipt"
+      }
+    ],
+    "anyOf": [
+      {
+        "$ref": "../openapi.json#/components/schemas/InventoryMaterialCreateRequest"
+      },
+      {
+        "$ref": "../openapi.json#/components/schemas/GoodsReceiptMaterialCreateRequest"
+      },
+      {
+        "$ref": "../openapi.json#/components/schemas/MaterialOfferCreateRequest"
       }
     ]
   },
@@ -2365,5 +2368,43 @@
       "recordsFiltered"
     ],
     "additionalProperties": false
+  },
+  "MaterialOfferCreateRequest": {
+    "type": "object",
+    "description": "Vincula un artículo existente del tipo de la ruta; ignora campos de identidad enviados por el cliente. La relación y el stock inicial se confirman atómicamente.",
+    "required": [
+      "materialId",
+      "supplierId",
+      "maxUnitCost",
+      "newStock",
+      "isActive"
+    ],
+    "properties": {
+      "materialId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "maxUnitCost": {
+        "type": "number",
+        "minimum": 0
+      },
+      "newStock": {
+        "type": "number",
+        "minimum": 0
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    }
   }
 }

@@ -246,7 +246,12 @@ Si entregó 10 y ya regresaron 4, puede recibir hasta 6 más en devolución.
 | Término | Significado |
 | --- | --- |
 | Catálogo | Lista administrable cuyos registros aparecen como opciones en los formularios. |
-| Activo | Opción disponible para las nuevas operaciones que utilizan este catálogo. |
+
+<!-- module:any reference catalog-departments catalog-roles catalog-presentations catalog-unit-measures catalog-reasons catalog-fulfillment-statuses -->
+
+**Activo:** opción disponible para las nuevas operaciones que utilizan ese catálogo.
+
+<!-- module:end -->
 
 <!-- module:end -->
 
@@ -296,5 +301,11 @@ Si entregó 10 y ya regresaron 4, puede recibir hasta 6 más en devolución.
 | Proveedor | Organización que suministra artículos. |
 | Código | Referencia del proveedor utilizada para localizarlo en las operaciones. |
 | Nombre comercial | Nombre con el que se reconoce al proveedor en las listas. |
+
+<!-- module:end -->
+
+<!-- module:any reference catalog-materials -->
+
+**Material:** identidad del artículo, clasificada como Material o Consumible. **Presentación:** forma de manejo. **Unidad:** nombre y símbolo de control. **Base y altura:** dimensiones por presentación; ambas vacías cuando no aplican. **Stock mínimo:** umbral de alerta compartido; `0` indica que no se definió un umbral. **Oferta:** vínculo del artículo con un proveedor, con su existencia y costo propios.
 
 <!-- module:end -->

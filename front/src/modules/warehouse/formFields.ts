@@ -64,6 +64,45 @@ export const inventorySections = (
     const sections: InventoryFormSection[] = [];
     if (action === 'delete') return sections;
 
+    if (isCreating && !isWaste && !fromPurchase)
+        return [
+            {
+                id: 'identity',
+                title: 'Artículo y proveedor',
+                description:
+                    'Selecciona un artículo del catálogo. Se vinculará al proveedor al guardar.',
+                fields: [
+                    { name: 'supplierId', label: 'Proveedor', type: 'lookup', isWide: true },
+                    {
+                        name: 'materialId',
+                        label: resource === 'consumables' ? 'Consumible' : 'Material',
+                        type: 'lookup',
+                        isWide: true,
+                    },
+                ],
+            },
+            {
+                id: 'inventory',
+                title: 'Datos de inventario',
+                fields: [
+                    { name: 'maxUnitCost', label: 'Costo máximo unitario', type: 'number' },
+                    { name: 'isActive', label: 'Activo', type: 'checkbox' },
+                    {
+                        name: 'newStock',
+                        label: 'Cantidad inicial',
+                        type: 'number',
+                        step: quantityStep,
+                    },
+                    {
+                        name: 'observations',
+                        label: 'Observaciones',
+                        type: 'textarea',
+                        isWide: true,
+                    },
+                ],
+            },
+        ];
+
     if (isCreating && isWaste)
         sections.push({
             id: 'origin',

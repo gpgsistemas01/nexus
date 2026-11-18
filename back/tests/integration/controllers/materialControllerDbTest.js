@@ -64,6 +64,44 @@ describe('registro de materiales con y sin medidas', () => {
     if (ids.user) await prisma.user.delete({ where: { id: ids.user } });
   });
 
+  it.each([['materials', 'MATERIAL'], ['consumables', 'CONSUMABLE']])('vincula %s por ID sin duplicar ni alterar el catálogo y conserva decimales', async (resource, type) => {
+    const presentation = await prisma.presentation.upsert({ where: { name: 'KILOGRAMOS' }, update: {}, create: { name: 'KILOGRAMOS' } });
+    const identity = await prisma.material.create({ data: { name: `IT Measures selected ${resource} ${suffix}`, type, presentationId: presentation.id, unitMeasureId: ids.kilograms, base: 1, height: 1, minStock: 0 } });
+    const countBefore = await prisma.material.count();
+    const data = { materialId: identity.id, supplierId: ids.supplier, maxUnitCost: 10, isActive: true, newStock: 7.25,
+      name: 'Identidad manipulada', base: 999, height: 999, presentationId: randomUUID(), minStock: 999 };
+    await prisma.presentation.update({ where: { id: presentation.id }, data: { isActive: false } });
+    try {
+      const rejected = await request(app).post(`/${resource}`).send(data).expect(404);
+      expect(rejected.body.code).toBe('PRESENTATION_NOT_FOUND');
+      expect(await prisma.supplierMaterial.count({ where: { materialId: identity.id } })).toBe(0);
+    } finally {
+      await prisma.presentation.update({ where: { id: presentation.id }, data: { isActive: true } });
+    }
+    await request(app).post(`/${resource}`).send(data).expect(200);
+    expect(await prisma.material.count()).toBe(countBefore);
+    const saved = await prisma.supplierMaterial.findUniqueOrThrow({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: identity.id } }, include: { material: true } });
+    expect(saved.material.name).toBe(identity.name);
+    expect(Number(saved.material.base)).toBe(1);
+    expect(Number(saved.material.minStock)).toBe(0);
+    expect(Number(saved.currentStock)).toBe(7.25);
+    expect(Number(saved.convertedQuantity)).toBe(7.25);
+    await request(app).post(`/${resource}`).send(data).expect(409);
+    expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where: { id: saved.id } })).currentStock)).toBe(7.25);
+    const wrongResource = resource === 'materials' ? 'consumables' : 'materials';
+    await request(app).post(`/${wrongResource}`).send(data).expect(404);
+  });
+
+  it('rechaza stock fraccionario para una identidad PIEZA sin dejar relación ni movimientos', async () => {
+    await withPiecePresentation({ prisma }, async presentationId => {
+      const identity = await prisma.material.create({ data: { name: `IT Measures piece selected ${suffix}`, type: 'CONSUMABLE', presentationId, unitMeasureId: ids.piece } });
+      await request(app).post('/consumables').send({ materialId: identity.id, supplierId: ids.supplier, maxUnitCost: 0, isActive: true, newStock: 1.5 }).expect(409);
+      expect(await prisma.supplierMaterial.count({ where: { materialId: identity.id } })).toBe(0);
+      expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: identity.id } })).toBe(0);
+      await prisma.material.delete({ where: { id: identity.id } });
+    });
+  });
+
   it.each(['direct', 'goodsReceipt'])('registra piezas sin medidas desde %s y conserva su cantidad', async context => {
     const data = { ...body(context), ...(context === 'goodsReceipt' ? { creationContext: context } : {}) };
     await request(app).post('/materials').send(data).expect(200);

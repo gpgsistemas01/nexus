@@ -123,6 +123,7 @@ export const useInventoryEditor = (options: {
         values: form.values,
         isPending,
         initialSupplier: options.initialSupplier,
+        creationContext: options.creationContext,
         setValue: (field, value) => form.setFieldValue(field, value, false),
         clearError: (field) => form.setFieldError(field, undefined),
     });
@@ -280,6 +281,19 @@ export const useInventoryEditor = (options: {
         isConflicted,
         isConfirmingDuplicate: duplicateRecovery.isConfirming,
         lookups: selection.lookups,
+        selectedArticle: selection.selectedArticle,
+        selectCreatedArticle: (article: LookupItem) => {
+            if (
+                !isCreating.value ||
+                resource === 'wastes' ||
+                isPending.value ||
+                isSubmitting.value ||
+                controller.signal.aborted
+            )
+                return;
+
+            selection.selectCreatedArticle(article);
+        },
         preview,
         selectedTemplate: selection.selectedTemplate,
         presentationName: selection.presentationName,

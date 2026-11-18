@@ -1,3 +1,4 @@
+import { MATERIAL_TYPES } from '../constants/inventory.js';
 import {
     DECIMAL_INPUT_FORMAT,
     FORM_FIELD_LIMITS,
@@ -80,6 +81,21 @@ export const materialValidation = {
     }),
 }
 
+export const materialCatalogValidation = {
+    name: materialValidation.name,
+    type: value => Object.values(MATERIAL_TYPES).includes(value) ? null : 'Seleccione Material o Consumible.',
+    presentationId: materialValidation.presentationId,
+    unitMeasureId: materialValidation.unitMeasureId,
+    base: materialValidation.base,
+    height: materialValidation.height,
+    minStock: value => validateNumberOptional(value, 'El stock mínimo', { format: MIN_STOCK_INPUT_FORMAT })
+};
+
+export const materialCatalogEditValidation = {
+    name: materialCatalogValidation.name,
+    minStock: materialCatalogValidation.minStock
+};
+
 export const materialStockValidation = {
     supplierId: materialEditValidation.supplierId,
     ...createInventoryStockValidation({
@@ -93,6 +109,15 @@ export const materialCreateValidation = {
     newStock: materialStockValidation.newStock,
     observations: materialStockValidation.observations
 }
+
+export const materialOfferCreateValidation = {
+    materialId: value => validateUUID(value, 'El artículo'),
+    supplierId: materialValidation.supplierId,
+    maxUnitCost: materialValidation.maxUnitCost,
+    isActive: materialValidation.isActive,
+    newStock: materialStockValidation.newStock,
+    observations: materialStockValidation.observations
+};
 
 export const goodsReceiptMaterialCreateValidation = {
     ...materialValidation,

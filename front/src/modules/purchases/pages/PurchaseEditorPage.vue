@@ -6,12 +6,8 @@ import { usePurchaseEditor } from '../composables/usePurchaseEditor.js';
 import PurchaseEditor from '../components/PurchaseEditor.vue';
 import PurchaseLineEntryPage from './PurchaseLineEntryPage.vue';
 import { canEditPurchase } from '../purchaseRules.js';
-import type {
-    PurchaseResource,
-    PurchaseTarget,
-    PurchaseDetail,
-    ItemCreation,
-} from '../purchase.js';
+import type { PurchaseResource, PurchaseTarget, PurchaseDetail } from '../purchase.js';
+import type { ItemCreation } from '../../../shared/lookup.js';
 import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
 import type { LookupCreation } from '../../../shared/lookup.js';
 

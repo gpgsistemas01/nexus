@@ -99,11 +99,11 @@ export const validateBoolean = (fieldName, { condition = () => true } = {}) =>
         .toBoolean()
 ;
 
-export const validateUUID = (fieldName) => {
+export const validateUUID = (fieldName, { condition = () => true } = {}) => {
 
     const errors = errorMap[fieldName];
 
-    return requireValue(body(fieldName), errors.REQUIRED)
+    return requireValue(body(fieldName).if(condition), errors.REQUIRED)
         .isString().withMessage(errors.INVALID_UUID).bail()
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
@@ -148,8 +148,8 @@ export const validatePositiveNumber = (fieldName, options = {}) => validateNumer
 export const validateNumberOptional = (fieldName, options = {}) => validateNumericInput({ ...options, fieldName, optional: true });
 export const validatePositiveNumberOptional = (fieldName, options = {}) => validateNumericInput({ ...options, fieldName, optional: true, positive: true });
 
-export const validateNumberRequiredWhenOtherPresent = ({ fieldName, pairedFieldName }) => requireValue(
-    body(fieldName).if((value, { req }) => hasValue(req.body[pairedFieldName])),
+export const validateNumberRequiredWhenOtherPresent = ({ fieldName, pairedFieldName, condition = () => true }) => requireValue(
+    body(fieldName).if(condition).if((value, { req }) => hasValue(req.body[pairedFieldName])),
     errorMap[fieldName].REQUIRED
 );
 

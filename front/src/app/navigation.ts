@@ -127,7 +127,10 @@ export const APP_NAVIGATION_GROUPS: readonly NavigationGroup[] = [
             title: definition.label,
             to: `/catalogos/${name}`,
             icon: APP_ICONS[name as keyof typeof PUBLIC_CATALOGS],
-            permission: PERMISSIONS.CATALOGS_MANAGE,
+            permission:
+                name === 'materials'
+                    ? PERMISSIONS.MATERIAL_CATALOGS_MANAGE
+                    : PERMISSIONS.CATALOGS_MANAGE,
         })),
     },
 ];

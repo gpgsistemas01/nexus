@@ -225,7 +225,7 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
 });
 
 test(
-  'consumibles: alta validada con catálogos y medidas opcionales',
+  'consumibles: alta con artículo del catálogo y datos de inventario',
   { tag: '@essential' },
   async ({ page }) => {
     await mockWarehouse(page);
@@ -239,23 +239,17 @@ test(
     const dialog = page.getByRole('dialog', { name: 'Crear consumible', exact: true });
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     expect(writes).toEqual([]);
-    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Cinta adhesiva');
     await chooseOption(page, 'Proveedor', 'Proveedor Central');
-    await chooseOption(page, 'Presentación', 'ROLLO');
-    await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
+    await chooseOption(page, 'Consumible', 'Lona · 2 × 50 · ROLLO');
     await dialog.getByRole('spinbutton', { name: 'Costo máximo unitario' }).fill('12.5');
     await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('4');
-    await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toBeVisible();
+    await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toHaveCount(0);
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes).toEqual([
       {
-        name: 'Cinta adhesiva',
+        materialId: ids.material,
         supplierId: ids.supplier,
-        presentationId: ids.presentation,
-        unitMeasureId: ids.unit,
-        base: null,
-        height: null,
         maxUnitCost: 12.5,
         newStock: 4,
         isActive: true,
@@ -307,7 +301,7 @@ test(
 );
 
 test(
-  'materiales: alta con medidas, edición versionada y baja de la relación correcta',
+  'materiales: alta desde catálogo, edición versionada y baja de la relación correcta',
   { tag: '@essential' },
   async ({ page }) => {
     await mockWarehouse(page);
@@ -335,21 +329,17 @@ test(
     await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
     let dialog = page.getByRole('dialog', { name: 'Crear material', exact: true });
     await chooseOption(page, 'Proveedor', 'Proveedor Central');
-    await chooseOption(page, 'Presentación', 'ROLLO');
-    await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
-    await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona nueva');
-    await dialog.getByRole('spinbutton', { name: 'Base (m)' }).fill('2');
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(
-      dialog.getByRole('alert').filter({ hasText: 'altura', hasNotText: 'base' }),
+      dialog.getByText('El artículo es un valor requerido', { exact: true }),
     ).toBeVisible();
     expect(writes).toHaveLength(0);
-    await dialog.getByRole('spinbutton', { name: 'Altura (m)' }).fill('50');
+    await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO');
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes[0]).toMatchObject({
       method: 'POST',
-      body: { name: 'Lona nueva', base: 2, height: 50, newStock: 0 },
+      body: { materialId: ids.material, supplierId: ids.supplier, newStock: 0 },
     });
     await page.getByRole('button', { name: 'Editar', exact: true }).click();
     dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
@@ -858,3 +848,77 @@ test('merma histórica: conserva pesos, referencia y medidas como consulta al ed
   ).not.toBeEditable();
   await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
 });
+
+test(
+  'almacén: registra un artículo faltante en modal y conserva los datos de stock',
+  { tag: '@essential' },
+  async ({ page }) => {
+    await mockWarehouse(page);
+    const newId = '99999999-9999-4999-8999-999999999999';
+    const writes: Record<string, unknown>[] = [];
+    await page.route('**/api/warehouse/materials**', async (route) => {
+      if (route.request().method() === 'GET') return route.fallback();
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      return route.fulfill({
+        json: {
+          code: 'CREATED_MATERIAL',
+          ...(body.creationContext === 'goodsReceipt'
+            ? {
+                material: {
+                  material: { ...material.material, id: newId, type: 'MATERIAL', name: body.name },
+                },
+              }
+            : {}),
+        },
+      });
+    });
+    await page.goto('/almacen/materiales');
+    await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+    const main = page.getByRole('dialog', { name: 'Crear material', exact: true }).first();
+    await chooseOption(page, 'Proveedor', 'Proveedor Central', main);
+    await main.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }).fill('4.25');
+    await main.getByRole('combobox', { name: 'Material', exact: true }).fill('Artículo nuevo');
+    await page
+      .getByRole('button', { name: 'Registrar artículo «Artículo nuevo»', exact: true })
+      .click();
+    let auxiliary = page.getByRole('dialog', { name: 'Crear material', exact: true }).last();
+    await expect(auxiliary.getByRole('textbox', { name: 'Nombre', exact: true })).toHaveValue(
+      'Artículo nuevo',
+    );
+    await auxiliary.getByRole('button', { name: 'Cerrar', exact: true }).click();
+    expect(writes).toEqual([]);
+    await expect(
+      main.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }),
+    ).toHaveValue('4.25');
+    await main.getByRole('combobox', { name: 'Material', exact: true }).fill('Artículo nuevo');
+    await page
+      .getByRole('button', { name: 'Registrar artículo «Artículo nuevo»', exact: true })
+      .click();
+    auxiliary = page.getByRole('dialog', { name: 'Crear material', exact: true }).last();
+    await chooseOption(page, 'Presentación', 'ROLLO', auxiliary);
+    await chooseOption(page, 'Unidad de medida', 'Metros cuadrados', auxiliary);
+    await auxiliary.getByRole('spinbutton', { name: 'Base (m)', exact: true }).fill('2');
+    await auxiliary.getByRole('spinbutton', { name: 'Altura (m)', exact: true }).fill('50');
+    await auxiliary.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(page.getByRole('dialog', { name: 'Crear material', exact: true })).toHaveCount(1);
+    await expect(main.getByRole('combobox', { name: 'Material', exact: true })).toHaveValue(
+      'Artículo nuevo · 2 × 50 · ROLLO',
+    );
+    await expect(
+      main.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }),
+    ).toHaveValue('4.25');
+    expect(writes[0]).toMatchObject({ creationContext: 'goodsReceipt', name: 'Artículo nuevo' });
+    expect(writes[0]).not.toHaveProperty('newStock');
+    await main.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(main).toBeHidden();
+    expect(writes[1]).toEqual({
+      materialId: newId,
+      supplierId: ids.supplier,
+      maxUnitCost: 0,
+      newStock: 4.25,
+      isActive: true,
+      observations: '',
+    });
+  },
+);

@@ -2,9 +2,8 @@
 
 [Índice y notación del modelo](index.md#alcance-y-notación).
 
-Estos cortes representan la consulta y el mantenimiento independientes de Sistemas.
-La participación de Almacén en las altas contextuales se representa en Inventario,
-Compras y Salidas; no necesita iniciar las consultas de Directorio.
+Almacén consulta y registra proveedores; Sistemas conserva su edición y reporte.
+El mantenimiento independiente de clientes corresponde a Sistemas.
 
 ## Proveedores
 
@@ -17,7 +16,9 @@ Compras y Salidas; no necesita iniciar las consultas de Directorio.
 ```mermaid
 usecase-beta
 direction LR
+    actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    admin --|> warehouse
 
     systemBoundary catalogPackage1["Nexus · Proveedores"]
         ucSupplierQuery("CU-CAT-01 Consultar proveedores")
@@ -26,11 +27,13 @@ direction LR
         ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
-    admin -- ucSupplierQuery
+    warehouse -- ucSupplierQuery
+    admin -- ucSupplierEdit
+    admin -- ucSupplierReport
 
     ucSupplierQuery -- ucSupplierCreate
-    ucSupplierQuery -- ucSupplierEdit
-    ucSupplierQuery -- ucSupplierReport
+    ucSupplierEdit ..>:extend ucSupplierQuery
+    ucSupplierReport ..>:extend ucSupplierQuery
 ```
 
 ## Clientes
@@ -58,6 +61,6 @@ direction LR
     ucClientQuery -- ucClientReport
 ```
 
-Almacén participa en el alta únicamente desde un selector de una operación
-autorizada. Las consultas independientes, edición y reportes se asocian a Sistemas.
+Para clientes, Almacén participa en el alta desde un selector autorizado;
+la consulta independiente, edición y reportes corresponden a Sistemas.
 Las lecturas de opciones son soporte del formulario y no un objetivo de mantenimiento.

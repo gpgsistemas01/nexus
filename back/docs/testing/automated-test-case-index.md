@@ -371,3 +371,7 @@ importe, payload y conservación del flujo normal.
 La revisión de `CP-INT-REC-CAT-001` incluye dos compras concurrentes con artículos nuevos en orden inverso: sólo existe una oferta por proveedor/artículo y el stock recibe ambas cantidades. `goodsReceiptHelpersTest.js` conserva totales activos y el saldo histórico al cancelar todo; `supplierMaterialServiceTest.js` comprueba el orden estable del lote.
 
 `CP-INT-CAT-PDF-001`: `consumablesPdfCatalogDbTest.js` verifica el alta de las 237 identidades de LISTA CONSUMIBLES.pdf (238 renglones, tuerca de 3/16 repetida), unidades PIEZA/PZA., medidas nulas, mínimo cero, ausencia de ofertas e idempotencia. Conserva las variantes revisadas de Kola Loka, tornillo/ventosa y medidas históricas de Alambre, Cable y SILVATRIN. La migración es exclusivamente de altas de catálogo y no reescribe registros existentes.
+
+`CP-INT-CAT-MAT-001` (`RF-CAT-030`): `catalogControllersDbTest.js` crea MATERIAL/CONSUMABLE por el catálogo administrativo, verifica identidad sin oferta ni ajuste, consulta paginada y edición exclusiva de nombre/mínimo. Manipular tipo/medidas no los modifica; una versión anterior devuelve 409 y conserva datos; entradas inválidas no persisten.
+
+El catálogo cubre edición completa sin proveedor, bloqueo al vincularlo y versión obsoleta. `materialControllerDbTest.js` comprueba alta por ID, identidad confiable, vínculo único, decimales y rollback al rechazar fracciones en PIEZA.

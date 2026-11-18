@@ -19,6 +19,7 @@ let prisma;
 let app;
 
 const cleanupCatalogs = async () => {
+  await prisma.material.deleteMany({ where: { name: { startsWith: 'IT Catalog Material ', endsWith: testSuffix } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { name: { startsWith: 'IT Reason ' } } });
   await prisma.fulfillmentStatus.deleteMany({ where: { name: { startsWith: 'IT Status ' } } });
   await prisma.unitMeasure.deleteMany({
@@ -289,5 +290,46 @@ describe('catalog controllers database integration', () => {
     await expect(prisma.unitMeasure.count({
       where: { name: 'x'.repeat(21) }
     })).resolves.toBe(0);
+  });
+
+
+  it.each(['MATERIAL', 'CONSUMABLE'])('edita todos los datos de %s sin proveedor y protege la identidad después de vincularlo', async type => {
+    const unit = await prisma.unitMeasure.create({ data: { name: `IT Unit ${testSuffix}`, symbol: `c${type.slice(0,1)}${testSuffix}` } });
+    const presentation = await prisma.presentation.upsert({ where: { name: `IT Presentation ${testSuffix}` }, update: {}, create: { name: `IT Presentation ${testSuffix}` } });
+    const input = { name: `IT Catalog Material ${type} ${testSuffix}`, type, presentationId: presentation.id, unitMeasureId: unit.id, base: type === 'MATERIAL' ? 2 : null, height: type === 'MATERIAL' ? 3 : null, minStock: 0, supplierId: 'ignored', newStock: 999, currentStock: 999, maxUnitCost: 999 };
+    const created = await request(app).post('/managed/materials').send(input).expect(201);
+    const id = created.body.data.id;
+    expect(created.body.data).toMatchObject({ name: input.name, type, version: 0, presentationId: presentation.id, unitMeasureId: unit.id });
+    expect(await prisma.supplierMaterial.count({ where: { materialId: id } })).toBe(0);
+    expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: id } })).toBe(0);
+    const list = await request(app).get('/managed/materials').query({ search: input.name, length: 1 }).expect(200);
+    expect(list.body.recordsFiltered).toBe(1);
+    expect(list.body.data.map(row => row.id)).toEqual([id]);
+    expect(list.body.data[0]).not.toHaveProperty('isActive');
+    expect(list.body.data[0]).not.toHaveProperty('supplier');
+    const updated = await request(app).put(`/managed/materials/${id}`).send({ name: `IT Catalog Material ${type} edit ${testSuffix}`, minStock: 4, expectedVersion: 0, type: type === 'MATERIAL' ? 'CONSUMABLE' : 'MATERIAL', base: 99, height: 99, currentStock: 999 }).expect(200);
+    expect(updated.body.data).toMatchObject({ type: type === 'MATERIAL' ? 'CONSUMABLE' : 'MATERIAL', version: 1, presentationId: presentation.id, unitMeasureId: unit.id });
+    expect(Number(updated.body.data.minStock)).toBe(4);
+    expect(updated.body.data.base === null ? null : Number(updated.body.data.base)).toBe(99);
+    await request(app).put(`/managed/materials/${id}`).send({ name: input.name, minStock: 8, expectedVersion: 0 }).expect(409);
+    expect(Number((await prisma.material.findUniqueOrThrow({ where: { id } })).minStock)).toBe(4);
+    const before = await prisma.material.count();
+    for (const changes of [{ type: 'INVALID' }, { base: 1, height: null }, { minStock: -1 }, { presentationId: 'bad-id' }]) {
+      await request(app).post('/managed/materials').send({ ...input, ...changes }).expect(400);
+    }
+    expect(await prisma.material.count()).toBe(before);
+    const supplier = await prisma.supplier.create({ data: { codeNumber: Date.now() % 100000000, code: `${type[0]}${testSuffix}`, legalName: 'IT Catalog Supplier', tradeName: 'IT Catalog Supplier' } });
+    await prisma.supplierMaterial.create({ data: { materialId: id, supplierId: supplier.id } });
+    const linked = await request(app).get('/managed/materials').query({ search: updated.body.data.name }).expect(200);
+    expect(linked.body.data[0]._count.supplierMaterials).toBe(1);
+    await request(app).put(`/managed/materials/${id}`).send({ name: updated.body.data.name, minStock: 5, type, base: 10, height: 10, expectedVersion: 1 }).expect(409);
+    await request(app).put(`/managed/materials/${id}`).send({ name: updated.body.data.name, minStock: 5, expectedVersion: 1 }).expect(200);
+    const protectedMaterial = await prisma.material.findUniqueOrThrow({ where: { id } });
+    expect(Number(protectedMaterial.base)).toBe(99);
+    expect(protectedMaterial.type).toBe(updated.body.data.type);
+    expect(Number(protectedMaterial.minStock)).toBe(5);
+    await prisma.supplierMaterial.deleteMany({ where: { materialId: id } });
+    await prisma.supplier.delete({ where: { id: supplier.id } });
+    await prisma.material.delete({ where: { id } });
   });
 });

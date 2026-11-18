@@ -8,3 +8,8 @@ export const lockSupplierMaterialStock = ({ tx, materialId, supplierId }) => tx.
 export const lockWasteStock = ({ tx, id }) => tx.$queryRaw`
     SELECT "id" FROM "Waste" WHERE "id" = ${id}::uuid FOR UPDATE
 `;
+
+// La identidad sólo puede cambiar antes del primer vínculo con proveedor.
+export const lockMaterialIdentity = ({ tx, id, forEditing = false }) => forEditing
+    ? tx.$queryRaw`SELECT id FROM "Material" WHERE id = ${id}::uuid FOR UPDATE`
+    : tx.$queryRaw`SELECT id FROM "Material" WHERE id = ${id}::uuid FOR KEY SHARE`;

@@ -11,7 +11,12 @@ import { catalogEntryEditValidation, catalogEntryValidation } from '../../../val
 
 const router = express.Router();
 
-router.use(verifyApiTokenRequired, authorizeUserApi(PERMISSIONS.CATALOGS_MANAGE));
+router.use(verifyApiTokenRequired);
+router.use('/:catalog', (req, res, next) => authorizeUserApi(
+    req.user.permissions.includes(PERMISSIONS.CATALOGS_MANAGE) ? PERMISSIONS.CATALOGS_MANAGE
+        : req.params.catalog === 'materials' || (req.method === 'GET' && ['presentations', 'unit-measures'].includes(req.params.catalog))
+            ? PERMISSIONS.MATERIAL_CATALOGS_MANAGE : PERMISSIONS.CATALOGS_MANAGE
+)(req, res, next));
 
 router.get(
     '/:catalog',

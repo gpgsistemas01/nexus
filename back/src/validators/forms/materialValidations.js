@@ -1,5 +1,5 @@
-import { FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../shared/constants/inputValidation.js';
 import { body } from 'express-validator';
+import { FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../shared/constants/inputValidation.js';
 import { errorMap } from '../../messages/codeMessages.js';
 import {
     validatePositiveNumberOptional,
@@ -19,7 +19,7 @@ const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRoll
 import { MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../shared/constants/inventory.js';
 
 export const isGoodsReceiptMaterialCreation = (body = {}) =>
-    body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
+    body.materialId === undefined && body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
 
 const materialDataValidation = [
     ...materialRollReferenceValidation,
@@ -43,18 +43,21 @@ export const materialStockValidation = [
     validateRecordVersion()
 ];
 
-const dimensionsValidation = [
-    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
-    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
-    validatePositiveNumberOptional('base'),
-    validatePositiveNumberOptional('height')
-];
+const isNewIdentity = (_, { req }) => req.body.materialId === undefined;
+const isSelectedIdentity = (_, { req }) => req.body.materialId !== undefined;
 
 export const consumableValidation = [
-    ...dimensionsValidation,
-    validateUUID('presentationId'),
-    validateUUID('unitMeasureId'),
-    ...materialDataValidation,
+    ...materialRollReferenceValidation,
+    validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME, condition: isNewIdentity }),
+    validateUUID('presentationId', { condition: isNewIdentity }),
+    validateUUID('unitMeasureId', { condition: isNewIdentity }),
+    validateUUID('materialId', { condition: isSelectedIdentity }),
+    validateUUID('supplierId'),
+    ...createInventoryStateValidation(),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height', condition: isNewIdentity }),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base', condition: isNewIdentity }),
+    validatePositiveNumberOptional('base', { condition: isNewIdentity }),
+    validatePositiveNumberOptional('height', { condition: isNewIdentity }),
     validateNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT, condition: (_, { req }) => !isGoodsReceiptMaterialCreation(req.body) }),
     validateNumber('newStock', { condition: (_, { req }) => !isGoodsReceiptMaterialCreation(req.body) }),
     createInventoryObservationsValidation()

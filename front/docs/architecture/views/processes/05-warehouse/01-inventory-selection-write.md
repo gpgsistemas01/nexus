@@ -24,17 +24,26 @@ sequenceDiagram
     box Integración
     participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
     end
+    participant Catalog@{ "type": "boundary" } as materialCatalog<br/>Service.ts
     Page->>Editor: nowrap: useInventoryEditor(options)
     Editor->>Selection: nowrap: useInventorySelection({ resource, target,<br/>values, isPending, setValue, clearError,<br/>... })
-    U->>Form: nowrap: update('unitMeasureId', value)
-    Form->>Page: nowrap: emit('update', 'unitMeasureId', value)
-    Page->>Editor: nowrap: editor.update('unitMeasureId', value)
-    Editor-->>Selection: nowrap: values.unitMeasureId
-    opt nowrap: resource === 'materials' && isCreating && unit &&<br/>!unitUsesMeasurements(unit.data)
-        loop nowrap: field of ['base', 'height']
-            Selection->>Editor: nowrap: options.setValue(field, '')
-            Selection->>Editor: nowrap: options.clearError(field)
+    alt Alta de material o consumible en Almacén
+        Selection->>Catalog: list(resource, { search, page }, signal)
+        Catalog-->>Selection: artículos paginados de todo el catálogo
+        U->>Form: seleccionar proveedor y materialId
+        Form->>Page: emit(update, materialId, id)
+        Page->>Editor: update(materialId, id)
+        Editor-->>Selection: identidad seleccionada
+        opt Artículo faltante con proveedor seleccionado
+            Page->>Page: emit(createArticle, búsqueda y callback)
+            Note over Page,Service: InventoryWorkspace abre el mismo editor con creationContext goodsReceipt.
+            Service-->>Editor: artículo nuevo sin stock ni vínculo
+            Editor->>Selection: selectCreatedArticle(artículo)
         end
+    else Modal de identidad o alta de merma
+        U->>Form: capturar identidad o material de origen
+        Form->>Page: emit(update, campo, valor)
+        Page->>Editor: update(campo, valor)
     end
     Editor-->>Page: nowrap: { values: form.values, lookups, preview }
     Page-->>Form: nowrap: { values, lookups, preview }
@@ -69,7 +78,8 @@ sequenceDiagram
 [useInventoryEditor.ts](../../../../../src/modules/warehouse/composables/useInventoryEditor.ts),
 [useInventorySelection.ts](../../../../../src/modules/warehouse/composables/useInventorySelection.ts),
 [formModel.ts](../../../../../src/modules/warehouse/formModel.ts),
-[inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts).
+[inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts),
+[materialCatalogService.ts](../../../../../src/shared/services/materialCatalogService.ts).
 
 ## Secuencias relacionadas
 

@@ -2,7 +2,8 @@
 import { usePurchaseLineEntry } from '../composables/usePurchaseLineEntry.js';
 import { PURCHASE_CONFIG } from '../purchaseConfig.js';
 import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
-import type { PurchaseResource, PurchaseDetail, ItemCreation } from '../purchase.js';
+import type { PurchaseResource, PurchaseDetail } from '../purchase.js';
+import type { ItemCreation } from '../../../shared/lookup.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import PurchaseLineEntryForm from '../components/PurchaseLineEntryForm.vue';
 

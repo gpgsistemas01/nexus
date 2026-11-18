@@ -25,7 +25,7 @@ const { getCurrentUser } = await import('../../../src/controllers/api/authContro
 describe('authMiddleware authorization', () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it.each([PERMISSIONS.CLIENTS_PAGE_VIEW, PERMISSIONS.SUPPLIERS_PAGE_VIEW])(
+    it.each([PERMISSIONS.CLIENTS_PAGE_VIEW])(
         'reserva la página %s para Sistemas y mantiene las altas contextuales de Almacén', permission => {
             for (const roleKey of [ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR, ROLE_KEYS.WAREHOUSE_KEEPER]) {
                 const req = { user: { permissions: getGrantedPermissions([{
@@ -39,7 +39,7 @@ describe('authMiddleware authorization', () => {
                 res.status.mockClear();
                 expect(nextPage).not.toHaveBeenCalled();
                 for (const allowed of [PERMISSIONS.CLIENTS_READ, PERMISSIONS.CLIENTS_CREATE,
-                    PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE]) {
+                    PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE, PERMISSIONS.SUPPLIERS_PAGE_VIEW, PERMISSIONS.MATERIAL_CATALOGS_MANAGE]) {
                     const nextApi = vi.fn();
                     authorizeUserApi(allowed)(req, res, nextApi);
                     expect(nextApi).toHaveBeenCalledOnce();
