@@ -75,6 +75,15 @@ const reference = (column: string) => {
 .detail-entry__mobile-reference {
     display: none;
 }
+@media (min-width: 600px) {
+    .detail-entry > td[data-column='costPerUnitType'] {
+        min-width: 16rem !important;
+    }
+    .detail-entry > td[data-column='costScope'] {
+        min-width: 18rem !important;
+        max-width: 22rem;
+    }
+}
 @media (max-width: 599px) {
     .detail-entry__mobile-reference {
         display: block;

@@ -38,13 +38,6 @@ const MOVEMENT_DETAIL_SELECT = {
             tradeName: true
         }
     },
-    goodsReceiptDetail: { select: { materialName: true } },
-    goodsIssueDetail: { select: { materialName: true } },
-    stockAdjustmentDetail: {
-        select: {
-            materialName: true,
-        }
-    },
     goodsIssueReturn: {
         select: {
             id: true
@@ -126,14 +119,6 @@ const getMovementSearchFilter = (search) => {
                 }
             },
             {
-                stockAdjustmentDetail: {
-                    materialName: {
-                        contains: search,
-                        mode: 'insensitive'
-                    }
-                }
-            },
-            {
                 movement: {
                     referenceNumber: {
                         contains: search,
@@ -179,11 +164,7 @@ const resolveMaterialBase = (detail) => detail.material?.base ?? null;
 
 const resolveMaterialHeight = (detail) => detail.material?.height ?? null;
 
-const resolveMaterialName = (detail) =>
-    detail.stockAdjustmentDetail?.materialName ??
-    detail.goodsReceiptDetail?.materialName ??
-    detail.goodsIssueDetail?.materialName ??
-    detail.material?.name;
+const resolveMaterialName = (detail) => detail.material?.name;
 
 const resolveSupplierName = (detail) => detail.supplier?.tradeName;
 

@@ -28,11 +28,15 @@ Abra **Compras → Consumibles**. Busque por folio, factura, proveedor, persona 
 <!-- manual:any goods:receipts-manage -->
 ## Registrar una compra
 
-1. Pulse **Nueva compra** y seleccione proveedor y persona que recibe.
+1. Pulse **Nueva compra**. Seleccione primero el proveedor para habilitar los detalles y después la persona que recibe.
 2. Elija **Factura** o **Remisión**, capture el número cuando corresponda y revise la fecha.
-3. En el último renglón de la tabla, seleccione el artículo bajo **Material**, capture **Cantidad** y **Costo por Presentación** en sus columnas y pulse **Agregar**.
+3. En el último renglón de la tabla, seleccione el artículo bajo **Material**, capture **Cantidad** y **Costo por presentación** en sus columnas y pulse **Agregar**.
 4. Repita para las demás partidas y revise cantidades e importes estimados.
 5. Pulse **Guardar** y compruebe el folio y la existencia recibida.
+
+El nombre, las medidas, la presentación y la unidad de los artículos se muestran desde el catálogo de Materiales. Los importes conservan los valores de la compra.
+
+La tabla coloca **Presentación** antes de **Compra**; el costo capturado y su alcance preceden a **Conversión** e **Importes**. **Conversión** reúne cantidad, unidad y costo unitario; **Importes**, montos sin IVA y con IVA.
 
 Todos los detalles pertenecen al **Proveedor** del encabezado; no se repite en el nombre de cada artículo. En móvil la captura se apila y conserva los mismos valores.
 
@@ -79,7 +83,7 @@ no aparece el botón.
 <!-- module:end -->
 
 Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: seleccionar la presentación KILOGRAMOS o METRO LINEAL fija ambas medidas en 1 × 1 y oculta esos campos durante el alta. Después de pulsar **Agregar**, la tabla de detalles muestra medidas, unidad y cantidad convertida. El artículo nuevo queda seleccionado;
-todavía debe capturar **Cantidad** y **Costo por Presentación**,
+todavía debe capturar **Cantidad** y **Costo por presentación**,
 pulsar **Agregar** y guardar la compra. El alta auxiliar guarda sólo la identidad del catálogo: no crea vínculo con el proveedor ni existencia. Si cancela la compra, el artículo queda disponible en el catálogo. La asociación y la existencia se registran al guardar la compra.
 <!-- manual:end -->
 
@@ -160,10 +164,11 @@ Pulse **Exportar Excel**, seleccione el alcance y confirme **Descargar Excel**.
 Consulte [Reportes](14-reports.md) para elegir periodo o filtros.
 <!-- manual:end -->
 
-Sin la opción de costo total, el importe sin IVA es Cantidad comprada × Costo por Presentación. Las medidas representan la conversión de la unidad.
+Sin la opción de costo total, el importe sin IVA es Cantidad comprada × Costo por presentación. Las medidas representan la conversión de la unidad.
 
 ### Capturar el costo total del detalle
 
+El campo y la columna se llaman **Costo por presentación**; capture siempre el importe sin IVA.
 Marque **Usar el costo por presentación como costo total** cuando el importe ingresado
 cubra toda la cantidad de esa partida, para cualquier presentación.
 Por ejemplo, cantidad 10 y costo total sin IVA $500 dan costo unitario $50,

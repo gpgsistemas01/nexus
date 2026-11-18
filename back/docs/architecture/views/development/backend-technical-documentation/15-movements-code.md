@@ -53,6 +53,10 @@ sus fachadas fijan `Material.type` a `MATERIAL` o `CONSUMABLE` antes de ejecutar
 consulta y conteos. `recordsTotal` cuenta sólo el contexto, incluso sin filtros.
 Merma conserva `WasteMovement`/`WasteMovementDetail`. La consulta es de sólo lectura.
 
+El nombre y las medidas visibles proceden de `Material`. No se consultan los
+nombres históricos de compras, salidas o ajustes para componer la fila; esos
+valores permanecen guardados en los documentos.
+
 Las rutas de Excel permanecen agrupadas bajo `admin/reports`, dentro del dominio
 administrativo, y seleccionan la misma consulta contextual. El prefijo URL no
 crea un módulo funcional separado de reportes ni justifica duplicar servicios.

@@ -21,7 +21,7 @@ const mapGoodsReceiptDetailRows = function* (goodsReceipts = [], { materialId = 
                 supplierName: goodsReceipt.supplierName,
                 invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
                 materialId: detail.materialId,
-                materialName: detail.materialName,
+                materialName: detail.material?.name ?? detail.materialName,
                 materialBase: toNumber(detail.material?.base),
                 materialHeight: toNumber(detail.material?.height),
                 quantity: toNumber(detail.quantity),

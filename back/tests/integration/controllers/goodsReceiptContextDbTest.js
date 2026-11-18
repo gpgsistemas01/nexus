@@ -112,6 +112,20 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(rows.map(row => row.referenceNumber)).toEqual([receipts[resource].referenceNumber]);
     });
 
+    it.each([['material', 'Material'], ['consumable', 'Consumable']])('el reporte de %s usa el catálogo sin alterar el histórico ni los importes', async (resource, label) => {
+        const original = await prisma.material.findUniqueOrThrow({ where: { id: ids[resource] } });
+        const name = `Nombre vigente ${resource} ${suffix}`;
+        try {
+            await prisma.material.update({ where: { id: ids[resource] }, data: { name } });
+            const rows = await Array.fromAsync(services[resource][`find${label}GoodsReceiptReportRows`]({ supplierId: ids.supplier }));
+            expect(rows[0]).toMatchObject({ materialName: name, netPurchaseAmount: 20, grossPurchaseAmount: 23.2 });
+            const detail = await prisma.goodsReceiptDetail.findUniqueOrThrow({ where: { id: receipts[resource].details[0].id } });
+            expect(detail.materialName).toBe(`RC ${resource} ${suffix}`);
+        } finally {
+            await prisma.material.update({ where: { id: ids[resource] }, data: { name: original.name } });
+        }
+    });
+
     it.each(['material', 'consumable'])('permite editar una compra homogénea de %s', async resource => {
         const receipt = receipts[resource];
         const beforeCounters = await prisma.referenceNumberCounter.findMany({

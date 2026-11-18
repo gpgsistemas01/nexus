@@ -76,7 +76,7 @@ const normalizePurchaseDetail = (value: unknown, resource: PurchaseResource): Pu
     return {
         id: value.id,
         materialId: readText(value, 'materialId'),
-        name: readText(value, 'materialName'),
+        name: readText(material, 'name'),
         base: material.base == null ? null : readPurchaseDecimal(material.base),
         height: material.height == null ? null : readPurchaseDecimal(material.height),
         presentation: readText(readOptionalRelation(material.presentation), 'name'),

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PURCHASE_DETAIL_LABELS } from '../purchaseConfig.js';
 import DetailEntryRow from '../../../shared/components/DetailEntryRow.vue';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
@@ -74,7 +75,8 @@ const emit = defineEmits<{
         </template>
         <template #costPerUnitType>
             <VTextField
-                :label="costIsTotal ? 'Costo total del detalle sin IVA' : 'Costo por Presentación'"
+                :label="PURCHASE_DETAIL_LABELS.costPerPresentation"
+                hint="Sin IVA"
                 type="number"
                 min="0"
                 step="0.000001"

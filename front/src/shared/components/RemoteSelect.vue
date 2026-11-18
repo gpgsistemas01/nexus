@@ -100,6 +100,7 @@ const loadWhenVisible = (isVisible: boolean) => {
 <template>
     <VAutocomplete
         :menu="isMenuOpen"
+        :search="search"
         :label="label"
         :model-value="modelValue || null"
         :items="visibleItems"

@@ -236,7 +236,7 @@ test('compras: consulta, borrador local y corrección sin confirmar', async ({ p
   await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO');
   const creating = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
   await creating.getByLabel('Cantidad', { exact: true }).fill('2');
-  await creating.getByLabel('Costo por Presentación', { exact: true }).fill('100');
+  await creating.getByLabel('Costo por presentación', { exact: true }).fill('100');
   await creating.getByRole('button', { name: 'Agregar', exact: true }).click();
   await expect(creating.getByRole('cell', { name: /^Lona(?: Proveedor Central)?$/ })).toBeVisible();
   await capture(page, '19-purchase-create');

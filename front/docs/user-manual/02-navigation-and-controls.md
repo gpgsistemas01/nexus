@@ -85,7 +85,8 @@ el listado antes de elegir otra acción. En esos casos no aparece el reintento.
 ## Seleccionar registros relacionados
 
 Abra el selector, escriba parte del nombre y **seleccione una opción de la lista**.
-Las opciones cargan al abrirlo. Si la consulta falla, use **Reintentar catálogo**
+Las opciones cargan al abrirlo. Al escribir, la búsqueda espera medio segundo de
+pausa y conserva el texto capturado. Si la consulta falla, use **Reintentar catálogo**
 cuando aparezca. Puede cerrar la lista y continuar con los otros campos; su captura
 se conserva. El área asignada automáticamente en Salidas se prepara al abrir el formulario.
 Escribir el nombre no basta para elegir el registro.
@@ -169,6 +170,8 @@ quienes deban utilizarlos y no incluya contraseñas en ellos.
 
 <!-- manual:any goods:receipts-page-view goods:issues-page-view waste:issues-page-view -->
 ## Leer las tablas de partidas
+
+La lectura comienza con artículo, medidas y presentación. En Compras siguen la cantidad y el costo capturados, la conversión y los importes. En Salidas siguen la cantidad solicitada y su conversión; al surtir o devolver se muestran las cantidades y saldos de esa operación. Las acciones quedan al final.
 
 En los detalles de **Compras** y **Salidas**, los nombres se leen desde la izquierda
 y las cantidades e importes se alinean a la derecha. Los encabezados **Medidas** y

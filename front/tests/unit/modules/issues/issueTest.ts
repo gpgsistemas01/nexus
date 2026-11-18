@@ -756,3 +756,11 @@ it.each(['KILOGRAMOS', 'METRO LINEAL'])(
     entry.wrapper.unmount();
   },
 );
+
+it('muestra el nombre vigente del catálogo sin modificar el nombre histórico del detalle', () => {
+  const source = structuredClone(issue);
+  source.details[0]!.materialName = 'Nombre histórico';
+  source.details[0]!.material.name = 'Nombre vigente';
+  expect(normalizeIssueDocument(source, 'materials').details[0]!.name).toBe('Nombre vigente');
+  expect(source.details[0]!.materialName).toBe('Nombre histórico');
+});

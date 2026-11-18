@@ -110,7 +110,7 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
         itemId: readText(value, resource === 'wastes' ? 'wasteId' : 'materialId'),
         supplierId: resource === 'wastes' ? '' : readText(value, 'supplierId'),
         supplierName: String(readOptionalRelation(value.supplier ?? item.supplier).tradeName ?? ''),
-        name: readText(value, 'materialName'),
+        name: readText(item, 'name'),
         base: item.base == null ? null : readIssueDecimal(item.base),
         height: item.height == null ? null : readIssueDecimal(item.height),
         presentation: readText(readOptionalRelation(item.presentation), 'name'),

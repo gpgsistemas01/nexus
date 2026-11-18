@@ -30,10 +30,10 @@ it('la espera de búsqueda ya está pendiente y no presenta resultados antiguos 
     error: '',
     hasMore: false,
   });
-  await vi.advanceTimersByTimeAsync(249);
+  await vi.advanceTimersByTimeAsync(499);
   expect(request).toHaveBeenCalledTimes(1);
   value.updateSearch('búsqueda final');
-  await vi.advanceTimersByTimeAsync(250);
+  await vi.advanceTimersByTimeAsync(500);
   expect(request).toHaveBeenCalledTimes(2);
   expect(request.mock.calls[1]!.slice(0, 2)).toEqual(['búsqueda final', 1]);
   expect(value.state.value).toMatchObject({ isLoading: false, error: '' });
@@ -103,7 +103,7 @@ it('cambiar la búsqueda invalida el reintento de la página vieja sin duplicar 
   expect(value.error.value).toBe('');
   await value.retry();
   expect(request).toHaveBeenCalledTimes(2);
-  await vi.advanceTimersByTimeAsync(300);
+  await vi.advanceTimersByTimeAsync(600);
   expect(request.mock.calls.map((call) => [call[0], call[1]])).toEqual([
     ['', 1],
     ['', 2],
@@ -160,7 +160,7 @@ it('desmontar cancela la petición y el debounce y bloquea callbacks conservados
   await value.refresh();
   await value.loadMore();
   finish(result(['tardío']));
-  await vi.advanceTimersByTimeAsync(300);
+  await vi.advanceTimersByTimeAsync(600);
   await flushPromises();
   expect(signal.aborted).toBe(true);
   expect(request).toHaveBeenCalledTimes(1);
@@ -231,7 +231,7 @@ it('refrescar con otra búsqueda cancela el debounce y hace una sola petición i
   const { value, wrapper } = mountComposable(() => useRemoteLookup(request, ref(true)));
   value.updateSearch('pendiente');
   await value.refresh('');
-  await vi.advanceTimersByTimeAsync(300);
+  await vi.advanceTimersByTimeAsync(600);
   expect(request).toHaveBeenCalledTimes(1);
   expect(request.mock.calls[0]!.slice(0, 2)).toEqual(['', 1]);
   expect(value.search.value).toBe('');
@@ -245,5 +245,42 @@ it('refrescar el catálogo todavía cerrado no duplica la primera petición', as
   await value.refresh('');
   expect(request).toHaveBeenCalledTimes(1);
   expect(value.items.value.map((item) => item.id)).toEqual(['nuevo']);
+  wrapper.unmount();
+});
+
+it('agrupa pulsaciones separadas por menos de 500 ms y descarta la respuesta de una búsqueda sustituida', async () => {
+  vi.useFakeTimers();
+  let finish!: (page: PageResult<LookupItem>) => void;
+  const request = vi
+    .fn()
+    .mockImplementationOnce(
+      () =>
+        new Promise<PageResult<LookupItem>>((resolve) => {
+          finish = resolve;
+        }),
+    )
+    .mockResolvedValueOnce(result(['final']));
+  const { value, wrapper } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('P');
+  await vi.advanceTimersByTimeAsync(300);
+  value.updateSearch('Pr');
+  await vi.advanceTimersByTimeAsync(300);
+  value.updateSearch('Pro');
+  value.updateSearch('Pro');
+  await vi.advanceTimersByTimeAsync(499);
+  expect(request).not.toHaveBeenCalled();
+  expect(value.search.value).toBe('Pro');
+  await vi.advanceTimersByTimeAsync(1);
+  expect(request).toHaveBeenCalledOnce();
+  value.updateSearch('Proveedor final');
+  expect(request.mock.calls[0]![2].aborted).toBe(true);
+  finish(result(['anterior']));
+  await flushPromises();
+  expect(value.items.value).toEqual([]);
+  await vi.advanceTimersByTimeAsync(499);
+  expect(request).toHaveBeenCalledOnce();
+  await vi.advanceTimersByTimeAsync(1);
+  expect(request.mock.calls.map((call) => call[0])).toEqual(['Pro', 'Proveedor final']);
+  expect(value.items.value.map((item) => item.id)).toEqual(['final']);
   wrapper.unmount();
 });

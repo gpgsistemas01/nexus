@@ -79,7 +79,7 @@ const mapIssueDetailRow = ({ issue, detail, material, supplier, requestDate }) =
     clientName: issue.clientName,
     projectNumber: issue.projectNumber,
     fulfillmentStatusName: issue.fulfillmentStatus?.name,
-    materialName: detail.materialName,
+    materialName: material?.name ?? detail.materialName,
     supplierName: supplier?.tradeName,
     materialBase: toNumber(material?.base),
     materialHeight: toNumber(material?.height),

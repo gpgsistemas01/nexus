@@ -321,6 +321,21 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(rows[0].referenceNumber).toBe(issues[inventoryResource].referenceNumber);
     });
 
+    it.each(['material', 'consumable'])('el reporte de salidas de %s muestra el catálogo y conserva el nombre histórico', async resource => {
+        const original = await prisma.material.findUniqueOrThrow({ where: { id: ids[resource] } });
+        const stored = await prisma.goodsIssueDetail.findFirstOrThrow({ where: { goodsIssueId: issues[resource].id } });
+        const name = `Nombre vigente ${resource} ${suffix}`;
+        try {
+            await prisma.material.update({ where: { id: ids[resource] }, data: { name } });
+            const rows = await Array.fromAsync(reportFinders[resource]({ departmentId: ids.department, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] }));
+            expect(rows[0]).toMatchObject({ materialName: name, requestedQuantity: 2 });
+            const detail = await prisma.goodsIssueDetail.findUniqueOrThrow({ where: { id: stored.id } });
+            expect(detail.materialName).toBe(stored.materialName);
+        } finally {
+            await prisma.material.update({ where: { id: ids[resource] }, data: { name: original.name } });
+        }
+    });
+
     it('fija el contexto desde la ruta e ignora intentos de cambiarlo por query', async () => {
         const response = await request(app).get(issuePath('material'))
             .query({ departmentId: ids.department, inventoryResource: 'consumable', type: 'CONSUMABLE' }).expect(200);

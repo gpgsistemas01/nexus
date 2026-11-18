@@ -103,6 +103,11 @@ for (const [path, title, item] of [
       await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
       const dialog = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
       await expect(dialog.locator('[aria-invalid="true"]')).toHaveCount(0);
+      const prerequisite = dialog.getByText(
+        'Selecciona primero un proveedor para agregar detalles.',
+        { exact: true },
+      );
+      await expect(prerequisite).toBeVisible();
       await dialog.getByLabel('Número de Factura', { exact: true }).fill('F'.repeat(51));
       await expect(dialog.getByLabel('Número de Factura', { exact: true })).toHaveValue(
         'F'.repeat(50),
@@ -119,6 +124,7 @@ for (const [path, title, item] of [
       await dialog.getByLabel('Observaciones', { exact: true }).fill('');
       await dialog.getByRole('combobox', { name: 'Proveedor', exact: true }).click();
       await page.getByRole('option', { name: 'Proveedor Central', exact: true }).click();
+      await expect(prerequisite).toBeHidden();
       await dialog.getByRole('combobox', { name: 'Persona que recibe', exact: true }).click();
       await page.getByRole('option', { name: personData.fullName, exact: true }).click();
       await dialog.getByRole('radio', { name: 'Remisión', exact: true }).check();
@@ -134,7 +140,7 @@ for (const [path, title, item] of [
         '',
       );
       await dialog.getByLabel('Cantidad', { exact: true }).fill('2');
-      await dialog.getByLabel('Costo por Presentación', { exact: true }).fill('100');
+      await dialog.getByLabel('Costo por presentación', { exact: true }).fill('100');
       await expect(dialog.getByRole('combobox', { name: 'Proveedor', exact: true })).toHaveValue(
         'Proveedor Central',
       );
@@ -155,26 +161,27 @@ for (const [path, title, item] of [
       await expect(dialog.getByRole('columnheader')).toHaveText([
         'Material',
         'Medidas',
-        'Compra',
         'Presentación',
-        'Conversión',
-        'Costo unitario',
-        'Costo capturado',
+        'Compra',
+        'Costo por presentación',
         'Alcance del costo',
-        'Monto s/ IVA',
-        'Monto c/ IVA',
+        'Conversión',
+        'Importes',
         'Acciones',
         'Base',
         'Altura',
         'Cantidad',
         'Unidad',
+        'Costo unitario',
+        'Monto s/ IVA',
+        'Monto c/ IVA',
       ]);
       await expect(
         dialog.getByRole('columnheader', { name: 'Medidas', exact: true }),
       ).toHaveAttribute('colspan', '2');
       await expect(
         dialog.getByRole('columnheader', { name: 'Conversión', exact: true }),
-      ).toHaveAttribute('colspan', '2');
+      ).toHaveAttribute('colspan', '3');
       await expect(dialog.getByLabel('Totales de compra')).toContainText('$232');
       expect(writes).toHaveLength(0);
       await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -585,7 +592,7 @@ for (const [path, label] of [
         await expect(totalOption).toBeChecked();
         await expect(totalOption).toBeDisabled();
       } else await totalOption.check();
-      await dialog.getByLabel('Costo total del detalle sin IVA', { exact: true }).fill('150');
+      await dialog.getByLabel('Costo por presentación', { exact: true }).fill('150');
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
       const row = dialog.locator('tbody tr').first();
       await expect(row).toContainText('Total del detalle');

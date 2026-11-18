@@ -36,6 +36,10 @@ los resultados de la API. Los campos y efectos por acción están en los
 | RD-VUE-006 | El cliente debe conservar la etiqueta y los datos de la opción seleccionada al paginar. Cambiar o limpiar el ID debe descartar la opción anterior; una respuesta remota del mismo ID debe poder actualizar sus datos. |
 | RD-VUE-007 | El cliente debe aceptar una respuesta sólo si cumple el contrato de la operación solicitada. Debe rechazar páginas, documentos, confirmaciones y archivos incompletos o incompatibles antes de usarlos o anunciar éxito. |
 
+En compras, salidas, movimientos y sus reportes, el nombre visible del material
+procede del catálogo `Material`, junto con sus medidas, presentación y unidad.
+Los nombres históricos y los importes registrados se conservan.
+
 ## Interacción, calidad y restricciones
 
 | ID | Criterio verificable |
@@ -44,7 +48,7 @@ los resultados de la API. Los campos y efectos por acción están en los
 | RN-VUE-002 | El cliente debe bloquear el envío repetido desde sus controles mientras una escritura esté pendiente. Un fallo de red no debe iniciar reenvíos automáticos; la recuperación de merma debe seguir `RF-VUE-008`. |
 | RN-VUE-003 | El cliente debe cancelar o invalidar las consultas sustituidas al cambiar el contexto o desmontar la pantalla. Una respuesta anterior no debe reemplazar los datos vigentes ni actualizar otra pantalla. |
 | RN-VUE-004 | El cliente debe mostrar los datos recibidos como texto literal, sin interpretar su contenido como HTML, tanto en controles como en avisos. |
-| RN-VUE-005 | Las tablas y selectores remotos deben consultar páginas de datos. Los selectores deben cargar opciones al abrirse, salvo la consulta necesaria para asignar automáticamente el área. Deben conservar la selección, admitir reintentos recuperables sin bloquear los otros campos, evitar IDs duplicados y terminar la carga adicional ante una página vacía. |
+| RN-VUE-005 | Las tablas y selectores remotos deben consultar páginas de datos. Los selectores deben cargar opciones al abrirse, salvo la consulta necesaria para asignar automáticamente el área. Al escribir deben conservar el texto y consultar tras 500 ms sin cambios. Deben conservar la selección, admitir reintentos recuperables sin bloquear los otros campos, evitar IDs duplicados y terminar la carga adicional ante una página vacía. |
 | RN-VUE-006 | La presentación debe recibir datos y emitir intenciones sin consumir servicios HTTP. Los servicios y mappers no deben depender del renderizado. Cada captura o listado debe conservar su estado por instancia y liberar sus recursos al terminar. |
 | RN-VUE-007 | Los listados con recarga automática deben actualizarse sólo si la página está visible, no hay una carga incompatible ni una captura protegida y ha transcurrido el intervalo configurado desde el último intento de lectura. La recarga debe conservar los filtros y evitar solicitudes solapadas. |
 | RC-VUE-001 | El cliente debe construirse con Vue 3, TypeScript, Composition API y Vue Router, usando versiones compatibles con los manifiestos y el lockfile. |

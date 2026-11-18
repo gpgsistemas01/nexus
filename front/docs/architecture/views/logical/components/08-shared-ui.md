@@ -78,7 +78,8 @@ definen campos modificables, props, eventos y callbacks.
 ## Selección remota y foco
 
 `RemoteSelect` presenta opciones, búsqueda y carga. En detalles, `selectedTitle`
-muestra el nombre seleccionado mientras las opciones conservan su descripción completa. Sus
+muestra el nombre seleccionado mientras las opciones conservan su descripción completa.
+La búsqueda permanece en el campo y se consulta tras 500 ms sin escribir. Sus
 [eventos](../../../contracts/form-and-event-contracts.md#eventos-de-interacción) permiten
 consultar o solicitar un alta. La [creación
 contextual](../../development/design-and-construction-patterns/09-contextual-creation.md)
@@ -93,3 +94,9 @@ En la cancelación de un detalle de compra, el editor de consulta libera tempora
 la retención de foco y bloquea sus acciones mientras SweetAlert2 controla la confirmación.
 Los demás diálogos conservan la retención de foco habitual. Las reglas de teclado y
 foco se consultan en el [estándar de interfaz](../../../interface-standards.md#teclado-y-distribución).
+
+Las columnas de detalle siguen identificación → captura → resultados → acciones.
+Compras agrupa costo unitario con Conversión e importes con IVA/sin IVA; Salidas
+selecciona seguimiento y saldos según consulta, surtido o devolución.
+`DetailEntryRow` recibe las columnas aplanadas de la misma tabla, y las fichas
+reciben sus encabezados: reordenar conserva la correspondencia de campo y dato.

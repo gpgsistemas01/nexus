@@ -100,7 +100,7 @@ it('una búsqueda con un solo resultado conserva el selector y el área elegida'
   );
   await flushPromises();
   value.updateSearch('IMP');
-  await vi.advanceTimersByTimeAsync(300);
+  await vi.advanceTimersByTimeAsync(500);
   expect(value.items.value).toHaveLength(1);
   expect(value.isLocked.value).toBe(false);
   expect(selected.value).toBe(router.id);

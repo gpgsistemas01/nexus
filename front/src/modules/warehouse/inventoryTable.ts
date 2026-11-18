@@ -26,13 +26,24 @@ export const inventoryHeaders = (
             ],
         });
 
+    if (resource === 'wastes')
+        headers.push({
+            title: 'Pesos por unidad (kg)',
+            align: 'center',
+            children: [
+                column('Cono', 'coneWeightKg'),
+                column('Total con cono', 'totalWeightKg'),
+                column('Neto', 'weightKg'),
+            ],
+        });
+
     headers.push(
+        column('Presentación', 'presentation'),
+        ...(isConsumable ? [column('Unidad de medida', 'unitMeasure')] : []),
         column(isConsumable ? 'Existencia' : 'Stock actual', 'currentStock'),
         column('Stock Mínimo', 'minStock', resource === 'materials'),
-        column('Presentación', 'presentation'),
     );
-    if (isConsumable) headers.push(column('Unidad de medida', 'unitMeasure'));
-    else
+    if (!isConsumable)
         headers.push({
             title: 'Conversión',
             align: 'center',
@@ -45,17 +56,6 @@ export const inventoryHeaders = (
         );
 
     if (permissions.canReadState) headers.push(column('Activo', 'isActive'));
-
-    if (resource === 'wastes')
-        headers.push({
-            title: 'Pesos por unidad (kg)',
-            align: 'center',
-            children: [
-                column('Cono', 'coneWeightKg'),
-                column('Total con cono', 'totalWeightKg'),
-                column('Neto', 'weightKg'),
-            ],
-        });
 
     if (permissions.canWrite || permissions.canAdjust || permissions.canAdd)
         headers.push(column('Acciones', 'actions'));
