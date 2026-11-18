@@ -22,6 +22,7 @@ export const issueDetail = {
   materialId: ids.material,
   supplierId: ids.supplier,
   materialName: 'Lona',
+  supplier: material.supplier,
   material: { ...material.material, type: 'MATERIAL' },
   quantity: '2',
   convertedQuantity: '200',

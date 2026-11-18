@@ -169,6 +169,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Miembro | Firma completa |
 | --- | --- |
+| `columns` | `columns: string[];` |
 | `itemLabel` | `itemLabel: string;` |
 | `values` | `values: { materialId: string; quantity: string; costPerUnitType: string };` |
 | `errors` | `errors: Partial<Record<'materialId' \| 'quantity' \| 'costPerUnitType', string>>;` |
@@ -188,7 +189,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 24, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 25, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -335,6 +336,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Miembro | Firma completa |
 | --- | --- |
+| `columns` | `columns: string[];` |
 | `resource` | `resource: PurchaseResource;` |
 | `supplier` | `supplier: LookupItem;` |
 | `isDisabled` | `isDisabled: boolean;` |
@@ -348,7 +350,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryPage.defineEmits
 
-**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 17, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 18, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

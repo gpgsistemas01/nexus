@@ -101,6 +101,17 @@ export const catalogService = {
             'No se pudo confirmar la operación. Actualiza el catálogo antes de reintentar.',
         );
 
-        return normalizeEntry(result.data, catalog);
+        const entry = normalizeEntry(result.data, catalog);
+        if (
+            catalog === 'materials' &&
+            target.action === 'create' &&
+            target.materialType &&
+            entry.type !== target.materialType
+        )
+            throw new ApiError(
+                'El servidor devolvió un artículo de otro catálogo. Actualiza las opciones antes de continuar.',
+            );
+
+        return entry;
     },
 };

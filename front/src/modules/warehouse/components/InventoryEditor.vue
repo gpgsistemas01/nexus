@@ -119,7 +119,7 @@ const emit = defineEmits<{
                                     field.name === 'supplierId' && canCreateSupplier
                                         ? 'Registrar proveedor'
                                         : field.name === 'materialId' && canCreateArticle
-                                          ? 'Registrar artículo'
+                                          ? `Registrar ${field.label.toLocaleLowerCase()}`
                                           : undefined
                                 "
                                 @create="

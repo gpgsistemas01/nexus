@@ -115,11 +115,13 @@ const cardValue = (item: PurchaseDetail, key: string) => {
         fit-columns
         mobile-cards
         details
+        :class="{ 'table-frame--entry': !!$slots.entry }"
     >
         <VDataTable
             v-model:sort-by="sortBy"
             :headers="headers"
             :items="rows"
+            :hide-no-data="!!$slots.entry"
             item-value="id"
             :items-per-page="10"
             :items-per-page-options="[10, 20, 50]"
@@ -129,6 +131,12 @@ const cardValue = (item: PurchaseDetail, key: string) => {
             items-per-page-text="Detalles por página:"
             page-text="{0}–{1} de {2}"
         >
+            <template #[`body.append`]="{ columns }">
+                <slot
+                    name="entry"
+                    :columns="columns.map((column) => String(column.key))"
+                />
+            </template>
             <template
                 v-for="key in numeric"
                 :key="key"

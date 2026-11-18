@@ -26,6 +26,7 @@ export interface IssueDetail {
     id: string;
     itemId: string;
     supplierId: string;
+    supplierName?: string;
     name: string;
     base: number | null;
     height: number | null;

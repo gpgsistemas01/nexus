@@ -191,7 +191,6 @@ const emit = defineEmits<{
                 </VCol>
             </VRow>
         </section>
-        <slot name="entry" />
         <section aria-label="Detalles de compra">
             <h3 class="purchase-section-title">Detalles de la compra</h3>
             <p
@@ -209,7 +208,17 @@ const emit = defineEmits<{
                 @remove="emit('remove', $event)"
                 @correct="emit('correct', $event)"
                 @cancel="emit('cancel', $event)"
-            />
+            >
+                <template
+                    v-if="!isReadOnly"
+                    #entry="{ columns }"
+                >
+                    <slot
+                        name="entry"
+                        :columns="columns"
+                    />
+                </template>
+            </PurchaseDetailsTable>
             <VAlert
                 v-if="errors.details"
                 type="error"

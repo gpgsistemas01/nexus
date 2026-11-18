@@ -119,7 +119,7 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 
 Nombre, presentación, unidad, medidas y mínimo pertenecen al catálogo; no se vuelven a capturar aquí. PIEZA exige cantidades enteras; KILOGRAMOS y METRO LINEAL admiten decimales y conservan `1 × 1`.
 
-Si falta el artículo, seleccione primero el proveedor, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar artículo «texto escrito»**, complete el modal y guarde. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Catálogos → Materiales**.
+Si falta el artículo, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar material «texto escrito»**, complete **Presentación**, **Unidad de medida**, medidas cuando apliquen y mínimo, y guarde. No necesita elegir antes un proveedor. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Catálogos → Materiales**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**

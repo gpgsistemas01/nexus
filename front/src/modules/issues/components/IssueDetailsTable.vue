@@ -109,6 +109,11 @@ const cardValue = (item: IssueDetail, key: string) => {
     if (['base', 'height', 'quantity', 'suppliedQuantity', 'returnedQuantity'].includes(key))
         return numberText(item[key as keyof IssueDetail] as number | null);
 
+    if (key === 'name')
+        return [item.name, item.supplierName ? `Proveedor: ${item.supplierName}` : '']
+            .filter(Boolean)
+            .join('\n');
+
     if (key === 'convertedQuantity')
         return convertedQuantityText(item.convertedQuantity, item.unitMeasure);
 
@@ -154,11 +159,13 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
         fit-columns
         mobile-cards
         details
+        :class="{ 'table-frame--entry': !!$slots.entry }"
     >
         <VDataTable
             v-model:sort-by="sortBy"
             :headers="headers"
             :items="rows"
+            :hide-no-data="!!$slots.entry"
             item-value="id"
             :items-per-page="10"
             :items-per-page-options="[10, 20, 50]"
@@ -168,12 +175,27 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
             items-per-page-text="Detalles por página:"
             page-text="{0}–{1} de {2}"
         >
+            <template #[`body.append`]="{ columns }">
+                <slot
+                    name="entry"
+                    :columns="columns.map((column) => String(column.key))"
+                />
+            </template>
             <template
                 v-for="key in numeric"
                 :key="key"
                 #[`item.${key}`]="{ item }"
             >
                 {{ numberText(item[key]) }}
+            </template>
+            <template #[`item.name`]="{ item }">
+                <span>{{ item.name }}</span>
+                <small
+                    v-if="item.supplierName"
+                    class="detail-supplier"
+                >
+                    Proveedor: {{ item.supplierName }}
+                </small>
             </template>
             <template #[`item.convertedQuantity`]="{ item }">
                 {{ convertedQuantityText(item.convertedQuantity, item.unitMeasure) }}
@@ -256,7 +278,15 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
             :sort-value="sortValue"
             @sort-by="sortBy = $event"
         >
-            <template #[`item.name`]="{ item }">{{ item.name }}</template>
+            <template #[`item.name`]="{ item }">
+                <span>{{ item.name }}</span>
+                <small
+                    v-if="item.supplierName"
+                    class="detail-supplier"
+                >
+                    Proveedor: {{ item.supplierName }}
+                </small>
+            </template>
             <template #[`item.fulfillmentStatus`]="{ item }">
                 {{ item.fulfillmentStatus || '—' }}
             </template>
@@ -309,3 +339,11 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
         </ResponsiveTableCards>
     </TableFrame>
 </template>
+
+<style scoped>
+.detail-supplier {
+    display: block;
+    color: rgb(var(--v-theme-muted));
+    font-size: 0.8rem;
+}
+</style>

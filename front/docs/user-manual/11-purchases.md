@@ -30,9 +30,11 @@ Abra **Compras → Consumibles**. Busque por folio, factura, proveedor, persona 
 
 1. Pulse **Nueva compra** y seleccione proveedor y persona que recibe.
 2. Elija **Factura** o **Remisión**, capture el número cuando corresponda y revise la fecha.
-3. Seleccione el artículo, capture **Cantidad** y **Costo por Presentación** y pulse **Agregar**.
+3. En el último renglón de la tabla, seleccione el artículo bajo **Material**, capture **Cantidad** y **Costo por Presentación** en sus columnas y pulse **Agregar**.
 4. Repita para las demás partidas y revise cantidades e importes estimados.
 5. Pulse **Guardar** y compruebe el folio y la existencia recibida.
+
+Todos los detalles pertenecen al **Proveedor** del encabezado; no se repite en el nombre de cada artículo. En móvil la captura se apila y conserva los mismos valores.
 
 <!-- module:any reference compras-materiales -->
 

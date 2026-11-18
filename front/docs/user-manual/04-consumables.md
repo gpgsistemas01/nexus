@@ -37,7 +37,7 @@ IDs/versiones incluidos para editar o ajustar.
 
 Presentación, unidad, medidas y mínimo provienen del catálogo. PIEZA exige enteros; KILOGRAMOS y METRO LINEAL admiten decimales y representan una unidad `1 × 1`.
 
-Si falta el consumible, seleccione primero el proveedor, **escriba el nombre en Consumible** y pulse **Registrar artículo «texto escrito»** después de la búsqueda. Complete el modal; al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Catálogos → Materiales**.
+Si falta el consumible, **escriba el nombre en Consumible** y pulse **Registrar consumible «texto escrito»** después de la búsqueda. Complete el modal; el tipo Consumible está definido por el módulo y no necesita elegir antes un proveedor. Al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Catálogos → Materiales**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**

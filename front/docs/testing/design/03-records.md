@@ -40,3 +40,7 @@ correspondientes](../01-test-plan.md#niveles-y-entornos).
 `RF-CAT-030`: Materiales reutiliza Catálogos con columnas y captura de identidad, sin Activo. `catalogEditorTest.ts` y `catalogServiceTest.ts` cubren payload, respuesta y edición restringida; `catalogs.spec.ts` prueba consulta/alta/edición con una cuenta sólo de catálogos. La integración `catalogControllersDbTest.js` cubre ambos tipos, ausencia de oferta/stock, validación, identidad protegida y versión obsoleta.
 
 Catálogo de Materiales: particiones sin/con proveedor para habilitación y payload de edición. Almacén: selección del catálogo por ID, datos de stock, alta auxiliar y permisos separados de los demás catálogos.
+
+`detailEntry.spec.ts` comprueba alineación con los encabezados, conservación de captura al cambiar el ancho y distinción de proveedores del mismo artículo en tabla y fichas. El nombre comercial es presentación; las solicitudes siguen usando los IDs del material y proveedor.
+
+El alta contextual de Almacén cubre Material/Consumible antes de elegir proveedor, tipo fijado, cancelación sin pérdida de stock capturado y selección del registro creado. El alta del proveedor mantiene su propio permiso y modal.

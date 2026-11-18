@@ -15,6 +15,9 @@ flowchart TB
     editorPage["IssueEditorPage"]
     editor["useIssueEditor"]
     form["IssueEditor"]
+    entryPage["IssueLineEntryPage"]
+    entryForm["IssueLineEntryForm"]
+    entryRow["DetailEntryRow"]
     returnPage["IssueReturnPage"]
     returns["useIssueReturn"]
     service["issueService"]
@@ -28,6 +31,9 @@ flowchart TB
     actions --> service
     editorPage --> editor
     editorPage --> form
+    editorPage --> entryPage
+    entryPage --> entryForm
+    entryForm --> entryRow
     editorPage --> returnPage
     returnPage --> returns
     editor --> service

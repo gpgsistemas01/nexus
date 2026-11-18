@@ -23,6 +23,7 @@ export const user = {
     'wastes:adjust-stock',
     'inventory:costs-read',
     'catalogs:manage',
+    'material-catalogs:manage',
     'suppliers:read',
     'warehouse:reports-read',
     'presentations:read',

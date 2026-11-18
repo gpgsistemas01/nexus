@@ -2,32 +2,39 @@
 import { shallowRef } from 'vue';
 import { PERMISSIONS } from '@nexus/permissions';
 import { usePageAccess } from '../composables/usePageAccess.js';
-import InventoryEditorPage from '../../modules/warehouse/pages/InventoryEditorPage.vue';
-import type { ItemCreation } from '../../shared/lookup.js';
-import type { LookupItem } from '../../shared/lookup.js';
+import CatalogEditorPage from '../../modules/catalogs/pages/CatalogEditorPage.vue';
+import type { CatalogEntry } from '../../modules/catalogs/catalog.js';
+import { mapMaterialOption } from '../../shared/utils/mapMaterialOption.js';
 import InventoryPage from '../../modules/warehouse/pages/InventoryPage.vue';
 import DirectoryCreationPage from './DirectoryCreationPage.vue';
 import type { InventoryResource } from '../../modules/warehouse/inventory.js';
 import type { LookupCreation } from '../../shared/lookup.js';
 
 const props = defineProps<{ resource: InventoryResource }>();
-const { has, session, onDenied } = usePageAccess();
-const articleCreation = shallowRef<ItemCreation>();
+const { has, onDenied } = usePageAccess();
+const articleCreation = shallowRef<LookupCreation>();
 
-const createArticle = (request: ItemCreation) => {
-    if (
-        props.resource !== 'wastes' &&
-        has(PERMISSIONS.MATERIALS_WRITE) &&
-        has(PERMISSIONS.PRESENTATIONS_READ) &&
-        has(PERMISSIONS.UNIT_MEASURES_READ)
-    )
+const createArticle = (request: LookupCreation) => {
+    if (props.resource !== 'wastes' && has(PERMISSIONS.MATERIAL_CATALOGS_MANAGE))
         articleCreation.value = request;
 };
 
-const articleSaved = (item?: LookupItem) => {
-    if (!item || !articleCreation.value) return;
+const articleSaved = (entry: CatalogEntry) => {
+    if (!articleCreation.value) return;
 
-    articleCreation.value.onCreated(item);
+    const option = mapMaterialOption(
+        {
+            material: {
+                ...entry,
+                base: entry.base || null,
+                height: entry.height || null,
+                presentation: { name: entry.presentation },
+                unitMeasure: { name: entry.unitMeasure, symbol: entry.unitSymbol },
+            },
+        },
+        props.resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+    );
+    articleCreation.value.onCreated(option);
     articleCreation.value = undefined;
 };
 
@@ -49,17 +56,18 @@ const createSupplier = (request: LookupCreation) => {
         @create-supplier="createSupplier"
         @create-article="createArticle"
     />
-    <InventoryEditorPage
+    <CatalogEditorPage
         v-if="articleCreation && resource !== 'wastes'"
-        :resource="resource"
-        :target="{ action: 'create', initialName: articleCreation.search }"
-        :user-id="session.user.value!.id"
-        creation-context="goodsReceipt"
-        :initial-supplier="articleCreation.supplier"
+        catalog="materials"
+        :target="{
+            action: 'create',
+            initialName: articleCreation.search,
+            materialType: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+        }"
         @saved="articleSaved"
         @close="articleCreation = undefined"
         @reload="articleCreation = undefined"
-        @unauthorized="onDenied(401)"
+        @denied="onDenied"
     />
     <DirectoryCreationPage
         v-if="creation"

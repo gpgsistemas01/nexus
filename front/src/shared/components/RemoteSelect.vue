@@ -17,6 +17,7 @@ const props = withDefaults(
         hint?: string;
         initialOption?: LookupItem;
         createLabel?: string;
+        selectedTitle?: string;
     }>(),
     {
         state: () => ({ items: [], isLoading: false, error: '', hasMore: false }),
@@ -24,6 +25,7 @@ const props = withDefaults(
         hint: undefined,
         initialOption: undefined,
         createLabel: undefined,
+        selectedTitle: undefined,
     },
 );
 const emit = defineEmits<{
@@ -106,7 +108,7 @@ const loadWhenVisible = (isVisible: boolean) => {
         :item-props="(item) => ({ disabled: item.isDisabled === true })"
         :loading="state.isLoading"
         :disabled="isDisabled"
-        :hint="hint"
+        :hint="hint || (createLabel ? 'Escribe el nombre para buscar o registrar.' : undefined)"
         :persistent-hint="!!hint && isDisabled"
         :error-messages="error || state.error"
         :aria-label="label"
@@ -122,6 +124,12 @@ const loadWhenVisible = (isVisible: boolean) => {
         @update:menu="updateMenu"
         @blur="emit('blur')"
     >
+        <template
+            v-if="selectedTitle"
+            #selection
+        >
+            {{ selectedTitle }}
+        </template>
         <template #no-data>
             <div
                 class="catalog-status"

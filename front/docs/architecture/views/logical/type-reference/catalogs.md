@@ -81,7 +81,8 @@ keyof CatalogValues
 **Definición completa:**
 
 ```typescript
-{ action: 'create' } | { action: 'edit'; row: CatalogEntry }
+| { action: 'create'; initialName?: string; materialType?: 'MATERIAL' | 'CONSUMABLE' }
+    | { action: 'edit'; row: CatalogEntry }
 ```
 
 | Relación | Destino | Origen de la referencia |
@@ -104,6 +105,7 @@ keyof CatalogValues
 | `maxNameLength` | `maxNameLength: number;` |
 | `maxSymbolLength` | `maxSymbolLength?: number;` |
 | `isEditing` | `isEditing: boolean;` |
+| `isTypeFixed` | `isTypeFixed?: boolean;` |
 | `isMaterial` | `isMaterial?: boolean;` |
 | `canEditIdentity` | `canEditIdentity?: boolean;` |
 | `fixedMeasurements` | `fixedMeasurements?: boolean;` |
@@ -123,7 +125,7 @@ keyof CatalogValues
 
 ## CatalogForm.defineEmits
 
-**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 30, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -175,7 +177,7 @@ keyof CatalogValues
 
 ## FormValues
 
-**Fuente:** [src/modules/catalogs/composables/useCatalogEditor.ts](../../../../../src/modules/catalogs/composables/useCatalogEditor.ts) · línea 23, columna 5. **Declaración:** type.
+**Fuente:** [src/modules/catalogs/composables/useCatalogEditor.ts](../../../../../src/modules/catalogs/composables/useCatalogEditor.ts) · línea 29, columna 5. **Declaración:** type.
 
 **Definición completa:**
 
@@ -207,10 +209,14 @@ Required<CatalogValues>
 
 | Miembro | Firma completa |
 | --- | --- |
-| `saved` | `saved: [];` |
+| `saved` | `saved: [entry: CatalogEntry];` |
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |
-| `denied` | `denied: [status: number]` |
+| `denied` | `denied: [status: number];` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `saved` |
 
 ## CatalogPage.defineProps
 

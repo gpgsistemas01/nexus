@@ -230,3 +230,24 @@ it('editar un artículo sin proveedor permite cambiar toda su identidad', async 
   );
   wrapper.unmount();
 });
+
+it.each(['MATERIAL', 'CONSUMABLE'] as const)(
+  'alta contextual precarga el nombre y el tipo %s y devuelve el registro creado',
+  async (materialType) => {
+    const target = { action: 'create' as const, initialName: 'Artículo buscado', materialType };
+    const { editor, saved, request, wrapper } = openEditor('materials', target);
+    expect(editor.values.name).toBe('Artículo buscado');
+    expect(editor.values.type).toBe(materialType);
+    editor.update('presentationId', entry.id);
+    editor.update('unitMeasureId', entry.id);
+    await editor.submit();
+    expect(request).toHaveBeenCalledWith(
+      'materials',
+      target,
+      expect.objectContaining({ name: 'Artículo buscado', type: materialType }),
+      expect.any(AbortSignal),
+    );
+    expect(saved).toHaveBeenCalledWith(entry);
+    wrapper.unmount();
+  },
+);

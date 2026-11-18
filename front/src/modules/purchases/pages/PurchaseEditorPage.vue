@@ -99,10 +99,11 @@ const title = document
             emit('createSupplier', { search: $event, onCreated: editor.selectCreatedSupplier })
         "
     >
-        <template #entry>
+        <template #entry="{ columns }">
             <PurchaseLineEntryPage
                 v-if="supplier && !editor.isReadOnly"
                 :key="supplier.id"
+                :columns="columns"
                 :resource="resource"
                 :supplier="supplier"
                 :is-disabled="isSubmitting"

@@ -34,10 +34,10 @@ sequenceDiagram
         Form->>Page: emit(update, materialId, id)
         Page->>Editor: update(materialId, id)
         Editor-->>Selection: identidad seleccionada
-        opt Artículo faltante con proveedor seleccionado
+        opt Artículo faltante y permiso de catálogo
             Page->>Page: emit(createArticle, búsqueda y callback)
-            Note over Page,Service: InventoryWorkspace abre el mismo editor con creationContext goodsReceipt.
-            Service-->>Editor: artículo nuevo sin stock ni vínculo
+            Note over Page,Service: InventoryWorkspace abre CatalogEditorPage con nombre y tipo del módulo.
+            Note over Page,Selection: CatalogEditorPage devuelve la identidad y Workspace conserva la selección.
             Editor->>Selection: selectCreatedArticle(artículo)
         end
     else Modal de identidad o alta de merma

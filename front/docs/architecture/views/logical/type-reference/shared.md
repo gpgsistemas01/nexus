@@ -4,6 +4,19 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 [Alcance y notación](index.md#alcance-y-notación).
 
+## DetailEntryRow.defineProps
+
+**Fuente:** [src/shared/components/DetailEntryRow.vue](../../../../../src/shared/components/DetailEntryRow.vue) · línea 7, columna 27. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `columns` | `columns: string[];` |
+| `selected` | `selected?: LookupItem` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [LookupItem](../../../../../src/shared/lookup.ts) | `selected` |
+
 ## DocumentReadDialog.defineProps
 
 **Fuente:** [src/shared/components/DocumentReadDialog.vue](../../../../../src/shared/components/DocumentReadDialog.vue) · línea 8, columna 13. **Declaración:** SFC contract.
@@ -210,6 +223,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `hint` | `hint?: string;` |
 | `initialOption` | `initialOption?: LookupItem;` |
 | `createLabel` | `createLabel?: string;` |
+| `selectedTitle` | `selectedTitle?: string;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -218,7 +232,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## RemoteSelect.defineEmits
 
-**Fuente:** [src/shared/components/RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue) · línea 31, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

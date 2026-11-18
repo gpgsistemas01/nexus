@@ -27,7 +27,9 @@ export interface CatalogQuery {
     page: number;
     length: number;
 }
-export type CatalogTarget = { action: 'create' } | { action: 'edit'; row: CatalogEntry };
+export type CatalogTarget =
+    | { action: 'create'; initialName?: string; materialType?: 'MATERIAL' | 'CONSUMABLE' }
+    | { action: 'edit'; row: CatalogEntry };
 
 export const catalogDefinition = (name: CatalogName) => {
     const definition = PUBLIC_CATALOGS[name];

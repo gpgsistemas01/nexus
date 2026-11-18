@@ -18,6 +18,7 @@ defineProps<{
     maxNameLength: number;
     maxSymbolLength?: number;
     isEditing: boolean;
+    isTypeFixed?: boolean;
     isMaterial?: boolean;
     canEditIdentity?: boolean;
     fixedMeasurements?: boolean;
@@ -71,6 +72,7 @@ const emit = defineEmits<{
         />
         <template v-if="isMaterial">
             <VSelect
+                v-if="!isTypeFixed"
                 label="Tipo"
                 :items="[
                     { title: 'Material', value: 'MATERIAL' },
@@ -78,7 +80,7 @@ const emit = defineEmits<{
                 ]"
                 :model-value="values.type"
                 :error-messages="errors.type"
-                :disabled="!canEditIdentity || isSubmitting || isConflicted"
+                :disabled="!canEditIdentity || isTypeFixed || isSubmitting || isConflicted"
                 @update:model-value="emit('update', 'type', $event)"
             />
             <RemoteSelect

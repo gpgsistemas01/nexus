@@ -1,3 +1,5 @@
+import { mockCatalogs } from './catalogFixtures.js';
+import { user } from '../fixtures/inventory.js';
 import { expect, test } from '@playwright/test';
 import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { ids, material, pageOf, waste } from '../fixtures/inventory.js';
@@ -849,76 +851,82 @@ test('merma histórica: conserva pesos, referencia y medidas como consulta al ed
   await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
 });
 
-test(
-  'almacén: registra un artículo faltante en modal y conserva los datos de stock',
-  { tag: '@essential' },
-  async ({ page }) => {
-    await mockWarehouse(page);
-    const newId = '99999999-9999-4999-8999-999999999999';
-    const writes: Record<string, unknown>[] = [];
-    await page.route('**/api/warehouse/materials**', async (route) => {
-      if (route.request().method() === 'GET') return route.fallback();
-      const body = route.request().postDataJSON();
-      writes.push(body);
-      return route.fulfill({
-        json: {
-          code: 'CREATED_MATERIAL',
-          ...(body.creationContext === 'goodsReceipt'
-            ? {
-                material: {
-                  material: { ...material.material, id: newId, type: 'MATERIAL', name: body.name },
-                },
-              }
-            : {}),
-        },
+for (const [path, resource, label, type] of [
+  ['materiales', 'materials', 'Material', 'MATERIAL'],
+  ['consumibles', 'consumables', 'Consumible', 'CONSUMABLE'],
+] as const) {
+  test(
+    `almacén ${resource}: registra artículo antes del proveedor y conserva stock`,
+    { tag: '@essential' },
+    async ({ page }) => {
+      const { store, writes: catalogWrites } = await mockCatalogs(page, [
+        ...user.permissions,
+        'suppliers:manage',
+      ]);
+      store.set('presentations', [
+        { id: ids.presentation, name: 'PIEZA', isActive: true, version: 0 },
+      ]);
+      store.set('unit-measures', [
+        { id: ids.unit, name: 'PIEZA', symbol: 'PZA.', isActive: true, version: 0 },
+      ]);
+      const stockWrites: Record<string, unknown>[] = [];
+      await page.route(`**/api/warehouse/${resource}`, async (route) => {
+        stockWrites.push(route.request().postDataJSON());
+        return route.fulfill({ json: { code: 'CREATED_MATERIAL' } });
       });
-    });
-    await page.goto('/almacen/materiales');
-    await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-    const main = page.getByRole('dialog', { name: 'Crear material', exact: true }).first();
-    await chooseOption(page, 'Proveedor', 'Proveedor Central', main);
-    await main.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }).fill('4.25');
-    await main.getByRole('combobox', { name: 'Material', exact: true }).fill('Artículo nuevo');
-    await page
-      .getByRole('button', { name: 'Registrar artículo «Artículo nuevo»', exact: true })
-      .click();
-    let auxiliary = page.getByRole('dialog', { name: 'Crear material', exact: true }).last();
-    await expect(auxiliary.getByRole('textbox', { name: 'Nombre', exact: true })).toHaveValue(
-      'Artículo nuevo',
-    );
-    await auxiliary.getByRole('button', { name: 'Cerrar', exact: true }).click();
-    expect(writes).toEqual([]);
-    await expect(
-      main.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }),
-    ).toHaveValue('4.25');
-    await main.getByRole('combobox', { name: 'Material', exact: true }).fill('Artículo nuevo');
-    await page
-      .getByRole('button', { name: 'Registrar artículo «Artículo nuevo»', exact: true })
-      .click();
-    auxiliary = page.getByRole('dialog', { name: 'Crear material', exact: true }).last();
-    await chooseOption(page, 'Presentación', 'ROLLO', auxiliary);
-    await chooseOption(page, 'Unidad de medida', 'Metros cuadrados', auxiliary);
-    await auxiliary.getByRole('spinbutton', { name: 'Base (m)', exact: true }).fill('2');
-    await auxiliary.getByRole('spinbutton', { name: 'Altura (m)', exact: true }).fill('50');
-    await auxiliary.getByRole('button', { name: 'Guardar', exact: true }).click();
-    await expect(page.getByRole('dialog', { name: 'Crear material', exact: true })).toHaveCount(1);
-    await expect(main.getByRole('combobox', { name: 'Material', exact: true })).toHaveValue(
-      'Artículo nuevo · 2 × 50 · ROLLO',
-    );
-    await expect(
-      main.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }),
-    ).toHaveValue('4.25');
-    expect(writes[0]).toMatchObject({ creationContext: 'goodsReceipt', name: 'Artículo nuevo' });
-    expect(writes[0]).not.toHaveProperty('newStock');
-    await main.getByRole('button', { name: 'Guardar', exact: true }).click();
-    await expect(main).toBeHidden();
-    expect(writes[1]).toEqual({
-      materialId: newId,
-      supplierId: ids.supplier,
-      maxUnitCost: 0,
-      newStock: 4.25,
-      isActive: true,
-      observations: '',
-    });
-  },
-);
+      await page.goto(`/almacen/${path}`);
+      await page.getByRole('button', { name: `Nuevo ${label.toLowerCase()}`, exact: true }).click();
+      const main = page.getByRole('dialog', { name: `Crear ${label.toLowerCase()}`, exact: true });
+      await main.getByLabel('Cantidad inicial', { exact: true }).fill('4');
+      const term = `Artículo nuevo ${resource}`;
+      await main.getByRole('combobox', { name: label, exact: true }).fill(term);
+      await page
+        .getByRole('button', { name: `Registrar ${label.toLowerCase()} «${term}»`, exact: true })
+        .click();
+      const auxiliary = page.getByRole('dialog', {
+        name: `Registrar ${label.toLowerCase()}`,
+        exact: true,
+      });
+      await expect(auxiliary.getByLabel('Nombre', { exact: true })).toHaveValue(term);
+      await expect(auxiliary.getByRole('combobox', { name: 'Proveedor', exact: true })).toHaveCount(
+        0,
+      );
+      await expect(auxiliary.getByRole('combobox', { name: 'Tipo', exact: true })).toHaveCount(0);
+      await auxiliary.getByRole('button', { name: 'Cerrar', exact: true }).click();
+      expect(catalogWrites).toEqual([]);
+      await expect(main.getByLabel('Cantidad inicial', { exact: true })).toHaveValue('4');
+      await main.getByRole('combobox', { name: label, exact: true }).fill(term);
+      await page
+        .getByRole('button', { name: `Registrar ${label.toLowerCase()} «${term}»`, exact: true })
+        .click();
+      await chooseOption(page, 'Presentación', 'PIEZA', auxiliary);
+      await chooseOption(page, 'Unidad de medida', 'PIEZA (PZA.)', auxiliary);
+      await auxiliary.getByRole('button', { name: 'Guardar', exact: true }).click();
+      await expect(auxiliary).toBeHidden();
+      await expect(main.getByRole('combobox', { name: label, exact: true })).toHaveValue(
+        `${term} · PIEZA`,
+      );
+      await expect(main.getByRole('combobox', { name: 'Proveedor', exact: true })).toHaveValue('');
+      expect(catalogWrites[0]?.data).toEqual({
+        name: term,
+        type,
+        presentationId: ids.presentation,
+        unitMeasureId: ids.unit,
+        base: null,
+        height: null,
+      });
+      expect(stockWrites).toEqual([]);
+      await chooseOption(page, 'Proveedor', 'Proveedor Central', main);
+      await main.getByRole('button', { name: 'Guardar', exact: true }).click();
+      await expect(main).toBeHidden();
+      expect(stockWrites[0]).toEqual({
+        materialId: '22222222-2222-4222-8222-222222222222',
+        supplierId: ids.supplier,
+        maxUnitCost: 0,
+        newStock: 4,
+        isActive: true,
+        observations: '',
+      });
+    },
+  );
+}

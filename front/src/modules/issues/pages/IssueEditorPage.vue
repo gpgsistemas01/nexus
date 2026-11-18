@@ -133,8 +133,9 @@ const openReturnDialog = (line: IssueDetail) => {
         @close="emit('close')"
         @reload="emit('reload')"
     >
-        <template #entry>
+        <template #entry="{ columns }">
             <IssueLineEntryPage
+                :columns="columns"
                 :resource="resource"
                 :is-disabled="editor.isSubmitting.value"
                 :can-read="canReadItems"
