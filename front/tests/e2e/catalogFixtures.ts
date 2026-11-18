@@ -33,7 +33,16 @@ export interface Entry {
   id: string;
   name: string;
   symbol?: string;
-  isActive: boolean;
+  isActive?: boolean;
+  _count?: { supplierMaterials: number };
+  type?: string;
+  presentationId?: string;
+  unitMeasureId?: string;
+  presentation?: { name: string };
+  unitMeasure?: { name: string; symbol: string };
+  base?: string | number | null;
+  height?: string | number | null;
+  minStock?: string | number;
   version: number;
 }
 export const entryId = '11111111-1111-4111-8111-111111111111';
@@ -53,6 +62,22 @@ export const mockCatalogs = async (page: Page, permissions = user.permissions) =
       ],
     ]),
   );
+  store.set('materials', [
+    {
+      id: entryId,
+      name: 'Material de catálogo',
+      _count: { supplierMaterials: 1 },
+      type: 'MATERIAL',
+      version: 7,
+      presentationId: entryId,
+      unitMeasureId: entryId,
+      presentation: { name: 'PIEZA' },
+      unitMeasure: { name: 'PIEZA', symbol: 'PZA.' },
+      base: null,
+      height: null,
+      minStock: '0',
+    },
+  ]);
   const writes: { method: string; catalog: string; data: Record<string, unknown> }[] = [];
   const reads: URL[] = [];
   await page.route('**/api/admin/catalogs/**', async (route) => {
@@ -77,13 +102,35 @@ export const mockCatalogs = async (page: Page, permissions = user.permissions) =
     }
     const body = route.request().postDataJSON();
     writes.push({ method, catalog: name, data: body });
-    const saved = {
-      id: method === 'POST' ? '22222222-2222-4222-8222-222222222222' : entryId,
-      name: body.name,
-      ...(name === 'unit-measures' ? { symbol: body.symbol } : {}),
-      isActive: body.isActive,
-      version: method === 'POST' ? 0 : 8,
-    };
+    const previous = rows.find((row) => row.id === entryId);
+    const saved: Entry =
+      name === 'materials'
+        ? {
+            id: method === 'POST' ? '22222222-2222-4222-8222-222222222222' : entryId,
+            name: String(body.name),
+            version: method === 'POST' ? 0 : 8,
+            _count: method === 'POST' ? { supplierMaterials: 0 } : previous?._count,
+            type: body.type ?? previous?.type,
+            presentationId: body.presentationId ?? previous?.presentationId,
+            unitMeasureId: body.unitMeasureId ?? previous?.unitMeasureId,
+            presentation: previous?.presentation ?? {
+              name: store.get('presentations')?.[0]?.name ?? '',
+            },
+            unitMeasure: previous?.unitMeasure ?? {
+              name: store.get('unit-measures')?.[0]?.name ?? '',
+              symbol: store.get('unit-measures')?.[0]?.symbol ?? '',
+            },
+            base: Object.hasOwn(body, 'base') ? body.base : previous?.base,
+            height: Object.hasOwn(body, 'height') ? body.height : previous?.height,
+            minStock: body.minStock ?? previous?.minStock ?? 0,
+          }
+        : {
+            id: method === 'POST' ? '22222222-2222-4222-8222-222222222222' : entryId,
+            name: body.name,
+            ...(name === 'unit-measures' ? { symbol: body.symbol } : {}),
+            isActive: body.isActive,
+            version: method === 'POST' ? 0 : 8,
+          };
     store.set(
       name,
       method === 'POST' ? [...rows, saved] : rows.map((row) => (row.id === entryId ? saved : row)),

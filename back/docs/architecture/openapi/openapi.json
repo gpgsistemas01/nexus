@@ -554,6 +554,9 @@
       },
       "MaterialCatalogList": {
         "$ref": "./components/warehouse-schemas.json#/MaterialCatalogList"
+      },
+      "MaterialOfferCreateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialOfferCreateRequest"
       }
     },
     "parameters": {

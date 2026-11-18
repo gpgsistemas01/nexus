@@ -22,6 +22,8 @@ defineProps<{
     isConfirmingDuplicate?: boolean;
     lookups: Record<string, LookupState>;
     supplier?: LookupItem;
+    article?: LookupItem;
+    canCreateArticle?: boolean;
     canCreateSupplier?: boolean;
 }>();
 const emit = defineEmits<{
@@ -34,6 +36,7 @@ const emit = defineEmits<{
     close: [];
     reload: [];
     createSupplier: [search: string];
+    createArticle: [search: string];
 }>();
 </script>
 
@@ -105,14 +108,25 @@ const emit = defineEmits<{
                                 :error="errors[field.name]"
                                 :is-disabled="isSubmitting"
                                 :lookup="lookups[field.name]"
-                                :initial-option="field.name === 'supplierId' ? supplier : undefined"
+                                :initial-option="
+                                    field.name === 'supplierId'
+                                        ? supplier
+                                        : field.name === 'materialId'
+                                          ? article
+                                          : undefined
+                                "
                                 :create-label="
                                     field.name === 'supplierId' && canCreateSupplier
                                         ? 'Registrar proveedor'
-                                        : undefined
+                                        : field.name === 'materialId' && canCreateArticle
+                                          ? 'Registrar artículo'
+                                          : undefined
                                 "
                                 @create="
-                                    field.name === 'supplierId' && emit('createSupplier', $event)
+                                    field.name === 'supplierId'
+                                        ? emit('createSupplier', $event)
+                                        : field.name === 'materialId' &&
+                                          emit('createArticle', $event)
                                 "
                                 @update="emit('update', field.name, $event)"
                                 @blur="emit('blur', field.name)"

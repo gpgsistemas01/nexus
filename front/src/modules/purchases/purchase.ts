@@ -1,6 +1,5 @@
 import type { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
 import type { RecordQuery } from '../../shared/list.js';
-import type { LookupCreation, LookupItem } from '../../shared/lookup.js';
 
 export type PurchaseResource = 'materials' | 'consumables';
 export type Decimal = string | number;
@@ -65,6 +64,3 @@ export type PurchaseTarget =
 export type PurchaseWriteTarget = Exclude<PurchaseTarget, { action: 'view' }>;
 export type PurchaseDetailChange =
     { action: 'correct'; quantity: number; costPerUnitType: number } | { action: 'cancel' };
-export interface ItemCreation extends LookupCreation {
-    supplier: LookupItem;
-}

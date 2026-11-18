@@ -122,13 +122,9 @@ test('materiales y consumibles: consulta, alta y ajuste', async ({ page }) => {
   await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'Crear material', exact: true })).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 1400 });
-  await page.getByLabel('Nombre', { exact: true }).fill('Lona de demostración');
   await chooseOption(page, 'Proveedor', 'Proveedor Central');
-  await chooseOption(page, 'Presentación', 'ROLLO');
-  await page.getByRole('combobox', { name: 'Unidad de medida', exact: true }).click();
-  await page.getByRole('option', { name: /Metros cuadrados/ }).click();
-  await page.getByLabel('Base (m)', { exact: true }).fill('2');
-  await page.getByLabel('Altura (m)', { exact: true }).fill('50');
+  await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO');
+  await page.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }).fill('4');
   await capture(page, '04-material-create');
   await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
   await page.setViewportSize({ width: 1440, height: 1100 });

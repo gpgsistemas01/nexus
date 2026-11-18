@@ -8,7 +8,7 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 | ID | Requisito | Estado |
 | --- | --- | --- |
 | RF-CAT-001 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar materiales y sus ofertas de proveedor sin modificar existencias. | Implementado |
-| RF-CAT-002 | Nexus debe permitir al Administrador del sistema de Sistemas consultar proveedores autorizados en su página independiente sin modificar sus datos; Almacén conserva las lecturas de los selectores operativos. | Implementado |
+| RF-CAT-002 | Nexus debe permitir al Personal de almacén y al Administrador del sistema consultar proveedores en su página independiente; la edición requiere su permiso específico. | Implementado |
 | RF-CAT-003 | Nexus debe permitir al Administrador del sistema de Sistemas consultar clientes autorizados en su página independiente sin modificar sus datos; Almacén conserva las lecturas de los selectores operativos. | Implementado |
 | RF-CAT-004 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar existencias de merma sin modificar sus datos ni existencias. | Implementado |
 | RF-CAT-005 | Nexus debe permitir al usuario autorizado consultar presentaciones activas sin modificar el catálogo. | Implementado |
@@ -36,6 +36,9 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 | RF-CAT-027 | Nexus debe permitir al Personal de almacén o al Administrador del sistema editar el nombre y stock mínimo compartidos de un consumible y el costo máximo y estado de la oferta seleccionada, sin cambiar su tipo, identidad física ni existencia. | Implementado |
 | RF-CAT-028 | Nexus debe permitir al Personal de almacén o al Administrador del sistema retirar una oferta de consumible sólo cuando no exista historia operativa protegida; la identidad sólo debe eliminarse cuando no conserve otras ofertas. | Implementado |
 | RF-CAT-029 | Nexus debe permitir al Administrador del sistema ajustar la existencia de un consumible mediante motivo y observaciones, conservando el ajuste y movimiento trazables; un recurso de otro tipo debe rechazarse. | Implementado |
+
+| RF-CAT-030 | Nexus debe permitir al Personal de almacén y al Administrador con material-catalogs:manage consultar, buscar y paginar la tabla Material desde Catálogos → Materiales, incluyendo ambos tipos sin ofertas duplicadas; crear identidades sin proveedor, costo ni stock, y editar todos sus datos con expectedVersion mientras no tenga proveedores vinculados. Con vínculo, sólo nombre y mínimo son editables. No existe estado activo de identidad. | Implementado |
+| RF-CAT-031 | El alta en Almacén debe seleccionar artículo y proveedor por ID y capturar costo máximo, disponibilidad, cantidad inicial y observaciones. La identidad procede del catálogo; el modal auxiliar registra un artículo faltante sin crear existencias ni vínculo hasta confirmar el formulario principal. | Implementado |
 
 ## Criterios de alta de artículos
 

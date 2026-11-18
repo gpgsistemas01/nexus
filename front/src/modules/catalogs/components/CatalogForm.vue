@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { VSelect } from 'vuetify/components/VSelect';
+import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
+import type { LookupState, LookupItem } from '../../../shared/lookup.js';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
@@ -15,6 +18,13 @@ defineProps<{
     maxNameLength: number;
     maxSymbolLength?: number;
     isEditing: boolean;
+    isMaterial?: boolean;
+    canEditIdentity?: boolean;
+    fixedMeasurements?: boolean;
+    presentations?: LookupState;
+    units?: LookupState;
+    selectedPresentation?: LookupItem;
+    selectedUnit?: LookupItem;
 }>();
 const emit = defineEmits<{
     update: [field: CatalogField, value: string | boolean];
@@ -22,6 +32,9 @@ const emit = defineEmits<{
     submit: [];
     close: [];
     reload: [];
+    search: [field: 'presentationId' | 'unitMeasureId', search: string];
+    more: [field: 'presentationId' | 'unitMeasureId'];
+    retry: [field: 'presentationId' | 'unitMeasureId'];
 }>();
 </script>
 
@@ -29,13 +42,19 @@ const emit = defineEmits<{
     <RecordEditorDialog
         :title="title"
         eyebrow="CATÁLOGOS"
-        :max-width="600"
+        :max-width="isMaterial ? 800 : 600"
         :is-submitting="isSubmitting"
         :is-conflicted="isConflicted"
         :message="message"
         reload-label="Cerrar y actualizar catálogo"
         :submit-label="isEditing ? 'Actualizar' : 'Guardar'"
-        note="Desactiva un registro para conservar su historial."
+        :note="
+            isMaterial
+                ? isEditing && !canEditIdentity
+                    ? 'Puede editar Nombre y Stock mínimo; tipo, presentación, unidad y medidas permanecen protegidos. Los datos se comparten entre proveedores.'
+                    : 'Sin proveedores vinculados puede editar todos los datos del artículo. Aquí no se registra stock ni costo.'
+                : 'Desactiva un registro para conservar su historial.'
+        "
         @close="emit('close')"
         @submit="emit('submit')"
         @reload="emit('reload')"
@@ -50,6 +69,82 @@ const emit = defineEmits<{
             @update:model-value="emit('update', 'name', $event ?? '')"
             @blur="emit('blur', 'name')"
         />
+        <template v-if="isMaterial">
+            <VSelect
+                label="Tipo"
+                :items="[
+                    { title: 'Material', value: 'MATERIAL' },
+                    { title: 'Consumible', value: 'CONSUMABLE' },
+                ]"
+                :model-value="values.type"
+                :error-messages="errors.type"
+                :disabled="!canEditIdentity || isSubmitting || isConflicted"
+                @update:model-value="emit('update', 'type', $event)"
+            />
+            <RemoteSelect
+                label="Presentación"
+                :model-value="values.presentationId ?? ''"
+                :state="presentations"
+                :initial-option="selectedPresentation"
+                :error="errors.presentationId"
+                :is-disabled="!canEditIdentity || isSubmitting || isConflicted"
+                @update:model-value="emit('update', 'presentationId', $event)"
+                @search="emit('search', 'presentationId', $event)"
+                @more="emit('more', 'presentationId')"
+                @retry="emit('retry', 'presentationId')"
+                @blur="emit('blur', 'presentationId')"
+            />
+            <RemoteSelect
+                label="Unidad de medida"
+                :model-value="values.unitMeasureId ?? ''"
+                :state="units"
+                :initial-option="selectedUnit"
+                :error="errors.unitMeasureId"
+                :is-disabled="!canEditIdentity || isSubmitting || isConflicted"
+                @update:model-value="emit('update', 'unitMeasureId', $event)"
+                @search="emit('search', 'unitMeasureId', $event)"
+                @more="emit('more', 'unitMeasureId')"
+                @retry="emit('retry', 'unitMeasureId')"
+                @blur="emit('blur', 'unitMeasureId')"
+            />
+            <template v-if="!fixedMeasurements">
+                <VTextField
+                    label="Base"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    :model-value="values.base"
+                    :error-messages="errors.base"
+                    :readonly="!canEditIdentity"
+                    :disabled="isSubmitting || isConflicted"
+                    @update:model-value="emit('update', 'base', $event ?? '')"
+                    @blur="emit('blur', 'base')"
+                />
+                <VTextField
+                    label="Altura"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    :model-value="values.height"
+                    :error-messages="errors.height"
+                    :readonly="!canEditIdentity"
+                    :disabled="isSubmitting || isConflicted"
+                    @update:model-value="emit('update', 'height', $event ?? '')"
+                    @blur="emit('blur', 'height')"
+                />
+            </template>
+            <VTextField
+                label="Stock mínimo"
+                type="number"
+                min="0"
+                step="0.01"
+                :model-value="values.minStock"
+                :error-messages="errors.minStock"
+                :disabled="isSubmitting || isConflicted"
+                @update:model-value="emit('update', 'minStock', $event ?? '')"
+                @blur="emit('blur', 'minStock')"
+            />
+        </template>
         <VTextField
             v-if="hasSymbol"
             label="Símbolo"
@@ -62,6 +157,7 @@ const emit = defineEmits<{
             @blur="emit('blur', 'symbol')"
         />
         <VCheckbox
+            v-if="!isMaterial"
             label="Activo"
             :model-value="values.isActive"
             :error-messages="errors.isActive"

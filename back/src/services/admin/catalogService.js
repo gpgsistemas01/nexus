@@ -1,3 +1,5 @@
+import { materialCatalogValidation, materialCatalogEditValidation } from '../../shared/validation/validators.js';
+import { findMaterialCatalogEntries, createMaterialCatalogEntry, updateMaterialCatalogEntry } from '../warehouse/materials/materialService.js';
 import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from '../../repository/paginationRepository.js';
 import { findManagedCatalog } from '../../constants/catalogs.js';
@@ -24,7 +26,12 @@ const removeInternalKey = (catalog, entry) => {
     return publicEntry;
 };
 
-const validateCatalogData = (catalog, data) => {
+const validateCatalogData = (catalog, data, isEditing = false) => {
+    if (catalog.model === 'material') {
+        const rules = isEditing ? materialCatalogEditValidation : materialCatalogValidation;
+        if (Object.entries(rules).some(([field, rule]) => rule(data[field], data))) throw new CatalogValidationError(catalog.label);
+        return;
+    }
     const hasInvalidName = typeof data.name !== 'string' || !data.name;
     const hasInvalidSymbol = catalog.fields.includes('symbol')
         && (typeof data.symbol !== 'string' || !data.symbol);
@@ -40,6 +47,7 @@ const validateCatalogData = (catalog, data) => {
 
 export const findAllCatalogEntries = async (catalogName, { skip = 0, take = 10, search = '' } = {}) => {
     const catalog = getCatalog(catalogName);
+    if (catalog.model === 'material') return findMaterialCatalogEntries({ skip, take, search });
     const model = getDb()[catalog.model];
     const where = search ? { name: { contains: search, mode: 'insensitive' } } : {};
 
@@ -64,6 +72,7 @@ export const createCatalogEntry = async (catalogName, input) => {
     const catalog = getCatalog(catalogName);
     const data = createCatalogEntryDto(catalog, input);
     validateCatalogData(catalog, data);
+    if (catalog.model === 'material') return createMaterialCatalogEntry(data);
     const entry = await getDb()[catalog.model].create({ data });
     return removeInternalKey(catalog, entry);
 };
@@ -71,7 +80,8 @@ export const createCatalogEntry = async (catalogName, input) => {
 export const updateCatalogEntry = async (catalogName, id, input) => {
     const catalog = getCatalog(catalogName);
     const data = createCatalogEntryDto(catalog, input);
-    validateCatalogData(catalog, data);
+    validateCatalogData(catalog, data, true);
+    if (catalog.model === 'material') return updateMaterialCatalogEntry(id, { ...data, expectedVersion: input.expectedVersion });
     try {
         const entry = await updateVersionedRecord({
             model: getDb()[catalog.model],

@@ -503,7 +503,7 @@ it('el reporte de Proveedores se incluye con permiso de reporte sin conceder alt
 });
 
 it.each(['almacen-auxiliar', 'almacen-coordinador'])(
-  '%s conserva altas contextuales en el manual sin páginas independientes de Directorio',
+  '%s conserva las altas contextuales y la consulta de proveedores',
   async (id) => {
     const session = demoSession(DEMO_PROFILES.find((profile) => profile.id === id)!);
     const chapters = selectedChapters(session.permissions).map(({ file }) => file);
@@ -512,16 +512,17 @@ it.each(['almacen-auxiliar', 'almacen-coordinador'])(
     const groups = APP_NAVIGATION_GROUPS.filter(({ links }) =>
       links.some(({ permission }) => session.permissions.includes(permission)),
     ).map(({ id }) => id);
-    expect(groups).not.toContain('directory');
+    expect(groups).toContain('directory');
     for (const file of ['09-clients.md', '10-suppliers.md']) {
       const content = filterManualContent(
         await readFile(path.resolve('docs/user-manual', file), 'utf8'),
         session.permissions,
       );
       expect(content).toContain('desde el selector');
-      expect(content).not.toContain('## Consulta independiente');
+      if (file === '09-clients.md') expect(content).not.toContain('## Consulta independiente');
+      else expect(content).toContain('## Consulta independiente');
       expect(content).not.toContain('## Editar y desactivar');
-      expect(content).not.toContain('Directorio comercial');
+      if (file === '09-clients.md') expect(content).not.toContain('Directorio comercial');
       expect(content).toMatch(/images\/(16-client-form|17-supplier-form)\.png/);
     }
   },

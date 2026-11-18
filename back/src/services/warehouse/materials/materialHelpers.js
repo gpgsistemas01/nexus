@@ -21,7 +21,7 @@ export const assertMaterialRollReference = ({ referenceConeWeightKg, referenceRo
     }
 };
 
-export const prepareMaterialData = async ({ tx, materialDto, materialId = null, context = null }) => {
+export const prepareMaterialData = async ({ tx, materialDto, materialId = null, context = null, requireSupplier = true }) => {
 
     const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...input } = materialDto;
 
@@ -32,7 +32,9 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null, 
     const measureError = rest.type === 'CONSUMABLE' || isFixedUnitPresentation(presentation)
         ? getUnitPresentationMeasurementsError(rest, presentation) : getPerPieceMeasureError(unit, rest);
     if (measureError) throw new AppError(measureError, 'PER_PIECE_MEASURE_INVALID', 400);
-    const supplier = context?.suppliers?.get(supplierId) ?? await findUniqueSupplier({ tx, id: supplierId });
+    const supplier = requireSupplier
+        ? context?.suppliers?.get(supplierId) ?? await findUniqueSupplier({ tx, id: supplierId })
+        : null;
 
     assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 

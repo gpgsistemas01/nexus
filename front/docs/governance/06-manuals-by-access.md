@@ -34,7 +34,7 @@ La configuración, ejecución y recuperación se explican en el
 | Perfiles de referencia | Acceso o área |
 | --- | --- |
 | `sistemas-admin` | Acceso completo: incluye ajustes, catálogos, usuarios, surtido y devolución. |
-| `almacen-auxiliar`, `almacen-coordinador` | Inventario, compras y salidas de todas las áreas, con surtido y devolución. Altas de clientes/proveedores desde selectores; sin páginas de Directorio, ajustes administrativos, Usuarios o Catálogos. |
+| `almacen-auxiliar`, `almacen-coordinador` | Inventario, compras y salidas de todas las áreas, con surtido y devolución. Altas de clientes/proveedores desde selectores; con consulta de Proveedores y gestión de Catálogos → Materiales; sin ajustes administrativos, Usuarios ni otros catálogos. |
 | `impresion-coordinador`, `impresion-operador` | Impresión. |
 | `taller-herreria-coordinador`, `taller-herreria-operador` | Taller/Herrería: clave `workshop_3d`, nombre TALLER 3D. |
 | `acabados-coordinador`, `acabados-operador` | Acabados. |

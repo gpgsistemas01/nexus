@@ -35,7 +35,10 @@ export const useRecordSave = <Result = unknown>(options: {
                 options.setErrors(cause.fieldErrors);
                 if (isFieldValidationError(cause, options.fields)) message.value = '';
 
-                isConflicted.value = cause.code === 'RECORD_VERSION_CONFLICT';
+                isConflicted.value = [
+                    'RECORD_VERSION_CONFLICT',
+                    'MATERIAL_IDENTITY_LINKED',
+                ].includes(cause.code);
                 if ([401, 403].includes(cause.status)) options.onDenied(cause.status);
             }
 

@@ -9,6 +9,7 @@ import { defineComponent, h } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useInventoryEditor } from '../../../../src/modules/warehouse/composables/useInventoryEditor.js';
+import { materialCatalogService } from '../../../../src/shared/services/materialCatalogService.js';
 import { inventoryService } from '../../../../src/modules/warehouse/services/inventoryService.js';
 import { ApiError } from '../../../../src/shared/http/apiError.js';
 import { ids, material, pageOf, template, user, waste } from '../../../fixtures/inventory.js';
@@ -22,9 +23,11 @@ const openEditor = (
   resource: InventoryResource,
   target: EditorTarget,
   lookup?: typeof inventoryCatalogService.lookup,
+  creationContext?: 'goodsReceipt',
 ) => {
   let editor!: ReturnType<typeof useInventoryEditor>;
   const saved = vi.fn();
+  vi.spyOn(materialCatalogService, 'list').mockResolvedValue(pageOf([]));
   const catalog = vi.spyOn(inventoryCatalogService, 'lookup');
   if (lookup) catalog.mockImplementation(lookup);
   else catalog.mockResolvedValue(pageOf([]));
@@ -38,6 +41,7 @@ const openEditor = (
           resource,
           target,
           userId: user.id,
+          creationContext,
           onSaved: saved,
           onUnauthorized: vi.fn(),
         });
@@ -109,12 +113,13 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     async (resource) => {
       const { editor, request } = openEditor(resource, { action: 'create' });
       await flushPromises();
-      await editor.blur('name');
+      const field = resource === 'wastes' ? 'name' : 'materialId';
+      await editor.blur(field);
       await editor.blur('supplierId');
       expect(editor.errors.value).toEqual({});
-      editor.update('name', ' ');
-      await editor.blur('name');
-      expect(editor.errors.value.name).toBeTruthy();
+      editor.update(field, ' ');
+      await editor.blur(field);
+      expect(editor.errors.value[field]).toBeTruthy();
       expect(editor.errors.value.supplierId).toBeUndefined();
       await editor.submit();
       expect(editor.errors.value.supplierId).toBeTruthy();
@@ -201,10 +206,11 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     expect(editor.errors.value[field]).toBeTruthy();
   });
 
-  it('el alta del consumible envía la medida por pieza', async () => {
+  it('el alta del consumible vincula el artículo seleccionado y sólo envía datos de stock', async () => {
     const { editor, request } = openEditor('consumables', { action: 'create' });
     for (const [field, value] of Object.entries({
       name: 'Cinta',
+      materialId: ids.material,
       supplierId: ids.supplier,
       presentationId: ids.presentation,
       unitMeasureId: ids.unit,
@@ -215,8 +221,14 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     }
     await editor.submit();
     expect(request).toHaveBeenCalledOnce();
-    expect(request.mock.calls[0]?.[2]).toHaveProperty('base', 1);
-    expect(request.mock.calls[0]?.[2]).toHaveProperty('height', 2.5);
+    expect(request.mock.calls[0]?.[2]).toEqual({
+      materialId: ids.material,
+      supplierId: ids.supplier,
+      maxUnitCost: 0,
+      isActive: true,
+      newStock: 0,
+      observations: '',
+    });
   });
 
   it.each(['materials', 'wastes'] as const)(
@@ -420,20 +432,24 @@ it.each([false, true])(
 it.each(['KILOGRAMOS', 'METRO LINEAL'])(
   'la presentación %s fija 1 × 1 sin depender de la unidad seleccionada',
   async (name) => {
-    const { editor, wrapper } = openEditor('consumables', { action: 'create' }, async (query) =>
-      pageOf(
-        query.path === 'presentations'
-          ? [{ id: ids.presentation, title: name, data: { id: ids.presentation, name } }]
-          : query.path === 'unit-measures'
-            ? [
-                {
-                  id: ids.unit,
-                  title: 'OTRA UNIDAD',
-                  data: { id: ids.unit, name: 'OTRA UNIDAD', symbol: 'u' },
-                },
-              ]
-            : [],
-      ),
+    const { editor, wrapper } = openEditor(
+      'consumables',
+      { action: 'create' },
+      async (query) =>
+        pageOf(
+          query.path === 'presentations'
+            ? [{ id: ids.presentation, title: name, data: { id: ids.presentation, name } }]
+            : query.path === 'unit-measures'
+              ? [
+                  {
+                    id: ids.unit,
+                    title: 'OTRA UNIDAD',
+                    data: { id: ids.unit, name: 'OTRA UNIDAD', symbol: 'u' },
+                  },
+                ]
+              : [],
+        ),
+      'goodsReceipt',
     );
     await flushPromises();
     editor.searchLookup('presentationId', '');

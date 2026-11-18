@@ -3,6 +3,7 @@ export const PERMISSIONS = Object.freeze({
     MATERIALS_READ: 'materials:read',
     MATERIALS_WRITE: 'materials:write',
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
+    MATERIAL_CATALOGS_MANAGE: 'material-catalogs:manage',
     CATALOGS_MANAGE: 'catalogs:manage',
     INVENTORY_COSTS_READ: 'inventory:costs-read',
     DEPARTMENTS_READ: 'departments:read',

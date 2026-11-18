@@ -292,9 +292,7 @@ test('select: coincidencias existentes, filtros y catálogos sólo consultables 
   await expect(page.getByRole('option', { name: 'Proveedor Central', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
   await page.keyboard.press('Escape');
-  await dialog
-    .getByRole('combobox', { name: 'Presentación', exact: true })
-    .fill('Presentación nueva');
+  await expect(dialog.getByRole('combobox', { name: 'Presentación', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Registrar presentación/ })).toHaveCount(0);
   await page.goto('/almacen/mermas');
   await page.getByRole('button', { name: 'Nueva merma', exact: true }).click();

@@ -1,5 +1,5 @@
 import {
-    materialCreateValidation,
+    materialOfferCreateValidation,
     goodsReceiptMaterialCreateValidation,
     materialEditValidation,
     materialStockValidation,
@@ -114,7 +114,7 @@ export const inventoryRules = (
         ? materialStockValidation
         : action === 'edit'
           ? materialEditValidation
-          : materialCreateValidation;
+          : materialOfferCreateValidation;
 };
 
 export const buildInventoryPayload = (
@@ -186,12 +186,10 @@ export const buildInventoryPayload = (
         };
 
     return {
-        ...data,
+        materialId: String(values.materialId),
         supplierId: String(values.supplierId),
-        presentationId: String(values.presentationId),
-        unitMeasureId: String(values.unitMeasureId),
-        base: values.base === '' ? null : Number(values.base),
-        height: values.height === '' ? null : Number(values.height),
+        isActive: Boolean(values.isActive),
+        maxUnitCost: Number(values.maxUnitCost),
         newStock: Number(values.newStock),
         observations,
     };

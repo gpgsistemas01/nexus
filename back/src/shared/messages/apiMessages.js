@@ -39,6 +39,7 @@ export const errorMessages = {
     WASTE_ISSUE_MISSING_MAX_UNIT_COST: meta => `Configure un costo unitario máximo mayor que cero en Almacén antes de usar la merma: ${ meta.materialName }.`,
     WASTE_ISSUE_FULFILLMENT_STATUS_NOT_FOUND: 'No están configurados los estados de surtido. Contacte al administrador.',
     MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
+    MATERIAL_IDENTITY_LINKED: 'El artículo ya tiene proveedores vinculados. Actualice el catálogo; sólo puede editar Nombre y Stock mínimo.',
     MATERIAL_ROLL_REFERENCE_READ_ONLY: 'Los pesos del rollo completo son históricos. Capture el peso del rollo completo al registrar merma.',
     WASTE_DIMENSIONS_INVALID: 'Complete las dimensiones de la merma o los pesos necesarios para calcularlas.',
     WASTE_MATERIAL_INVALID: 'Seleccione un material con unidad de metro cuadrado (m²) para registrar merma.',

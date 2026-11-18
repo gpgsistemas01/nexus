@@ -1023,7 +1023,8 @@
               "presentations",
               "unit-measures",
               "reasons",
-              "fulfillment-statuses"
+              "fulfillment-statuses",
+              "materials"
             ]
           },
           "description": "Catálogo permitido."
@@ -1112,7 +1113,8 @@
       "tags": [
         "Catálogos"
       ],
-      "summary": "Consultar registros de catálogo"
+      "summary": "Consultar registros de catálogo",
+      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage."
     },
     "post": {
       "operationId": "postManagedCatalog",
@@ -1134,7 +1136,8 @@
               "presentations",
               "unit-measures",
               "reasons",
-              "fulfillment-statuses"
+              "fulfillment-statuses",
+              "materials"
             ]
           },
           "description": "Catálogo permitido."
@@ -1145,7 +1148,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "title": "Áreas",
                   "type": "object",
@@ -1245,6 +1248,63 @@
                     "name"
                   ],
                   "additionalProperties": false
+                },
+                {
+                  "title": "Materiales",
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "MATERIAL",
+                        "CONSUMABLE"
+                      ]
+                    },
+                    "presentationId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "unitMeasureId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "base": {
+                      "type": [
+                        "number",
+                        "string",
+                        "null"
+                      ],
+                      "description": "Positiva y opcional; se captura junto con altura. Kg/metro lineal fijan 1 × 1."
+                    },
+                    "height": {
+                      "type": [
+                        "number",
+                        "string",
+                        "null"
+                      ],
+                      "description": "Positiva y opcional; se captura junto con base."
+                    },
+                    "minStock": {
+                      "type": [
+                        "number",
+                        "string"
+                      ],
+                      "minimum": 0,
+                      "description": "Opcional; vacío o ausente en alta usa 0. PIEZA exige un entero."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type",
+                    "presentationId",
+                    "unitMeasureId"
+                  ],
+                  "additionalProperties": false
                 }
               ]
             }
@@ -1293,7 +1353,8 @@
       "tags": [
         "Catálogos"
       ],
-      "summary": "Crear registro de catálogo"
+      "summary": "Crear registro de catálogo",
+      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage."
     }
   },
   "/api/admin/catalogs/{catalog}/{id}": {
@@ -1317,7 +1378,8 @@
               "presentations",
               "unit-measures",
               "reasons",
-              "fulfillment-statuses"
+              "fulfillment-statuses",
+              "materials"
             ]
           },
           "description": "Catálogo permitido."
@@ -1338,7 +1400,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "title": "Áreas",
                   "type": "object",
@@ -1480,6 +1542,66 @@
                     "expectedVersion"
                   ],
                   "additionalProperties": false
+                },
+                {
+                  "title": "Materiales",
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "minStock": {
+                      "type": [
+                        "number",
+                        "string"
+                      ],
+                      "minimum": 0,
+                      "description": "Opcional; vacío o ausente en alta usa 0. PIEZA exige un entero."
+                    },
+                    "expectedVersion": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "MATERIAL",
+                        "CONSUMABLE"
+                      ]
+                    },
+                    "presentationId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "unitMeasureId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "base": {
+                      "type": [
+                        "number",
+                        "string",
+                        "null"
+                      ],
+                      "description": "Positiva y opcional; se captura junto con altura. Kg/metro lineal fijan 1 × 1."
+                    },
+                    "height": {
+                      "type": [
+                        "number",
+                        "string",
+                        "null"
+                      ],
+                      "description": "Positiva y opcional; se captura junto con base."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "expectedVersion"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Sin proveedor permite modificar toda la identidad; con proveedor sólo nombre y minStock. Requiere expectedVersion. Un vínculo concurrente rechaza el cambio de identidad con MATERIAL_IDENTITY_LINKED."
                 }
               ]
             }
@@ -1541,7 +1663,8 @@
       "tags": [
         "Catálogos"
       ],
-      "summary": "Editar registro de catálogo"
+      "summary": "Editar registro de catálogo",
+      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage. Sin proveedor se permite editar toda la identidad; con proveedor sólo nombre y stock mínimo. expectedVersion es obligatorio."
     }
   },
   "/api/admin/reports/persons/excel": {

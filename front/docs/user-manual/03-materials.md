@@ -112,26 +112,14 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 <!-- manual:any materials:write -->
 ## Registrar un material
 
-**Antes de empezar.** Identifique proveedor, presentación y unidad del artículo.
-
 1. Pulse **Nuevo material** para abrir **Crear material**.
-2. Complete los campos de la tabla siguiente.
-3. Revise la presentación, unidad y cantidad inicial.
-4. Pulse **Guardar** y espere la confirmación.
-5. Localice el material en el listado y compruebe sus datos y existencias.
+2. Elija **Proveedor** y **Material**. La búsqueda incluye todo el catálogo, aunque el artículo todavía no tenga proveedor.
+3. Complete **Costo máximo unitario**, **Activo**, **Cantidad inicial** y **Observaciones**.
+4. Pulse **Guardar**. Se vincula el artículo al proveedor y se registra el stock inicial en una sola operación.
 
-| Campo | Cómo utilizarlo |
-| --- | --- |
-| Nombre | Identifique el material de forma reconocible para otros operadores. |
-| Proveedor | Seleccione el proveedor del registro. |
-| Presentación | Seleccione cómo se maneja el artículo, por ejemplo un rollo. |
-| Unidad de medida | Elija la unidad de su conversión o control. |
-| Base (m), Altura (m) | Capture las dimensiones cuando la unidad del material las requiera. |
-| Stock mínimo | Indique el umbral de referencia del inventario. |
-| Costo máximo unitario | Capture el costo correspondiente al campo, sin sustituirlo por el total de una compra. |
-| Activo | Manténgalo marcado si el artículo debe estar disponible para la operación. |
-| Cantidad inicial | Capture la existencia con la que comienza este registro. |
-| Observaciones | Explique la captura inicial cuando corresponda. |
+Nombre, presentación, unidad, medidas y mínimo pertenecen al catálogo; no se vuelven a capturar aquí. PIEZA exige cantidades enteras; KILOGRAMOS y METRO LINEAL admiten decimales y conservan `1 × 1`.
+
+Si falta el artículo, seleccione primero el proveedor, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar artículo «texto escrito»**, complete el modal y guarde. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Catálogos → Materiales**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**

@@ -67,7 +67,7 @@ describe('políticas funcionales de acceso', () => {
                 PERMISSIONS.INVENTORY_COSTS_READ, PERMISSIONS.WAREHOUSE_REPORTS_READ,
                 PERMISSIONS.GOODS_RECEIPTS_MANAGE, PERMISSIONS.GOODS_RECEIPTS_PAGE_VIEW,
                 PERMISSIONS.SUPPLIERS_MANAGE, PERMISSIONS.SUPPLIERS_UPDATE, PERMISSIONS.SUPPLIERS_PAGE_VIEW,
-                PERMISSIONS.CLIENTS_CREATE, PERMISSIONS.PERSONS_WRITE, PERMISSIONS.CATALOGS_MANAGE
+                PERMISSIONS.CLIENTS_CREATE, PERMISSIONS.PERSONS_WRITE, PERMISSIONS.CATALOGS_MANAGE, PERMISSIONS.MATERIAL_CATALOGS_MANAGE
             ]) {
                 expect(permissions).not.toContain(permission);
             }
@@ -189,7 +189,7 @@ describe('políticas funcionales de acceso', () => {
             PERMISSIONS.WASTE_ISSUES_SUPPLY,
             PERMISSIONS.INVENTORY_COSTS_READ, PERMISSIONS.WAREHOUSE_REPORTS_READ,
             PERMISSIONS.GOODS_RECEIPTS_MANAGE, PERMISSIONS.GOODS_RECEIPTS_PAGE_VIEW,
-            PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE,
+            PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE, PERMISSIONS.SUPPLIERS_PAGE_VIEW, PERMISSIONS.MATERIAL_CATALOGS_MANAGE,
             PERMISSIONS.CLIENTS_CREATE, PERMISSIONS.PERSONS_WRITE
         ]));
 
@@ -198,7 +198,7 @@ describe('políticas funcionales de acceso', () => {
             PERMISSIONS.MATERIALS_ADJUST_STOCK, PERMISSIONS.WASTES_ADJUST_STOCK,
             PERMISSIONS.CATALOGS_MANAGE, PERMISSIONS.USERS_MANAGE,
             PERMISSIONS.MOVEMENTS_READ, PERMISSIONS.SUPPLIERS_UPDATE,
-            PERMISSIONS.CLIENTS_PAGE_VIEW, PERMISSIONS.SUPPLIERS_PAGE_VIEW
+            PERMISSIONS.CLIENTS_PAGE_VIEW
         ]) {
             expect(permissions.includes(permission)).toBe(isSystemAdmin);
         }
@@ -224,7 +224,7 @@ describe('políticas funcionales de acceso', () => {
     });
 
     it.each([ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR])(
-        'conserva altas contextuales para Almacén con rol %s sin conceder páginas independientes', roleKey => {
+        'conserva altas contextuales para Almacén con rol %s sin conceder acceso a otros catálogos', roleKey => {
             const permissions = getGrantedPermissions([{
                 roleKey,
                 departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
@@ -235,7 +235,8 @@ describe('políticas funcionales de acceso', () => {
                 PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE
             ]));
             expect(permissions).not.toContain(PERMISSIONS.CLIENTS_PAGE_VIEW);
-            expect(permissions).not.toContain(PERMISSIONS.SUPPLIERS_PAGE_VIEW);
+            expect(permissions).toContain(PERMISSIONS.SUPPLIERS_PAGE_VIEW);
+            expect(permissions).toContain(PERMISSIONS.MATERIAL_CATALOGS_MANAGE);
         }
     );
 });

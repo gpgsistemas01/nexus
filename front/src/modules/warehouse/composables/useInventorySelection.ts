@@ -1,4 +1,7 @@
 import { isPerPieceMeasure, isFixedUnitPresentation } from '@nexus/waste-measurements';
+import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
+import { materialCatalogService } from '../../../shared/services/materialCatalogService.js';
+import { isRecord } from '../../../shared/utils/isRecord.js';
 import { computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
@@ -19,11 +22,24 @@ export const useInventorySelection = (options: {
     values: InventoryValues;
     isPending: Ref<boolean>;
     initialSupplier?: LookupItem;
+    creationContext?: 'goodsReceipt';
     setValue: (field: InventoryField, value: string) => void;
     clearError: (field: InventoryField) => void;
 }) => {
     const { resource, target, values, isPending } = options;
     const isCreating = target.action === 'create';
+    const selectsArticle =
+        isCreating && resource !== 'wastes' && options.creationContext !== 'goodsReceipt';
+    const articles = useRemoteLookup(
+        (search, page, signal) =>
+            materialCatalogService.list(
+                resource === 'consumables' ? 'consumables' : 'materials',
+                { search, page },
+                signal,
+            ),
+        computed(() => selectsArticle),
+    );
+    const selectedArticle = useSelectedOption(articles.items, () => String(values.materialId));
     const supplierId = computed(() => String(values.supplierId));
     const suppliers = useRemoteOptions(
         'suppliers',
@@ -31,11 +47,11 @@ export const useInventorySelection = (options: {
     );
     const presentations = useRemoteOptions(
         'presentations',
-        computed(() => isCreating && resource !== 'wastes'),
+        computed(() => isCreating && resource !== 'wastes' && !selectsArticle),
     );
     const units = useRemoteOptions(
         'unit-measures',
-        computed(() => isCreating && resource !== 'wastes'),
+        computed(() => isCreating && resource !== 'wastes' && !selectsArticle),
     );
     const templates = useRemoteOptions(
         'wastes/material-templates',
@@ -59,6 +75,13 @@ export const useInventorySelection = (options: {
     const presentationName = computed(() => {
         if (!isCreating) return target.row?.presentation ?? '';
 
+        if (selectsArticle) {
+            const data = selectedArticle.value?.data.material;
+            return isRecord(data) && isRecord(data.presentation)
+                ? String(data.presentation.name ?? '')
+                : '';
+        }
+
         if (resource !== 'wastes') return String(selectedPresentation.value?.data.name ?? '');
 
         return getLookupPresentation(selectedTemplate.value);
@@ -67,7 +90,7 @@ export const useInventorySelection = (options: {
         supplierId: suppliers,
         presentationId: presentations,
         unitMeasureId: units,
-        materialId: templates,
+        materialId: selectsArticle ? articles : templates,
         reasonId: reasons,
     };
     const lookupByField: Partial<Record<InventoryField, ReturnType<typeof useRemoteOptions>>> =
@@ -154,6 +177,30 @@ export const useInventorySelection = (options: {
         },
     );
 
+    watch(selectedArticle, (article) => {
+        if (!selectsArticle || isPending.value) return;
+
+        const material = article?.data.material;
+        const data = isRecord(material) ? material : {};
+
+        for (const field of [
+            'name',
+            'presentationId',
+            'unitMeasureId',
+            'base',
+            'height',
+            'minStock',
+        ] as const) {
+            options.setValue(field, String(data[field] ?? ''));
+        }
+    });
+
+    const selectCreatedArticle = (article: LookupItem) => {
+        selectedArticle.value = article;
+        options.setValue('materialId', article.id);
+        void articles.refresh();
+    };
+
     const refreshSuppliers = () => {
         suppliers.updateSearch('');
         return suppliers.refresh();
@@ -161,6 +208,9 @@ export const useInventorySelection = (options: {
 
     return {
         lookups,
+        selectsArticle,
+        selectedArticle,
+        selectCreatedArticle,
         selectedSupplier,
         selectedTemplate,
         presentationName,

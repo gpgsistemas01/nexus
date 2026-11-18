@@ -5,6 +5,7 @@ import { useInventoryEditor } from '../composables/useInventoryEditor.js';
 import { inventorySections } from '../formFields.js';
 import { INVENTORY_CONFIG } from '../inventory.js';
 import type { EditorTarget, InventoryResource, StockAdditionTarget } from '../inventory.js';
+import type { ItemCreation } from '../../../shared/lookup.js';
 import type { LookupCreation, LookupItem } from '../../../shared/lookup.js';
 
 const props = defineProps<{
@@ -15,6 +16,7 @@ const props = defineProps<{
     initialSupplier?: LookupItem;
     canAddStock?: boolean;
     canCreateSupplier?: boolean;
+    canCreateArticle?: boolean;
 }>();
 const emit = defineEmits<{
     saved: [created?: LookupItem];
@@ -23,6 +25,7 @@ const emit = defineEmits<{
     unauthorized: [];
     addStock: [target: StockAdditionTarget];
     createSupplier: [request: LookupCreation];
+    createArticle: [request: ItemCreation];
 }>();
 const editor = useInventoryEditor({
     resource: props.resource,
@@ -70,12 +73,27 @@ const context = props.target.row
         :is-conflicted="isConflicted"
         :is-confirming-duplicate="editor.isConfirmingDuplicate.value"
         :supplier="editor.selectedSupplier.value"
+        :article="editor.selectedArticle.value"
+        :can-create-article="
+            canCreateArticle &&
+            !!editor.selectedSupplier.value &&
+            !creationContext &&
+            target.action === 'create' &&
+            resource !== 'wastes'
+        "
         :can-create-supplier="
             canCreateSupplier &&
             target.action === 'create' &&
             resource !== 'wastes' &&
             !initialSupplier &&
             !isPending
+        "
+        @create-article="
+            emit('createArticle', {
+                search: $event,
+                supplier: editor.selectedSupplier.value!,
+                onCreated: editor.selectCreatedArticle,
+            })
         "
         @create-supplier="
             emit('createSupplier', { search: $event, onCreated: editor.selectCreatedSupplier })

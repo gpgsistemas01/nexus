@@ -181,15 +181,25 @@ export const createAppRouter = (
                 path: '/catalogos',
                 meta: {
                     requiresAuth: true,
-                    permission: PERMISSIONS.CATALOGS_MANAGE,
                     navigationGroup: 'catalogs',
                 },
                 component: () => import('../layouts/AppLayout.vue'),
                 children: [
-                    { path: '', redirect: { name: 'catalog-departments' } },
+                    {
+                        path: '',
+                        name: 'catalogs-home',
+                        component: () => import('../../modules/catalogs/pages/CatalogPage.vue'),
+                        props: { catalog: 'materials' },
+                    },
                     ...Object.keys(PUBLIC_CATALOGS).map((catalog) => ({
                         path: catalog,
                         name: `catalog-${catalog}`,
+                        meta: {
+                            permission:
+                                catalog === 'materials'
+                                    ? PERMISSIONS.MATERIAL_CATALOGS_MANAGE
+                                    : PERMISSIONS.CATALOGS_MANAGE,
+                        },
                         component: () => import('../../modules/catalogs/pages/CatalogPage.vue'),
                         props: { catalog },
                     })),
@@ -227,6 +237,7 @@ export const createAppRouter = (
                     'movements-home',
                     'purchases-home',
                     'issues-home',
+                    'catalogs-home',
                 ].includes(String(to.name))
             ) {
                 const groups = APP_NAVIGATION_GROUPS.filter(

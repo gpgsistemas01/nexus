@@ -6,6 +6,10 @@ import { ApiError } from '../../../../src/shared/http/apiError.js';
 import type { AuthSession } from '../../../../src/modules/auth/session.js';
 import { user } from '../../../fixtures/inventory.js';
 
+vi.mock('../../../../src/modules/directory/pages/DirectoryPage.vue', () => ({
+  default: { template: '<div />' },
+}));
+
 // Estas pruebas comprueban las guardas; Chromium ejecuta los componentes Vuetify reales.
 vi.mock('../../../../src/app/layouts/AppLayout.vue', () => ({
   default: { template: '<div />' },
@@ -71,16 +75,29 @@ describe('sesión y permisos de almacén (DP-VUE-WH-001)', () => {
 
 describe('rutas y permisos de catálogos (DP-VUE-CAT-001)', () => {
   it.each([
+    'materials',
     'departments',
     'roles',
     'presentations',
     'unit-measures',
     'reasons',
     'fulfillment-statuses',
-  ])('permite %s a catalogs:manage', async (catalog) => {
+  ])('permite %s con su permiso de gestión', async (catalog) => {
     expect(
-      (await navigate(`/catalogos/${catalog}`, { ...user, permissions: ['catalogs:manage'] })).name,
+      (
+        await navigate(`/catalogos/${catalog}`, {
+          ...user,
+          permissions: [catalog === 'materials' ? 'material-catalogs:manage' : 'catalogs:manage'],
+        })
+      ).name,
     ).toBe(`catalog-${catalog}`);
+  });
+  it('Almacén administra materiales sin acceder a Áreas o Roles', async () => {
+    const account = { ...user, permissions: ['material-catalogs:manage', 'suppliers:page-view'] };
+    expect((await navigate('/catalogos/materials', account)).name).toBe('catalog-materials');
+    expect((await navigate('/directorio/proveedores', account)).name).toBe('suppliers');
+    expect((await navigate('/catalogos/departments', account)).name).toBe('forbidden');
+    expect((await navigate('/catalogos/roles', account)).name).toBe('forbidden');
   });
   it('una cuenta sólo de catálogos llega a Áreas después del login', async () => {
     expect((await navigate('/almacen', { ...user, permissions: ['catalogs:manage'] })).name).toBe(

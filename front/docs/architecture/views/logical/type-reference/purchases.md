@@ -293,7 +293,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseEditorPage.defineProps
 
-**Fuente:** [src/modules/purchases/pages/PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue) · línea 18, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue) · línea 14, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -309,7 +309,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseEditorPage.defineEmits
 
-**Fuente:** [src/modules/purchases/pages/PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue) · línea 24, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -327,11 +327,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | dependency | [PurchaseDetail](../../../../../src/modules/purchases/purchase.ts) | `correct` |
 | dependency | [PurchaseDetail](../../../../../src/modules/purchases/purchase.ts) | `cancel` |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createSupplier` |
-| dependency | [ItemCreation](../../../../../src/modules/purchases/purchase.ts) | `createItem` |
+| dependency | [ItemCreation](../../../../../src/shared/lookup.ts) | `createItem` |
 
 ## PurchaseLineEntryPage.defineProps
 
-**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 9, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 10, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -348,7 +348,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryPage.defineEmits
 
-**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 16, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 17, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -358,11 +358,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [PurchaseDetail](../../../../../src/modules/purchases/purchase.ts) | `add` |
-| dependency | [ItemCreation](../../../../../src/modules/purchases/purchase.ts) | `create` |
+| dependency | [ItemCreation](../../../../../src/shared/lookup.ts) | `create` |
 
 ## PurchasePage.defineProps
 
-**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 28, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 29, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -374,7 +374,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchasePage.defineEmits
 
-**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 30, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -384,11 +384,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createSupplier` |
-| dependency | [ItemCreation](../../../../../src/modules/purchases/purchase.ts) | `createItem` |
+| dependency | [ItemCreation](../../../../../src/shared/lookup.ts) | `createItem` |
 
 ## PurchaseResource
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 5, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 4, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -398,7 +398,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## Decimal
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 6, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 5, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -408,7 +408,7 @@ string | number
 
 ## PurchaseFilters
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 7, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 6, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -419,7 +419,7 @@ string | number
 
 ## PurchaseQuery
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 13, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 12, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -434,7 +434,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseRow
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 14, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 13, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -460,7 +460,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseDetail
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 29, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 28, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -494,7 +494,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseDocument
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 47, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 46, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends PurchaseRow`.
 
@@ -510,7 +510,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseValues
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 51, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 50, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -528,7 +528,7 @@ RecordQuery & PurchaseFilters
 
 ## PurchaseField
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 60, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 59, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -542,7 +542,7 @@ keyof PurchaseValues
 
 ## PurchaseTarget
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 61, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 60, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -558,7 +558,7 @@ keyof PurchaseValues
 
 ## PurchaseWriteTarget
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 65, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 64, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -572,7 +572,7 @@ Exclude<PurchaseTarget, { action: 'view' }>
 
 ## PurchaseDetailChange
 
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 66, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 65, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -580,24 +580,9 @@ Exclude<PurchaseTarget, { action: 'view' }>
 { action: 'correct'; quantity: number; costPerUnitType: number } | { action: 'cancel' }
 ```
 
-## ItemCreation
-
-**Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 68, columna 1. **Declaración:** interface.
-
-**Extensión/implementación:** `extends LookupCreation`.
-
-| Miembro | Firma completa |
-| --- | --- |
-| `supplier` | `supplier: LookupItem;` |
-
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| inheritance | [LookupCreation](../../../../../src/shared/lookup.ts) | `extends` |
-| association | [LookupItem](../../../../../src/shared/lookup.ts) | `supplier` |
-
 ## PurchaseLookupRequest
 
-**Fuente:** [src/modules/purchases/services/purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts) · línea 10, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/services/purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts) · línea 9, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupQuery`.
 

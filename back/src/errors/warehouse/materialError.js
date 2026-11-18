@@ -6,6 +6,12 @@ export class MaterialRollReferenceReadOnly extends AppError {
     }
 }
 
+export class MaterialIdentityLinkedConflict extends AppError {
+    constructor() {
+        super('El artículo ya tiene proveedores vinculados. Actualice el catálogo; sólo puede editar Nombre y Stock mínimo.', 'MATERIAL_IDENTITY_LINKED', 409);
+    }
+}
+
 export class MaterialNotFound extends AppError {
 
     constructor () {

@@ -15,6 +15,8 @@ flowchart TB
     editor["useInventoryEditor"]
     form["InventoryEditor"]
     service["inventoryService"]
+    selection["useInventorySelection"]
+    catalog["materialCatalogService"]
     http["apiClient.ts"]
     workspace --> page
     workspace --> auxiliary
@@ -25,6 +27,9 @@ flowchart TB
     editorPage --> editor
     editorPage --> form
     editor --> service
+    editor --> selection
+    selection --> catalog
+    catalog --> http
     service --> http
 ```
 
@@ -68,3 +73,7 @@ precisa eventos y callbacks entre dominios.
 campos que adapta `InventoryFormField`. La tabla usa paginación de servidor, sin
 descargar el inventario para filtrarlo en memoria. El
 [contrato HTTP](../../../contracts/client-contracts.md) conserva parámetros y aceptación.
+
+Compras y Almacén consultan artículos mediante `shared/services/materialCatalogService`,
+con búsqueda, paginación y señal de cancelación comunes. El contrato `ItemCreation`
+vive en `shared/lookup.ts`; el alta auxiliar comparte el editor de inventario.

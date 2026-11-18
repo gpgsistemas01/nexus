@@ -593,9 +593,24 @@ keyof typeof API_PATHS.inventoryCatalogs
 | --- | --- | --- |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `onCreated` |
 
+## ItemCreation
+
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 23, columna 1. **Declaración:** interface.
+
+**Extensión/implementación:** `extends LookupCreation`.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `supplier` | `supplier: LookupItem;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| inheritance | [LookupCreation](../../../../../src/shared/lookup.ts) | `extends` |
+| association | [LookupItem](../../../../../src/shared/lookup.ts) | `supplier` |
+
 ## OrganizationResource
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 23, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 26, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -605,7 +620,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## OrganizationState
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 24, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 27, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

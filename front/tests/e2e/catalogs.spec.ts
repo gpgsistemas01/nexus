@@ -312,3 +312,118 @@ for (const status of [401, 403])
       }),
     ).toBeVisible();
   });
+
+for (const type of ['Material', 'Consumible']) {
+  test(
+    `catálogos: Material consulta, crea ${type} sin proveedor y edita sólo datos habilitados`,
+    { tag: '@essential' },
+    async ({ page }) => {
+      const { store, writes } = await mockCatalogs(page, [
+        'catalogs:manage',
+        'material-catalogs:manage',
+      ]);
+      store.set('presentations', [{ id: entryId, name: 'PIEZA', version: 0, isActive: true }]);
+      store.set('unit-measures', [
+        { id: entryId, name: 'PIEZA', symbol: 'PZA.', version: 0, isActive: true },
+      ]);
+      await page.goto('/catalogos/materials');
+      await expect(
+        page.getByRole('heading', { name: 'Tabla de Materiales', exact: true }),
+      ).toBeVisible();
+      await page.getByRole('button', { name: 'Menú', exact: true }).click();
+      await expect(
+        page
+          .getByRole('navigation', { name: 'Navegación principal' })
+          .getByRole('link', { name: 'Materiales', exact: true }),
+      ).toHaveAttribute('href', '/catalogos/materials');
+      await page
+        .getByRole('navigation', { name: 'Navegación principal' })
+        .getByRole('link', { name: 'Materiales', exact: true })
+        .click();
+      await expect(
+        page.getByRole('cell', { name: 'Material de catálogo', exact: true }),
+      ).toBeVisible();
+      for (const name of ['Proveedor', 'Existencia', 'Costo', 'Activo'])
+        await expect(page.getByRole('columnheader', { name, exact: true })).toHaveCount(0);
+      await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+      const create = page.getByRole('dialog', { name: 'Registrar material', exact: true });
+      const name = `Artículo ${type}`;
+      await create.getByLabel('Nombre', { exact: true }).fill(name);
+      await create.getByRole('combobox', { name: 'Tipo', exact: true }).press('ArrowDown');
+      await page.getByRole('option', { name: type, exact: true }).click();
+      await create.getByRole('combobox', { name: 'Presentación', exact: true }).click();
+      await page.getByRole('option', { name: 'PIEZA', exact: true }).click();
+      await create.getByRole('combobox', { name: 'Unidad de medida', exact: true }).click();
+      await page.getByRole('option', { name: 'PIEZA (PZA.)', exact: true }).click();
+      await expect(create.getByRole('checkbox', { name: 'Activo', exact: true })).toHaveCount(0);
+      await expect(create.getByRole('combobox', { name: 'Proveedor', exact: true })).toHaveCount(0);
+      await create.getByRole('button', { name: 'Guardar', exact: true }).click();
+      await expect(create).toBeHidden();
+      expect(writes[0]?.data).toEqual({
+        name,
+        type: type === 'Material' ? 'MATERIAL' : 'CONSUMABLE',
+        presentationId: entryId,
+        unitMeasureId: entryId,
+        base: null,
+        height: null,
+      });
+      await expect(page.getByRole('cell', { name, exact: true })).toBeVisible();
+      await page
+        .getByRole('row')
+        .filter({ hasText: 'Material de catálogo' })
+        .getByRole('button', { name: 'Editar registro', exact: true })
+        .click();
+      const edit = page.getByRole('dialog', { name: 'Editar material', exact: true });
+      for (const label of ['Tipo', 'Presentación', 'Unidad de medida'])
+        await expect(edit.getByRole('combobox', { name: label, exact: true })).toBeDisabled();
+      await expect(edit.getByLabel('Base', { exact: true })).toHaveAttribute('readonly', '');
+      await edit.getByLabel('Nombre', { exact: true }).fill('Material editado');
+      await edit.getByLabel('Stock mínimo', { exact: true }).fill('5');
+      await edit.getByRole('button', { name: 'Actualizar', exact: true }).click();
+      await expect(edit).toBeHidden();
+      expect(writes[1]?.data).toEqual({
+        name: 'Material editado',
+        minStock: 5,
+        expectedVersion: 7,
+      });
+      await expect(page.getByRole('cell', { name: 'Material editado', exact: true })).toBeVisible();
+    },
+  );
+}
+
+test(
+  'catálogo de Almacén: edita identidad completa sin proveedor y restringe otros catálogos',
+  { tag: '@essential' },
+  async ({ page }) => {
+    const { store, writes } = await mockCatalogs(page, ['material-catalogs:manage']);
+    store.get('materials')![0]!._count = { supplierMaterials: 0 };
+    store.set('presentations', [{ id: entryId, name: 'PIEZA', version: 0, isActive: true }]);
+    store.set('unit-measures', [
+      { id: entryId, name: 'PIEZA', symbol: 'PZA.', version: 0, isActive: true },
+    ]);
+    await page.goto('/catalogos/materials');
+    await page.getByRole('button', { name: 'Editar registro', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+    await dialog.getByRole('combobox', { name: 'Tipo', exact: true }).press('ArrowDown');
+    await page.getByRole('option', { name: 'Consumible', exact: true }).click();
+    await expect(dialog.getByRole('combobox', { name: 'Presentación', exact: true })).toBeEnabled();
+    await expect(
+      dialog.getByRole('combobox', { name: 'Unidad de medida', exact: true }),
+    ).toBeEnabled();
+    await expect(dialog.getByLabel('Base', { exact: true })).toBeEditable();
+    await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    expect(writes[0]?.data).toMatchObject({
+      type: 'CONSUMABLE',
+      presentationId: entryId,
+      unitMeasureId: entryId,
+      base: null,
+      height: null,
+      expectedVersion: 7,
+    });
+    await page.goto('/catalogos/roles');
+    await expect(
+      page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),
+    ).toBeVisible();
+  },
+);

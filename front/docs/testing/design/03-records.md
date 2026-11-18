@@ -36,3 +36,7 @@ La evidencia está en `identityTest.ts`, `recordNavigationTest.ts`, `directoryTe
 `useSelectedOption` y `useRemoteLookup`; `inventoryReportTest.ts`, Excel y filtros. La
 autorización, persistencia y reportes reales requieren los [niveles
 correspondientes](../01-test-plan.md#niveles-y-entornos).
+
+`RF-CAT-030`: Materiales reutiliza Catálogos con columnas y captura de identidad, sin Activo. `catalogEditorTest.ts` y `catalogServiceTest.ts` cubren payload, respuesta y edición restringida; `catalogs.spec.ts` prueba consulta/alta/edición con una cuenta sólo de catálogos. La integración `catalogControllersDbTest.js` cubre ambos tipos, ausencia de oferta/stock, validación, identidad protegida y versión obsoleta.
+
+Catálogo de Materiales: particiones sin/con proveedor para habilitación y payload de edición. Almacén: selección del catálogo por ID, datos de stock, alta auxiliar y permisos separados de los demás catálogos.

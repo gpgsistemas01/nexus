@@ -3,6 +3,7 @@ import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { pageParams } from '../../../shared/http/pageParams.js';
 import { ApiError } from '../../../shared/http/apiError.js';
+import { readText } from '../../../shared/http/recordContract.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -14,19 +15,58 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
         typeof value.id !== 'string' ||
         !value.id ||
         typeof value.name !== 'string' ||
-        typeof value.isActive !== 'boolean' ||
+        (catalog !== 'materials' && typeof value.isActive !== 'boolean') ||
         !Number.isInteger(value.version) ||
         Number(value.version) < 0 ||
         (catalog === 'unit-measures' && typeof value.symbol !== 'string')
     )
         throw new ApiError('El servidor devolvió un registro de catálogo incompleto.');
 
+    if (catalog === 'materials') {
+        if (
+            !['MATERIAL', 'CONSUMABLE'].includes(String(value.type)) ||
+            !isRecord(value.presentation) ||
+            !isRecord(value.unitMeasure)
+        )
+            throw new ApiError('El servidor devolvió un material de catálogo incompleto.');
+
+        const decimal = (input: unknown) => {
+            if (input === null) return '';
+
+            if (
+                (typeof input !== 'number' && typeof input !== 'string') ||
+                !Number.isFinite(Number(input)) ||
+                Number(input) < 0
+            )
+                throw new ApiError('El servidor devolvió una medida o mínimo inválido.');
+
+            return String(input);
+        };
+
+        return {
+            id: value.id,
+            version: Number(value.version),
+            name: value.name,
+            symbol: '',
+            type: String(value.type),
+            hasSuppliers: !isRecord(value._count) || Number(value._count.supplierMaterials) > 0,
+            presentationId: readText(value, 'presentationId'),
+            unitMeasureId: readText(value, 'unitMeasureId'),
+            presentation: readText(value.presentation, 'name'),
+            unitMeasure: readText(value.unitMeasure, 'name'),
+            unitSymbol: readText(value.unitMeasure, 'symbol'),
+            base: decimal(value.base),
+            height: decimal(value.height),
+            minStock: decimal(value.minStock),
+        };
+    }
+
     // La clave estable interna nunca forma parte de la captura ni de la vista.
     return {
         id: value.id,
         name: value.name,
         symbol: typeof value.symbol === 'string' ? value.symbol : '',
-        isActive: value.isActive,
+        isActive: value.isActive as boolean,
         version: Number(value.version),
     };
 };

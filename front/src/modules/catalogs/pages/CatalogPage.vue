@@ -14,7 +14,15 @@ import type { CatalogName, CatalogTarget } from '../catalog.js';
 
 const props = defineProps<{ catalog: CatalogName }>();
 const { has, onDenied } = usePageAccess();
-const canManage = computed(() => has(PERMISSIONS.CATALOGS_MANAGE));
+const canManage = computed(
+    () =>
+        has(PERMISSIONS.CATALOGS_MANAGE) ||
+        has(
+            props.catalog === 'materials'
+                ? PERMISSIONS.MATERIAL_CATALOGS_MANAGE
+                : PERMISSIONS.CATALOGS_MANAGE,
+        ),
+);
 const definition = catalogDefinition(props.catalog);
 const list = useCatalogList(props.catalog, onDenied);
 const { query, rows, total, isLoading, error } = list;
@@ -60,6 +68,7 @@ onMounted(() => {
             :query="query"
             :is-loading="isLoading"
             :has-symbol="definition.fields.includes('symbol')"
+            :is-material="catalog === 'materials'"
             @query="list.applyQuery"
             @edit="openEditor({ action: 'edit', row: $event })"
         />

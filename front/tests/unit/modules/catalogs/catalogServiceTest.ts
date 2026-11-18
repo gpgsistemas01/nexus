@@ -62,3 +62,38 @@ it('un código de éxito inesperado no confirma una escritura', async () => {
     catalogService.save('roles', { action: 'create' }, { name: 'Operador', isActive: false }),
   ).rejects.toThrow('confirmar');
 });
+
+it('Material devuelve identidad, tipo y medidas sin exigir ni inventar proveedor o estado', async () => {
+  apiClient.http.defaults.adapter = mockHttpAdapter(() => ({
+    data: {
+      data: [
+        {
+          id: 'm',
+          version: 0,
+          name: 'Consumible',
+          type: 'CONSUMABLE',
+          presentationId: 'p',
+          unitMeasureId: 'u',
+          presentation: { name: 'PIEZA' },
+          unitMeasure: { name: 'PIEZA', symbol: 'PZA.' },
+          base: null,
+          height: null,
+          minStock: '0',
+        },
+      ],
+      recordsTotal: 1,
+      recordsFiltered: 1,
+    },
+  }));
+  const result = await catalogService.list('materials', { search: '', page: 1, length: 10 });
+  expect(result.data[0]).toMatchObject({
+    id: 'm',
+    type: 'CONSUMABLE',
+    presentation: 'PIEZA',
+    unitSymbol: 'PZA.',
+    base: '',
+    height: '',
+    minStock: '0',
+  });
+  expect(result.data[0]).not.toHaveProperty('isActive');
+});
