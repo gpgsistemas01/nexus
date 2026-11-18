@@ -24,9 +24,13 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
             material: await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js'),
             consumable: await import('../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js')
         };
+        const { getAllMaterials } = await import('../../../src/controllers/api/warehouse/materialController.js');
+        const { getAllConsumables } = await import('../../../src/controllers/api/warehouse/consumableController.js');
         const report = await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js');
         app = createControllerTestApp({ registerRoutes: router => {
             router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
+            router.get('/catalog/material', getAllMaterials);
+            router.get('/catalog/consumable', getAllConsumables);
             router.get('/purchase-report', report.exportMaterialGoodsReceiptReportExcel);
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
                 const controller = controllers[resource];
@@ -83,9 +87,9 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         await prisma.inventoryMovement.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
         await prisma.goodsReceiptDetail.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
         await prisma.goodsReceipt.deleteMany({ where: { id: { in: receiptIds } } });
-        await prisma.supplierMaterial.deleteMany({ where: { supplierId: ids.supplier } });
-        await prisma.material.deleteMany({ where: { id: { in: [ids.material, ids.consumable] } } });
-        await prisma.supplier.delete({ where: { id: ids.supplier } });
+        await prisma.supplierMaterial.deleteMany({ where: { supplierId: { in: [ids.supplier, ids.catalogSupplier].filter(Boolean) } } });
+        await prisma.material.deleteMany({ where: { id: { in: [ids.material, ids.consumable, ...(ids.catalogIds ?? [])] } } });
+        await prisma.supplier.deleteMany({ where: { id: { in: [ids.supplier, ids.catalogSupplier].filter(Boolean) } } });
         await prisma.person.delete({ where: { id: ids.person } });
         await prisma.presentation.delete({ where: { id: ids.presentation } });
         await prisma.unitMeasure.delete({ where: { id: ids.unit } });
@@ -152,6 +156,64 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
     const purchaseBody = resource => ({
         supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-12T12:00:00.000Z',
         details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 10 }]
+    });
+
+    it.each(['material', 'consumable'])('compras de %s consultan identidades únicas y vinculan sólo las partidas confirmadas', async resource => {
+        const type = resource === 'material' ? 'MATERIAL' : 'CONSUMABLE';
+        ids.catalogIds ??= [];
+        if (!ids.catalogSupplier) ids.catalogSupplier = (await prisma.supplier.create({ data: {
+            codeNumber: Number.parseInt(Date.now().toString().slice(-8)), code: `CAT${suffix}`,
+            legalName: `Catalog legal ${suffix}`, tradeName: `Catalog supplier ${suffix}`
+        } })).id;
+        const catalog = [];
+        for (const label of ['A', 'B', 'C', 'D']) {
+            const item = await prisma.material.create({ data: { name: `RC-Catalog-${resource}-${suffix}-${label}`,
+                type, presentationId: ids.presentation, unitMeasureId: ids.unit } });
+            catalog.push(item);
+            ids.catalogIds.push(item.id);
+        }
+        // B pertenece a dos proveedores: el catálogo debe mostrar una sola identidad.
+        await prisma.supplierMaterial.createMany({ data: [ids.supplier, ids.catalogSupplier].map(supplierId => ({ supplierId, materialId: catalog[1].id })) });
+        const result = await request(app).get(`/catalog/${resource}`).query({ catalog: true, supplierId: ids.supplier, search: `RC-Catalog-${resource}-${suffix}`, length: 20 }).expect(200);
+        expect(result.body.recordsFiltered).toBe(4);
+        expect(result.body.data.map(row => row.material.id)).toEqual(catalog.map(row => row.id));
+        expect(result.body.data[0]).not.toHaveProperty('supplier');
+        const next = await request(app).get(`/catalog/${resource}`).query({ catalog: true, search: `RC-Catalog-${resource}-${suffix}`, start: 1, length: 1 }).expect(200);
+        expect(next.body.data.map(row => row.material.id)).toEqual([catalog[1].id]);
+        const purchase = quantity => request(app).post(path(resource)).send({ ...purchaseBody(resource), details: [{ materialId: catalog[0].id, quantity, costPerUnitType: 10 }] });
+        const created = await purchase(2).expect(200);
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[0].id } };
+        let offer = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+        expect(Number(offer.currentStock)).toBe(2);
+        expect(offer.maxUnitCost).toBeNull();
+        expect(await prisma.supplierMaterial.count({ where: { materialId: { in: [catalog[2].id, catalog[3].id] } } })).toBe(0);
+        await purchase(0.5).expect(200);
+        offer = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+        expect(Number(offer.currentStock)).toBe(2.5);
+        expect(await prisma.supplierMaterial.count({ where: { supplierId: ids.supplier, materialId: catalog[0].id } })).toBe(1);
+        await request(app).patch(`${path(resource)}/${created.body.goodsReceipt.id}`).send({ ...purchaseBody(resource), details: [{ materialId: catalog[2].id, quantity: 1, costPerUnitType: 10 }] }).expect(200);
+        expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[2].id } } })).currentStock)).toBe(1);
+        await prisma.supplierMaterial.update({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[1].id } }, data: { isActive: false } });
+        const before = await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } });
+        await request(app).post(path(resource)).send({ ...purchaseBody(resource), details: [catalog[3], catalog[1]].map(row => ({ materialId: row.id, quantity: 1, costPerUnitType: 10 })) }).expect(409);
+        expect(await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } })).toBe(before);
+        expect(await prisma.supplierMaterial.count({ where: { materialId: catalog[3].id } })).toBe(0);
+    });
+
+    it('dos compras concurrentes vinculan artículos nuevos en orden inverso sin duplicar ofertas ni perder stock', async () => {
+        const items = [];
+        for (const name of ['A', 'B']) {
+            const item = await prisma.material.create({ data: { name: `RC Concurrent ${name} ${suffix}`, type: 'MATERIAL', presentationId: ids.presentation, unitMeasureId: ids.unit } });
+            items.push(item.id);
+            (ids.catalogIds ??= []).push(item.id);
+        }
+        const create = ids => request(app).post(path('material')).send({ ...purchaseBody('material'), details: ids.map(materialId => ({ materialId, quantity: 1, costPerUnitType: 10 })) });
+        const responses = await Promise.all([create(items), create([...items].reverse())]);
+        expect(responses.map(response => response.status)).toEqual([200, 200]);
+        const offers = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier, materialId: { in: items } } });
+        expect(offers).toHaveLength(2);
+        expect(offers.map(offer => Number(offer.currentStock))).toEqual([2, 2]);
+        for (const response of responses) expect(await prisma.inventoryMovement.count({ where: { goodsReceiptId: response.body.goodsReceipt.id } })).toBe(1);
     });
 
     it.each(['KILOGRAMOS', 'METRO LINEAL'])('compra fracciones con presentación %s y costo total sin alterar la unidad', async name => {

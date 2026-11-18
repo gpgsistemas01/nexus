@@ -288,7 +288,7 @@ export const inventorySections = (
                       },
                   ]
                 : []),
-            ...(!isStock || row?.isActive !== undefined
+            ...(!fromPurchase && (!isStock || row?.isActive !== undefined)
                 ? [
                       {
                           name: 'isActive' as const,

@@ -25,6 +25,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
 | `Facade` | control | [`materialGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) |
 | `Core` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
+| `Offers` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) |
 | `Inventory` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
@@ -51,6 +52,8 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 ### Configuración y construcción
 
 El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js).
+
+`ensureSupplierMaterials` en [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) crea en bloque sólo los vínculos faltantes dentro de la transacción de la compra; conserva ofertas existentes.
 
 ## Composición de archivos
 
@@ -172,7 +175,6 @@ sequenceDiagram
     autonumber
     participant Facade@{ "type": "control" } as materialGoodsReceiptService.js
     participant Core@{ "type": "control" } as goodsReceiptService.js
-    participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
     participant Supplier@{ "type": "control" } as supplierService.js
     participant Person@{ "type": "control" } as personService.js
     participant Invoice@{ "type": "control" } as goodsReceiptInvoiceService.js
@@ -189,10 +191,6 @@ sequenceDiagram
         Core->>Person: findPersonById({ id: receivedById })
         Person-->>Core: findPersonById(): Promise[Person | null]
         Note over Core: PersonReceivedByNotFound si falta el receptor
-        Core->>Helpers: buildGoodsReceiptDetails(details, { supplierId, type })
-        Helpers-->>Core: buildGoodsReceiptDetails(): Promise[Object[]]
-        Core->>Helpers: calculateGoodsReceiptTotals(processedDetails)
-        Helpers-->>Core: calculateGoodsReceiptTotals(): Object
         Core->>FileBaseRepository: getDb()
         FileBaseRepository-->>Core: getDb(): PrismaClient | TransactionClient — tx si se recibió
     deactivate Core
@@ -211,6 +209,8 @@ sequenceDiagram
     participant Core@{ "type": "control" } as goodsReceiptService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Inventory@{ "type": "control" } as movementService.js
+    participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
+    participant Offers@{ "type": "control" } as supplierMaterialService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
 
     Facade->>Core: createGoodsReceipt({ goodsReceiptDto, type: MATERIAL })
@@ -220,6 +220,14 @@ sequenceDiagram
         Core->>Prisma: db.$transaction(async tx => ...)
         rect rgb(245, 245, 245)
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
+            Core->>Helpers: buildGoodsReceiptDetails(details, { tx, supplierId, type })
+            Helpers-->>Core: buildGoodsReceiptDetails(): Promise[Object[]]
+            Core->>Offers: ensureSupplierMaterials({ tx, supplierId, materialIds })
+            Offers->>Prisma: tx.supplierMaterial.createMany({ data, skipDuplicates: true })
+            Prisma-->>Offers: createMany(): Promise[BatchPayload]
+            Offers-->>Core: ensureSupplierMaterials(): Promise[BatchPayload]
+            Core->>Helpers: calculateGoodsReceiptTotals(processedDetails)
+            Helpers-->>Core: calculateGoodsReceiptTotals(): Object
             Note over Core: MATERIAL selecciona CMA
             Core->>Reference: generateYearlyReferenceNumber({ type: referenceType, tx })
             Core->>Prisma: tx.goodsReceipt.create({ data: { type, referenceNumber, ... } })
@@ -238,9 +246,9 @@ sequenceDiagram
 
 ## Detalle de preparación de partidas de compra
 
-Amplía `buildGoodsReceiptDetails`: la consulta usa `tx` cuando se proporciona. En el alta
-la preparación ocurre antes de iniciar la transacción; no se atribuye esa lectura al
-callback transaccional. Los conflictos se propagan al servicio que llamó al helper.
+Amplía `buildGoodsReceiptDetails`: la preparación de nuevas partidas consulta identidades
+y ofertas con el mismo `tx` de la compra. Una oferta ausente permite crear el vínculo;
+una oferta existente inactiva se rechaza. Los conflictos revierten la operación.
 
 ```mermaid
 sequenceDiagram

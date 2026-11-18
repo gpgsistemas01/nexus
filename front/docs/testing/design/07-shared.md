@@ -198,3 +198,7 @@ La exportación valida primero el manifiesto y las capturas de la misma cuenta.
 nombre largo con espacio suficiente, texto de al menos 14 px, cifras largas sin
 salto de línea, captura numérica accesible y desplazamiento contenido en la tabla.
 Conserva la matriz existente de 320 a 1920 px para los listados y fichas.
+
+El recorrido de alta en `purchases.spec.ts` comprueba la política de autocompletado de los selectores: `autocomplete=off` y exclusión del formulario HTML mediante Vuetify, selección por catálogo, conservación al cambiar de campo y payload por ID. Se mantienen los recorridos de búsqueda, precarga y creación contextual. La prueba no automatiza el menú de sugerencias propio del navegador ni sus perfiles guardados.
+
+`remoteLookupTest.ts` cubre refrescar con otra búsqueda pendiente y refrescar un catálogo aún cerrado: una única petición inmediata, página inicial y cancelación del debounce anterior. Las altas rápidas de Compras reutilizan `refresh('')` para proveedor y artículo.

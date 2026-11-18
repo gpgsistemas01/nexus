@@ -135,7 +135,7 @@ export const buildInventoryPayload = (
             base: values.base === '' ? null : Number(values.base),
             height: values.height === '' ? null : Number(values.height),
             ...(values.minStock === '' ? {} : { minStock: Number(values.minStock) }),
-            isActive: values.isActive,
+            isActive: true,
         };
 
     const observations = String(values.observations).trim();

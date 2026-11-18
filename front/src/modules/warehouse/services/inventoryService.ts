@@ -13,6 +13,7 @@ import type {
     InventoryResource,
 } from '../inventory.js';
 import type { LookupItem } from '../../../shared/lookup.js';
+import { mapMaterialOption } from '../../../shared/utils/mapMaterialOption.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 
 export const inventoryService = {
@@ -83,18 +84,9 @@ export const inventoryService = {
                 'No se pudo identificar el artículo registrado. Actualiza las opciones antes de continuar.',
             );
 
-        const row = normalizeInventoryRow(result.material);
-        return {
-            id: row.entityId,
-            title: [
-                row.name,
-                row.base != null && row.height != null ? `${row.base} × ${row.height}` : '',
-                row.presentation,
-            ]
-                .filter(Boolean)
-                .join(' · '),
-            data: result.material,
-            isDisabled: !row.isActive,
-        };
+        return mapMaterialOption(
+            result.material,
+            resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+        );
     },
 };

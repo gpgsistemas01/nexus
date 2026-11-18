@@ -42,3 +42,5 @@ export const WASTE_OPERATION_ACTIONS = Object.freeze({
     CREATE: 'create',
     ADD_STOCK: 'add-stock'
 });
+
+export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';

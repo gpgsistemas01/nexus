@@ -47,7 +47,17 @@ it.each(['materials', 'consumables'] as const)(
     apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
       expect(config.method).toBe('post');
       expect(config.url).toBe(`/api/warehouse/${resource}`);
-      return { data: { code: 'CREATED_MATERIAL', material: purchaseItem } };
+      return {
+        data: {
+          code: 'CREATED_MATERIAL',
+          material: {
+            material: {
+              ...purchaseItem.material,
+              type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+            },
+          },
+        },
+      };
     });
     const item = await inventoryService.createForPurchase(
       resource,
@@ -56,7 +66,12 @@ it.each(['materials', 'consumables'] as const)(
     );
     expect(item.id).toBe(ids.material);
     expect(item.id).not.toBe(ids.offer);
-    expect(item.data).toEqual(purchaseItem);
+    expect(item.data).toEqual({
+      material: {
+        ...purchaseItem.material,
+        type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+      },
+    });
   },
 );
 it('el proveedor recién creado devuelve su identidad, versión y estado para volver a Compras', async () => {

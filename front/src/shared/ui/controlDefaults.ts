@@ -22,6 +22,7 @@ export const controlDefaults = {
         hideDetails: 'auto',
     },
     VAutocomplete: {
+        autocomplete: 'suppress',
         class: 'warehouse-control',
         variant: 'outlined',
         density: 'compact',
@@ -30,6 +31,7 @@ export const controlDefaults = {
         hideDetails: 'auto',
     },
     VSelect: {
+        autocomplete: 'suppress',
         class: 'warehouse-control',
         variant: 'outlined',
         density: 'compact',

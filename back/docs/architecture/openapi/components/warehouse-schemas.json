@@ -1722,7 +1722,14 @@
     "type": "object",
     "properties": {
       "material": {
-        "$ref": "../openapi.json#/components/schemas/SupplierMaterial"
+        "oneOf": [
+          {
+            "$ref": "../openapi.json#/components/schemas/SupplierMaterial"
+          },
+          {
+            "$ref": "../openapi.json#/components/schemas/MaterialCatalogEntry"
+          }
+        ]
       },
       "code": {
         "$ref": "../openapi.json#/components/schemas/SuccessCode"
@@ -2250,7 +2257,7 @@
         "enum": [
           "goodsReceipt"
         ],
-        "description": "Alta para una compra: omite costo máximo y existencia inicial; crea la oferta con stock cero."
+        "description": "Alta de identidad para compra: no crea oferta, stock ni ajuste. La asociación al proveedor se confirma al guardar la compra."
       }
     },
     "additionalProperties": false,
@@ -2263,5 +2270,100 @@
       "creationContext"
     ],
     "description": "Alta para una compra: crea la oferta con stock cero y sin costo máximo; ambos campos se ignoran si se envían."
+  },
+  "MaterialCatalogEntry": {
+    "type": "object",
+    "properties": {
+      "material": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": [
+              "MATERIAL",
+              "CONSUMABLE"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "base": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "height": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "minStock": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "presentation": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "unitMeasure": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "presentation"
+        ]
+      }
+    },
+    "required": [
+      "material"
+    ],
+    "additionalProperties": false,
+    "description": "Identidad de catálogo, sin oferta, stock ni proveedor."
+  },
+  "MaterialCatalogList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/MaterialCatalogEntry"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ],
+    "additionalProperties": false
   }
 }

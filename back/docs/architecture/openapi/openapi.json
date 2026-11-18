@@ -548,6 +548,12 @@
       },
       "HistoricalDeliveryResponse": {
         "$ref": "./components/historical-delivery-schemas.json#/HistoricalDeliveryResponse"
+      },
+      "MaterialCatalogEntry": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialCatalogEntry"
+      },
+      "MaterialCatalogList": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialCatalogList"
       }
     },
     "parameters": {

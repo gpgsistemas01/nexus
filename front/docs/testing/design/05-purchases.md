@@ -28,3 +28,5 @@ los botones de la partida cancelada.
 `successCodeMessages` es el catálogo público de códigos de confirmación. Los
 adaptadores comparan el código recibido con el correspondiente a su operación.
 Las pruebas comprueban que un código distinto no se interprete como éxito.
+
+El selector de artículos consulta `catalog=true`, sin `supplierId`, y recibe identidades sin oferta. `purchaseTest.ts` verifica filtros, tipos y payload; `purchaseQuickCreateTest.ts`, la identidad devuelta por el alta contextual. `purchaseFixtures.ts` comprueba el contrato en los recorridos de compras. La persistencia del vínculo se verifica en `goodsReceiptContextDbTest.js` del backend.

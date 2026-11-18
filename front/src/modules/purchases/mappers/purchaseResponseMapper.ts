@@ -10,7 +10,6 @@ import type {
     PurchaseDocument,
     PurchaseDetail,
 } from '../purchase.js';
-import type { LookupItem } from '../../../shared/lookup.js';
 
 const createInvalidResponseError = () =>
     new ApiError('El servidor devolvió una compra incompleta. Actualiza la consulta.');
@@ -116,33 +115,5 @@ export const normalizePurchaseDocument = (
         ...normalizePurchaseRow(value, resource),
         observations: value.observations ?? '',
         details,
-    };
-};
-
-export const mapPurchaseItemOption = (
-    value: Record<string, unknown>,
-    resource: PurchaseResource,
-): LookupItem => {
-    const material = readOptionalRelation(value.material);
-    // El listado de inventario se filtra por endpoint y no incluye `type`.
-    if (material.type !== undefined && material.type !== PURCHASE_CONFIG[resource].type)
-        throw createInvalidResponseError();
-
-    const id = readText(material, 'id');
-    const name = readText(material, 'name');
-    const presentation = readText(readOptionalRelation(material.presentation), 'name');
-    return {
-        id,
-        title: [
-            name,
-            material.base != null && material.height != null
-                ? `${material.base} × ${material.height}`
-                : '',
-            presentation,
-        ]
-            .filter(Boolean)
-            .join(' · '),
-        isDisabled: value.isActive === false,
-        data: value,
     };
 };

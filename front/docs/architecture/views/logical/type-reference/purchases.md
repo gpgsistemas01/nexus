@@ -253,7 +253,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## Field
 
-**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 23, columna 5. **Declaración:** type.
+**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 22, columna 5. **Declaración:** type.
 
 **Definición completa:**
 
@@ -597,7 +597,7 @@ Exclude<PurchaseTarget, { action: 'view' }>
 
 ## PurchaseLookupRequest
 
-**Fuente:** [src/modules/purchases/services/purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts) · línea 9, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/services/purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts) · línea 10, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupQuery`.
 
@@ -605,7 +605,6 @@ Exclude<PurchaseTarget, { action: 'view' }>
 | --- | --- |
 | `kind` | `kind: 'suppliers' \| 'persons' \| 'items';` |
 | `resource` | `resource: PurchaseResource;` |
-| `supplierId` | `supplierId?: string;` |
 | `capture` | `capture?: boolean;` |
 
 | Relación | Destino | Origen de la referencia |

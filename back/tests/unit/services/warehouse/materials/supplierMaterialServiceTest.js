@@ -18,6 +18,7 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
 }));
 
 const {
+  ensureSupplierMaterials,
   existsMaterialUsage,
   findAllSupplierMaterials,
   findSupplierMaterialById,
@@ -193,4 +194,14 @@ describe('listado del CRUD de materiales', () => {
     );
   });
 
+});
+
+it('crea vínculos en bloque y en orden estable aunque las compras envíen órdenes inversos o repetidos', async () => {
+  const createMany = vi.fn().mockResolvedValue({ count: 2 });
+  for (const materialIds of [['b', 'a', 'b'], ['a', 'b']]) {
+    await ensureSupplierMaterials({ tx: { supplierMaterial: { createMany } }, supplierId: 'supplier', materialIds });
+  }
+  const payloads = createMany.mock.calls.map(([payload]) => payload);
+  expect(payloads[0]).toEqual({ data: [{ supplierId: 'supplier', materialId: 'a' }, { supplierId: 'supplier', materialId: 'b' }], skipDuplicates: true });
+  expect(payloads[1]).toEqual(payloads[0]);
 });

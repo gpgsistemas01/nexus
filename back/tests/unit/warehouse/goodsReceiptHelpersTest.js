@@ -6,7 +6,7 @@ vi.mock('../../../src/services/warehouse/materials/materialService.js', () => ({
     }))
 }));
 
-import { buildGoodsReceiptDetails, calculateGoodsReceiptDetail } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
+import { buildGoodsReceiptDetails, buildGoodsReceiptStockOffers, calculateGoodsReceiptDetail } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
 import {
     cancelGoodsReceiptDetailAndTotals,
     createGoodsReceiptDetailsAndUpdateTotals
@@ -31,11 +31,10 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         const tx = {
             goodsReceiptDetail: {
                 updateManyAndReturn: vi.fn().mockResolvedValue([{ id: 'detail-id' }]),
-                findMany: vi.fn().mockResolvedValue([{
-                    quantity: 1,
-                    netPurchaseAmount: 10,
-                    grossPurchaseAmount: 11.6
-                }])
+                aggregate: vi.fn().mockResolvedValue({
+                    _count: { _all: 1 },
+                    _sum: { quantity: 1, netPurchaseAmount: 10, grossPurchaseAmount: 11.6 }
+                })
             },
             goodsReceipt: { update }
         };
@@ -72,10 +71,12 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         const tx = {
             goodsReceiptDetail: {
                 updateManyAndReturn: vi.fn().mockResolvedValue([{ id: 'detail-id' }]),
-                findMany: vi.fn().mockResolvedValue([
-                    { status: 'CANCELED', quantity: 5, netPurchaseAmount: 50, grossPurchaseAmount: 58 },
-                    { status, quantity: 2, netPurchaseAmount: 20, grossPurchaseAmount: 23.2 }
-                ])
+                aggregate: vi.fn().mockResolvedValue({
+                    _count: { _all: status === 'ACTIVE' ? 1 : 0 },
+                    _sum: status === 'ACTIVE'
+                        ? { quantity: 2, netPurchaseAmount: 20, grossPurchaseAmount: 23.2 }
+                        : { quantity: null, netPurchaseAmount: null, grossPurchaseAmount: null }
+                })
             },
             goodsReceipt: { update }
         };
@@ -100,9 +101,10 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
                     height: null
                 }])
             },
+            supplierMaterial: { createMany: vi.fn().mockResolvedValue({ count: 1 }) },
             goodsReceiptDetail: {
                 createManyAndReturn: vi.fn().mockResolvedValue([]),
-                findMany: vi.fn().mockResolvedValue([])
+                aggregate: vi.fn().mockResolvedValue({ _count: { _all: 0 }, _sum: { quantity: null, netPurchaseAmount: null, grossPurchaseAmount: null } })
             },
             goodsReceipt: { update }
         };
@@ -187,4 +189,14 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
             expect.objectContaining({ materialId: 'material-id', quantity: 1 })
         ]);
     });
+});
+
+it('el movimiento de una entrada reutiliza los artículos persistidos y limita sus ofertas a las partidas nuevas', () => {
+    const goodsReceipt = { supplierId: 'supplier', supplierName: 'Proveedor', details: [
+        { materialId: 'a', material: { id: 'a', base: 2, height: 3, name: 'A' } },
+        { materialId: 'b', material: { id: 'b', base: 1, height: 1, name: 'B' } }
+    ] };
+    expect(buildGoodsReceiptStockOffers(goodsReceipt, [{ materialId: 'b' }, { materialId: 'b' }])).toEqual([
+        { materialId: 'b', supplierId: 'supplier', material: goodsReceipt.details[1].material, supplier: { tradeName: 'Proveedor' } }
+    ]);
 });

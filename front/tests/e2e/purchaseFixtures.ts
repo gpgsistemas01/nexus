@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { mockWarehouse } from './warehouseFixtures.js';
 import { purchase, purchaseItem, purchasePermissions } from '../fixtures/purchases.js';
 import { pageOf } from '../fixtures/inventory.js';
@@ -34,9 +34,12 @@ export const mockPurchases = async (
     route.fulfill({ json: pageOf([supplierData]) }),
   );
   await page.route(/\/api\/warehouse\/(materials|consumables)\?/, (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    expect(query.get('catalog')).toBe('true');
+    expect(query.has('supplierId')).toBe(false);
     const type = route.request().url().includes('/consumables') ? 'CONSUMABLE' : 'MATERIAL';
     return route.fulfill({
-      json: pageOf([{ ...purchaseItem, material: { ...purchaseItem.material, type } }]),
+      json: pageOf([{ material: { ...purchaseItem.material, type } }]),
     });
   });
   await page.route('**/api/warehouse/goods-receipts/**', (route) => {

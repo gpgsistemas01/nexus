@@ -56,7 +56,7 @@ no aparece el botón. Complete **Razón social**, revise **Nombre comercial** y
 <!-- manual:all materials:read materials:write presentations:read unit:measures-read -->
 ### Registrar un artículo durante la compra
 
-Seleccione primero el proveedor de la compra.
+Seleccione primero el proveedor de la compra. El selector de artículos consulta el catálogo completo de Materiales o Consumibles, incluidos los que aún no están vinculados con ese proveedor. Busque y agregue sólo los artículos comprados; al guardar, Nexus crea los vínculos faltantes y recibe sus cantidades.
 
 <!-- module:any reference compras-materiales -->
 
@@ -78,8 +78,7 @@ no aparece el botón.
 
 Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: seleccionar la presentación KILOGRAMOS o METRO LINEAL fija ambas medidas en 1 × 1 y oculta esos campos durante el alta. Después de pulsar **Agregar**, la tabla de detalles muestra medidas, unidad y cantidad convertida. El artículo nuevo queda seleccionado;
 todavía debe capturar **Cantidad** y **Costo por Presentación**,
-pulsar **Agregar** y guardar la compra. El alta auxiliar no recibe la mercancía:
-la existencia de esta recepción se registra al guardar la compra.
+pulsar **Agregar** y guardar la compra. El alta auxiliar guarda sólo la identidad del catálogo: no crea vínculo con el proveedor ni existencia. Si cancela la compra, el artículo queda disponible en el catálogo. La asociación y la existencia se registran al guardar la compra.
 <!-- manual:end -->
 
 ## Editar o corregir

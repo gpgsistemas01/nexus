@@ -142,7 +142,16 @@ export const useRemoteLookup = (
         search,
         hasMore,
         updateSearch,
-        refresh: () => load(1),
+        refresh: (value = search.value) => {
+            if (isDisposed) return;
+
+            if (value !== search.value) {
+                search.value = value;
+                resetOptions();
+            }
+
+            return load(1);
+        },
         loadMore: () => {
             if (!isLoading.value && !error.value && hasMore.value) return load(page.value + 1);
         },

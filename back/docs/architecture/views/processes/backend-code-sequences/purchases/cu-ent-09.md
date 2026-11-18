@@ -20,6 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
 | `Facade` | control | [`consumableGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js) |
 | `Core` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
+| `Offers` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) |
 | `Inventory` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
@@ -41,6 +42,8 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 ### Configuración y construcción
 
 El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js).
+
+`ensureSupplierMaterials` en [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) crea en bloque sólo los vínculos faltantes dentro de la transacción de la compra; conserva ofertas existentes.
 
 ## Composición de archivos
 
@@ -160,6 +163,7 @@ la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración
 ```mermaid
 sequenceDiagram
     autonumber
+    participant Offers@{ "type": "control" } as supplierMaterialService.js
     participant Totals@{ "type": "control" } as goodsReceiptTotalsService.js
     participant Facade@{ "type": "control" } as consumableGoodsReceiptService.js
     participant Core@{ "type": "control" } as goodsReceiptService.js
@@ -185,6 +189,11 @@ sequenceDiagram
             Core->>Prisma: tx.goodsReceipt.update({ where: { id, ...contextWhere }, data: headerData })
             opt Hay detalles nuevos
                 Core->>Totals: createGoodsReceiptDetailsAndUpdateTotals({ tx, details: newDetails, type, ... })
+                Totals->>Offers: ensureSupplierMaterials({ tx, supplierId, materialIds })
+                Offers->>Prisma: tx.supplierMaterial.createMany({ data, skipDuplicates: true })
+                Prisma-->>Offers: createMany(): Promise[BatchPayload]
+                Offers-->>Totals: ensureSupplierMaterials(): Promise[BatchPayload]
+                Totals-->>Core: createGoodsReceiptDetailsAndUpdateTotals(): Promise[Object]
                 Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details: createdDetails })
             end
         end

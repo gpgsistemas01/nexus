@@ -16,7 +16,7 @@ const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRoll
     body(fieldName).not().exists({ values: 'undefined' }).withMessage(errorMap.materialRollReference.READ_ONLY)
 );
 
-export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
+import { MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../shared/constants/inventory.js';
 
 export const isGoodsReceiptMaterialCreation = (body = {}) =>
     body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
