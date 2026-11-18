@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { mockPurchases } from './purchaseFixtures.js';
-import { ids } from '../fixtures/inventory.js';
+import { ids, pageOf } from '../fixtures/inventory.js';
 import { personData } from '../fixtures/records.js';
 import { purchaseItem } from '../fixtures/purchases.js';
 
@@ -528,6 +528,24 @@ for (const [path, label] of [
     { tag: '@essential' },
     async ({ page }) => {
       const { writes } = await mockPurchases(page);
+      const automatic = path === 'consumibles';
+      if (automatic)
+        await page.route(/\/api\/warehouse\/consumables\?/, (route) =>
+          route.fulfill({
+            json: pageOf([
+              {
+                ...purchaseItem,
+                material: {
+                  ...purchaseItem.material,
+                  type: 'CONSUMABLE',
+                  base: 1,
+                  height: 1,
+                  presentation: { ...purchaseItem.material.presentation, name: 'KILOGRAMOS' },
+                },
+              },
+            ]),
+          }),
+        );
       await page.goto(`/compras/${path}`);
       await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
       const dialog = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
@@ -537,21 +555,31 @@ for (const [path, label] of [
       await page.getByRole('option', { name: personData.fullName, exact: true }).click();
       await dialog.getByRole('radio', { name: 'Remisión', exact: true }).check();
       await dialog.getByRole('combobox', { name: label, exact: true }).click();
-      await page.getByRole('option', { name: 'Lona · 2 × 50 · ROLLO', exact: true }).click();
-      await dialog.getByLabel('Cantidad', { exact: true }).fill('10');
-      await dialog
-        .getByRole('checkbox', { name: 'El costo capturado corresponde al total', exact: true })
-        .check();
-      await dialog.getByLabel('Costo total del detalle sin IVA', { exact: true }).fill('500');
+      await page
+        .getByRole('option', {
+          name: automatic ? 'Lona · 1 × 1 · KILOGRAMOS' : 'Lona · 2 × 50 · ROLLO',
+          exact: true,
+        })
+        .click();
+      await dialog.getByLabel('Cantidad', { exact: true }).fill('0.75');
+      const totalOption = dialog.getByRole('checkbox', {
+        name: 'Usar el costo por presentación como costo total',
+        exact: true,
+      });
+      if (automatic) {
+        await expect(totalOption).toBeChecked();
+        await expect(totalOption).toBeDisabled();
+      } else await totalOption.check();
+      await dialog.getByLabel('Costo total del detalle sin IVA', { exact: true }).fill('150');
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
       const row = dialog.locator('tbody tr').first();
       await expect(row).toContainText('Total del detalle');
-      await expect(row).toContainText('$50');
-      await expect(dialog.getByLabel('Totales de compra')).toContainText('$580');
+      await expect(row).toContainText('$200');
+      await expect(dialog.getByLabel('Totales de compra')).toContainText('$174');
       await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
       await expect(dialog).toBeHidden();
       expect(writes[0]!.data).toMatchObject({
-        details: [{ quantity: 10, costPerUnitType: 500, costIsTotal: true }],
+        details: [{ quantity: 0.75, costPerUnitType: 150, costIsTotal: true }],
       });
     },
   );

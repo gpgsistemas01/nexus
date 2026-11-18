@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DECIMAL_INPUT_FORMAT } from '@nexus/input-validation';
 import { useIssueLineEntry } from '../composables/useIssueLineEntry.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
 import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
@@ -24,7 +25,7 @@ const entry = useIssueLineEntry({
         :selected="entry.selected.value"
         :presentation="getLookupPresentation(entry.selected.value)"
         :is-disabled="isDisabled || !canRead"
-        :minimum="resource === 'wastes' ? '0.01' : '1'"
+        :minimum="String(DECIMAL_INPUT_FORMAT.minimumPositive)"
         @update="entry.update"
         @blur="entry.blur"
         @search="entry.items.updateSearch"

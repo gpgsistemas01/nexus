@@ -126,7 +126,7 @@ la selección de partidas, **Cantidad a surtir** y **Cantidad de proyecto**.
 
 El artículo debe tener costo máximo mayor que cero. Si falta, configúrelo en **Almacén**.
 La cantidad de proyecto se expresa en la unidad de conversión y sirve para comparar
-lo previsto con la cantidad convertida. El descuento de stock usa **Cantidad a surtir**.
+lo previsto con la cantidad convertida. El descuento de stock usa **Cantidad a surtir**. En **KILOGRAMOS** y **METRO LINEAL**, puede solicitar y surtir fracciones desde `0.01`: entregar `0.25` descuenta `0.25` del stock y de su cantidad convertida, porque sus medidas son `1 × 1`. Registrar la solicitud no descuenta existencias; cada entrega descuenta sólo lo efectivamente surtido.
 
 ## Devolver una entrega
 

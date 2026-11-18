@@ -232,7 +232,7 @@ export const validateGoodsIssueDetailsArray = ({ allowDetailId = false } = {}) =
         allowDetailId,
         exclusiveMinimum: false,
         itemIdField: 'materialId',
-        minimumQuantity: 1,
+        minimumQuantity: DECIMAL_INPUT_FORMAT.minimumPositive,
         requireSupplier: true
     })
 ;

@@ -1,4 +1,8 @@
+import { isFixedUnitPresentation } from './wasteMeasurements.js';
 import { roundTo, normalizeDecimal } from '../utils/numberUtils.js';
+
+export const usesAutomaticTotalCost = ({ base, height, presentation } = {}) =>
+    isFixedUnitPresentation(presentation) && Number(base) === 1 && Number(height) === 1;
 
 export const VAT_RATE = 0.16;
 export const VAT_MULTIPLIER = 1 + VAT_RATE;

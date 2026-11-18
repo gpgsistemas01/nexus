@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateGoodsReceiptDetailAmounts } from '../../../../src/shared/inventory/goodsReceiptCalculations.js';
+import { calculateGoodsReceiptDetailAmounts, usesAutomaticTotalCost } from '../../../../src/shared/inventory/goodsReceiptCalculations.js';
 
 describe('importes compartidos de compras', () => {
     it('calcula el área, el costo convertido y el IVA de una presentación con medidas', () => {
@@ -26,4 +26,12 @@ it.each([1, 2.5])('costo total divide por cantidad comprada aunque la medida sea
         costIsTotal: true, conversionUnitCost: 50, netPurchaseAmount: 500, grossPurchaseAmount: 580,
         convertedQuantity: 10 * height
     });
+});
+
+it.each([
+    ['KILOGRAMOS', 1, 1, true], ['KILOGRAMO', '1', '1', true],
+    ['METRO LINEAL', 1, 1, true], ['METRO LINEAL', 1, 2, false],
+    ['KILOGRAMOS', null, null, false], ['PIEZA', 1, 1, false], ['ROLLO', 1, 1, false]
+])('costo total automático para %s con medidas %s × %s: %s', (name, base, height, expected) => {
+    expect(usesAutomaticTotalCost({ presentation: { name }, base, height })).toBe(expected);
 });

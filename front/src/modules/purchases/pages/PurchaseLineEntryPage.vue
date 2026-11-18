@@ -33,6 +33,7 @@ const { values, errors, items, item } = line;
         :selected="item"
         :presentation="getLookupPresentation(item)"
         :cost-is-total="line.costIsTotal.value"
+        :automatic-total-cost="line.automaticTotalCost.value"
         :is-disabled="isDisabled"
         :can-read="canRead"
         :can-create="canCreate"

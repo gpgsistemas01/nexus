@@ -717,3 +717,40 @@ it('el surtido protege detalles persistidos/cancelados y desmarcar limpia sólo 
   expect(original.details[0]!.projectConvertedQuantity).toBe('');
   wrapper.unmount();
 });
+
+it.each(['KILOGRAMOS', 'METRO LINEAL'])(
+  'solicita fracciones de %s conservando la unidad',
+  async (name) => {
+    vi.spyOn(issueLookupService, 'list').mockResolvedValue(pageOf([]));
+    const added = vi.fn();
+    const entry = mountComposable(() =>
+      useIssueLineEntry({
+        resource: 'consumables',
+        isDisabled: () => false,
+        canRead: () => true,
+        onAdd: added,
+      }),
+    );
+    const item = mapIssueItemOption(
+      {
+        ...material,
+        material: {
+          ...material.material,
+          type: 'CONSUMABLE',
+          base: 1,
+          height: 1,
+          presentation: { ...material.material.presentation, name },
+        },
+      },
+      'consumables',
+    );
+    entry.value.selected.value = item;
+    entry.value.update('itemId', item.id);
+    entry.value.update('quantity', '0.75');
+    await entry.value.add();
+    expect(added).toHaveBeenCalledWith(
+      expect.objectContaining({ quantity: 0.75, convertedQuantity: 0.75 }),
+    );
+    entry.wrapper.unmount();
+  },
+);

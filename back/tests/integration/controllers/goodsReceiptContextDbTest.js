@@ -154,6 +154,32 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 10 }]
     });
 
+    it.each(['KILOGRAMOS', 'METRO LINEAL'])('compra fracciones con presentación %s y costo total sin alterar la unidad', async name => {
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids.consumable } };
+        const original = await prisma.material.findUniqueOrThrow({ where: { id: ids.consumable }, select: { presentationId: true, base: true, height: true } });
+        const presentation = await prisma.presentation.findUniqueOrThrow({ where: { name } });
+        try {
+            await prisma.material.update({ where: { id: ids.consumable }, data: { presentationId: presentation.id, base: 1, height: 1 } });
+            const before = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+            const response = await request(app).post(path('consumable')).send({
+                ...purchaseBody('consumable'),
+                details: [{ materialId: ids.consumable, quantity: 0.75, costPerUnitType: 150, costIsTotal: false }]
+            }).expect(200);
+            const saved = await prisma.goodsReceiptDetail.findFirstOrThrow({ where: { goodsReceiptId: response.body.goodsReceipt.id } });
+            expect(saved.costIsTotal).toBe(true);
+            expect(Number(saved.quantity)).toBe(0.75);
+            expect(Number(saved.convertedQuantity)).toBe(0.75);
+            expect(Number(saved.conversionUnitCost)).toBe(200);
+            expect(Number(saved.netPurchaseAmount)).toBe(150);
+            expect(Number(saved.grossPurchaseAmount)).toBe(174);
+            const after = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+            expect(Number(after.currentStock)).toBe(Number(before.currentStock) + 0.75);
+            expect(Number(after.convertedQuantity)).toBe(Number(before.convertedQuantity) + 0.75);
+        } finally {
+            await prisma.material.update({ where: { id: ids.consumable }, data: original });
+        }
+    });
+
     it.each(['material', 'consumable'])('comprar %s conserva el costo de almacén, incluso si aún no se capturó', async resource => {
         const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
         try {

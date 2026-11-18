@@ -3,6 +3,7 @@ import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VBtn } from 'vuetify/components/VBtn';
+import { DECIMAL_INPUT_FORMAT } from '@nexus/input-validation';
 import { isPiecePresentation } from '@nexus/piece-quantity';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
@@ -15,6 +16,7 @@ defineProps<{
     selected?: LookupItem;
     presentation: string;
     costIsTotal?: boolean;
+    automaticTotalCost?: boolean;
     isDisabled: boolean;
     canRead: boolean;
     canCreate: boolean;
@@ -65,7 +67,9 @@ const emit = defineEmits<{
                 <VTextField
                     label="Cantidad"
                     type="number"
-                    min="1"
+                    :min="
+                        isPiecePresentation(presentation) ? 1 : DECIMAL_INPUT_FORMAT.minimumPositive
+                    "
                     :step="isPiecePresentation(presentation) ? 1 : 0.01"
                     :model-value="values.quantity"
                     :error-messages="errors.quantity"
@@ -106,11 +110,15 @@ const emit = defineEmits<{
             </VCol>
             <VCol cols="12">
                 <VCheckbox
-                    label="El costo capturado corresponde al total"
-                    hint="Calcula el costo unitario dividiendo este importe entre la cantidad. El IVA se agrega al total."
+                    label="Usar el costo por presentación como costo total"
+                    :hint="
+                        automaticTotalCost
+                            ? 'Automático para KILOGRAMOS y METRO LINEAL con medidas 1 × 1. Costo unitario = costo total sin IVA ÷ cantidad comprada.'
+                            : 'Marque si el costo por presentación cubre toda la cantidad comprada. El costo unitario se obtiene dividiendo entre esa cantidad.'
+                    "
                     persistent-hint
                     :model-value="costIsTotal ?? false"
-                    :disabled="isDisabled"
+                    :disabled="isDisabled || automaticTotalCost"
                     @update:model-value="emit('update:costIsTotal', $event === true)"
                 />
             </VCol>
