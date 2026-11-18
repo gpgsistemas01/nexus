@@ -65,11 +65,13 @@ flowchart TB
     page["PurchaseLineEntryPage"]
     line["usePurchaseLineEntry"]
     form["PurchaseLineEntryForm"]
+    entryRow["DetailEntryRow"]
     service["purchaseLookupService"]
     details["purchaseDetails.ts"]
     editor --> page
     page --> line
     page --> form
+    form --> entryRow
     line --> service
     line --> details
 ```

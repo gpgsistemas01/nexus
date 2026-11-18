@@ -8,12 +8,18 @@ import { createCatalogValidation } from '@nexus/form-validation';
 import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { buildCatalogPayload, catalogDefinition } from '../catalog.js';
 import { catalogService } from '../services/catalogService.js';
-import type { CatalogField, CatalogName, CatalogTarget, CatalogValues } from '../catalog.js';
+import type {
+    CatalogField,
+    CatalogName,
+    CatalogTarget,
+    CatalogValues,
+    CatalogEntry,
+} from '../catalog.js';
 
 export const useCatalogEditor = (options: {
     catalog: CatalogName;
     target: CatalogTarget;
-    onSaved: () => void;
+    onSaved: (entry: CatalogEntry) => void;
     onDenied: (status: number) => void;
 }) => {
     const { catalog, target } = options;
@@ -33,10 +39,12 @@ export const useCatalogEditor = (options: {
               });
     const form = useForm<FormValues>({
         initialValues: {
-            name: row?.name ?? '',
+            name: row?.name ?? (target.action === 'create' ? (target.initialName ?? '') : ''),
             symbol: row?.symbol ?? '',
             isActive: row?.isActive ?? true,
-            type: row?.type ?? 'MATERIAL',
+            type:
+                row?.type ??
+                (target.action === 'create' ? (target.materialType ?? 'MATERIAL') : 'MATERIAL'),
             presentationId: row?.presentationId ?? '',
             unitMeasureId: row?.unitMeasureId ?? '',
             base: row?.base ?? '',

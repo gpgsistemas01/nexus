@@ -10,6 +10,10 @@ pertenecen al lector de la página. SweetAlert2 mantiene confirmaciones y avisos
 Los fallos generales de envío usan `FormErrorDialog`; su interacción se define en
 el [estándar de interfaz](../../../interface-standards.md#carga-y-recuperación).
 
+`DetailEntryRow` presenta la captura de Compras y Salidas con las columnas que
+entrega la tabla. Usa un único conjunto de controles: fila alineada en escritorio
+y campos apilados en móvil; el estado permanece en los composables del módulo.
+
 ## Dependencias de presentación
 
 **Identificador:** `DIA-VUE-COMP-009`. **Pregunta:** ¿qué piezas propias componen los
@@ -73,7 +77,8 @@ definen campos modificables, props, eventos y callbacks.
 
 ## Selección remota y foco
 
-`RemoteSelect` presenta opciones, búsqueda y carga. Sus
+`RemoteSelect` presenta opciones, búsqueda y carga. En detalles, `selectedTitle`
+muestra el nombre seleccionado mientras las opciones conservan su descripción completa. Sus
 [eventos](../../../contracts/form-and-event-contracts.md#eventos-de-interacción) permiten
 consultar o solicitar un alta. La [creación
 contextual](../../development/design-and-construction-patterns/09-contextual-creation.md)

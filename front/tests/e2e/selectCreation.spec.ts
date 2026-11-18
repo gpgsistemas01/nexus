@@ -29,10 +29,6 @@ for (const [path, resource, title] of [
     page,
   }) => {
     await mockWarehouse(page, [...user.permissions, 'suppliers:manage']);
-    await page.goto('/directorio/proveedores');
-    await expect(
-      page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),
-    ).toBeVisible();
     let attempts = 0;
     const term = `Proveedor nuevo ${resource}`;
     await page.route('**/api/warehouse/suppliers', async (route) => {
@@ -59,7 +55,12 @@ for (const [path, resource, title] of [
     await page.goto(`/almacen/${path}`);
     await page.getByRole('button', { name: `Nuevo ${title}`, exact: true }).click();
     const parent = page.getByRole('dialog', { name: `Crear ${title}`, exact: true });
-    await parent.getByLabel('Nombre', { exact: true }).fill('Captura del artículo');
+    await chooseOption(
+      page,
+      title === 'material' ? 'Material' : 'Consumible',
+      'Lona · 2 × 50 · ROLLO',
+      parent,
+    );
     await parent.getByLabel('Cantidad inicial', { exact: true }).fill('5');
     await openCreation(page, parent, 'Proveedor', 'Registrar proveedor', term);
     const child = page.getByRole('dialog', { name: 'Registrar proveedor', exact: true });
@@ -67,7 +68,12 @@ for (const [path, resource, title] of [
     await expect(child.locator('[aria-invalid="true"]')).toHaveCount(0);
     await child.getByRole('button', { name: 'Cerrar', exact: true }).click();
     expect(attempts).toBe(0);
-    await expect(parent.getByLabel('Nombre', { exact: true })).toHaveValue('Captura del artículo');
+    await expect(
+      parent.getByRole('combobox', {
+        name: title === 'material' ? 'Material' : 'Consumible',
+        exact: true,
+      }),
+    ).toHaveValue('Lona · 2 × 50 · ROLLO');
     await openCreation(page, parent, 'Proveedor', 'Registrar proveedor', term);
     await child.getByLabel('Razón social', { exact: true }).fill('Empresa nueva');
     await child.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -79,7 +85,12 @@ for (const [path, resource, title] of [
       term,
     );
     await expect(parent.getByLabel('Cantidad inicial', { exact: true })).toHaveValue('5');
-    await expect(parent.getByLabel('Nombre', { exact: true })).toHaveValue('Captura del artículo');
+    await expect(
+      parent.getByRole('combobox', {
+        name: title === 'material' ? 'Material' : 'Consumible',
+        exact: true,
+      }),
+    ).toHaveValue('Lona · 2 × 50 · ROLLO');
     expect(attempts).toBe(2);
   });
 

@@ -220,6 +220,7 @@ sequenceDiagram
 | Caso o condición | Regla de aplicación |
 | --- | --- |
 | Proveedor desde Inventario | Sólo alta de Materiales/Consumibles, con lectura y alta de proveedor. No aplica a Merma, proveedor fijado, envío o captura pendiente ni instancia desmontada. El texto buscado precarga el nombre comercial; la razón social se captura aparte. |
+| Artículo desde Inventario | Requiere gestión del catálogo de materiales. `CatalogEditorPage` recibe nombre y tipo del módulo y devuelve la identidad al selector, sin proveedor previo, relación ni stock. |
 | Proveedor desde Compras | Sólo compra nueva editable y con permisos de lectura/alta. La edición conserva el proveedor original. |
 | Artículo desde Compras | Requiere lectura/escritura de artículos y lectura de Presentación/Unidad. Usa el proveedor de la compra y `creationContext=goodsReceipt`; no captura stock ni costo inicial. |
 | Cliente desde Salidas | Requiere encabezado editable y permisos de lectura/alta de cliente. Cambiarlo actualiza sus selecciones dependientes de asesor y proyecto. No permite crear asesor o solicitante. |

@@ -389,6 +389,8 @@ describe('salidas Vue: contratos y modos', () => {
     const line = createIssueDetailDraft(option, 2, 'materials');
     expect(line).toMatchObject({
       supplierId: ids.supplier,
+      supplierName: 'Proveedor Central',
+      name: 'Lona',
       itemId: ids.material,
       convertedQuantity: 200,
     });

@@ -8,6 +8,7 @@ import type { LookupItem } from '../../../shared/lookup.js';
 import PurchaseLineEntryForm from '../components/PurchaseLineEntryForm.vue';
 
 const props = defineProps<{
+    columns: string[];
     resource: PurchaseResource;
     supplier: LookupItem;
     isDisabled: boolean;
@@ -26,6 +27,7 @@ const { values, errors, items, item } = line;
 
 <template>
     <PurchaseLineEntryForm
+        :columns="columns"
         :item-label="PURCHASE_CONFIG[resource].item"
         :values="values"
         :errors="errors"

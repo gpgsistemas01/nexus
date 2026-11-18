@@ -5,7 +5,6 @@ import { useInventoryEditor } from '../composables/useInventoryEditor.js';
 import { inventorySections } from '../formFields.js';
 import { INVENTORY_CONFIG } from '../inventory.js';
 import type { EditorTarget, InventoryResource, StockAdditionTarget } from '../inventory.js';
-import type { ItemCreation } from '../../../shared/lookup.js';
 import type { LookupCreation, LookupItem } from '../../../shared/lookup.js';
 
 const props = defineProps<{
@@ -25,7 +24,7 @@ const emit = defineEmits<{
     unauthorized: [];
     addStock: [target: StockAdditionTarget];
     createSupplier: [request: LookupCreation];
-    createArticle: [request: ItemCreation];
+    createArticle: [request: LookupCreation];
 }>();
 const editor = useInventoryEditor({
     resource: props.resource,
@@ -76,7 +75,6 @@ const context = props.target.row
         :article="editor.selectedArticle.value"
         :can-create-article="
             canCreateArticle &&
-            !!editor.selectedSupplier.value &&
             !creationContext &&
             target.action === 'create' &&
             resource !== 'wastes'
@@ -91,7 +89,6 @@ const context = props.target.row
         @create-article="
             emit('createArticle', {
                 search: $event,
-                supplier: editor.selectedSupplier.value!,
                 onCreated: editor.selectCreatedArticle,
             })
         "

@@ -97,3 +97,27 @@ it('Material devuelve identidad, tipo y medidas sin exigir ni inventar proveedor
   });
   expect(result.data[0]).not.toHaveProperty('isActive');
 });
+
+it('el alta contextual rechaza una respuesta de otro tipo de artículo', async () => {
+  apiClient.http.defaults.adapter = mockHttpAdapter(() => ({
+    data: {
+      code: 'CREATED_CATALOG_ENTRY',
+      data: {
+        id: 'm',
+        version: 0,
+        name: 'Consumible',
+        type: 'CONSUMABLE',
+        presentationId: 'p',
+        unitMeasureId: 'u',
+        presentation: { name: 'PIEZA' },
+        unitMeasure: { name: 'PIEZA', symbol: 'PZA.' },
+        base: null,
+        height: null,
+        minStock: '0',
+      },
+    },
+  }));
+  await expect(
+    catalogService.save('materials', { action: 'create', materialType: 'MATERIAL' }, {}),
+  ).rejects.toThrow('otro catálogo');
+});

@@ -13,14 +13,13 @@ import { useAuthSession } from '../../auth/session.js';
 import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import { useInventory } from '../composables/useInventory.js';
 import type { InventoryResource } from '../inventory.js';
-import type { ItemCreation } from '../../../shared/lookup.js';
 import type { LookupCreation } from '../../../shared/lookup.js';
 
 const props = defineProps<{ resource: InventoryResource }>();
 
 const emit = defineEmits<{
     createSupplier: [request: LookupCreation];
-    createArticle: [request: ItemCreation];
+    createArticle: [request: LookupCreation];
 }>();
 
 const InventoryImportPage = defineAsyncComponent(() => import('./InventoryImportPage.vue'));
@@ -174,8 +173,7 @@ onMounted(() => {
             session.user.value!.permissions.includes(PERMISSIONS.SUPPLIERS_READ)
         "
         :can-create-article="
-            session.user.value!.permissions.includes(PERMISSIONS.PRESENTATIONS_READ) &&
-            session.user.value!.permissions.includes(PERMISSIONS.UNIT_MEASURES_READ)
+            session.user.value!.permissions.includes(PERMISSIONS.MATERIAL_CATALOGS_MANAGE)
         "
         @create-article="emit('createArticle', $event)"
         @create-supplier="emit('createSupplier', $event)"

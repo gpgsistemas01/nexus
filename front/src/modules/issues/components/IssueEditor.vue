@@ -157,10 +157,6 @@ const emit = defineEmits<{
                 />
             </VCol>
         </VRow>
-        <slot
-            v-if="canEditDetails"
-            name="entry"
-        />
         <h3>Detalles de la salida</h3>
         <VAlert
             v-if="errors.details"
@@ -178,6 +174,16 @@ const emit = defineEmits<{
             @remove="emit('remove', $event)"
             @supply="(id, changes) => emit('supply', id, changes)"
             @return="emit('return', $event)"
-        />
+        >
+            <template
+                v-if="canEditDetails"
+                #entry="{ columns }"
+            >
+                <slot
+                    name="entry"
+                    :columns="columns"
+                />
+            </template>
+        </IssueDetailsTable>
     </RecordEditorDialog>
 </template>

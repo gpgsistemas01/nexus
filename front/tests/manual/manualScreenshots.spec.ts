@@ -273,7 +273,7 @@ test('salidas: consulta, borrador local y selección de surtido', async ({ page 
   await page.getByRole('option').filter({ hasText: 'Lona' }).click();
   await creating.getByLabel('Cantidad', { exact: true }).fill('2');
   await creating.getByRole('button', { name: 'Agregar', exact: true }).click();
-  await expect(creating.getByRole('cell', { name: /^Lona(?: Proveedor Central)?$/ })).toBeVisible();
+  await expect(creating.getByText('Lona', { exact: true }).filter({ visible: true })).toBeVisible();
   await capture(page, '23-issue-create');
   await creating.getByRole('button', { name: 'Regresar', exact: true }).click();
   await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();

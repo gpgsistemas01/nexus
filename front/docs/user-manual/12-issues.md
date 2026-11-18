@@ -37,7 +37,7 @@ Si dispone de una sola área, permanece seleccionada al limpiar filtros.
 
 1. Pulse **Nueva salida** y seleccione cliente, asesor, área y solicitante.
 2. Capture proyecto, fecha y observaciones. Para **GPG INTERNO**, conserve el proyecto del área.
-3. Seleccione el artículo del módulo, capture **Cantidad** y pulse **Agregar**.
+3. En el último renglón de detalles, seleccione el artículo en su columna, capture **Cantidad** bajo **Salida** y pulse **Agregar**.
 4. Revise las partidas, pulse **Guardar** y compruebe el folio pendiente.
 
 <!-- module:any reference salidas-materiales -->
@@ -46,7 +46,7 @@ Si dispone de una sola área, permanece seleccionada al limpiar filtros.
 
 <!-- module:end -->
 
-Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida distinta.
+El proveedor se muestra debajo del nombre en cada detalle, para distinguir las ofertas del mismo artículo. Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida distinta. En móvil se conserva esta identificación en las fichas.
 Materiales y consumibles requieren al menos una unidad; merma admite cantidades positivas menores.
 Solicitar no descuenta inventario.
 

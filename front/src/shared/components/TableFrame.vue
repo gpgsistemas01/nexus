@@ -414,4 +414,18 @@ const scrollTable = (direction: -1 | 1) => {
         scroll-padding-inline: 14rem 7rem;
     }
 }
+@media (max-width: 599px) {
+    .table-frame--entry :deep(.v-table__wrapper) {
+        display: block;
+    }
+    .table-frame--entry :deep(.v-table__wrapper > table),
+    .table-frame--entry :deep(.v-table__wrapper > table > tbody) {
+        display: block;
+        width: 100%;
+    }
+    .table-frame--entry :deep(thead),
+    .table-frame--entry :deep(tbody > tr:not(.detail-entry)) {
+        display: none;
+    }
+}
 </style>

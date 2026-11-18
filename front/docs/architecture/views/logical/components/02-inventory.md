@@ -1,6 +1,6 @@
 # Inventario y merma: componentes
 
-**Identificador:** `DIA-VUE-COMP-002`. **Pregunta:** ¿quién compone listado, editor y alta auxiliar de proveedor?
+**Identificador:** `DIA-VUE-COMP-002`. **Pregunta:** ¿quién compone listado, editor y altas auxiliares?
 **Fuentes:** [InventoryWorkspace.vue](../../../../../src/app/pages/InventoryWorkspace.vue), [InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue), [inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts), [apiClient.ts](../../../../../src/shared/http/apiClient.ts).
 **Notación:** [mapa de dependencias](../../diagram-reading.md#componentes-y-dependencias).
 
@@ -9,6 +9,7 @@ flowchart TB
     workspace["InventoryWorkspace"]
     page["InventoryPage"]
     auxiliary["DirectoryCreationPage"]
+    catalogEditor["CatalogEditorPage"]
     inventory["useInventory"]
     list["useInventoryList"]
     editorPage["InventoryEditorPage"]
@@ -20,6 +21,7 @@ flowchart TB
     http["apiClient.ts"]
     workspace --> page
     workspace --> auxiliary
+    workspace --> catalogEditor
     page --> inventory
     page --> editorPage
     inventory --> list
@@ -75,5 +77,4 @@ descargar el inventario para filtrarlo en memoria. El
 [contrato HTTP](../../../contracts/client-contracts.md) conserva parámetros y aceptación.
 
 Compras y Almacén consultan artículos mediante `shared/services/materialCatalogService`,
-con búsqueda, paginación y señal de cancelación comunes. El contrato `ItemCreation`
-vive en `shared/lookup.ts`; el alta auxiliar comparte el editor de inventario.
+con búsqueda, paginación y señal de cancelación comunes. El contrato de selección vive en `shared/lookup.ts`; Compras conserva el contrato `ItemCreation` con proveedor fijado. Almacén registra artículos mediante `CatalogEditorPage` y `LookupCreation`, sin exigir proveedor.

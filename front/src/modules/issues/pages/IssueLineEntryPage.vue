@@ -6,7 +6,12 @@ import { getLookupPresentation } from '../../../shared/utils/getLookupPresentati
 import type { IssueResource, IssueDetail } from '../issue.js';
 import IssueLineEntryForm from '../components/IssueLineEntryForm.vue';
 
-const props = defineProps<{ resource: IssueResource; isDisabled: boolean; canRead: boolean }>();
+const props = defineProps<{
+    columns: string[];
+    resource: IssueResource;
+    isDisabled: boolean;
+    canRead: boolean;
+}>();
 const emit = defineEmits<{ add: [line: IssueDetail] }>();
 const entry = useIssueLineEntry({
     resource: props.resource,
@@ -18,6 +23,7 @@ const entry = useIssueLineEntry({
 
 <template>
     <IssueLineEntryForm
+        :columns="columns"
         :label="ISSUE_CONFIG[resource].item"
         :values="entry.values"
         :errors="entry.errors.value"

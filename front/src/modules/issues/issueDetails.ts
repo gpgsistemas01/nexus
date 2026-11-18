@@ -63,6 +63,7 @@ export const createIssueDetailDraft = (
                 : String(
                       (isRecord(data.supplier) ? data.supplier.id : undefined) ?? data.supplierId,
                   ),
+        supplierName: String((isRecord(data.supplier) ? data.supplier.tradeName : '') ?? ''),
         name: String(item.name),
         base,
         height,
