@@ -80,6 +80,10 @@ contextual](../../development/design-and-construction-patterns/09-contextual-cre
 explica el editor auxiliar; la [secuencia de
 lookup](../../processes/02-shared-runtime/03-remote-lookup.md), las consultas.
 
+`controlDefaults` aplica `autocomplete="suppress"` de Vuetify a `VAutocomplete` y
+`VSelect`. Los selectores excluyen el historial nativo y conservan la selección por ID;
+los campos de texto mantienen su autocompletado.
+
 En la cancelación de un detalle de compra, el editor de consulta libera temporalmente
 la retención de foco y bloquea sus acciones mientras SweetAlert2 controla la confirmación.
 Los demás diálogos conservan la retención de foco habitual. Las reglas de teclado y

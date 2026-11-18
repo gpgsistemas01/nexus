@@ -1,3 +1,5 @@
+import { findMaterialCatalog } from '../../../services/warehouse/materials/materialService.js';
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import {
     createConsumable,
@@ -18,6 +20,9 @@ import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../..
 
 export const getAllConsumables = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
+    if (req.query.catalog === 'true') {
+        return res.status(200).json(await findMaterialCatalog({ skip, take, search: getDataTableSearch(req.query), type: MATERIAL_TYPES.CONSUMABLE }));
+    }
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns: ['name', null, null, null, null, null, null]

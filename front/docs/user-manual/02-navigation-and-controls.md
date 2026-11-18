@@ -128,6 +128,8 @@ formulario secundario sin guardar conserva la captura principal.
 
 ## Usar los formularios
 
+En los selectores, busque y elija una opción de Nexus. Las sugerencias guardadas por el navegador contienen texto y no sustituyen la selección de un registro; el autocompletado nativo se suprime en esos controles.
+
 Corrija los campos que muestren un mensaje al editar o enviar. Los campos de
 consulta no se pueden cambiar.
 

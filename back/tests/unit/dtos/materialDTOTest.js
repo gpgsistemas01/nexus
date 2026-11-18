@@ -22,6 +22,7 @@ describe('materialDTO', () => {
     });
 
     expect(dto).toEqual({
+      creationContext: 'goodsReceipt',
       name: 'Lámina',
       supplierId: 'supplier-1',
       presentationId: 'presentation-1',

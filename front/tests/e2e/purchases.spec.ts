@@ -107,6 +107,11 @@ for (const [path, title, item] of [
       await expect(dialog.getByLabel('Número de Factura', { exact: true })).toHaveValue(
         'F'.repeat(50),
       );
+      for (const label of ['Proveedor', 'Persona que recibe']) {
+        const select = dialog.getByRole('combobox', { name: label, exact: true });
+        await expect(select).toHaveAttribute('autocomplete', 'off');
+        expect(await select.evaluate((input) => (input as HTMLInputElement).form)).toBeNull();
+      }
       await dialog.getByLabel('Observaciones', { exact: true }).fill('A'.repeat(501));
       await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue(
         'A'.repeat(500),
@@ -117,6 +122,10 @@ for (const [path, title, item] of [
       await dialog.getByRole('combobox', { name: 'Persona que recibe', exact: true }).click();
       await page.getByRole('option', { name: personData.fullName, exact: true }).click();
       await dialog.getByRole('radio', { name: 'Remisión', exact: true }).check();
+      await expect(dialog.getByRole('combobox', { name: item, exact: true })).toHaveAttribute(
+        'autocomplete',
+        'off',
+      );
       await dialog.getByRole('combobox', { name: item, exact: true }).click();
       await page.getByRole('option', { name: 'Lona · 2 × 50 · ROLLO', exact: true }).click();
       await expect(dialog.getByLabel('Presentación', { exact: true })).toHaveValue('ROLLO');
@@ -126,6 +135,12 @@ for (const [path, title, item] of [
       );
       await dialog.getByLabel('Cantidad', { exact: true }).fill('2');
       await dialog.getByLabel('Costo por Presentación', { exact: true }).fill('100');
+      await expect(dialog.getByRole('combobox', { name: 'Proveedor', exact: true })).toHaveValue(
+        'Proveedor Central',
+      );
+      await expect(
+        dialog.getByRole('combobox', { name: 'Persona que recibe', exact: true }),
+      ).toHaveValue(personData.fullName);
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
       await expect(dialog.getByLabel('Presentación', { exact: true })).toHaveValue('');
       await expect(dialog.getByRole('cell', { name: 'Lona', exact: true })).toBeVisible();

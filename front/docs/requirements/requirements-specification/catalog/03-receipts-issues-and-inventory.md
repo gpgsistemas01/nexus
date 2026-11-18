@@ -74,7 +74,7 @@ a Almacén y administración.
   contexto correspondiente. Un documento vacío, mixto o de otro contexto se rechaza
   sin modificar documento, existencia ni movimientos.
 - **CA-RF-REC-007-2:** un artículo no catalogado puede darse de alta desde la compra;
-  su oferta queda sin existencia hasta confirmar la recepción conforme a `RF-CAT-006`
+  su identidad queda en el catálogo sin oferta ni existencia hasta confirmar la recepción conforme a `RF-CAT-006`
   o `RF-CAT-026`. No se contabiliza dos veces la cantidad recibida.
 - **CA-RF-REC-002-1:** la cantidad corregida es positiva y no supera la cantidad
   recibida vigente; el costo es positivo y debe existir un cambio de cantidad o costo.
@@ -138,3 +138,5 @@ a Almacén y administración.
 Cada detalle de compra permite indicar si el costo capturado es el total sin IVA. En ese modo, el subtotal es ese costo, el costo unitario es costo ÷ cantidad comprada y el IVA se calcula sobre el subtotal. Sin marcar se conserva cantidad × costo. La selección persiste por detalle y se conserva en correcciones, consulta y Excel, para cualquier presentación.
 
 Para KILOGRAMOS y METRO LINEAL, las medidas son `1 × 1`: compras y surtidos suman o descuentan la cantidad capturada, incluidas fracciones desde `0.01`. Solicitar una salida no descuenta stock; cada entrega descuenta sólo lo surtido. En nuevas partidas de KILOGRAMOS y METRO LINEAL con medidas `1 × 1`, **Usar el costo por presentación como costo total** se activa automáticamente; el servidor resuelve presentación y medidas persistidas y aplica la regla aunque el cliente envíe `false`. En otras presentaciones la opción es manual. Las correcciones conservan el modo registrado en la partida original.
+
+- **CA-RF-REC-007-3:** Compras consulta identidades únicas de todo el catálogo del tipo correspondiente, con búsqueda y paginación, sin exigir vínculo previo al proveedor. Confirmar alta o nuevas partidas crea sólo las ofertas faltantes y suma la existencia en la misma transacción. Reutiliza ofertas activas sin alterar su costo máximo; rechaza ofertas existentes inactivas. Cancelar la captura no vincula artículos.

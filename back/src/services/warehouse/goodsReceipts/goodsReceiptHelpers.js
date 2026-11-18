@@ -33,7 +33,7 @@ export const GOODS_RECEIPT_DETAIL_INCLUDE = Object.freeze({
 });
 
 export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId = null, type = null, requireActive = true } = {}) => {
-    const materialIds = details.map(d => d.materialId);
+    const materialIds = [...new Set(details.map(d => d.materialId))];
 
     const materials = await findMaterialsSnapshot({ tx, materialIds, supplierId });
 
@@ -59,6 +59,17 @@ export const calculateGoodsReceiptDetail = ({ material, detail }) => {
         materialName: material.name,
         ...calculateGoodsReceiptDetailAmounts({ ...detail, base: material.base, height: material.height })
     };
+};
+
+// Las entradas ya hidratan los artículos al guardar la compra; reutilizan esos datos para el movimiento.
+export const buildGoodsReceiptStockOffers = (goodsReceipt, details = goodsReceipt.details) => {
+    const materials = new Map(goodsReceipt.details.map(detail => [detail.materialId, detail.material]));
+    return [...new Set(details.map(detail => detail.materialId))].map(materialId => ({
+        materialId,
+        supplierId: goodsReceipt.supplierId,
+        material: materials.get(materialId),
+        supplier: { tradeName: goodsReceipt.supplierName }
+    }));
 };
 
 export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => details.reduce((acc, detail) => {

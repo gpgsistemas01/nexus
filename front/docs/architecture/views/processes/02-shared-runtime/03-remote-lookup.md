@@ -2,6 +2,8 @@
 
 **Casos relacionados:** RD-VUE-006; RN-VUE-003/005; soporte de captura.
 
+`refresh(search)` cambia la búsqueda y recarga la primera página en una sola operación; cancela el debounce anterior. Sin argumento conserva la búsqueda. Las altas rápidas de Compras usan `refresh('')` para evitar dos solicitudes consecutivas.
+
 ## Primera apertura y reutilización
 
 **Identificador:** `DIA-VUE-SEQ-058`. Apertura sin texto de búsqueda. La

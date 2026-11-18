@@ -1,3 +1,4 @@
+import { ensureSupplierMaterials } from '../materials/supplierMaterialService.js';
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import { createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptTotalsService.js";
@@ -25,6 +26,7 @@ import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierErro
 import {
     buildGoodsReceiptContextWhere,
     buildGoodsReceiptDetails,
+    buildGoodsReceiptStockOffers,
     calculateGoodsReceiptTotals,
     GOODS_RECEIPT_DETAIL_INCLUDE
 } from "./goodsReceiptHelpers.js";
@@ -164,16 +166,15 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
 
         if (!receivedBy) throw new PersonReceivedByNotFound();
 
-        const processedDetails = await buildGoodsReceiptDetails(details, { supplierId, type });
-
-        const totals = calculateGoodsReceiptTotals(processedDetails);
-
         const referenceType = type === MATERIAL_TYPES.CONSUMABLE
             ? DOCUMENT_REFERENCE_TYPES.CONSUMABLE_GOODS_RECEIPT
             : DOCUMENT_REFERENCE_TYPES.GOODS_RECEIPT;
 
         const result = await getDb().$transaction(async (tx) => {
 
+            const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId, type });
+            await ensureSupplierMaterials({ tx, supplierId, materialIds: processedDetails.map(detail => detail.materialId) });
+            const totals = calculateGoodsReceiptTotals(processedDetails);
             referenceNumber = await generateYearlyReferenceNumber({ type: referenceType, tx });
 
             const goodsReceipt = await tx.goodsReceipt.create({
@@ -217,6 +218,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
             await applyInventoryMovement({
                 tx,
                 reference: { goodsReceiptId: goodsReceipt.id },
+                supplierMaterials: buildGoodsReceiptStockOffers(goodsReceipt),
                 details: goodsReceipt.details.map(detail => ({
                     materialId: detail.materialId,
                     goodsReceiptDetailId: detail.id,
@@ -334,6 +336,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
             await applyInventoryMovement({
                 tx,
                 reference: { goodsReceiptId: id },
+                supplierMaterials: buildGoodsReceiptStockOffers(updatedReceipt, createdDetails),
                 details: createdDetails.map(detail => ({
                     materialId: detail.materialId,
                     goodsReceiptDetailId: detail.id,

@@ -305,3 +305,9 @@ export const createSupplierMaterial = async ({
     // El alta no puede actualizar una oferta que ganó una carrera concurrente.
     return db.supplierMaterial.create({ data });
 };
+
+export const ensureSupplierMaterials = ({ tx, supplierId, materialIds }) => tx.supplierMaterial.createMany({
+    // Un orden común evita esperas cruzadas entre compras que crean las mismas ofertas.
+    data: [...new Set(materialIds)].sort().map(materialId => ({ supplierId, materialId })),
+    skipDuplicates: true
+});

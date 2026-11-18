@@ -1,3 +1,4 @@
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import {
     createMaterialDtoForEdit,
     createMaterialDtoForRegister,
@@ -6,6 +7,7 @@ import {
 import { successCodeMessages } from "../../../shared/constants/apiSuccessCodes.js";
 import {
     findAllMaterials,
+    findMaterialCatalog,
     createMaterial,
     updateMaterial,
     updateMaterialStock,
@@ -19,6 +21,9 @@ import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 export const getAllMaterials = async (req, res) => {
 
     const { skip, take } = getDataTablePaging(req.query);
+    if (req.query.catalog === 'true') {
+        return res.status(200).json(await findMaterialCatalog({ skip, take, search: getDataTableSearch(req.query), type: MATERIAL_TYPES.MATERIAL }));
+    }
     const search = getDataTableSearch(req.query);
     const supplierId = req.query.supplierId || null;
     const columns = ['name', 'base', 'height', null, 'minStock', null, null, null, null, null];

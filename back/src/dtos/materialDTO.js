@@ -1,6 +1,6 @@
 import { createVersionDto } from './versionDTO.js';
 
-const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
+import { MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../shared/constants/inventory.js';
 
 const buildMaterialDataDto = (body = {}) => ({
     name: body.name.trim(),
@@ -30,6 +30,7 @@ export const createMaterialDtoForRegister = (body = {}) => {
     if (body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT) {
         return {
             ...materialData,
+            creationContext: MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT,
             ...(body.minStock !== undefined && body.minStock !== null
                 ? { minStock: body.minStock }
                 : {}),

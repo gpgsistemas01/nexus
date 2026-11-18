@@ -224,3 +224,26 @@ it.each([400, 401, 403, 404, 405, 410, 422])(
     expect(request).toHaveBeenCalledOnce();
   },
 );
+
+it('refrescar con otra búsqueda cancela el debounce y hace una sola petición inmediata', async () => {
+  vi.useFakeTimers();
+  const request = vi.fn().mockResolvedValue(result(['nuevo']));
+  const { value, wrapper } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('pendiente');
+  await value.refresh('');
+  await vi.advanceTimersByTimeAsync(300);
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(request.mock.calls[0]!.slice(0, 2)).toEqual(['', 1]);
+  expect(value.search.value).toBe('');
+  expect(value.items.value.map((item) => item.id)).toEqual(['nuevo']);
+  wrapper.unmount();
+});
+
+it('refrescar el catálogo todavía cerrado no duplica la primera petición', async () => {
+  const request = vi.fn().mockResolvedValue(result(['nuevo']));
+  const { value, wrapper } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  await value.refresh('');
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(value.items.value.map((item) => item.id)).toEqual(['nuevo']);
+  wrapper.unmount();
+});

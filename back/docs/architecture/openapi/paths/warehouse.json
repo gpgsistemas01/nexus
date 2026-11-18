@@ -13,7 +13,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../openapi.json#/components/schemas/MaterialList"
+                "oneOf": [
+                  {
+                    "$ref": "../openapi.json#/components/schemas/MaterialList"
+                  },
+                  {
+                    "$ref": "../openapi.json#/components/schemas/MaterialCatalogList"
+                  }
+                ]
               }
             }
           }
@@ -61,6 +68,15 @@
         },
         {
           "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "name": "catalog",
+          "in": "query",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          },
+          "description": "true: identidades únicas por tipo, incluso sin oferta; ignora supplierId y no incluye stock ni costos. Conserva búsqueda y paginación."
         }
       ]
     },
@@ -111,7 +127,8 @@
       "tags": [
         "Consumibles"
       ],
-      "summary": "Crear consumible"
+      "summary": "Crear consumible",
+      "description": "El alta directa crea oferta e inventario. Con creationContext=goodsReceipt sólo registra o recupera la identidad del catálogo; la compra confirmada crea el vínculo con su proveedor."
     }
   },
   "/api/warehouse/materials": {
@@ -128,7 +145,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../openapi.json#/components/schemas/MaterialList"
+                "oneOf": [
+                  {
+                    "$ref": "../openapi.json#/components/schemas/MaterialList"
+                  },
+                  {
+                    "$ref": "../openapi.json#/components/schemas/MaterialCatalogList"
+                  }
+                ]
               }
             }
           }
@@ -179,6 +203,15 @@
         },
         {
           "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "name": "catalog",
+          "in": "query",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          },
+          "description": "true: identidades únicas por tipo, incluso sin oferta; ignora supplierId y no incluye stock ni costos. Conserva búsqueda y paginación."
         }
       ]
     },
@@ -229,7 +262,8 @@
       "tags": [
         "Materiales"
       ],
-      "summary": "Crear material"
+      "summary": "Crear material",
+      "description": "El alta directa crea oferta e inventario. Con creationContext=goodsReceipt sólo registra o recupera la identidad del catálogo; la compra confirmada crea el vínculo con su proveedor."
     }
   },
   "/api/warehouse/materials/{id}": {

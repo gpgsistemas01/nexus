@@ -15,7 +15,6 @@ import type { PurchaseResource, PurchaseDetail } from '../purchase.js';
 
 export const usePurchaseLineEntry = (options: {
     resource: PurchaseResource;
-    supplier: LookupItem;
     canRead: boolean;
     isDisabled: () => boolean;
     onAdded: (line: PurchaseDetail) => void;
@@ -52,7 +51,6 @@ export const usePurchaseLineEntry = (options: {
                     resource: options.resource,
                     search,
                     page,
-                    supplierId: options.supplier.id,
                 },
                 signal,
             ),
@@ -89,8 +87,7 @@ export const usePurchaseLineEntry = (options: {
 
         item.value = created;
         interaction.update('materialId', created.id);
-        items.updateSearch('');
-        void items.refresh();
+        void items.refresh('');
     };
 
     const validated = form.handleSubmit((values) => {

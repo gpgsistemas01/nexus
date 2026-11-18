@@ -354,3 +354,13 @@ retirar reglas de integridad; su costo se distingue del número y tiempo de cons
 El alta/entrada deja de recargar el movimiento desde `WasteStockEntry.create`: el
 servicio ya lo obtuvo al aplicar el movimiento y el consumidor no requiere esa relación.
 La lectura final de merma sí conserva saldos y versión resultantes para la respuesta.
+
+En Compras, el catálogo pagina identidades y comparte el conteo cuando no hay búsqueda.
+Las partidas consultan sus IDs únicos en bloque; vínculos, inserción de detalles y
+actualización de stock usan lotes dentro de la misma transacción. El movimiento
+reutiliza artículos y proveedor ya cargados por la compra, sin volver a consultarlos. Los vínculos se
+insertan en orden común para compras concurrentes. Correcciones, cancelaciones y
+partidas nuevas obtienen totales con `SUM`/`COUNT` de partidas activas en PostgreSQL;
+sólo la lectura de respuesta hidrata los detalles completos. Si se cancela la última
+partida se conservan los importes históricos. Comprobar el número de consultas con
+varios tamaños de compra y los planes reales antes de añadir índices.

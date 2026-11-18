@@ -9,6 +9,7 @@ import {
     MaterialDeleteDatabaseError,
     MaterialDeleteRelationConflict
 } from "../../../errors/warehouse/materialError.js";
+import { findPage } from '../../../repository/paginationRepository.js';
 import { getDb } from "../../../repository/baseRepository.js";
 import {
     existsMaterialUsage,
@@ -22,7 +23,7 @@ import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findInitialStockAdjustmentReason } from "../reasonService.js";
-import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
+import { MATERIAL_TYPES, MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../../shared/constants/inventory.js';
 
 import { updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
@@ -98,6 +99,21 @@ const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
     height: true
 };
 
+export const findMaterialCatalog = async ({ skip = 0, take = 10, search = '', type = MATERIAL_TYPES.MATERIAL }) => {
+    const page = await findPage({
+        model: getDb().material,
+        totalWhere: { type },
+        hasFilters: Boolean(search),
+        query: {
+            skip, take,
+            where: { type, ...(search && { name: { contains: search, mode: 'insensitive' } }) },
+            select: { ...DEFAULT_MATERIAL_SNAPSHOT_SELECT, version: true, unitMeasure: true },
+            orderBy: [{ name: 'asc' }, { id: 'asc' }]
+        }
+    });
+    return { ...page, data: page.data.map(material => ({ material })) };
+};
+
 export const findMaterialsSnapshot = async ({
     tx = null,
     materialIds,
@@ -127,7 +143,7 @@ export const findMaterialsSnapshot = async ({
 
     return materials.map(({ supplierMaterials, ...material }) => ({
         ...material,
-        isActive: supplierMaterials[0]?.isActive ?? false
+        isActive: supplierMaterials[0]?.isActive ?? true
     }));
 }
 
@@ -158,7 +174,8 @@ export const createMaterial = async ({
     try {
 
         const material = await getDb().$transaction(async (tx) => {
-            const { newStock, observations, ...materialData } = materialDto;
+            const { newStock, observations, creationContext, ...materialData } = materialDto;
+            const catalogOnly = creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
             const { rest, relations } = await prepareMaterialData({
                 tx,
                 materialDto: { ...materialData, type }
@@ -167,7 +184,7 @@ export const createMaterial = async ({
             const existingMaterial = await findMaterialByIdentity({ tx, rest, relations });
             let materialId = existingMaterial?.id;
 
-            if (existingMaterial) {
+            if (existingMaterial && !catalogOnly) {
                 const existingSupplierMaterial = await tx.supplierMaterial.findUnique({
                     where: {
                         supplierId_materialId: {
@@ -179,13 +196,20 @@ export const createMaterial = async ({
                 });
 
                 if (existingSupplierMaterial) throw new MaterialAlreadyExists();
-            } else {
+            } else if (!existingMaterial) {
                 const createdMaterial = await tx.material.create({
                     data: buildMaterialData({ rest, relations }),
                     select: { id: true }
                 });
 
                 materialId = createdMaterial.id;
+            }
+
+            if (catalogOnly) {
+                return { material: await tx.material.findUniqueOrThrow({
+                    where: { id: materialId },
+                    select: { ...DEFAULT_MATERIAL_SNAPSHOT_SELECT, version: true, unitMeasure: true }
+                }) };
             }
 
             await createSupplierMaterial({
@@ -221,7 +245,7 @@ export const createMaterial = async ({
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.materials.materialService.createMaterial',
-            ...getModelLogContext('material', { ...materialDto, id: material?.materialId ?? material?.id })
+            ...getModelLogContext('material', { ...materialDto, id: material?.materialId ?? material?.id ?? material?.material?.id })
         }, 'Material creado correctamente');
 
         return material;

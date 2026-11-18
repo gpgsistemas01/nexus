@@ -1,3 +1,5 @@
+import { mapMaterialOption } from '../../../../src/shared/utils/mapMaterialOption.js';
+import { PURCHASE_CONFIG } from '../../../../src/modules/purchases/purchaseConfig.js';
 import { defineComponent, h } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -6,10 +8,7 @@ import { apiClient } from '../../../../src/shared/http/apiClient.js';
 import { mockHttpAdapter } from '../../../helpers/httpAdapter.js';
 import { ids, pageOf, material } from '../../../fixtures/inventory.js';
 import { purchase, purchaseItem } from '../../../fixtures/purchases.js';
-import {
-  normalizePurchaseDocument,
-  mapPurchaseItemOption,
-} from '../../../../src/modules/purchases/mappers/purchaseResponseMapper.js';
+import { normalizePurchaseDocument } from '../../../../src/modules/purchases/mappers/purchaseResponseMapper.js';
 import { createPurchaseDetailDraft } from '../../../../src/modules/purchases/purchaseDetails.js';
 import {
   createInitialPurchaseValues,
@@ -127,7 +126,8 @@ it.each([
       expect(url.searchParams.get('onlyActive')).toBe(
         kind === 'suppliers' && capture ? 'true' : null,
       );
-      expect(url.searchParams.get('supplierId')).toBe(kind === 'items' ? ids.supplier : null);
+      expect(url.searchParams.get('supplierId')).toBeNull();
+      expect(url.searchParams.get('catalog')).toBe(kind === 'items' ? 'true' : null);
       expect(url.searchParams.get('department')).toBe(
         kind === 'persons' ? 'ALMACÉN Y PROVEDURÍA' : null,
       );
@@ -144,7 +144,6 @@ it.each([
         search: 'Acero & onlyActive=false + 50% / #á',
         page: 2,
         ...(kind === 'suppliers' ? { capture } : {}),
-        ...(kind === 'items' ? { supplierId: ids.supplier } : {}),
       },
       requestSignal,
     );
@@ -194,14 +193,13 @@ it.each(['materials', 'consumables'] as const)(
     const { state, wrapper } = harness(() =>
       usePurchaseLineEntry({
         resource,
-        supplier: { id: ids.supplier, title: 'Proveedor', data: {} },
         canRead: true,
         isDisabled: () => false,
         onAdded: added,
       }),
     );
     state.selectCreatedItem(
-      mapPurchaseItemOption(
+      mapMaterialOption(
         {
           ...purchaseItem,
           material: {
@@ -212,7 +210,7 @@ it.each(['materials', 'consumables'] as const)(
             presentation: { ...purchaseItem.material.presentation, name: 'PIEZA' },
           },
         },
-        resource,
+        PURCHASE_CONFIG[resource].type,
       ),
     );
     state.update('quantity', '1.5');
@@ -320,7 +318,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     expect(payload).not.toHaveProperty('details');
     expect(payload).not.toHaveProperty('expectedVersion');
     values.details = [
-      createPurchaseDetailDraft(mapPurchaseItemOption(purchaseItem, 'materials'), 3, 100),
+      createPurchaseDetailDraft(mapMaterialOption(purchaseItem, 'MATERIAL'), 3, 100),
     ];
     values.details.push(document().details[0]!);
     expect(mapPurchaseFormToRequest(values, document()).details).toEqual([
@@ -361,9 +359,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     const { state } = editor();
     state.update('supplierId', ids.supplier);
     state.update('receivedById', purchase.receivedById);
-    state.addDetail(
-      createPurchaseDetailDraft(mapPurchaseItemOption(purchaseItem, 'materials'), 2, 100),
-    );
+    state.addDetail(createPurchaseDetailDraft(mapMaterialOption(purchaseItem, 'MATERIAL'), 2, 100));
     state.update('supplierId', 'otro');
     expect(state.values.details).toEqual([]);
     expect(state.values.receivedById).toBe('');
@@ -407,18 +403,19 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
   });
   it('agregar detalle rechaza cantidad cero y selecciona altas recientes aunque no estén en la página', async () => {
     vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) });
-    vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
+    const lookup = vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
     const added = vi.fn();
     const { state, wrapper } = harness(() =>
       usePurchaseLineEntry({
         resource: 'materials',
-        supplier: { id: ids.supplier, title: 'Proveedor', data: {} },
         canRead: true,
         isDisabled: () => false,
         onAdded: added,
       }),
     );
-    state.selectCreatedItem(mapPurchaseItemOption(purchaseItem, 'materials'));
+    state.selectCreatedItem(mapMaterialOption(purchaseItem, 'MATERIAL'));
+    await flushPromises();
+    expect(lookup).toHaveBeenCalledTimes(1);
     state.update('quantity', '0');
     state.update('costPerUnitType', '100');
     await state.add();
@@ -504,18 +501,19 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
   );
 });
 
-it('selector de compras admite el contrato de inventario sin type y rechaza un tipo explícito ajeno', () => {
-  expect(mapPurchaseItemOption(material, 'materials').id).toBe(ids.material);
+it('selector de compras admite identidades sin oferta, inventario sin type y rechaza un tipo ajeno', () => {
+  expect(mapMaterialOption({ material: purchaseItem.material }, 'MATERIAL').id).toBe(ids.material);
+  expect(mapMaterialOption(material, 'MATERIAL').id).toBe(ids.material);
   expect(() =>
-    mapPurchaseItemOption(
+    mapMaterialOption(
       { ...material, material: { ...material.material, type: 'CONSUMABLE' } },
-      'materials',
+      'MATERIAL',
     ),
   ).toThrow();
 });
 
 it('costo capturado total conserva el modo, divide por compra y se envía sin totales derivados', () => {
-  const item = mapPurchaseItemOption(purchaseItem, 'materials');
+  const item = mapMaterialOption(purchaseItem, 'MATERIAL');
   const detail = createPurchaseDetailDraft(item, 10, 500, true);
   expect(detail).toMatchObject({
     costIsTotal: true,
@@ -552,14 +550,13 @@ it.each(['KILOGRAMOS', 'METRO LINEAL'])(
     const { state, wrapper } = harness(() =>
       usePurchaseLineEntry({
         resource: 'consumables',
-        supplier: { id: ids.supplier, title: 'Proveedor', data: {} },
         canRead: true,
         isDisabled: () => false,
         onAdded: added,
       }),
     );
     state.selectCreatedItem(
-      mapPurchaseItemOption(
+      mapMaterialOption(
         {
           ...purchaseItem,
           material: {
@@ -570,7 +567,7 @@ it.each(['KILOGRAMOS', 'METRO LINEAL'])(
             presentation: { ...purchaseItem.material.presentation, name },
           },
         },
-        'consumables',
+        'CONSUMABLE',
       ),
     );
     expect(state.costIsTotal.value).toBe(true);

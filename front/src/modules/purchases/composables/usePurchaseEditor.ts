@@ -95,8 +95,7 @@ export const usePurchaseEditor = (options: {
 
         supplier.value = item;
         record.update('supplierId', item.id);
-        suppliers.updateSearch('');
-        void suppliers.refresh();
+        void suppliers.refresh('');
     };
 
     const addDetail = (line: PurchaseDetail) =>

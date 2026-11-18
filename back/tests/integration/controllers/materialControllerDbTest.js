@@ -67,16 +67,15 @@ describe('registro de materiales con y sin medidas', () => {
   it.each(['direct', 'goodsReceipt'])('registra piezas sin medidas desde %s y conserva su cantidad', async context => {
     const data = { ...body(context), ...(context === 'goodsReceipt' ? { creationContext: context } : {}) };
     await request(app).post('/materials').send(data).expect(200);
-    const saved = await prisma.supplierMaterial.findFirst({
-      where: { supplierId: ids.supplier, material: { name: data.name } }, include: { material: true }
-    });
-
-    expect(saved.material).toMatchObject({ base: null, height: null, unitMeasureId: ids.piece });
-    expect(Number(saved.currentStock)).toBe(context === 'direct' ? 7 : 0);
-    expect(Number(saved.convertedQuantity)).toBe(context === 'direct' ? 7 : 0);
-    if (context === 'goodsReceipt') expect(saved.maxUnitCost).toBeNull();
-    expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: saved.materialId } }))
-      .toBe(context === 'direct' ? 1 : 0);
+    const material = await prisma.material.findFirstOrThrow({ where: { name: data.name } });
+    expect(material).toMatchObject({ base: null, height: null, unitMeasureId: ids.piece });
+    const saved = await prisma.supplierMaterial.findFirst({ where: { materialId: material.id, supplierId: ids.supplier } });
+    if (context === 'goodsReceipt') expect(saved).toBeNull();
+    else {
+      expect(Number(saved.currentStock)).toBe(7);
+      expect(Number(saved.convertedQuantity)).toBe(7);
+    }
+    expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: material.id } })).toBe(context === 'direct' ? 1 : 0);
   });
 
   it.each(['meters', 'liters'])('conserva las medidas y la conversión para %s', async unit => {
@@ -149,12 +148,16 @@ describe('registro de materiales con y sin medidas', () => {
       expect(await prisma.material.count({ where: { name: data.name } })).toBe(0);
     }
     await request(app).post('/consumables').send({ ...data, base: null, height: null }).expect(200);
-    const saved = await prisma.supplierMaterial.findFirstOrThrow({ where: { supplierId: ids.supplier, material: { name: data.name } }, include: { material: true } });
-    expect(Number(saved.material.base)).toBe(1);
-    expect(Number(saved.material.height)).toBe(1);
-    expect(Number(saved.currentStock)).toBe(context === 'direct' ? 7.5 : 0);
-    expect(Number(saved.convertedQuantity)).toBe(Number(saved.currentStock));
-    expect(saved.material.presentationId).toBe(presentation.id);
+    const material = await prisma.material.findFirstOrThrow({ where: { name: data.name } });
+    expect(Number(material.base)).toBe(1);
+    expect(Number(material.height)).toBe(1);
+    expect(material.presentationId).toBe(presentation.id);
+    const saved = await prisma.supplierMaterial.findFirst({ where: { materialId: material.id, supplierId: ids.supplier } });
+    if (context === 'goodsReceipt') expect(saved).toBeNull();
+    else {
+      expect(Number(saved.currentStock)).toBe(7.5);
+      expect(Number(saved.convertedQuantity)).toBe(7.5);
+    }
   });
 
   it('ofrece para merma sólo materiales en m² del proveedor y excluye consumibles', async () => {
