@@ -1,14 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const materialFindMany = vi.fn();
-const materialFindFirst = vi.fn();
 const supplierMaterialFindMany = vi.fn();
 const supplierMaterialFindUnique = vi.fn();
 const supplierMaterialCount = vi.fn();
 
 vi.mock('../../../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
-    material: { findMany: materialFindMany, findFirst: materialFindFirst },
+    material: { findMany: materialFindMany },
     supplierMaterial: {
       findMany: supplierMaterialFindMany,
       findUnique: supplierMaterialFindUnique,
@@ -19,7 +18,7 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
 
 const {
   ensureSupplierMaterials,
-  existsMaterialUsage,
+  findMaterialsWithUsage,
   findAllSupplierMaterials,
   findSupplierMaterialById,
   findSupplierMaterialByIds,
@@ -40,29 +39,33 @@ describe('listado del CRUD de materiales', () => {
     materialFindMany.mockResolvedValue([{ id: 'material-1' }]);
   });
 
-  it('calcula si se puede eliminar sin consultar la relación retirada entre oferta y merma', async () => {
-    const result = await findAllSupplierMaterials({});
+  it.each([false, true])('omite la consulta de baja si no hay candidatos, con permiso %s', async canRemoveOffers => {
+    const result = await findAllSupplierMaterials({ canRemoveOffers });
 
-    expect(materialFindMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({
-        id: { in: ['material-1'] },
-        AND: expect.arrayContaining([
-          { goodsReceiptDetails: { none: {} } },
-          { correctedGoodsReceiptDetailChanges: { none: {} } }
-        ])
-      }),
+    expect(supplierMaterialFindMany).toHaveBeenCalledTimes(1);
+    expect(result.data[0].canDelete).not.toBe(true);
+  });
+
+  it('comprueba la baja en bloque y sólo para el proveedor de cada oferta sin saldo', async () => {
+    const row = { id: 'offer-1', currentStock: 0, material: { minStock: 1 }, supplier: { id: 'supplier-1' } };
+    supplierMaterialFindMany.mockResolvedValueOnce([row]).mockResolvedValueOnce([{ id: row.id }]);
+
+    const result = await findAllSupplierMaterials({ canRemoveOffers: true });
+
+    expect(supplierMaterialFindMany).toHaveBeenNthCalledWith(2, {
+      where: {
+        currentStock: 0,
+        OR: [{
+          id: row.id,
+          material: expect.objectContaining({
+            goodsIssueDetails: { none: { supplierId: 'supplier-1' } },
+            goodsReceiptDetails: { none: { goodsReceipt: { supplierId: 'supplier-1' } } }
+          })
+        }]
+      },
       select: { id: true }
     });
-    expect(materialFindMany.mock.calls[0][0].where).not.toHaveProperty('supplierMaterials');
-    expect(materialFindMany.mock.calls[0][0].where).not.toHaveProperty('NOT');
-    expect(materialFindMany.mock.calls[0][0].where.AND).not.toContainEqual(
-      { purchaseRequisitionsDetails: { none: {} } }
-    );
-    expect(result.data[0]).toEqual(expect.objectContaining({
-      id: 'offer-1',
-      material: expect.objectContaining({ id: 'material-1', name: 'Lona' }),
-      canDelete: true
-    }));
+    expect(result.data[0]).toEqual({ ...row, canDelete: true });
   });
 
   it('filtra los consumibles mediante su clasificación explícita', async () => {
@@ -176,12 +179,12 @@ describe('listado del CRUD de materiales', () => {
   });
 
   it('reutiliza las relaciones históricas en una sola consulta antes de eliminar', async () => {
-    materialFindFirst.mockResolvedValue({ id: 'material-1' });
+    materialFindMany.mockResolvedValue([{ id: 'material-1' }]);
 
-    await expect(existsMaterialUsage({ materialId: 'material-1' })).resolves.toBe(true);
-    expect(materialFindFirst).toHaveBeenCalledWith({
+    await expect(findMaterialsWithUsage(['material-1'])).resolves.toEqual([{ id: 'material-1' }]);
+    expect(materialFindMany).toHaveBeenCalledWith({
       where: {
-        id: 'material-1',
+        id: { in: ['material-1'] },
         OR: expect.arrayContaining([
           { goodsIssueDetails: { some: {} } },
           { stockAdjustmentDetails: { some: {} } }
@@ -189,7 +192,7 @@ describe('listado del CRUD de materiales', () => {
       },
       select: { id: true }
     });
-    expect(materialFindFirst.mock.calls[0][0].where.OR).not.toContainEqual(
+    expect(materialFindMany.mock.calls[0][0].where.OR).not.toContainEqual(
       { purchaseRequisitionsDetails: { some: {} } }
     );
   });

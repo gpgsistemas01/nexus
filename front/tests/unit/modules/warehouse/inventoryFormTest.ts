@@ -57,9 +57,10 @@ afterEach(() => {
 });
 
 it.each(['materials', 'consumables', 'wastes'] as const)(
-  'stock y mínimo de PIEZA en %s exigen enteros y conservan las versiones',
+  'el ajuste de PIEZA en %s y el mínimo de merma exigen enteros y conservan la versión',
   async (resource) => {
-    for (const action of ['stock', 'edit'] as const) {
+    const actions = resource === 'wastes' ? (['stock', 'edit'] as const) : (['stock'] as const);
+    for (const action of actions) {
       const row = normalizeInventoryRow(resource === 'wastes' ? waste : material);
       row.presentation = 'PIEZA';
       const { editor, request, wrapper } = openEditor(resource, { action, row });
@@ -144,25 +145,22 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     },
   );
   it.each(['materials', 'consumables'] as const)(
-    'editar %s conserva las dos versiones leídas y omite identidad y stock',
+    'editar %s envía únicamente los datos y la versión de la oferta',
     async (resource) => {
       const { editor, request, saved } = openEditor(resource, {
         action: 'edit',
         row: normalizeInventoryRow(material),
       });
-      editor.update('name', 'Lona actualizada');
+      editor.update('maxUnitCost', '110');
       await editor.submit();
       expect(request).toHaveBeenCalledWith(
         resource,
         'edit',
         {
-          name: 'Lona actualizada',
-          minStock: 5,
-          maxUnitCost: 100,
+          maxUnitCost: 110,
           isActive: true,
           supplierId: ids.supplier,
           expectedVersion: 3,
-          expectedMaterialVersion: 7,
         },
         ids.material,
         expect.any(AbortSignal),

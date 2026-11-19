@@ -4,6 +4,7 @@ import {
     usesAutomaticTotalCost,
 } from '@nexus/purchase-calculations';
 import { isRecord } from '../../shared/utils/isRecord.js';
+import { getLookupArticle } from '../../shared/utils/articleOptions.js';
 import { createUuid } from '../../shared/utils/createUuid.js';
 import type { LookupItem } from '../../shared/lookup.js';
 import type { PurchaseDetail } from './purchase.js';
@@ -14,7 +15,7 @@ export const createPurchaseDetailDraft = (
     costPerUnitType: number,
     costIsTotal = false,
 ): PurchaseDetail => {
-    const material = isRecord(item.data.material) ? item.data.material : {};
+    const material = getLookupArticle(item);
     const presentation = isRecord(material.presentation) ? material.presentation : {};
     const unit = isRecord(material.unitMeasure) ? material.unitMeasure : {};
     return {

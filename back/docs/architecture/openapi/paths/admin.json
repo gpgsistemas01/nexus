@@ -1664,7 +1664,7 @@
         "Catálogos"
       ],
       "summary": "Editar registro de catálogo",
-      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage. Sin proveedor se permite editar toda la identidad; con proveedor sólo nombre y stock mínimo. expectedVersion es obligatorio."
+      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage. Sin proveedor vinculado se permite editar toda la identidad. Con proveedor vinculado sólo se editan nombre y stock mínimo. Los documentos anteriores conservan sus especificaciones. En presentaciones y unidades vinculadas a artículos o mermas sólo se edita el estado. expectedVersion es obligatorio."
     }
   },
   "/api/admin/reports/persons/excel": {
@@ -2016,6 +2016,93 @@
           "$ref": "../openapi.json#/components/parameters/ReportMonth"
         }
       ]
+    }
+  },
+  "/api/admin/catalogs/materials/{id}": {
+    "delete": {
+      "operationId": "deleteMaterialCatalogEntry",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Artículo eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data",
+                  "code"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
+                  },
+                  "code": {
+                    "const": "DELETED_CATALOG_ENTRY"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "404": {
+          "description": "Artículo no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "tags": [
+        "Catálogos"
+      ],
+      "summary": "Eliminar artículo",
+      "description": "Permite eliminar un artículo sin proveedores vinculados ni referencias de inventario. Requiere material-catalogs:manage o catalogs:manage."
     }
   }
 }

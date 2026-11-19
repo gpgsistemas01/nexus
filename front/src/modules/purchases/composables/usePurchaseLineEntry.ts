@@ -3,8 +3,7 @@ import { useForm } from 'vee-validate';
 import { addGoodsReceiptMaterialValidation } from '@nexus/form-validation';
 import { usesAutomaticTotalCost } from '@nexus/purchase-calculations';
 import { getPieceQuantityError } from '@nexus/piece-quantity';
-import { isRecord } from '../../../shared/utils/isRecord.js';
-import { getLookupPresentation } from '../../../shared/utils/articleOptions.js';
+import { getLookupArticle, getLookupPresentation } from '../../../shared/utils/articleOptions.js';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
@@ -57,10 +56,7 @@ export const usePurchaseLineEntry = (options: {
         computed(() => options.canRead),
     );
     const item = useSelectedOption(items.items, () => form.values.materialId);
-    const automaticTotalCost = computed(() => {
-        const material = item.value?.data.material;
-        return isRecord(material) && usesAutomaticTotalCost(material);
-    });
+    const automaticTotalCost = computed(() => usesAutomaticTotalCost(getLookupArticle(item.value)));
     const costIsTotal = computed({
         get: () => automaticTotalCost.value || manualCostIsTotal.value,
         set: (value: boolean) => {

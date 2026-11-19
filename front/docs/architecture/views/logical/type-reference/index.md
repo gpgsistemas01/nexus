@@ -8,13 +8,13 @@ Se inspeccionan 200 archivos TS/SFC y se describen 262 contratos declarados.
 | --- | --- | --- |
 | [app](app.md) | 11 | 25 |
 | [auth](auth.md) | 11 | 21 |
-| [catalogs](catalogs.md) | 14 | 60 |
+| [catalogs](catalogs.md) | 14 | 62 |
 | [directory](directory.md) | 12 | 35 |
 | [identity](identity.md) | 21 | 82 |
 | [issues](issues.md) | 50 | 237 |
 | [movements](movements.md) | 10 | 38 |
 | [purchases](purchases.md) | 36 | 169 |
-| [warehouse](warehouse.md) | 41 | 219 |
+| [warehouse](warehouse.md) | 41 | 220 |
 | [shared](shared.md) | 56 | 193 |
 
 ## Alcance y notación

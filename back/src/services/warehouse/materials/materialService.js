@@ -1,5 +1,5 @@
 import { toNumber } from '../../../utils/formattersUtils.js';
-import { lockMaterialIdentity } from '../../../repository/warehouse/stockLockRepository.js';
+import { lockMaterialIdentity, lockSupplierMaterialForRemoval } from '../../../repository/warehouse/stockLockRepository.js';
 import { AppError } from '../../../errors/AppError.js';
 import { materialCatalogValidation } from '../../../shared/validation/validators.js';
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
@@ -12,15 +12,21 @@ import {
     MaterialUpdateDatabaseError,
     MaterialStockAdjustmentDatabaseError,
     MaterialDeleteDatabaseError,
-    MaterialDeleteRelationConflict
+    MaterialDeleteRelationConflict,
+    MaterialDeleteStockConflict,
+    MaterialDeleteHistoryConflict,
+    MaterialCatalogDeleteConflict,
+    MaterialFieldsManagedInCatalog
 } from "../../../errors/warehouse/materialError.js";
 import { findPage } from '../../../repository/paginationRepository.js';
 import { getDb } from "../../../repository/baseRepository.js";
 import {
-    existsMaterialUsage,
+    findMaterialsWithUsage,
+    existsDeletableSupplierMaterial,
     findAllSupplierMaterials,
     findSupplierMaterialByIds,
-    createSupplierMaterial
+    createSupplierMaterial,
+    SUPPLIER_MATERIAL_DETAIL_SELECT
 } from "./supplierMaterialService.js";
 import { assertMaterialRollReference, prepareMaterialData } from "./materialHelpers.js";
 import { isAppError } from "../../../errors/AppError.js";
@@ -30,8 +36,10 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findInitialStockAdjustmentReason } from "../reasonService.js";
 import { MATERIAL_TYPES, MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../../shared/constants/inventory.js';
 
-import { updateVersionedRecord } from '../../../repository/versionRepository.js';
+import { assertRecordVersion, updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
+import { createMaterialSpecification, MATERIAL_SPECIFICATION_SELECT } from './materialDocumentSnapshot.js';
+import { preserveMaterialSpecifications } from '../../../repository/warehouse/materialDocumentRepository.js';
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
 
@@ -60,8 +68,9 @@ const buildMaterialData = ({ rest, relations }) => ({
     }
 });
 
-const findMaterialByIdentity = ({ tx, rest, relations }) => tx.material.findFirst({
+const findMaterialByIdentity = ({ tx, rest, relations, excludeId }) => tx.material.findFirst({
     where: {
+        ...(excludeId && { id: { not: excludeId } }),
         name: { equals: rest.name, mode: 'insensitive' },
         presentationId: relations.presentationId,
         unitMeasureId: relations.unitMeasureId,
@@ -79,7 +88,8 @@ export const findAllMaterials = async ({
     supplierId = null,
     orderBy = 'name',
     orderDir = 'asc',
-    canReadCosts = false
+    canReadCosts = false,
+    canRemoveOffers = false
 }) => {
 
     return await findAllSupplierMaterials({
@@ -90,7 +100,8 @@ export const findAllMaterials = async ({
         type: MATERIAL_TYPES.MATERIAL,
         orderBy,
         orderDir,
-        canReadCosts
+        canReadCosts,
+        canRemoveOffers
     });
 };
 
@@ -113,17 +124,39 @@ export const MATERIAL_CATALOG_SELECT = Object.freeze({
     unitMeasure: { select: { name: true, symbol: true } }
 });
 
-export const findMaterialCatalogEntries = ({ skip = 0, take = 10, search = '', type = null, includeSupplierCount = true } = {}) => findPage({
-    model: getDb().material,
-    totalWhere: type ? { type } : {},
-    hasFilters: Boolean(search),
-    query: {
-        skip, take,
-        where: { ...(type && { type }), ...(search && { name: { contains: search, mode: 'insensitive' } }) },
-        select: { ...MATERIAL_CATALOG_SELECT, ...(!includeSupplierCount && { _count: false }) },
-        orderBy: [{ name: 'asc' }, { id: 'asc' }]
-    }
+export const MATERIAL_DOCUMENT_DISPLAY_SELECT = Object.freeze({
+    type: true,
+    base: true,
+    height: true,
+    presentation: { select: { name: true } },
+    unitMeasure: { select: { name: true, symbol: true } }
 });
+
+export const findMaterialCatalogEntries = async ({ skip = 0, take = 10, search = '', type = null, includeSupplierCount = true } = {}) => {
+    const page = await findPage({
+        model: getDb().material,
+        totalWhere: type ? { type } : {},
+        hasFilters: Boolean(search),
+        query: {
+            skip, take,
+            where: { ...(type && { type }), ...(search && { name: { contains: search, mode: 'insensitive' } }) },
+            select: { ...MATERIAL_CATALOG_SELECT, ...(!includeSupplierCount && { _count: false }) },
+            orderBy: [{ name: 'asc' }, { id: 'asc' }]
+        }
+    });
+    if (!includeSupplierCount) return page;
+
+    // Un proveedor vinculado ya protege la identidad. Sólo consultamos historial para los demás.
+    const withoutOffers = new Map();
+    for (const article of page.data) {
+        if (article._count.supplierMaterials === 0) withoutOffers.set(article.id, article);
+    }
+    if (withoutOffers.size) {
+        const used = await findMaterialsWithUsage([...withoutOffers.keys()]);
+        for (const { id } of used) withoutOffers.get(id).hasHistory = true;
+    }
+    return page;
+};
 
 export const createMaterialCatalogEntry = async data => {
     try {
@@ -140,12 +173,20 @@ export const updateMaterialCatalogEntry = async (id, input) => {
         return await getDb().$transaction(async tx => {
             // Serializa la edición con los INSERT de relaciones que comprueban esta FK.
             await lockMaterialIdentity({ tx, id, forEditing: true });
-            const current = await tx.material.findUnique({ where: { id }, select: { ...MATERIAL_CATALOG_SELECT, unitMeasure: false } });
+            const current = await tx.material.findUnique({
+                where: { id },
+                select: { ...MATERIAL_CATALOG_SELECT, ...MATERIAL_SPECIFICATION_SELECT }
+            });
             if (!current) throw new MaterialNotFound();
+            assertRecordVersion(current, input.expectedVersion);
             const identityChanged = ['type', 'presentationId', 'unitMeasureId', 'base', 'height'].some(field =>
                 input[field] !== undefined && String(input[field] ?? '') !== String(current[field] ?? ''));
             let data = { name: input.name, ...(input.minStock !== undefined && { minStock: input.minStock }) };
-            if (identityChanged && current._count.supplierMaterials === 0) {
+            let identity = { rest: { ...current, name: input.name }, relations: current };
+            if (identityChanged) {
+                if (current._count.supplierMaterials > 0) {
+                    throw new MaterialIdentityLinkedConflict();
+                }
                 const capture = { ...current, base: toNumber(current.base),
                     height: toNumber(current.height), minStock: Number(current.minStock), ...input };
                 if (Object.entries(materialCatalogValidation).some(([field, rule]) => rule(capture[field], capture))) {
@@ -153,12 +194,19 @@ export const updateMaterialCatalogEntry = async (id, input) => {
                 }
                 const { rest, relations } = await prepareMaterialData({ tx, requireSupplier: false,
                     materialDto: Object.fromEntries(Object.keys(materialCatalogValidation).map(field => [field, capture[field]])) });
+                identity = { rest, relations };
                 data = buildMaterialData({ rest, relations });
             } else {
-                if (identityChanged) {
-                    throw new MaterialIdentityLinkedConflict();
-                }
                 assertPieceQuantity({ quantity: input.minStock, item: current });
+            }
+            if ((identityChanged || input.name !== current.name) &&
+                await findMaterialByIdentity({ tx, ...identity, excludeId: id })) {
+                throw new MaterialAlreadyExists();
+            }
+            if (identityChanged) {
+                await preserveMaterialSpecifications({
+                    tx, materialId: id, type: current.type, specification: createMaterialSpecification(current)
+                });
             }
             return updateVersionedRecord({ model: tx.material, where: { id }, expectedVersion: input.expectedVersion,
                 data, select: MATERIAL_CATALOG_SELECT });
@@ -166,9 +214,18 @@ export const updateMaterialCatalogEntry = async (id, input) => {
     } catch (err) { throwMaterialWriteError({ err, fallbackError: new MaterialUpdateDatabaseError() }); }
 };
 
-export const findMaterialCatalog = async ({ skip = 0, take = 10, search = '', type = MATERIAL_TYPES.MATERIAL }) => {
-    const page = await findMaterialCatalogEntries({ skip, take, search, type, includeSupplierCount: false });
-    return { ...page, data: page.data.map(material => ({ material })) };
+export const findMaterialCatalog = ({ skip = 0, take = 10, search = '', type = MATERIAL_TYPES.MATERIAL }) =>
+    findMaterialCatalogEntries({ skip, take, search, type, includeSupplierCount: false });
+
+export const deleteMaterialCatalogEntry = async id => {
+    try {
+        // PostgreSQL comprueba los vínculos y elimina el registro en la misma operación.
+        return await getDb().material.delete({ where: { id }, select: { id: true } });
+    } catch (error) {
+        if (error.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new MaterialNotFound();
+        if (error.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new MaterialCatalogDeleteConflict();
+        throw error;
+    }
 };
 
 export const findMaterialsSnapshot = async ({
@@ -342,63 +399,47 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
 
             const { supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, expectedVersion, expectedMaterialVersion, ...materialData } = materialDto;
 
-            const currentMaterial = await tx.material.findUnique({
-                where: { id, ...(type && { type }) },
-                select: {
-                    id: true,
-                    presentationId: true,
-                    presentation: { select: { name: true } },
-                    unitMeasureId: true,
-                    base: true,
-                    height: true,
-                    type: true
-                }
-            });
-
-            if (!currentMaterial) throw new MaterialNotFound();
-            assertPieceQuantity({ quantity: materialData.minStock, item: currentMaterial });
             assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 
-            const existingMaterial = await tx.material.findFirst({
-                where: {
-                    name: { equals: materialDto.name, mode: 'insensitive' },
-                    presentationId: currentMaterial.presentationId,
-                    unitMeasureId: currentMaterial.unitMeasureId,
-                    base: currentMaterial.base ?? null,
-                    height: currentMaterial.height ?? null,
-                    type: currentMaterial.type,
-                    NOT: { id }
-                },
-                select: { id: true }
-            });
+            const where = {
+                supplierId_materialId: { materialId: id, supplierId },
+                ...(type && { material: { type } })
+            };
 
-            if (existingMaterial) {
-                throw new MaterialAlreadyExists();
+            // Las capturas que ya enviaban datos del artículo aún validan su versión y sus valores.
+            if (expectedMaterialVersion !== undefined || materialData.name !== undefined || materialData.minStock !== undefined) {
+                const currentOffer = await tx.supplierMaterial.findUnique({
+                    where,
+                    select: { version: true }
+                });
+                if (!currentOffer) throw new MaterialNotFound();
+                assertRecordVersion(currentOffer, expectedVersion);
+
+                const currentMaterial = await tx.material.findUnique({
+                    where: { id, ...(type && { type }) },
+                    select: { version: true, name: true, minStock: true }
+                });
+                if (!currentMaterial) throw new MaterialNotFound();
+                assertRecordVersion(currentMaterial, expectedMaterialVersion);
+                if ((materialData.name !== undefined && materialData.name !== currentMaterial.name) ||
+                    (materialData.minStock !== undefined && Number(materialData.minStock) !== Number(currentMaterial.minStock))) {
+                    throw new MaterialFieldsManagedInCatalog();
+                }
             }
 
-            const updatedMaterial = await updateVersionedRecord({
-                model: tx.material, expectedVersion: expectedMaterialVersion,
-                where: { id },
-                data: materialData
-            });
-
-            await updateVersionedRecord({
-                model: tx.supplierMaterial, expectedVersion,
-                where: { supplierId_materialId: { materialId: updatedMaterial.id, supplierId } },
-                data: { maxUnitCost, isActive }
-            });
-
-            return findSupplierMaterialByIds({
-                tx,
-                materialId: updatedMaterial.id,
-                supplierId
+            return updateVersionedRecord({
+                model: tx.supplierMaterial,
+                expectedVersion,
+                where,
+                data: { maxUnitCost, isActive },
+                select: SUPPLIER_MATERIAL_DETAIL_SELECT
             });
         });
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.materials.materialService.updateMaterial',
             ...getModelLogContext('material', { id, ...materialDto })
-        }, 'Material actualizado correctamente');
+        }, 'Oferta del proveedor actualizada correctamente');
 
         return material;
 
@@ -466,9 +507,12 @@ export const deleteMaterial = async (supplierMaterialId, { type = null } = {}) =
 
         const deletedMaterial = await getDb().$transaction(async (tx) => {
 
+            const locked = await lockSupplierMaterialForRemoval({ tx, id: supplierMaterialId });
+            if (locked.length === 0) throw new MaterialNotFound();
+
             const supplierMaterial = await tx.supplierMaterial.findUnique({
                 where: { id: supplierMaterialId },
-                select: { materialId: true, material: { select: { type: true } } }
+                select: { materialId: true, supplierId: true, currentStock: true, material: { select: { type: true } } }
             });
 
             if (!supplierMaterial) throw new MaterialNotFound();
@@ -476,17 +520,17 @@ export const deleteMaterial = async (supplierMaterialId, { type = null } = {}) =
 
             const { materialId } = supplierMaterial;
 
-            if (await existsMaterialUsage({ tx, materialId })) {
-                throw new MaterialDeleteRelationConflict();
+            if (Number(supplierMaterial.currentStock) !== 0) throw new MaterialDeleteStockConflict();
+
+            if (!await existsDeletableSupplierMaterial({ tx, id: supplierMaterialId, supplierId: supplierMaterial.supplierId })) {
+                throw new MaterialDeleteHistoryConflict();
             }
 
             await tx.supplierMaterial.delete({ where: { id: supplierMaterialId } });
 
-            const remainingRelations = await tx.supplierMaterial.count({ where: { materialId } });
-
-            if (remainingRelations > 0) return { id: materialId };
-
-            return tx.material.delete({ where: { id: materialId }, select: { id: true } });
+            // Las transacciones conservan sus propias referencias a Material y Supplier; retirar
+            // esta oferta no borra ni modifica el historial ni la ficha del artículo.
+            return { id: supplierMaterialId, materialId };
         });
 
         logServiceInfo(serviceLogger, {

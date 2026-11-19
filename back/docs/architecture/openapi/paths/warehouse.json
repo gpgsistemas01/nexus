@@ -76,7 +76,7 @@
             "type": "boolean",
             "default": false
           },
-          "description": "true: identidades únicas por tipo, incluso sin oferta; ignora supplierId y no incluye stock ni costos. Conserva búsqueda y paginación."
+          "description": "true: devuelve los artículos únicos del tipo de la ruta, sin campos de oferta. Ignora supplierId y conserva búsqueda y paginación."
         }
       ]
     },
@@ -211,7 +211,7 @@
             "type": "boolean",
             "default": false
           },
-          "description": "true: identidades únicas por tipo, incluso sin oferta; ignora supplierId y no incluye stock ni costos. Conserva búsqueda y paginación."
+          "description": "true: devuelve los artículos únicos del tipo de la ruta, sin campos de oferta. Ignora supplierId y conserva búsqueda y paginación."
         }
       ]
     },
@@ -339,7 +339,8 @@
       "tags": [
         "Materiales"
       ],
-      "summary": "Editar material"
+      "summary": "Editar material",
+      "description": "Edita únicamente el costo máximo unitario y el estado de la oferta. El artículo y el proveedor identifican la oferta."
     },
     "delete": {
       "operationId": "deleteWarehouseMaterialsId",
@@ -394,13 +395,14 @@
             "type": "string",
             "format": "uuid"
           },
-          "description": "UUID del registro."
+          "description": "UUID de SupplierMaterial."
         }
       ],
       "tags": [
         "Materiales"
       ],
-      "summary": "Eliminar material"
+      "summary": "Eliminar oferta de proveedor",
+      "description": "Retira una oferta con existencia cero y sin compras, salidas ni otros registros de inventario vinculados al mismo artículo y proveedor. Conserva el artículo."
     }
   },
   "/api/warehouse/materials/{id}/stock": {
@@ -3378,7 +3380,8 @@
       "tags": [
         "Consumibles"
       ],
-      "summary": "Editar consumible"
+      "summary": "Editar consumible",
+      "description": "Edita únicamente el costo máximo unitario y el estado de la oferta. El artículo y el proveedor identifican la oferta."
     },
     "delete": {
       "operationId": "deleteWarehouseConsumablesId",
@@ -3433,13 +3436,14 @@
             "type": "string",
             "format": "uuid"
           },
-          "description": "UUID del registro."
+          "description": "UUID de SupplierMaterial."
         }
       ],
       "tags": [
         "Consumibles"
       ],
-      "summary": "Eliminar consumible"
+      "summary": "Eliminar oferta de proveedor",
+      "description": "Retira una oferta con existencia cero y sin compras, salidas ni otros registros de inventario vinculados al mismo artículo y proveedor. Conserva el artículo."
     }
   },
   "/api/warehouse/consumables/{id}/stock": {

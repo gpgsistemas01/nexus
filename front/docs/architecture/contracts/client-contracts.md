@@ -50,13 +50,29 @@ estado. Un `200` incompleto no confirma la operación. La
 | Usuarios | `GET/POST /api/admin/users`; edición `PATCH /:id`; contraseña `PATCH /:id/password`. Alta incluye contraseña; editar datos no la reenvía; ambos modos de edición conservan versión. |
 | Clientes | `GET/POST /api/sales/clients`, edición `PUT /:id`. Nombre/Activo y versión al editar. |
 | Proveedores | `GET/POST /api/warehouse/suppliers`, edición `PUT /:id`. Razón social, nombre comercial, Activo y versión al editar. |
-| Inventario | Base `/api/warehouse/materials`, `/consumables` o `/wastes`: GET lista, POST alta, PATCH `/:id` metadatos, PATCH `/:id/stock` ajuste. POST `/:id/stock-additions` es entrada de merma; DELETE usa la identidad de la relación admitida para baja. |
+| Inventario | Base `/api/warehouse/materials`, `/consumables` o `/wastes`: GET lista, POST alta, PATCH `/:id` actualiza costo/estado de la oferta (nombre y stock mínimo se editan por Artículos), PATCH `/:id/stock` ajusta el saldo. POST `/:id/stock-additions` es entrada de merma; DELETE retira una oferta con stock cero y sin compras, salidas ni otros registros de inventario de esa oferta, y conserva el artículo. |
 | Compras | Base `/api/warehouse/goods-receipts/materials` o `/consumables`: listado, lectura por ID, alta y edición a través de `purchaseService`; corrección/cancelación de detalle conserva su operación y confirmación propias. |
 | Salidas | Base `/api/warehouse/goods-issues/materials`, `/consumables` o `/api/warehouse/waste-issues`: GET listado/ID, POST alta, PATCH edición; `/:id/header` para encabezado y `/:id/details` para surtido. Devolución: PATCH `/:id/details/:detailId/returns`. |
 | Reportes | Todas las páginas usan `useReportScope` y `ReportScopeDialog`; `useFileExport` comparte permiso, bloqueo, cancelación, nombre fechado y descarga. Los servicios configuran la ruta y usan `requestExcel`; `reportParams` comparte periodos, filtros, orden y eliminación de paginación. |
 
 Las acciones disponibles dependen del recurso y los permisos. Merma no ofrece una baja
 genérica de material ni stock inicial desde compra.
+
+En Compras y Salidas, Prisma devuelve `materialName` desde el detalle persistido.
+`material` aporta tipo, medidas, presentación y unidad. Las salidas devuelven
+`supplierName` desde el detalle, incluidas las mermas. La compra guarda el nombre
+comercial en el encabezado. Las correcciones de compras y las ediciones de salidas
+mantienen los nombres originales de las partidas que conservan.
+
+Si se cambia la identidad de un artículo sin proveedor vinculado, sus partidas y
+movimientos anteriores conservan tipo y medidas. Los detalles devuelven
+`materialSpecification` cuando la ficha cambió. Vue adapta y
+valida cada partida una vez. En Existencias, `material.name` representa el nombre vigente.
+Al consultar con `catalog=true`, Prisma devuelve los artículos directamente y el
+selector los adapta a `LookupItem`.
+
+`DELETE /api/admin/catalogs/materials/:id` elimina un artículo sin proveedores ni
+historial. En Existencias, la edición envía proveedor, costo, estado y versión de la oferta.
 
 `loginRequest` exige el código `SUCCESS_LOGIN`; otro resultado no confirma el acceso.
 La preferencia local del nombre tiene su propietario y vida útil en el

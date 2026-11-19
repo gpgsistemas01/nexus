@@ -6,16 +6,15 @@ import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockErr
 import { buildStockKey } from '../../../utils/formattersUtils.js';
 import { assertPieceQuantity, calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { findSupplierMaterialsSnapshot } from "../materials/supplierMaterialService.js";
+import { lockSupplierMaterialsForIssue } from '../../../repository/warehouse/stockLockRepository.js';
+import { assertMaterialDetailMatchesInventory, materialDocumentDetailsWhere } from '../materials/materialDocumentSnapshot.js';
 
 export const buildGoodsIssueContextWhere = (type = MATERIAL_TYPES.MATERIAL) => {
     if (!Object.values(MATERIAL_TYPES).includes(type)) throw new GoodsIssueNotFound();
 
     return {
         type,
-        details: {
-            some: {},
-            every: { material: { type } }
-        }
+        details: materialDocumentDetailsWhere(type)
     };
 };
 
@@ -23,7 +22,9 @@ export const buildGoodsIssueDetails = async ({
     tx,
     details,
     initialFulfillmentStatusId = null,
-    type = MATERIAL_TYPES.MATERIAL
+    type = MATERIAL_TYPES.MATERIAL,
+    supplyImmediately = false,
+    previousDetails = []
 }) => {
 
     const pairs = [
@@ -38,6 +39,8 @@ export const buildGoodsIssueDetails = async ({
         ).values()
     ];
 
+    const locked = await lockSupplierMaterialsForIssue({ tx, pairs, supplyImmediately });
+    if (locked.length !== pairs.length) throw new MaterialNotFound();
     const supplierMaterials = await findSupplierMaterialsSnapshot({ tx, pairs });
 
     const spMap = new Map(
@@ -46,13 +49,18 @@ export const buildGoodsIssueDetails = async ({
             sp
         ])
     );
+    const previousByPair = new Map(previousDetails.map(detail => [
+        buildStockKey(detail.materialId, detail.supplierId), detail
+    ]));
 
     return details.map(({ materialId, quantity, supplierId, presentationId }) => {
 
         const key = buildStockKey(materialId, supplierId);
         const sp = spMap.get(key);
+        const previous = previousByPair.get(key);
 
         if (!sp || sp.material.type !== type) throw new MaterialNotFound();
+        if (previous) assertMaterialDetailMatchesInventory(previous, sp.material);
         if (!sp.isActive) throw new MaterialInactiveConflict();
         if (!sp.supplier.isActive) throw new SupplierInactiveConflict();
 
@@ -83,7 +91,12 @@ export const buildGoodsIssueDetails = async ({
             quantity,
             convertedQuantity,
             maxUnitCost,
-            materialName: name,
+            materialName: previous?.materialName ?? name,
+            supplierName: previous?.supplierName || sp.supplier.tradeName,
+            ...(previous?.materialSpecification && {
+                materialType: previous.materialType,
+                materialSpecification: previous.materialSpecification
+            }),
             ...(initialFulfillmentStatusId ? { fulfillmentStatusId: initialFulfillmentStatusId } : {})
         };
     });

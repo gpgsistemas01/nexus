@@ -39,7 +39,6 @@ export const WASTE_ISSUE_INCLUDE = {
             fulfillmentStatus: { select: { id: true, name: true } },
             waste: {
                 include: {
-                    supplier: true,
                     presentation: true,
                     unitMeasure: true
                 }
@@ -71,11 +70,12 @@ export const resolveWasteIssueHeaderData = async ({ tx, dto }) => {
     });
 };
 
-const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) => {
+const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId, previous }) => {
     assertPieceQuantity({ quantity: detail.quantity, item: waste });
 
     return {
-        materialName: waste.name,
+        materialName: previous?.materialName ?? waste.name,
+        supplierName: previous?.supplierName || waste.supplier.tradeName,
         quantity: detail.quantity,
         convertedQuantity: calculateConvertedQuantity({
             quantity: detail.quantity,
@@ -91,7 +91,7 @@ const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) 
     };
 };
 
-export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
+export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId, previousDetails = [] }) => {
 
     const uniqueIds = new Set(details.map(detail => detail.wasteId));
 
@@ -101,7 +101,11 @@ export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId 
 
     const wastes = await tx.waste.findMany({
         where: { id: { in: [...uniqueIds] }, isActive: true },
-        select: { id: true, name: true, base: true, height: true, maxUnitCost: true, presentation: { select: { name: true } } }
+        select: {
+            id: true, name: true, base: true, height: true, maxUnitCost: true,
+            presentation: { select: { name: true } },
+            supplier: { select: { tradeName: true } }
+        }
     });
 
     if (wastes.length !== uniqueIds.size) {
@@ -109,6 +113,7 @@ export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId 
     }
 
     const byId = new Map(wastes.map(waste => [waste.id, waste]));
+    const previousById = new Map(previousDetails.map(detail => [detail.wasteId, detail]));
 
     for (const waste of wastes) {
         if (!(Number(waste.maxUnitCost) > 0)) {
@@ -119,6 +124,7 @@ export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId 
     return details.map(detail => createWasteIssueDetailSnapshot({
         waste: byId.get(detail.wasteId),
         detail,
+        previous: previousById.get(detail.wasteId),
         fulfillmentStatusId
     }));
 };

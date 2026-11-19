@@ -6,6 +6,10 @@ vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService
     findSupplierMaterialsSnapshot
 }));
 
+vi.mock('../../../../../src/repository/warehouse/stockLockRepository.js', () => ({
+    lockSupplierMaterialsForIssue: vi.fn(({ pairs }) => pairs)
+}));
+
 const { buildGoodsIssueDetails } = await import('../../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js');
 
 const detail = {

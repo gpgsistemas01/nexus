@@ -3,7 +3,7 @@ import { readText } from '../http/recordContract.js';
 import { isRecord } from './isRecord.js';
 import type { LookupItem } from '../lookup.js';
 
-// Las opciones de material contienen data.material; las plantillas de merma usan data.
+// El catálogo devuelve el artículo directamente. Una oferta lo contiene bajo material.
 export const getLookupArticle = (option?: LookupItem): Record<string, unknown> => {
     const data = option?.data;
     return data && isRecord(data.material) ? data.material : (data ?? {});
@@ -18,7 +18,7 @@ export const mapMaterialOption = (
     value: Record<string, unknown>,
     expectedType: 'MATERIAL' | 'CONSUMABLE',
 ): LookupItem => {
-    const material = isRecord(value.material) ? value.material : {};
+    const material = isRecord(value.material) ? value.material : value;
     // También acepta el listado de inventario, cuyo contrato omite type.
     if (material.type !== undefined && material.type !== expectedType)
         throw new ResponseContractError('El servidor devolvió un artículo de otro catálogo.');

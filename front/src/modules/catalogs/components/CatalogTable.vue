@@ -13,7 +13,11 @@ const props = defineProps<{
     hasSymbol: boolean;
     isMaterial?: boolean;
 }>();
-const emit = defineEmits<{ edit: [row: CatalogEntry]; query: [query: Partial<CatalogQuery>] }>();
+const emit = defineEmits<{
+    edit: [row: CatalogEntry];
+    remove: [row: CatalogEntry];
+    query: [query: Partial<CatalogQuery>];
+}>();
 const headers = computed(() => [
     { title: 'Nombre', key: 'name', sortable: false },
     ...(props.hasSymbol ? [{ title: 'Símbolo', key: 'symbol', sortable: false }] : []),
@@ -62,6 +66,13 @@ const headers = computed(() => [
                 icon="$edit"
                 label="Editar registro"
                 @click="emit('edit', item)"
+            />
+            <TableAction
+                v-if="isMaterial && item.hasSuppliers === false && !item.hasHistory"
+                color="error"
+                icon="$delete"
+                label="Eliminar artículo"
+                @click="emit('remove', item)"
             />
         </template>
     </ServerTable>

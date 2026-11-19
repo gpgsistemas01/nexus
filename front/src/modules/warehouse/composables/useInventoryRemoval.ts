@@ -21,7 +21,7 @@ export const useInventoryRemoval = (options: {
         try {
             const confirmed = await confirmAction({
                 title: `${inventoryActionTitle(options.resource, 'delete')}: ${row.name}`,
-                description: `Se eliminará la relación con ${row.supplierName}. Si no quedan otros proveedores, también se eliminará el material.`,
+                description: `Se eliminará la oferta del proveedor ${row.supplierName}. El artículo y el historial se conservarán. Sólo se puede eliminar con stock cero y sin compras, salidas ni otros registros de inventario.`,
                 signal: controller.signal,
                 submit: async () => {
                     try {

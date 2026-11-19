@@ -1,4 +1,5 @@
 import { ensureSupplierMaterials } from '../materials/supplierMaterialService.js';
+import { MATERIAL_DOCUMENT_DISPLAY_SELECT } from '../materials/materialService.js';
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import { createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptTotalsService.js";
@@ -124,7 +125,6 @@ export const findAllGoodsReceipts = async ({
                 receivedByName: true,
                 supplierId: true,
                 supplierName: true,
-                supplier: true,
                 totalGrossPurchaseAmount: true,
                 totalNetPurchaseAmount: true,
                 totalQuantity: true,
@@ -138,7 +138,9 @@ export const findAllGoodsReceipts = async ({
                 },
                 details: includeDetails ? {
                     ...(activeDetailsOnly && { where: { status: 'ACTIVE' } }),
-                    include: GOODS_RECEIPT_DETAIL_INCLUDE
+                    include: {
+                        material: { select: MATERIAL_DOCUMENT_DISPLAY_SELECT }
+                    }
                 } : false
             }
         }

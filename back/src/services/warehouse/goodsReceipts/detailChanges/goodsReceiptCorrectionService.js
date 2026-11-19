@@ -25,6 +25,7 @@ import {
     GOODS_RECEIPT_DETAIL_STATUS
 } from './goodsReceiptDetailChangeService.js';
 import { findGoodsReceiptDetailChangeReason } from '../../reasonService.js';
+import { getMaterialDetailSpecification } from '../../materials/materialDocumentSnapshot.js';
 
 const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges.goodsReceiptCorrectionService');
 
@@ -52,7 +53,8 @@ export const correctGoodsReceiptDetailLine = async ({
                 supplierId: currentDetail.goodsReceipt.supplierId
             });
             const correctedDetail = calculateGoodsReceiptDetail({
-                material: currentDetail.material,
+                material: { ...getMaterialDetailSpecification(currentDetail), id: currentDetail.materialId },
+                materialName: currentDetail.materialName,
                 detail: { quantity, costPerUnitType, costIsTotal: currentDetail.costIsTotal }
             });
             const correctedQuantity = normalizeDecimal(correctedDetail.quantity);

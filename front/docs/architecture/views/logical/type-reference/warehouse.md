@@ -25,6 +25,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `article` | `article?: LookupItem;` |
 | `canCreateArticle` | `canCreateArticle?: boolean;` |
 | `canCreateSupplier` | `canCreateSupplier?: boolean;` |
+| `isEditingOffer` | `isEditingOffer?: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -37,7 +38,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryEditor.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 28, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 29, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

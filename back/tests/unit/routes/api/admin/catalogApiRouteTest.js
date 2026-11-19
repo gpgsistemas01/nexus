@@ -14,7 +14,8 @@ vi.mock('../../../../../src/middleware/authMiddleware.js', async importOriginal 
 vi.mock('../../../../../src/controllers/api/admin/catalogController.js', () => ({
     getAllCatalogEntries: (_req, res) => res.json({ ok: true }),
     registerCatalogEntry: (_req, res) => res.json({ ok: true }),
-    editCatalogEntry: (_req, res) => res.json({ ok: true })
+    editCatalogEntry: (_req, res) => res.json({ ok: true }),
+    removeMaterialCatalogEntry: (_req, res) => res.json({ ok: true })
 }));
 vi.mock('../../../../../src/validators/forms/catalogValidations.js', () => ({
     catalogEntryValidation: [], catalogEntryEditValidation: []
@@ -29,6 +30,8 @@ describe('acceso a catálogos por recurso', () => {
         [PERMISSIONS.MATERIAL_CATALOGS_MANAGE, 'get', 'materials', 200],
         [PERMISSIONS.MATERIAL_CATALOGS_MANAGE, 'post', 'materials', 200],
         [PERMISSIONS.MATERIAL_CATALOGS_MANAGE, 'put', 'materials/id', 200],
+        [PERMISSIONS.MATERIAL_CATALOGS_MANAGE, 'delete', 'materials/id', 200],
+        [PERMISSIONS.MATERIALS_READ, 'delete', 'materials/id', 403],
         [PERMISSIONS.MATERIAL_CATALOGS_MANAGE, 'get', 'presentations', 200],
         [PERMISSIONS.MATERIAL_CATALOGS_MANAGE, 'get', 'unit-measures', 200],
         [PERMISSIONS.MATERIAL_CATALOGS_MANAGE, 'post', 'presentations', 403],

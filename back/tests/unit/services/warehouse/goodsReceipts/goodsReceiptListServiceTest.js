@@ -20,7 +20,7 @@ describe('conteos de compras sin consultas redundantes', () => {
         expect(result).toEqual({ data: [], recordsTotal: 20, recordsFiltered: 20 });
         expect(count).toHaveBeenCalledTimes(1);
         expect(count).toHaveBeenCalledWith({ where: {
-            type, details: { some: {}, every: { material: { type } } }
+            type, details: { some: {}, none: { OR: [{ materialType: { not: type } }, { materialType: null, material: { type: { not: type } } }] } }
         } });
     });
 
@@ -38,7 +38,7 @@ describe('conteos de compras sin consultas redundantes', () => {
         expect(count).not.toHaveBeenCalled();
         expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({
             type: 'CONSUMABLE', supplierId: 'supplier-1',
-            details: { some: {}, every: { material: { type: 'CONSUMABLE' } } },
+            details: { some: {}, none: { OR: [{ materialType: { not: 'CONSUMABLE' } }, { materialType: null, material: { type: { not: 'CONSUMABLE' } } }] } },
             status: expect.any(Object)
         }) }));
     });

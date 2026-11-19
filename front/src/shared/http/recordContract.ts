@@ -34,6 +34,21 @@ export const readState = (record: Record<string, unknown>): boolean => {
     return record.isActive;
 };
 
+export const mapUniqueRecords = <T extends { id: string }>(
+    values: unknown[],
+    read: (value: unknown) => T,
+    invalidResponse: () => ResponseContractError,
+): T[] => {
+    const ids = new Set<string>();
+    return values.map((value) => {
+        const record = read(value);
+        if (ids.has(record.id)) throw invalidResponse();
+
+        ids.add(record.id);
+        return record;
+    });
+};
+
 export interface MutationConfirmation {
     code: string;
     message: string;

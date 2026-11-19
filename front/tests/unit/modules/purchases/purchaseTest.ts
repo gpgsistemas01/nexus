@@ -135,7 +135,9 @@ it.each([
         kind === 'persons' ? 'true' : null,
       );
       expect(config.signal).toBe(requestSignal);
-      return { data: pageOf([]) };
+      return {
+        data: pageOf(kind === 'items' ? [{ ...purchaseItem.material, type: 'CONSUMABLE' }] : []),
+      };
     });
     const result = await purchaseLookupService.list(
       {
@@ -147,7 +149,11 @@ it.each([
       },
       requestSignal,
     );
-    expect(result.data).toEqual([]);
+    if (kind === 'items') {
+      expect(result.data).toEqual([expect.objectContaining({ id: purchaseItem.material.id })]);
+    } else {
+      expect(result.data).toEqual([]);
+    }
   },
 );
 const query = {
@@ -590,10 +596,21 @@ it.each(['KILOGRAMOS', 'METRO LINEAL'])(
   },
 );
 
-it('muestra el nombre vigente del catálogo sin modificar el nombre histórico del detalle', () => {
+it('muestra la partida histórica aunque cambien el nombre y las medidas del catálogo', () => {
   const source = structuredClone(purchase);
   source.details[0]!.materialName = 'Nombre histórico';
-  source.details[0]!.material.name = 'Nombre vigente';
-  expect(normalizePurchaseDocument(source, 'materials').details[0]!.name).toBe('Nombre vigente');
+  const row = source.details[0]!;
+  Object.assign(row, { materialSpecification: { ...row.material, base: '2', height: '3' } });
+  Object.assign(row.material, {
+    name: 'Nombre vigente',
+    type: 'CONSUMABLE',
+    base: '4',
+    height: '5',
+  });
+  expect(normalizePurchaseDocument(source, 'materials').details[0]).toMatchObject({
+    name: 'Nombre histórico',
+    base: '2',
+    height: '3',
+  });
   expect(source.details[0]!.materialName).toBe('Nombre histórico');
 });

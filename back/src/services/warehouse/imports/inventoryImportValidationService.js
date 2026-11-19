@@ -18,6 +18,8 @@ const snapshot = (item, material = item) => ({
     maxUnitCost: item.maxUnitCost == null ? null : Number(item.maxUnitCost), isActive: item.isActive
 });
 const editable = dto => ({ name: dto.name, minStock: dto.minStock ?? 0, maxUnitCost: dto.maxUnitCost, isActive: dto.isActive });
+const offerSnapshot = item => ({ maxUnitCost: item.maxUnitCost == null ? null : Number(item.maxUnitCost), isActive: item.isActive });
+const offerEditable = dto => ({ maxUnitCost: dto.maxUnitCost, isActive: dto.isActive });
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const issue = (field, message, code = errorMap.inventoryImport.VALIDATION) => ({ field, message, code });
 
@@ -87,10 +89,11 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                         || (config.type && target.material.version !== dto.expectedMaterialVersion)) {
                         add('expectedVersion', 'El registro cambió desde que se descargó la plantilla.');
                     }
-                    before = snapshot(target, target.material ?? target);
-                    assertPieceQuantity({ quantity: dto.minStock, item: target.material ?? target });
+                    before = config.type ? offerSnapshot(target) : snapshot(target, target.material ?? target);
                     identity = config.type ? `${body.id}:${body.supplierId}` : body.id;
                     if (config.type) {
+                        if (dto.name !== target.material.name) add('name', 'El nombre se modifica en Almacén → Artículos.');
+                        if (Number(dto.minStock) !== Number(target.material.minStock)) add('minStock', 'El stock mínimo se modifica en Almacén → Artículos.');
                         const signature = JSON.stringify([dto.name, dto.minStock, dto.expectedMaterialVersion]);
                         if (shared.has(body.id) && shared.get(body.id) !== signature) add('name', 'Las filas del mismo material deben conservar iguales nombre, mínimo y versión del material.');
                         shared.set(body.id, signature);
@@ -143,7 +146,7 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
             else if (identity) targets.set(identity, input.row);
             if (config.mode === modes.CREATE && dto.maxUnitCost === 0) warnings.push('Alta sin costo: no podrá usarse en salidas hasta configurar un costo mayor que cero en Almacén.');
         }
-        const after = dto ? editable(dto) : null;
+        const after = dto ? config.mode === modes.UPDATE && config.type ? offerEditable(dto) : editable(dto) : null;
         const details = config.mode === modes.CREATE && dto ? {
             supplier: supplier?.tradeName ?? '', supplierCode: supplier?.code ?? '',
             ...(config.resource === 'wastes' ? { materialId: dto.materialId,

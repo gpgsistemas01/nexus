@@ -34,7 +34,8 @@ export const getAllConsumables = async (req, res) => {
         supplierId: req.query.supplierId || null,
         orderBy,
         orderDir,
-        canReadCosts: req.user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ)
+        canReadCosts: req.user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ),
+        canRemoveOffers: req.user.permissions.includes(PERMISSIONS.MATERIALS_WRITE)
     });
 
     return res.status(200).json(result);

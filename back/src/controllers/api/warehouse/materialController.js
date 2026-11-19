@@ -39,7 +39,8 @@ export const getAllMaterials = async (req, res) => {
         supplierId,
         orderBy,
         orderDir,
-        canReadCosts: req.user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ)
+        canReadCosts: req.user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ),
+        canRemoveOffers: req.user.permissions.includes(PERMISSIONS.MATERIALS_WRITE)
     });
 
     return res.status(200).json(result);
@@ -65,7 +66,7 @@ export const editMaterial = async (req, res) => {
     const materialDto = createMaterialDtoForEdit(req.body);
     const sanitizedMaterialDto = sanitizeEmptyStrings(materialDto);
 
-    const material = await updateMaterial(sanitizedMaterialDto, req.params.id);
+    const material = await updateMaterial(sanitizedMaterialDto, req.params.id, { type: MATERIAL_TYPES.MATERIAL });
 
     return res.status(200).json({
         material,
@@ -94,7 +95,7 @@ export const editMaterialStock = async (req, res) => {
 
 export const removeMaterial = async (req, res) => {
 
-    const material = await deleteMaterial(req.params.id);
+    const material = await deleteMaterial(req.params.id, { type: MATERIAL_TYPES.MATERIAL });
 
     return res.status(200).json({
         material,

@@ -5,7 +5,7 @@ const { buildWasteIssueDetails } = await import('../../../../../src/services/war
 
 describe('costo de merma antes de solicitar su uso', () => {
   const details = [{ wasteId: 'waste-1', quantity: 2, maxUnitCost: 99 }];
-  const waste = { id: 'waste-1', name: 'Lona', base: 1, height: 2 };
+  const waste = { id: 'waste-1', name: 'Lona', base: 1, height: 2, supplier: { tradeName: 'Proveedor vigente' } };
 
   it('rechaza una cantidad fraccionaria con la presentación de la merma guardada', async () => {
     const tx = { waste: { findMany: vi.fn().mockResolvedValue([{ ...waste, maxUnitCost: 10, presentation: { name: 'PIEZA' } }]) } };
@@ -21,8 +21,8 @@ describe('costo de merma antes de solicitar su uso', () => {
 
   it('acepta un costo positivo de seis decimales sin persistir el costo enviado', async () => {
     const tx = { waste: { findMany: vi.fn().mockResolvedValue([{ ...waste, maxUnitCost: '0.000001' }]) } };
-    const result = await buildWasteIssueDetails({ tx, details, fulfillmentStatusId: 'pending' });
-    expect(result).toEqual([expect.objectContaining({ quantity: 2, convertedQuantity: 4 })]);
+    const result = await buildWasteIssueDetails({ tx, details, fulfillmentStatusId: 'pending', previousDetails: [{ wasteId: 'waste-1', materialName: 'Merma original', supplierName: 'Proveedor original' }] });
+    expect(result).toEqual([expect.objectContaining({ quantity: 2, convertedQuantity: 4, materialName: 'Merma original', supplierName: 'Proveedor original' })]);
     expect(result[0]).not.toHaveProperty('maxUnitCost');
   });
 });

@@ -61,21 +61,8 @@ export const lockInventoryImportReferences = async ({ tx, context }) => {
     }
 };
 
-export const updateImportedMaterials = async ({ tx, type, materials, offers }) => {
-    if (!materials.length) return;
-    const shared = materials.map(row => Prisma.sql`(${row.id}::uuid, ${row.version}::int, ${row.name}::text, ${row.minStock}::numeric)`);
-    const changed = await tx.$queryRaw(Prisma.sql`
-        WITH source(id, version, name, minimum) AS (VALUES ${Prisma.join(shared)}),
-        locked AS MATERIALIZED (
-            SELECT item."id" FROM "Material" item JOIN source ON item."id" = source.id
-            ORDER BY item."id" FOR UPDATE OF item
-        )
-        UPDATE "Material" item SET "name" = source.name, "minStock" = source.minimum
-        FROM source, locked WHERE item."id" = source.id AND item."id" = locked."id"
-            AND item."version" = source.version AND item."type" = ${type}::"MaterialType"
-        RETURNING item."id"
-    `);
-    requireEveryRow(changed, materials.length);
+export const updateImportedSupplierMaterials = async ({ tx, offers }) => {
+    if (!offers.length) return;
     const suppliers = offers.map(row => Prisma.sql`(${row.materialId}::uuid, ${row.supplierId}::uuid, ${row.version}::int, ${row.maxUnitCost}::numeric, ${row.isActive}::boolean)`);
     const updated = await tx.$queryRaw(Prisma.sql`
         WITH source(material_id, supplier_id, version, cost, active) AS (VALUES ${Prisma.join(suppliers)}),

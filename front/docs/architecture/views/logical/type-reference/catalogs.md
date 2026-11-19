@@ -54,6 +54,7 @@ keyof CatalogValues
 | --- | --- |
 | `isActive` | `isActive?: boolean;` |
 | `hasSuppliers` | `hasSuppliers?: boolean;` |
+| `hasHistory` | `hasHistory?: boolean;` |
 | `presentation` | `presentation?: string;` |
 | `unitMeasure` | `unitMeasure?: string;` |
 | `unitSymbol` | `unitSymbol?: string;` |
@@ -66,7 +67,7 @@ keyof CatalogValues
 
 ## CatalogQuery
 
-**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 25, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 26, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -76,7 +77,7 @@ keyof CatalogValues
 
 ## CatalogTarget
 
-**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 30, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 31, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -168,11 +169,13 @@ keyof CatalogValues
 | Miembro | Firma completa |
 | --- | --- |
 | `edit` | `edit: [row: CatalogEntry];` |
-| `query` | `query: [query: Partial<CatalogQuery>]` |
+| `remove` | `remove: [row: CatalogEntry];` |
+| `query` | `query: [query: Partial<CatalogQuery>];` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `edit` |
+| dependency | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `remove` |
 | dependency | [CatalogQuery](../../../../../src/modules/catalogs/catalog.ts) | `query` |
 
 ## FormValues
@@ -220,7 +223,7 @@ Required<CatalogValues>
 
 ## CatalogPage.defineProps
 
-**Fuente:** [src/modules/catalogs/pages/CatalogPage.vue](../../../../../src/modules/catalogs/pages/CatalogPage.vue) · línea 15, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/catalogs/pages/CatalogPage.vue](../../../../../src/modules/catalogs/pages/CatalogPage.vue) · línea 18, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

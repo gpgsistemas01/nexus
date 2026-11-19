@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { PERMISSIONS } from '@nexus/permissions';
 import { VBtn } from 'vuetify/components/VBtn';
 import { usePageAccess } from '../../../app/composables/usePageAccess.js';
@@ -10,7 +10,10 @@ import CatalogTable from '../components/CatalogTable.vue';
 import CatalogEditorPage from './CatalogEditorPage.vue';
 import { catalogDefinition } from '../catalog.js';
 import { useCatalogList } from '../composables/useCatalogList.js';
-import type { CatalogName, CatalogTarget } from '../catalog.js';
+import { catalogService } from '../services/catalogService.js';
+import { confirmAction } from '../../../shared/ui/feedback.js';
+import { ApiError } from '../../../shared/http/apiError.js';
+import type { CatalogEntry, CatalogName, CatalogTarget } from '../catalog.js';
 
 const props = defineProps<{ catalog: CatalogName }>();
 const { has, onDenied } = usePageAccess();
@@ -35,6 +38,47 @@ const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor
             ? 'El artículo se guardó correctamente.'
             : 'El catálogo se guardó correctamente.',
 });
+
+const removal = new AbortController();
+const isRemoving = ref(false);
+
+const removeArticle = async (entry: CatalogEntry) => {
+    if (
+        !canManage.value ||
+        props.catalog !== 'materials' ||
+        entry.hasSuppliers !== false ||
+        entry.hasHistory ||
+        isRemoving.value ||
+        removal.signal.aborted
+    )
+        return;
+
+    isRemoving.value = true;
+
+    try {
+        const confirmed = await confirmAction({
+            title: `Eliminar artículo: ${entry.name}`,
+            description:
+                'El artículo se eliminará si no tiene proveedores vinculados ni historial de inventario.',
+            signal: removal.signal,
+            submit: async () => {
+                try {
+                    await catalogService.removeArticle(entry.id, removal.signal);
+                } catch (cause) {
+                    if (cause instanceof ApiError && [401, 403].includes(cause.status))
+                        onDenied(cause.status);
+
+                    throw cause;
+                }
+            },
+        });
+        if (confirmed) await list.load();
+    } finally {
+        isRemoving.value = false;
+    }
+};
+
+onBeforeUnmount(() => removal.abort());
 
 onMounted(() => {
     document.title = `Nexus | ${definition.label}`;
@@ -74,6 +118,7 @@ onMounted(() => {
             :is-material="catalog === 'materials'"
             @query="list.applyQuery"
             @edit="openEditor({ action: 'edit', row: $event })"
+            @remove="removeArticle"
         />
     </RecordListPanel>
     <CatalogEditorPage

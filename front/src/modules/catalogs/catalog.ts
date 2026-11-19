@@ -16,6 +16,7 @@ export interface CatalogValues {
 export interface CatalogEntry extends Omit<CatalogValues, 'isActive'> {
     isActive?: boolean;
     hasSuppliers?: boolean;
+    hasHistory?: boolean;
     presentation?: string;
     unitMeasure?: string;
     unitSymbol?: string;

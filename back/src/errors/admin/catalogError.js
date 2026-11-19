@@ -32,3 +32,9 @@ export class CatalogEntryNotFound extends AppError {
         this.meta = { catalogLabel };
     }
 }
+
+export class CatalogMeasurementInUse extends AppError {
+    constructor() {
+        super('La presentación o unidad está vinculada a artículos o mermas. Sólo puede cambiar su estado.', errorMap.catalog.MEASUREMENT_IN_USE, 409);
+    }
+}

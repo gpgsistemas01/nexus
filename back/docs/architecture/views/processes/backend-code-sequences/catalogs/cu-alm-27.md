@@ -17,6 +17,7 @@ sequenceDiagram
     participant Materials@{ "type": "control" } as materialService.js
     participant Lock@{ "type": "control" } as stockLockRepository.js
     participant Helpers@{ "type": "control" } as materialHelpers.js
+    participant History@{ "type": "control" } as materialDocumentRepository.js
     participant Version@{ "type": "control" } as versionRepository.js
     participant Db@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler@{ "type": "control" } as app.js
@@ -37,14 +38,15 @@ sequenceDiagram
     Db-->>Lock: $queryRaw(): Promise<void>
     Materials->>Db: tx.material.findUnique({id, select})
     Db-->>Materials: findUnique(): Promise[Material]
-    alt Sin ofertas y campos de identidad cambiaron
+    opt Sin proveedores vinculados y cambio de identidad
         Materials->>Helpers: prepareMaterialData(tx, data, requireSupplier: false)
         Helpers-->>Materials: prepareMaterialData(): Object
-    else Nombre y stock mínimo, o artículo con ofertas
-        Materials->>Version: updateVersionedRecord(model: material, expectedVersion)
-        Version->>Db: material.updateMany({id, version: expectedVersion})
+        Materials->>History: preserveMaterialSpecifications(tx, materialId, specification)
+        History->>Db: tx.$executeRaw(actualiza las especificaciones de las partidas existentes)
     end
-    Db-->>Materials: updateVersionedRecord(): Promise[Material]
+    Materials->>Version: updateVersionedRecord(model: material, expectedVersion)
+    Version->>Db: material.update({where: {id, version: expectedVersion}, data})
+    Version-->>Materials: updateVersionedRecord(): Promise[Material]
     Materials-->>Domain: updateMaterialCatalogEntry(): Promise[Material]
     Domain-->>Controller: updateCatalogEntry(): Promise[Material]
     alt Artículo inexistente, conflicto de versión o identidad vinculada
@@ -70,5 +72,6 @@ sequenceDiagram
 | `Materials` | control | [materialService.js](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Lock` | control | [stockLockRepository.js](../../../../../../src/repository/warehouse/stockLockRepository.js) |
 | `Helpers` | control | [materialHelpers.js](../../../../../../src/services/warehouse/materials/materialHelpers.js) |
+| `History` | control | [materialDocumentRepository.js](../../../../../../src/repository/warehouse/materialDocumentRepository.js) |
 | `Version` | control | [versionRepository.js](../../../../../../src/repository/versionRepository.js) |
 | `ErrorHandler` | control | [app.js](../../../../../../src/app.js) |

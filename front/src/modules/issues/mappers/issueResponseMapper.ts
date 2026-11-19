@@ -1,6 +1,6 @@
 import { ResponseContractError } from '../../../shared/clientError.js';
 import { FULFILLMENT_STATUS_NAMES } from '@nexus/issue-statuses';
-import { readText } from '../../../shared/http/recordContract.js';
+import { mapUniqueRecords, readText } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
 import type { IssueDocument, IssueRow, IssueDetail, IssueResource } from '../issue.js';
@@ -96,7 +96,9 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
     )
         throw createInvalidResponseError();
 
-    const item = readOptionalRelation(resource === 'wastes' ? value.waste : value.material);
+    const item = readOptionalRelation(
+        resource === 'wastes' ? value.waste : (value.materialSpecification ?? value.material),
+    );
     if (
         !Object.keys(item).length ||
         (resource !== 'wastes' && item.type !== ISSUE_CONFIG[resource].type)
@@ -109,8 +111,8 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
         id: value.id,
         itemId: readText(value, resource === 'wastes' ? 'wasteId' : 'materialId'),
         supplierId: resource === 'wastes' ? '' : readText(value, 'supplierId'),
-        supplierName: String(readOptionalRelation(value.supplier ?? item.supplier).tradeName ?? ''),
-        name: readText(item, 'name'),
+        supplierName: readText(value, 'supplierName'),
+        name: readText(value, 'materialName'),
         base: item.base == null ? null : readIssueDecimal(item.base),
         height: item.height == null ? null : readIssueDecimal(item.height),
         presentation: readText(readOptionalRelation(item.presentation), 'name'),
@@ -138,9 +140,11 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
 export const normalizeIssueDocument = (value: unknown, resource: IssueResource): IssueDocument => {
     if (!isRecord(value) || !Array.isArray(value.details)) throw createInvalidResponseError();
 
-    const details = value.details.map((row) => normalizeIssueDetail(row, resource));
-    if (new Set(details.map((row) => row.id)).size !== details.length)
-        throw createInvalidResponseError();
+    const details = mapUniqueRecords(
+        value.details,
+        (row) => normalizeIssueDetail(row, resource),
+        createInvalidResponseError,
+    );
 
     return { ...normalizeIssueRow(value, resource), details };
 };

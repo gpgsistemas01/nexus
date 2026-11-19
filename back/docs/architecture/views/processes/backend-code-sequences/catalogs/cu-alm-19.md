@@ -1,5 +1,5 @@
 <a id="cu-alm-19"></a>
-# `CU-ALM-19` — Editar consumible
+# `CU-ALM-19` — Editar oferta de consumible
 
 **Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
@@ -60,7 +60,7 @@ sequenceDiagram
     activate MaterialDto
     MaterialDto-->>Controller: createMaterialDtoForEdit(): Object (materialDto)
     deactivate MaterialDto
-    Controller->>Domain: updateConsumable(materialDto, req.params.id) sincroniza datos y relación
+    Controller->>Domain: updateConsumable(materialDto, req.params.id) actualiza la oferta del proveedor
     activate Domain
     Domain->>MaterialService: updateMaterial(materialDto, id, { type: CONSUMABLE })
     alt Servicio resuelto

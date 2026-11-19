@@ -86,6 +86,7 @@ describe('catalog controllers database integration', () => {
           validatorMiddleware.validate,
           catalog.editCatalogEntry
         );
+        router.delete('/managed/materials/:id', catalog.removeMaterialCatalogEntry);
       }
     });
 
@@ -299,6 +300,12 @@ describe('catalog controllers database integration', () => {
     const input = { name: `IT Catalog Material ${type} ${testSuffix}`, type, presentationId: presentation.id, unitMeasureId: unit.id, base: type === 'MATERIAL' ? 2 : null, height: type === 'MATERIAL' ? 3 : null, minStock: 0, supplierId: 'ignored', newStock: 999, currentStock: 999, maxUnitCost: 999 };
     const created = await request(app).post('/managed/materials').send(input).expect(201);
     const id = created.body.data.id;
+    await request(app).put(`/managed/presentations/${presentation.id}`)
+      .send({ name: 'Nueva presentación', isActive: true, expectedVersion: presentation.version }).expect(409)
+      .expect(response => expect(response.body.code).toBe('CATALOG_MEASUREMENT_IN_USE'));
+    await request(app).put(`/managed/unit-measures/${unit.id}`)
+      .send({ name: unit.name, symbol: 'NUEVO', isActive: true, expectedVersion: unit.version }).expect(409)
+      .expect(response => expect(response.body.code).toBe('CATALOG_MEASUREMENT_IN_USE'));
     expect(created.body.data).toMatchObject({ name: input.name, type, version: 0, presentationId: presentation.id, unitMeasureId: unit.id });
     expect(await prisma.supplierMaterial.count({ where: { materialId: id } })).toBe(0);
     expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: id } })).toBe(0);
@@ -320,6 +327,8 @@ describe('catalog controllers database integration', () => {
     expect(await prisma.material.count()).toBe(before);
     const supplier = await prisma.supplier.create({ data: { codeNumber: Date.now() % 100000000, code: `${type[0]}${testSuffix}`, legalName: 'IT Catalog Supplier', tradeName: 'IT Catalog Supplier' } });
     await prisma.supplierMaterial.create({ data: { materialId: id, supplierId: supplier.id } });
+    await request(app).delete(`/managed/materials/${id}`).expect(409)
+      .expect(response => expect(response.body.code).toBe('MATERIAL_CATALOG_DELETE_CONFLICT'));
     const linked = await request(app).get('/managed/materials').query({ search: updated.body.data.name }).expect(200);
     expect(linked.body.data[0]._count.supplierMaterials).toBe(1);
     await request(app).put(`/managed/materials/${id}`).send({ name: updated.body.data.name, minStock: 5, type, base: 10, height: 10, expectedVersion: 1 }).expect(409);
@@ -330,6 +339,8 @@ describe('catalog controllers database integration', () => {
     expect(Number(protectedMaterial.minStock)).toBe(5);
     await prisma.supplierMaterial.deleteMany({ where: { materialId: id } });
     await prisma.supplier.delete({ where: { id: supplier.id } });
-    await prisma.material.delete({ where: { id } });
+    await request(app).delete(`/managed/materials/${id}`).expect(200)
+      .expect(response => expect(response.body).toEqual({ code: 'DELETED_CATALOG_ENTRY', data: { id } }));
+    expect(await prisma.material.findUnique({ where: { id } })).toBeNull();
   });
 });

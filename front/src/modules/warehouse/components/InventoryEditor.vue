@@ -24,6 +24,7 @@ defineProps<{
     article?: LookupItem;
     canCreateArticle?: boolean;
     canCreateSupplier?: boolean;
+    isEditingOffer?: boolean;
 }>();
 const emit = defineEmits<{
     update: [field: InventoryField, value: string | boolean];
@@ -48,15 +49,21 @@ const emit = defineEmits<{
         :retain-focus="!isConfirmingDuplicate"
         :is-submit-disabled="isConflicted && !isPending"
         :submit-label="isPending ? 'Recuperar captura' : 'Guardar'"
-        :note="
-            isPending
-                ? 'Captura protegida para recuperación'
-                : 'Los campos de consulta se conservan sin modificarlos.'
-        "
+        :note="isPending ? 'Captura protegida para recuperación' : undefined"
         @close="emit('close')"
         @submit="emit('submit')"
     >
         <template #default="{ formId }">
+            <VAlert
+                v-if="isEditingOffer && !isPending"
+                type="info"
+                variant="tonal"
+                class="mb-4"
+            >
+                El nombre y el stock mínimo se editan en Almacén → Artículos; los datos del
+                proveedor, en Proveedores. Aquí puedes actualizar el costo y el estado de esta
+                oferta. El stock se cambia con Ajustar stock.
+            </VAlert>
             <VAlert
                 v-if="isPending"
                 type="info"

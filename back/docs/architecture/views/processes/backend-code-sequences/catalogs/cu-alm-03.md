@@ -1,5 +1,5 @@
 <a id="cu-alm-03"></a>
-# `CU-ALM-03` — Editar material
+# `CU-ALM-03` — Editar oferta de material
 
 **Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
@@ -58,10 +58,10 @@ sequenceDiagram
     activate MaterialDto
     MaterialDto-->>Controller: createMaterialDtoForEdit(): Object (materialDto)
     deactivate MaterialDto
-    Controller->>Domain: materialService.updateMaterial({ id: req.params.id, materialDto }) sincroniza datos y relación
+    Controller->>Domain: materialService.updateMaterial({ id: req.params.id, materialDto }) actualiza la oferta del proveedor
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: materialService.updateMaterial(): Promise[Material]
+        Domain-->>Controller: materialService.updateMaterial(): Promise[SupplierMaterial]
         Controller-->>Client: HTTP 200 { material, code }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

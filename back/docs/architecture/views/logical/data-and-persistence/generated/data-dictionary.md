@@ -287,6 +287,8 @@ usuarios y responsables se mantiene en el
 | `netPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `grossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
+| `materialType` | `MaterialType?` | No | — | — | — |
+| `materialSpecification` | `Json?` | No | — | — | — |
 | `status` | `GoodsReceiptDetailStatus` | Sí | — | `ACTIVE` | — |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
@@ -386,6 +388,9 @@ usuarios y responsables se mantiene en el
 | `goodsIssueId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
+| `materialType` | `MaterialType?` | No | — | — | — |
+| `materialSpecification` | `Json?` | No | — | — | — |
+| `supplierName` | `String` | Sí | — | `""` | `@db.VarChar(200)` |
 | `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `applyWaste` | `Boolean` | Sí | — | `false` | — |
 | `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
@@ -460,6 +465,8 @@ usuarios y responsables se mantiene en el
 | `newStock` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `previousStock` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `materialType` | `MaterialType?` | No | — | — | — |
+| `materialSpecification` | `Json?` | No | — | — | — |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `goodsReceiptDetailId` | `String?` | No | FK | — | `@db.Uuid` |
 | `goodsIssueDetailId` | `String?` | No | FK | — | `@db.Uuid` |
@@ -613,6 +620,7 @@ usuarios y responsables se mantiene en el
 | `wasteIssueId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `wasteId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
+| `supplierName` | `String` | Sí | — | `""` | `@db.VarChar(200)` |
 | `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `projectConvertedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |

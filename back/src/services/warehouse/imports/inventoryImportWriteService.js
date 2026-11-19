@@ -5,7 +5,7 @@ import { registerWasteStockAdjustmentsBatch } from '../wastes/wasteStockAdjustme
 import { registerWasteStockEntriesBatch } from '../wastes/wasteStockEntryService.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { materialImportIdentity } from './inventoryImportContext.js';
-import { lockInventoryImportReferences, lockInventoryStockCount, updateImportedMaterials, updateImportedWastes } from '../../../repository/warehouse/inventoryImportWriteRepository.js';
+import { lockInventoryImportReferences, lockInventoryStockCount, updateImportedSupplierMaterials, updateImportedWastes } from '../../../repository/warehouse/inventoryImportWriteRepository.js';
 import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 
 const createMaterials = async ({ tx, config, rows, context, userId }) => {
@@ -87,16 +87,12 @@ export const writeInventoryImport = async ({ tx, config, rows, context, userId }
         });
         await updateImportedWastes({ tx, changes });
     } else {
-        const materials = new Map();
         const offers = changed.map(row => {
             const dto = row.dto;
-            const material = context.offers.get(`${row.id}:${dto.supplierId}`).material;
-            assertPieceQuantity({ quantity: dto.minStock, item: material });
-            materials.set(row.id, { id: row.id, version: dto.expectedMaterialVersion, name: dto.name, minStock: dto.minStock });
             return { materialId: row.id, supplierId: dto.supplierId, version: dto.expectedVersion,
                 maxUnitCost: dto.maxUnitCost, isActive: dto.isActive };
         });
-        await updateImportedMaterials({ tx, type: config.type, materials: [...materials.values()], offers });
+        await updateImportedSupplierMaterials({ tx, offers });
     }
     return new Map(changed.map(row => [row.row, row.id]));
 };

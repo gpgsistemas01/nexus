@@ -54,8 +54,8 @@ const emit = defineEmits<{
         :note="
             isMaterial
                 ? isEditing && !canEditIdentity
-                    ? 'Puede editar Nombre y Stock mínimo; tipo, presentación, unidad y medidas permanecen protegidos. Los datos se comparten entre proveedores.'
-                    : 'Sin proveedores vinculados puede editar todos los datos del artículo. Aquí no se registra stock ni costo.'
+                    ? 'Puede editar Nombre y Stock mínimo. Los documentos registrados conservan el nombre que tenían al guardarse.'
+                    : 'Puede editar todos los campos mientras el artículo no tenga proveedores vinculados.'
                 : 'Desactiva un registro para conservar su historial.'
         "
         @close="emit('close')"

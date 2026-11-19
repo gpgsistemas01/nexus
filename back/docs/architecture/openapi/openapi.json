@@ -186,6 +186,9 @@
     "/api/admin/catalogs/{catalog}/{id}": {
       "$ref": "./paths/admin.json#/~1api~1admin~1catalogs~1{catalog}~1{id}"
     },
+    "/api/admin/catalogs/materials/{id}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1catalogs~1materials~1{id}"
+    },
     "/api/warehouse/wastes/{id}/stock-additions": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes~1{id}~1stock-additions"
     },
