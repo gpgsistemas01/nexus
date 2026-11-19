@@ -113,7 +113,11 @@ export const inventoryRules = (
     return action === 'stock'
         ? materialStockValidation
         : action === 'edit'
-          ? materialEditValidation
+          ? {
+                supplierId: materialEditValidation.supplierId,
+                maxUnitCost: materialEditValidation.maxUnitCost,
+                isActive: materialEditValidation.isActive,
+            }
           : materialOfferCreateValidation;
 };
 
@@ -152,6 +156,14 @@ export const buildInventoryPayload = (
             ...(resource !== 'wastes' ? { supplierId: row!.supplierId } : {}),
         };
 
+    if (action === 'edit' && resource !== 'wastes')
+        return {
+            supplierId: row!.supplierId,
+            expectedVersion: row!.version,
+            isActive: Boolean(values.isActive),
+            maxUnitCost: Number(values.maxUnitCost),
+        };
+
     const data: InventoryPayload = {
         name: String(values.name).trim(),
         isActive: Boolean(values.isActive),
@@ -162,9 +174,6 @@ export const buildInventoryPayload = (
         return {
             ...data,
             expectedVersion: row!.version,
-            ...(resource !== 'wastes'
-                ? { supplierId: row!.supplierId, expectedMaterialVersion: row!.materialVersion! }
-                : {}),
         };
 
     if (resource === 'wastes')

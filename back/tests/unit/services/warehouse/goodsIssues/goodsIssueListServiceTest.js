@@ -24,7 +24,7 @@ describe('listado de salidas por recurso', () => {
         const where = findMany.mock.calls[0][0].where;
         expect(where).toMatchObject({
             type,
-            details: { some: {}, every: { material: { type } } },
+            details: { some: {}, none: { OR: [{ materialType: { not: type } }, { materialType: null, material: { type: { not: type } } }] } },
             departmentId: { in: ['department-1'] }
         });
         expect(count).toHaveBeenCalledWith({ where });
@@ -34,7 +34,7 @@ describe('listado de salidas por recurso', () => {
         await findAllGoodsIssues({});
         expect(findMany.mock.calls[0][0].where.details).toEqual({
             some: {},
-            every: { material: { type: 'MATERIAL' } }
+            none: { OR: [{ materialType: { not: 'MATERIAL' } }, { materialType: null, material: { type: { not: 'MATERIAL' } } }] }
         });
     });
 
@@ -77,7 +77,7 @@ describe('listado de salidas por recurso', () => {
         expect(count).not.toHaveBeenCalled();
         expect(findMany.mock.calls[0][0].where).toMatchObject({
             type: 'CONSUMABLE',
-            details: { some: {}, every: { material: { type: 'CONSUMABLE' } } },
+            details: { some: {}, none: { OR: [{ materialType: { not: 'CONSUMABLE' } }, { materialType: null, material: { type: { not: 'CONSUMABLE' } } }] } },
             departmentId: { in: ['department-1'] }
         });
     });

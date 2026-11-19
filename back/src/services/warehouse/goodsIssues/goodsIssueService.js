@@ -31,7 +31,7 @@ import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../sha
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
-import { GOODS_ISSUE_DETAIL_SELECT } from "./goodsIssueDetailSelect.js";
+import { GOODS_ISSUE_DETAIL_READ_SELECT, GOODS_ISSUE_DETAIL_SELECT } from "./goodsIssueDetailSelect.js";
 import { assertIssueNotCanceled } from "../issues/issueFulfillmentRules.js";
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
@@ -133,7 +133,7 @@ export const findAllGoodsIssues = async ({
                             }
                         ]
                     },
-                    select: GOODS_ISSUE_DETAIL_SELECT
+                    select: GOODS_ISSUE_DETAIL_READ_SELECT
                 }
             }
         }
@@ -162,16 +162,19 @@ export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MA
         });
 
         const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
-        const processedDetails = await buildGoodsIssueDetails({
-            details,
-            initialFulfillmentStatusId: pendingFulfillmentStatusId,
-            type
-        });
         const referenceType = type === MATERIAL_TYPES.CONSUMABLE
             ? DOCUMENT_REFERENCE_TYPES.CONSUMABLE_GOODS_ISSUE
             : DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE;
 
         const result = await getDb().$transaction(async (tx) => {
+
+            const processedDetails = await buildGoodsIssueDetails({
+                tx,
+                details,
+                initialFulfillmentStatusId: pendingFulfillmentStatusId,
+                type,
+                supplyImmediately
+            });
 
             referenceNumber = await generateYearlyReferenceNumber({ type: referenceType, tx });
 
@@ -252,6 +255,10 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
                             id: true,
                             materialId: true,
                             supplierId: true,
+                            materialName: true,
+                            supplierName: true,
+                            materialType: true,
+                            materialSpecification: true,
                             quantity: true,
                             suppliedQuantity: true,
                             isSupplied: true
@@ -287,7 +294,8 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
                 tx,
                 details,
                 initialFulfillmentStatusId: pendingFulfillmentStatusId,
-                type
+                type,
+                previousDetails: goodsIssue.details
             });
 
             await tx.goodsIssueDetail.deleteMany({

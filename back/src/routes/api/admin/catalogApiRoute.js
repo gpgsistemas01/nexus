@@ -2,7 +2,8 @@ import express from 'express';
 import {
     editCatalogEntry,
     getAllCatalogEntries,
-    registerCatalogEntry
+    registerCatalogEntry,
+    removeMaterialCatalogEntry
 } from '../../../controllers/api/admin/catalogController.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
@@ -36,5 +37,7 @@ router.put(
     validate,
     editCatalogEntry
 );
+
+router.delete('/materials/:id', removeMaterialCatalogEntry);
 
 export default router;

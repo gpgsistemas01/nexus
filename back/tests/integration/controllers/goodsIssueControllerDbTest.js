@@ -8,6 +8,7 @@ import pg from 'pg';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
+import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
 import { resolveDatabaseUrl } from '../../../src/lib/databaseUrl.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
@@ -85,11 +86,20 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         };
         reportFinders.material = (await import('../../../src/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js')).findMaterialGoodsIssueReportRows;
         reportFinders.consumable = (await import('../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js')).findConsumableGoodsIssueReportRows;
+        const { getAllMaterials, removeMaterial } = await import('../../../src/controllers/api/warehouse/materialController.js');
+        const { getAllConsumables, removeConsumable } = await import('../../../src/controllers/api/warehouse/consumableController.js');
         app = createControllerTestApp({ registerRoutes: router => {
             router.use((req, _res, next) => {
-                req.user = { accesses: sessionAccesses ?? [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] };
+                req.user = {
+                    accesses: sessionAccesses ?? [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }],
+                    permissions: [PERMISSIONS.MATERIALS_WRITE]
+                };
                 next();
             });
+            router.get('/materials', getAllMaterials);
+            router.delete('/materials/:id', removeMaterial);
+            router.get('/consumables', getAllConsumables);
+            router.delete('/consumables/:id', removeConsumable);
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
                 const path = issuePath(resource);
                 const controller = controllers[resource];
@@ -170,6 +180,50 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
     });
 
     afterAll(cleanCreatedRecords);
+
+    it.each([['material', 'MATERIAL', '/materials'], ['consumable', 'CONSUMABLE', '/consumables']])(
+        'conserva el vínculo de %s con saldo cero tras registrar una salida en cualquier estado',
+        async (resource, type, warehousePath) => {
+            const article = await prisma.material.create({ data: {
+                name: `IT GI Vínculo ${resource} ${suffix}`, type,
+                presentationId: ids.presentation, unitMeasureId: ids.unit
+            } });
+            const offer = await prisma.supplierMaterial.create({
+                data: { materialId: article.id, supplierId: ids.supplier, maxUnitCost: 10 }
+            });
+            let issue;
+            try {
+                const list = () => request(app).get(warehousePath).query({ search: article.name }).expect(200);
+                expect((await list()).body.data[0]).toMatchObject({ id: offer.id, canDelete: true });
+                const created = await request(app).post(issuePath(resource)).send({
+                    ...header(), details: [{ ...detail(resource), materialId: article.id }]
+                }).expect(200);
+                issue = created.body.goodsIssue;
+                const states = await prisma.fulfillmentStatus.findMany({
+                    where: { name: { in: ['Pendiente', 'Surtido parcial', 'Surtido', 'Cancelado'] } },
+                    select: { id: true }
+                });
+                expect(states).toHaveLength(4);
+                // Aísla el estado de la salida del saldo y de sus movimientos.
+                for (const { id: fulfillmentStatusId } of states) {
+                    await prisma.goodsIssueDetail.update({
+                        where: { id: issue.details[0].id }, data: { fulfillmentStatusId }
+                    });
+                    expect((await list()).body.data[0]).toMatchObject({ id: offer.id, canDelete: false });
+                    await request(app).delete(`${warehousePath}/${offer.id}`).expect(409)
+                        .expect(response => expect(response.body.code).toBe('MATERIAL_DELETE_HISTORY_CONFLICT'));
+                }
+                expect(await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).toEqual(offer);
+            } finally {
+                if (issue) {
+                    await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: issue.id } });
+                    await prisma.goodsIssue.delete({ where: { id: issue.id } });
+                }
+                await prisma.supplierMaterial.deleteMany({ where: { id: offer.id } });
+                await prisma.material.delete({ where: { id: article.id } });
+            }
+        }
+    );
 
     it('clasifica las salidas históricas con la misma regla de la migración de compras', async () => {
         await prisma.goodsIssue.updateMany({ where: { departmentId: ids.department }, data: { type: 'MATERIAL' } });
@@ -323,18 +377,44 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(rows[0].referenceNumber).toBe(issues[inventoryResource].referenceNumber);
     });
 
-    it.each(['material', 'consumable'])('el reporte de salidas de %s muestra el catálogo y conserva el nombre histórico', async resource => {
+    it.each(['material', 'consumable'])('el reporte de salidas de %s conserva el nombre histórico al renombrar el artículo', async resource => {
         const original = await prisma.material.findUniqueOrThrow({ where: { id: ids[resource] } });
         const stored = await prisma.goodsIssueDetail.findFirstOrThrow({ where: { goodsIssueId: issues[resource].id } });
         const name = `Nombre vigente ${resource} ${suffix}`;
         try {
             await prisma.material.update({ where: { id: ids[resource] }, data: { name } });
             const rows = await Array.fromAsync(reportFinders[resource]({ departmentId: ids.department, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] }));
-            expect(rows[0]).toMatchObject({ materialName: name, requestedQuantity: 2 });
+            expect(rows[0]).toMatchObject({ materialName: stored.materialName, requestedQuantity: 2 });
             const detail = await prisma.goodsIssueDetail.findUniqueOrThrow({ where: { id: stored.id } });
             expect(detail.materialName).toBe(stored.materialName);
         } finally {
             await prisma.material.update({ where: { id: ids[resource] }, data: { name: original.name } });
+        }
+    });
+
+    it('conserva los nombres originales al editar una salida pendiente y usa los vigentes en un alta', async () => {
+        const payload = { ...header(), details: [detail('material')] };
+        const path = issuePath('material');
+        const saved = (await request(app).post(path).send(payload).expect(200)).body.goodsIssue;
+        const original = saved.details[0];
+        const supplier = await prisma.supplier.findUniqueOrThrow({ where: { id: ids.supplier } });
+        const currentNames = { materialName: `Nuevo artículo ${suffix}`, supplierName: `Nuevo proveedor ${suffix}` };
+        try {
+            await prisma.material.update({ where: { id: ids.material }, data: { name: currentNames.materialName } });
+            await prisma.supplier.update({ where: { id: ids.supplier }, data: { tradeName: currentNames.supplierName } });
+            const edited = await request(app).patch(`${path}/${saved.id}`).send({
+                ...payload, details: [{ ...detail('material'), quantity: 3 }]
+            }).expect(200);
+            expect(edited.body.goodsIssue.details[0]).toMatchObject({
+                materialName: original.materialName, supplierName: original.supplierName, quantity: '3'
+            });
+            const next = await request(app).post(path).send(payload).expect(200);
+            expect(next.body.goodsIssue.details[0]).toMatchObject(currentNames);
+            await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: [saved.id, next.body.goodsIssue.id] } } });
+            await prisma.goodsIssue.deleteMany({ where: { id: { in: [saved.id, next.body.goodsIssue.id] } } });
+        } finally {
+            await prisma.material.update({ where: { id: ids.material }, data: { name: original.materialName } });
+            await prisma.supplier.update({ where: { id: ids.supplier }, data: { tradeName: supplier.tradeName } });
         }
     });
 

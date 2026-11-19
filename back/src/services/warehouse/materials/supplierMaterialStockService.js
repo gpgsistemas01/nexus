@@ -4,14 +4,15 @@ import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { updateSupplierMaterialStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
+import { MATERIAL_SPECIFICATION_SELECT } from './materialDocumentSnapshot.js';
 
-export const findSupplierMaterialsForStockMovement = ({ tx, where }) => tx.supplierMaterial.findMany({
+export const findSupplierMaterialsForStockMovement = ({ tx, where, includeSpecification }) => tx.supplierMaterial.findMany({
     where,
     select: {
         materialId: true,
         supplierId: true,
         maxUnitCost: true,
-        material: { select: { base: true, height: true, name: true } },
+        material: { select: { base: true, height: true, name: true, ...(includeSpecification && MATERIAL_SPECIFICATION_SELECT) } },
         supplier: { select: { tradeName: true } }
     }
 });

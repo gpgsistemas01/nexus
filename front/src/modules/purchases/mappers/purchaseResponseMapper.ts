@@ -1,6 +1,6 @@
 import { ResponseContractError } from '../../../shared/clientError.js';
 import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
-import { readText } from '../../../shared/http/recordContract.js';
+import { mapUniqueRecords, readText } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { PURCHASE_CONFIG } from '../purchaseConfig.js';
 import type {
@@ -66,17 +66,19 @@ const normalizePurchaseDetail = (value: unknown, resource: PurchaseResource): Pu
         typeof value.id !== 'string' ||
         !value.id ||
         (value.costIsTotal !== undefined && typeof value.costIsTotal !== 'boolean') ||
-        !isRecord(value.material) ||
-        value.material.type !== PURCHASE_CONFIG[resource].type ||
         !Object.values(GOODS_RECEIPT_DETAIL_STATUSES).some((status) => status === value.status)
     )
         throw createInvalidResponseError();
 
-    const material = value.material;
+    const material = value.materialSpecification ?? value.material;
+
+    if (!isRecord(material) || material.type !== PURCHASE_CONFIG[resource].type)
+        throw createInvalidResponseError();
+
     return {
         id: value.id,
         materialId: readText(value, 'materialId'),
-        name: readText(material, 'name'),
+        name: readText(value, 'materialName'),
         base: material.base == null ? null : readPurchaseDecimal(material.base),
         height: material.height == null ? null : readPurchaseDecimal(material.height),
         presentation: readText(readOptionalRelation(material.presentation), 'name'),
@@ -107,9 +109,11 @@ export const normalizePurchaseDocument = (
     )
         throw createInvalidResponseError();
 
-    const details = value.details.map((row) => normalizePurchaseDetail(row, resource));
-    if (new Set(details.map((row) => row.id)).size !== details.length)
-        throw createInvalidResponseError();
+    const details = mapUniqueRecords(
+        value.details,
+        (row) => normalizePurchaseDetail(row, resource),
+        createInvalidResponseError,
+    );
 
     return {
         ...normalizePurchaseRow(value, resource),

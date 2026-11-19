@@ -21,9 +21,10 @@ export const inventoryActionTitle = (
 ) => {
     const item = INVENTORY_CONFIG[resource].singular;
     const subject = resource !== 'wastes' && !creationContext ? `existencia de ${item}` : item;
+    const editTitle = resource === 'wastes' ? `Editar ${subject}` : `Editar oferta de ${item}`;
     const titles: Record<InventoryAction, string> = {
         create: `Registrar ${subject}`,
-        edit: `Editar ${subject}`,
+        edit: editTitle,
         delete: `Eliminar ${subject}`,
         stock: `Ajustar stock de ${item}`,
         'add-stock': `Agregar stock de ${item}`,

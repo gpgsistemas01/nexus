@@ -20,8 +20,9 @@ para su cuenta; no se elige una operación diferente en cada fila.
 y observaciones. El sistema genera los IDs nuevos; Stock actual y Conversión
 son referencias.
 
-**Editar datos:** cambie **Material**, **Stock mínimo**, **Costo máximo unitario** y **Activo**.
-Se conservan IDs/versiones, proveedor, presentación, unidad, medidas y existencias.
+**Editar datos:** cambie **Costo máximo unitario** o **Activo** de la oferta.
+Nombre y Stock mínimo son referencias de **Artículos**; los datos del proveedor se editan
+en **Proveedores**. Se conservan IDs/versiones, presentación, unidad, medidas y existencias.
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->
@@ -136,15 +137,15 @@ la existencia; el costo máximo se configura en **Almacén**. No duplique la ent
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
-## Editar datos
+## Editar una oferta
 
-1. Localice el registro y pulse **Editar**.
-2. Cambie **Material**, **Stock mínimo**, **Costo máximo unitario** o **Activo**, según corresponda.
+1. Localice el registro y pulse **Editar oferta**.
+2. Cambie **Costo máximo unitario** o **Activo**.
 3. Pulse **Guardar** y compruebe el registro actualizado.
 
-Proveedor, presentación, unidad y medidas son de consulta. El stock y su conversión
-se conservan: no se capturan desde esta edición. Nombre y mínimo se comparten entre
-los proveedores del material; costo y Activo afectan la oferta seleccionada. Si necesita cambiar la identidad del artículo, consulte al responsable del inventario.
+El stock y su conversión se conservan: no se capturan desde esta edición. Para cambiar
+nombre o stock mínimo, abra **Almacén → Artículos**. Los datos comerciales del proveedor
+se editan en **Directorio comercial → Proveedores**.
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->
@@ -170,11 +171,10 @@ Compruebe el historial en **Movimientos → Materiales**. Ante un conflicto, sig
 <!-- manual:any materials:write -->
 ## Retirar un registro
 
-**Antes de eliminar.** Revise nombre y proveedor en la confirmación. Eliminar la
-última relación con un proveedor también puede eliminar el material. Sus relaciones
-o historial pueden impedirlo.
-
-Desmarcar **Activo** conserva el registro y su historia para consulta.
+**Eliminar** está disponible cuando la oferta tiene stock cero y carece de compras,
+salidas y otros registros de inventario. Revise el proveedor antes de confirmar. El
+artículo se conserva en **Artículos**. Para dejar de usar una oferta con historial en
+operaciones nuevas, desmarque **Activo** en **Editar oferta**.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->

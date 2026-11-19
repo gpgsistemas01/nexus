@@ -7,7 +7,7 @@ import { GoodsReceiptNotFound } from '../../../../../src/errors/warehouse/goodsR
 describe('contexto de compras', () => {
     it.each(['MATERIAL', 'CONSUMABLE'])('exige cabecera y todos los detalles de %s', type => {
         expect(buildGoodsReceiptContextWhere(type)).toEqual({
-            type, details: { some: {}, every: { material: { type } } }
+            type, details: { some: {}, none: { OR: [{ materialType: { not: type } }, { materialType: null, material: { type: { not: type } } }] } }
         });
     });
     it('conserva las consultas comunes sin contexto', () => {

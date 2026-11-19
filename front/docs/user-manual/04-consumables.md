@@ -54,12 +54,12 @@ se recibe al guardar la compra; no la duplique como cantidad inicial.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
-## Editar datos
+## Editar una oferta
 
-Pulse **Editar** y cambie **Consumible**, **Stock mínimo**, **Costo máximo unitario**
-o **Activo**; después pulse **Guardar**. Proveedor, presentación y unidad son de
-consulta. El stock, su conversión y la medida por pieza del alta se conservan. Nombre y mínimo se comparten entre proveedores; costo y Activo
-afectan la oferta seleccionada.
+Pulse **Editar oferta** y cambie **Costo máximo unitario** o **Activo**; después
+pulse **Guardar**. El stock y su conversión se conservan. Para cambiar nombre o stock
+mínimo, abra **Almacén → Artículos**; los datos comerciales se editan en
+**Directorio comercial → Proveedores**.
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->
@@ -80,9 +80,10 @@ para entregas. Los ajustes corrigen el saldo; no sustituyen esos documentos.
 <!-- manual:any materials:write -->
 ## Disponibilidad e incidencias
 
-Desmarcar **Activo** retira el registro de nuevas operaciones y conserva su historia.
-Para eliminarlo, revise la confirmación; sus relaciones pueden impedirlo. Ante un
-conflicto o un envío sin respuesta, siga [Errores y recuperación](15-errors-and-recovery.md).
+**Eliminar** está disponible cuando la oferta tiene stock cero y carece de compras,
+salidas y otros registros de inventario. Revise el proveedor antes de confirmar. El
+artículo se conserva en **Artículos**. Para dejar de usar una oferta con historial en
+operaciones nuevas, desmarque **Activo** en **Editar oferta**.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->

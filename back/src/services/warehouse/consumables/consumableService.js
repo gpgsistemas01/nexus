@@ -9,7 +9,8 @@ export const findAllConsumables = async ({
     supplierId = null,
     orderBy = 'name',
     orderDir = 'asc',
-    canReadCosts = false
+    canReadCosts = false,
+    canRemoveOffers = false
 }) => findAllSupplierMaterials({
     skip,
     take,
@@ -18,7 +19,8 @@ export const findAllConsumables = async ({
     type: MATERIAL_TYPES.CONSUMABLE,
     orderBy,
     orderDir,
-    canReadCosts
+    canReadCosts,
+    canRemoveOffers
 });
 
 export const createConsumable = ({ consumableDto, userId = null }) => createMaterial({

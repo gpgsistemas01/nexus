@@ -159,6 +159,7 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto, accesses }) => g
     const details = await buildWasteIssueDetails({
         tx,
         details: requestedDetails,
+        previousDetails: current.details,
         fulfillmentStatusId: pendingStatusId
     });
     const headerData = await resolveWasteIssueHeaderData({ tx, dto: headerDto });

@@ -24,13 +24,11 @@ const articleSaved = (entry: CatalogEntry) => {
 
     const option = mapMaterialOption(
         {
-            material: {
-                ...entry,
-                base: entry.base || null,
-                height: entry.height || null,
-                presentation: { name: entry.presentation },
-                unitMeasure: { name: entry.unitMeasure, symbol: entry.unitSymbol },
-            },
+            ...entry,
+            base: entry.base || null,
+            height: entry.height || null,
+            presentation: { name: entry.presentation },
+            unitMeasure: { name: entry.unitMeasure, symbol: entry.unitSymbol },
         },
         props.resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
     );

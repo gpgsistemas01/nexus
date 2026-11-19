@@ -24,12 +24,15 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
             material: await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js'),
             consumable: await import('../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js')
         };
-        const { getAllMaterials } = await import('../../../src/controllers/api/warehouse/materialController.js');
+        const { getAllMaterials, removeMaterial } = await import('../../../src/controllers/api/warehouse/materialController.js');
+        const { editCatalogEntry } = await import('../../../src/controllers/api/admin/catalogController.js');
         const { getAllConsumables } = await import('../../../src/controllers/api/warehouse/consumableController.js');
         const report = await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js');
         app = createControllerTestApp({ registerRoutes: router => {
-            router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
+            router.use((req, _res, next) => { req.user = { id: ids.user, permissions: ['materials:write'] }; next(); });
             router.get('/catalog/material', getAllMaterials);
+            router.put('/articles/:catalog/:id', editCatalogEntry);
+            router.delete('/catalog/material/:id', removeMaterial);
             router.get('/catalog/consumable', getAllConsumables);
             router.get('/purchase-report', report.exportMaterialGoodsReceiptReportExcel);
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
@@ -112,13 +115,13 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(rows.map(row => row.referenceNumber)).toEqual([receipts[resource].referenceNumber]);
     });
 
-    it.each([['material', 'Material'], ['consumable', 'Consumable']])('el reporte de %s usa el catálogo sin alterar el histórico ni los importes', async (resource, label) => {
+    it.each([['material', 'Material'], ['consumable', 'Consumable']])('el reporte de %s conserva el nombre histórico y los importes al renombrar el artículo', async (resource, label) => {
         const original = await prisma.material.findUniqueOrThrow({ where: { id: ids[resource] } });
         const name = `Nombre vigente ${resource} ${suffix}`;
         try {
             await prisma.material.update({ where: { id: ids[resource] }, data: { name } });
             const rows = await Array.fromAsync(services[resource][`find${label}GoodsReceiptReportRows`]({ supplierId: ids.supplier }));
-            expect(rows[0]).toMatchObject({ materialName: name, netPurchaseAmount: 20, grossPurchaseAmount: 23.2 });
+            expect(rows[0]).toMatchObject({ materialName: original.name, netPurchaseAmount: 20, grossPurchaseAmount: 23.2 });
             const detail = await prisma.goodsReceiptDetail.findUniqueOrThrow({ where: { id: receipts[resource].details[0].id } });
             expect(detail.materialName).toBe(`RC ${resource} ${suffix}`);
         } finally {
@@ -172,6 +175,65 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 10 }]
     });
 
+    it('conserva una oferta con compra aunque llegue a cero y retira otra oferta del mismo artículo sin historial propio', async () => {
+        ids.catalogSupplier ??= (await prisma.supplier.create({ data: {
+            codeNumber: Number.parseInt(Date.now().toString().slice(-8)) + 1, code: `CV${suffix}`,
+            legalName: `RC other legal ${suffix}`, tradeName: `RC other supplier ${suffix}`
+        } })).id;
+        const materialId = ids.material;
+        const offer = await prisma.supplierMaterial.findUniqueOrThrow({
+            where: { supplierId_materialId: { materialId, supplierId: ids.supplier } }
+        });
+        try {
+            await prisma.supplierMaterial.update({
+                where: { id: offer.id }, data: { currentStock: 0, convertedQuantity: 0 }
+            });
+            await request(app).delete(`/catalog/material/${offer.id}`).expect(409)
+                .expect(response => expect(response.body.code).toBe('MATERIAL_DELETE_HISTORY_CONFLICT'));
+            const { body } = await request(app).get('/catalog/material')
+                .query({ supplierId: ids.supplier, search: `RC material ${suffix}` }).expect(200);
+            expect(body.data[0]).toMatchObject({ id: offer.id, canDelete: false });
+            const unused = await prisma.supplierMaterial.create({ data: { materialId, supplierId: ids.catalogSupplier } });
+            await request(app).delete(`/catalog/material/${unused.id}`).expect(200);
+            expect(await prisma.supplierMaterial.findUnique({ where: { id: unused.id } })).toBeNull();
+            expect(await prisma.material.findUnique({ where: { id: materialId } })).not.toBeNull();
+        } finally {
+            await prisma.supplierMaterial.update({
+                where: { id: offer.id }, data: { currentStock: offer.currentStock, convertedQuantity: offer.convertedQuantity }
+            });
+        }
+    });
+
+    it('reclasifica un artículo sin proveedor y conserva las especificaciones de una compra anterior', async () => {
+        const article = await prisma.material.create({ data: {
+            name: `RC unlinked ${suffix}`, type: 'MATERIAL', base: 2, height: 3,
+            presentationId: ids.presentation, unitMeasureId: ids.unit
+        } });
+        (ids.catalogIds ??= []).push(article.id);
+        const line = await prisma.goodsReceiptDetail.create({ data: {
+            materialId: article.id, materialName: article.name, goodsReceiptId: receipts.material.id,
+            quantity: 1, convertedQuantity: 6, costPerUnitType: 10, conversionUnitCost: 2,
+            netPurchaseAmount: 10, grossPurchaseAmount: 11.6
+        } });
+        try {
+            const edited = await request(app).put(`/articles/materials/${article.id}`)
+                .send({ name: article.name, type: 'CONSUMABLE', base: 4, height: 5, expectedVersion: article.version }).expect(200);
+            expect(edited.body.data).toMatchObject({ type: 'CONSUMABLE', base: '4', height: '5' });
+            await request(app).get(`${path('material')}/${receipts.material.id}`).expect(200).expect(response => {
+                expect(response.body.goodsReceipt.details.find(item => item.id === line.id)).toMatchObject({
+                    materialSpecification: { type: 'MATERIAL', base: '2', height: '3' },
+                    convertedQuantity: '6'
+                });
+            });
+            const rows = await Array.fromAsync(services.material.findMaterialGoodsReceiptReportRows({ supplierId: ids.supplier }));
+            expect(rows.find(row => row.materialId === article.id)).toMatchObject({ materialBase: 2, materialHeight: 3 });
+            const stored = await prisma.goodsReceiptDetail.findUniqueOrThrow({ where: { id: line.id } });
+            expect(stored.updatedAt).toEqual(line.updatedAt);
+        } finally {
+            await prisma.goodsReceiptDetail.delete({ where: { id: line.id } });
+        }
+    });
+
     it.each(['material', 'consumable'])('compras de %s consultan identidades únicas y vinculan sólo las partidas confirmadas', async resource => {
         const type = resource === 'material' ? 'MATERIAL' : 'CONSUMABLE';
         ids.catalogIds ??= [];
@@ -190,10 +252,11 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         await prisma.supplierMaterial.createMany({ data: [ids.supplier, ids.catalogSupplier].map(supplierId => ({ supplierId, materialId: catalog[1].id })) });
         const result = await request(app).get(`/catalog/${resource}`).query({ catalog: true, supplierId: ids.supplier, search: `RC-Catalog-${resource}-${suffix}`, length: 20 }).expect(200);
         expect(result.body.recordsFiltered).toBe(4);
-        expect(result.body.data.map(row => row.material.id)).toEqual(catalog.map(row => row.id));
+        expect(result.body.data.map(row => row.id)).toEqual(catalog.map(row => row.id));
         expect(result.body.data[0]).not.toHaveProperty('supplier');
+        expect(result.body.data[0]).not.toHaveProperty('material');
         const next = await request(app).get(`/catalog/${resource}`).query({ catalog: true, search: `RC-Catalog-${resource}-${suffix}`, start: 1, length: 1 }).expect(200);
-        expect(next.body.data.map(row => row.material.id)).toEqual([catalog[1].id]);
+        expect(next.body.data.map(row => row.id)).toEqual([catalog[1].id]);
         const purchase = quantity => request(app).post(path(resource)).send({ ...purchaseBody(resource), details: [{ materialId: catalog[0].id, quantity, costPerUnitType: 10 }] });
         const created = await purchase(2).expect(200);
         const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[0].id } };
@@ -292,10 +355,16 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         await request(app).get(`${path(resource)}/${receipt.id}`).expect(200).expect(result => {
             expect(result.body.goodsReceipt.details[0].costIsTotal).toBe(true);
         });
-        await request(app).patch(`${path(resource)}/${receipt.id}/details/${detail.id}/corrections`)
-            .send({ quantity: 5, costPerUnitType: 400 }).expect(200);
+        await prisma.material.update({ where: { id: detail.materialId }, data: { name: `Nombre nuevo ${suffix}` } });
+        try {
+            await request(app).patch(`${path(resource)}/${receipt.id}/details/${detail.id}/corrections`)
+                .send({ quantity: 5, costPerUnitType: 400 }).expect(200);
+        } finally {
+            await prisma.material.update({ where: { id: detail.materialId }, data: { name: detail.materialName } });
+        }
         const corrected = await prisma.goodsReceiptDetail.findUniqueOrThrow({ where: { id: detail.id } });
         expect(corrected.costIsTotal).toBe(true);
+        expect(corrected.materialName).toBe(detail.materialName);
         expect(Number(corrected.conversionUnitCost)).toBe(80);
         expect(Number(corrected.netPurchaseAmount)).toBe(400);
         const label = resource === 'material' ? 'Material' : 'Consumable';

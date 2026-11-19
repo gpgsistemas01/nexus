@@ -21,18 +21,15 @@ import { MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../shared/constants/
 export const isGoodsReceiptMaterialCreation = (body = {}) =>
     body.materialId === undefined && body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
 
-const materialDataValidation = [
-    ...materialRollReferenceValidation,
-    validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME }),
-    validateUUID('supplierId'),
-    ...createInventoryStateValidation()
-];
-
 export const materialEditValidation = [
-    ...materialDataValidation,
+    ...materialRollReferenceValidation,
+    validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME,
+        condition: (_, { req }) => req.body.name !== undefined }),
+    validateUUID('supplierId'),
+    ...createInventoryStateValidation(),
     validatePositiveNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT }),
     validateRecordVersion(),
-    validateRecordVersion('expectedMaterialVersion')
+    validateRecordVersion('expectedMaterialVersion').optional()
 ];
 
 export const materialStockValidation = [

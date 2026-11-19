@@ -1,5 +1,5 @@
 <a id="cu-alm-04"></a>
-# `CU-ALM-04` — Retirar material
+# `CU-ALM-04` — Retirar oferta de material
 
 **Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
@@ -81,7 +81,7 @@ sequenceDiagram
     Domain->>FileBaseRepository: getDb()
     FileBaseRepository-->>Domain: getDb(): PrismaClient | TransactionClient — tx si se recibió
     Domain->>Prisma: db.$transaction(async tx => ...)
-    Prisma->>Prisma: tx.supplierMaterial.findUnique({ id })
+    Prisma->>Prisma: tx.supplierMaterial.findUnique({ id, select: currentStock/supplierId/material.type })
     break UUID de relación mal formado
         Prisma-->>Domain: error 22P02 y rollback
         Domain->>DatabaseErrors: normalizeDatabaseError(error)
@@ -94,23 +94,20 @@ sequenceDiagram
         Prisma-->>Domain: findUnique(): Promise[null]
         Domain-->>Controller: throw MaterialNotFound
     else Relación encontrada
-        Domain->>Usage: existsMaterialUsage({ tx, materialId })
-        Usage->>FileBaseRepository: getDb(tx)
-        FileBaseRepository-->>Usage: getDb(): PrismaClient | TransactionClient — conserva tx
-        Usage->>Prisma: material.findFirst({ relaciones históricas: some })
-        alt Existe historia protegida
-            Usage-->>Domain: existsMaterialUsage(): Promise[boolean] (true)
-            Domain-->>Controller: throw MaterialDeleteRelationConflict y rollback
-        else Sin historia protegida
-            Usage-->>Domain: existsMaterialUsage(): Promise[boolean] (false)
-            Domain->>Prisma: tx.supplierMaterial.delete({ id })
-            Domain->>Prisma: tx.supplierMaterial.count({ materialId })
-            opt No quedan relaciones con proveedores
-                Domain->>Prisma: tx.material.delete({ materialId })
+        alt Existencia distinta de cero
+            Domain-->>Controller: throw MaterialDeleteStockConflict y rollback
+        else Existencia en cero
+            Domain->>Usage: existsDeletableSupplierMaterial({ tx, id, supplierId })
+            Usage->>Prisma: supplierMaterial.findFirst({ id, currentStock: 0, material sin historial del proveedor })
+            alt Hay compras, salidas u otros registros de inventario
+                Domain-->>Controller: throw MaterialDeleteHistoryConflict y rollback
+            else Oferta sin historial
+                Domain->>Prisma: tx.supplierMaterial.delete({ id })
+                Note over Domain,Prisma: Material, Supplier y documentos históricos se conservan
+                Prisma-->>Domain: delete(): Promise[{ id, materialId }]
+                Domain-->>Controller: deleteMaterial(): Promise[SupplierMaterial]
+                Controller-->>Client: HTTP 200 { material: { id, materialId }, code }
             end
-            Prisma-->>Domain: delete(): Promise[{ id: number }]
-            Domain-->>Controller: deleteMaterial(): Promise[Material]
-            Controller-->>Client: HTTP 200 { material: { id }, code }
         end
     end
     opt AppError propagado

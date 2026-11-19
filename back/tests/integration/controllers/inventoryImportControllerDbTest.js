@@ -247,23 +247,26 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         await confirm(batch).expect(409);
     });
 
-    it('actualiza campos editables de un material compartido una vez y conserva los saldos', async () => {
+    it('edita ofertas de un artículo compartido sin cambiar el catálogo ni los saldos', async () => {
         const offer = await seedOffer('Editar compartido');
         await prisma.supplierMaterial.create({ data: { materialId: offer.materialId, supplierId: fixture.suppliers[1].id,
             maxUnitCost: 10, currentStock: 3, convertedQuantity: 18 } });
         const offers = await prisma.supplierMaterial.findMany({ where: { materialId: offer.materialId }, include: { material: true } });
-        const rows = offers.map(item => ({ ...updateRow(item), name: fixture.row('Renombrado').name, maxUnitCost: 22 }));
+        const rows = offers.map(item => ({ ...updateRow(item), maxUnitCost: 22 }));
+        const invalid = await preview(rows.map(row => ({ ...row, name: fixture.row('Renombrado').name })), 'materials', 'update');
+        expect(invalid.preview.summary).toMatchObject({ updates: 0, errors: 2 });
+        await confirm(invalid).expect(400);
         const batch = await preview(rows, 'materials', 'update');
         expect(batch.preview.summary).toMatchObject({ updates: 2, errors: 0 });
         await confirm(batch).expect(200);
         const saved = await prisma.supplierMaterial.findMany({ where: { materialId: offer.materialId }, include: { material: true } });
-        expect(saved.every(item => Number(item.maxUnitCost) === 22 && item.material.version === offer.material.version + 1)).toBe(true);
+        expect(saved.every(item => Number(item.maxUnitCost) === 22 && item.material.version === offer.material.version)).toBe(true);
         expect(saved.map(item => Number(item.currentStock)).sort()).toEqual([2, 3]);
         expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: offer.materialId } })).toBe(0);
         const unchanged = await preview(saved.map(updateRow), 'materials', 'update');
         expect(unchanged.preview.summary.unchanged).toBe(2);
         await confirm(unchanged).expect(200);
-        expect((await prisma.material.findUnique({ where: { id: offer.materialId } })).version).toBe(offer.material.version + 1);
+        expect((await prisma.material.findUnique({ where: { id: offer.materialId } })).version).toBe(offer.material.version);
     });
 
     it('rechaza un archivo viejo antes de confirmar y un cambio entre vista previa y confirmación', async () => {
@@ -437,7 +440,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
             .attach('file', buffer, 'inventario.csv').expect(400);
     });
 
-    it('descarga IDs y versiones, permite editar el nombre y actualiza el mismo registro al subirlo', async () => {
+    it('descarga IDs y versiones y actualiza el costo de la misma oferta al subir el Excel', async () => {
         const offer = await seedOffer('Plantilla actual');
         const { createInventoryImportTemplate } = await import('../../../src/services/warehouse/imports/inventoryImportTemplateService.js');
         const bytes = await createInventoryImportTemplate({ user: fixture.user, resource: 'materials', mode: 'update', query: { supplierId: fixture.suppliers[0].id, search: 'Plantilla actual' } });
@@ -448,18 +451,18 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(headers.slice(0, 10)).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual', 'Stock mínimo', 'Presentación', 'Conversión', 'Unidad', 'Costo unitario']);
         expect(['ID material', 'ID proveedor', 'Versión proveedor', 'Versión material'].map(header => sheet.getCell(2, headers.indexOf(header) + 1).value))
             .toEqual([offer.materialId, offer.supplierId, offer.version, offer.material.version]);
-        const name = fixture.row('Plantilla editada').name;
-        sheet.getCell(2, headers.indexOf('Material') + 1).value = name;
+        const maxUnitCost = 27;
+        sheet.getCell(2, headers.indexOf('Costo unitario') + 1).value = maxUnitCost;
         const response = await request(app).post('/materials/preview?mode=update').set('Cookie', cookie)
             .attach('file', await writeInventoryWorkbook(workbook), 'actualizar.xlsx').expect(200);
         const batch = response.body.batch;
         expect(batch.preview.summary).toMatchObject({ updates: 1, errors: 0 });
-        expect(batch.preview.rows[0]).toMatchObject({ id: offer.materialId, before: { name: offer.material.name }, after: { name } });
+        expect(batch.preview.rows[0]).toMatchObject({ id: offer.materialId, before: { maxUnitCost: Number(offer.maxUnitCost) }, after: { maxUnitCost } });
         await confirm(batch).expect(200);
         const saved = await prisma.supplierMaterial.findUnique({ where: { id: offer.id }, include: { material: true } });
-        expect(saved.material).toMatchObject({ id: offer.materialId, name });
+        expect(saved.material).toMatchObject({ id: offer.materialId, name: offer.material.name });
+        expect(Number(saved.maxUnitCost)).toBe(maxUnitCost);
         expect(Number(saved.currentStock)).toBe(2);
-        expect(await prisma.material.count({ where: { name } })).toBe(1);
     });
 
     it('informa IDs de proveedor inválidos por fila sin abortar toda la vista previa', async () => {

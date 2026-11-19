@@ -1,16 +1,18 @@
 import { materialCatalogValidation, materialCatalogEditValidation } from '../../shared/validation/validators.js';
 import { findMaterialCatalogEntries, createMaterialCatalogEntry, updateMaterialCatalogEntry } from '../warehouse/materials/materialService.js';
-import { updateVersionedRecord } from '../../repository/versionRepository.js';
+import { assertRecordVersion, updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from '../../repository/paginationRepository.js';
 import { findManagedCatalog } from '../../constants/catalogs.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
 import {
     CatalogEntryNotFound,
+    CatalogMeasurementInUse,
     CatalogNotFound,
     CatalogValidationError
 } from '../../errors/admin/catalogError.js';
 import { getDb } from '../../repository/baseRepository.js';
 import { createCatalogEntryDto } from '../../dtos/catalogDTO.js';
+import { normalizeDatabaseError, RecordIdentifierInvalid } from '../../errors/databaseError.js';
 
 const getCatalog = (catalogName) => {
     const catalog = findManagedCatalog(catalogName);
@@ -82,19 +84,39 @@ export const updateCatalogEntry = async (catalogName, id, input) => {
     const data = createCatalogEntryDto(catalog, input);
     validateCatalogData(catalog, data, true);
     if (catalog.model === 'material') return updateMaterialCatalogEntry(id, { ...data, expectedVersion: input.expectedVersion });
+    const modelName = catalog.model;
+    const isMeasurement = modelName === 'presentation' || modelName === 'unitMeasure';
     try {
-        const entry = await updateVersionedRecord({
-            model: getDb()[catalog.model],
+        const db = getDb();
+        const updateEntry = model => updateVersionedRecord({
+            model,
             where: { id },
             data,
             expectedVersion: input.expectedVersion
         });
+        const entry = isMeasurement ? await db.$transaction(async tx => {
+            const table = modelName === 'presentation'
+                ? await tx.$queryRaw`SELECT "name", "version" FROM "Presentation" WHERE "id" = ${id}::uuid FOR UPDATE`
+                : await tx.$queryRaw`SELECT "name", "symbol", "version" FROM "UnitMeasure" WHERE "id" = ${id}::uuid FOR UPDATE`;
+            const [current] = table;
+            if (!current) throw new CatalogEntryNotFound(catalog.label);
+            assertRecordVersion(current, input.expectedVersion);
+
+            if (data.name !== current.name || (data.symbol !== undefined && data.symbol !== current.symbol)) {
+                const inUse = await tx[modelName].findFirst({
+                    where: { id, OR: [{ materials: { some: {} } }, { wastes: { some: {} } }] },
+                    select: { id: true }
+                });
+                if (inUse) throw new CatalogMeasurementInUse();
+            }
+            return updateEntry(tx[modelName]);
+        }) : await updateEntry(db[modelName]);
         return removeInternalKey(catalog, entry);
     } catch (error) {
         if ([
             PRISMA_ERROR_CODES.RECORD_NOT_FOUND,
             PRISMA_ERROR_CODES.INCONSISTENT_COLUMN_DATA
-        ].includes(error?.code)) {
+        ].includes(error?.code) || (isMeasurement && normalizeDatabaseError(error) instanceof RecordIdentifierInvalid)) {
             throw new CatalogEntryNotFound(catalog.label);
         }
         throw error;

@@ -86,6 +86,7 @@ const context = props.target.row
             !initialSupplier &&
             !isPending
         "
+        :is-editing-offer="target.action === 'edit' && resource !== 'wastes'"
         @create-article="
             emit('createArticle', {
                 search: $event,

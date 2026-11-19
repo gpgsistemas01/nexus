@@ -254,7 +254,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## Field
 
-**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 22, columna 5. **Declaración:** type.
+**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 21, columna 5. **Declaración:** type.
 
 **Definición completa:**
 

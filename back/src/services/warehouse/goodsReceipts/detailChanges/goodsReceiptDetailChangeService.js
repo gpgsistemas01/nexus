@@ -41,7 +41,8 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
             materialId: currentDetail.materialId,
             supplierId: currentDetail.goodsReceipt.supplierId,
             quantity: normalizedQuantityDifference,
-            goodsReceiptDetailId
+            goodsReceiptDetailId,
+            materialSpecification: currentDetail.materialSpecification
         }]
     });
 };

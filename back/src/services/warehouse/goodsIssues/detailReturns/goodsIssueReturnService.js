@@ -17,6 +17,7 @@ import { applyInventoryMovement } from '../../../inventory/movementService.js';
 import { findFulfillmentStatusIdsByName } from '../../fulfillmentStatusService.js';
 import { resolveIssueFulfillmentStatus } from '../../issues/issueFulfillmentRules.js';
 import { buildGoodsIssueContextWhere } from '../goodsIssueHelpers.js';
+import { getMaterialDetailSpecification } from '../../materials/materialDocumentSnapshot.js';
 import { GOODS_ISSUE_DETAIL_SELECT } from '../goodsIssueDetailSelect.js';
 import { resolveGoodsIssueDetailFulfillmentStatusName } from '../goodsIssueFulfillmentRules.js';
 import { assertPieceQuantity } from '../../../inventory/stockHelpers.js';
@@ -45,7 +46,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
                 throw new GoodsIssueReturnStatusConflict();
             }
 
-            assertPieceQuantity({ quantity: requestedReturnQuantityInput, item: detail.material });
+            assertPieceQuantity({ quantity: requestedReturnQuantityInput, item: getMaterialDetailSpecification(detail) });
 
             const totalSuppliedQuantity = normalizeDecimal(detail.suppliedQuantity ?? 0);
             const currentTotalReturnedQuantity = normalizeDecimal(detail.returnedQuantity ?? 0);
@@ -68,6 +69,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
                     materialId: detail.materialId,
                     supplierId: detail.supplierId,
                     goodsIssueDetailId: detail.id,
+                    materialSpecification: detail.materialSpecification,
                     quantity: requestedReturnQuantity
                 }],
                 movementType: INVENTORY_MOVEMENT_TYPES.ENTRY

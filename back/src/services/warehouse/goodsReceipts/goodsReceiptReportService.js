@@ -4,6 +4,7 @@ import { GOODS_RECEIPT_DETAIL_STATUSES } from '../../../shared/constants/goodsRe
 import { QUERY_BATCH_SIZES } from '../../../constants/pagination.js';
 import { findBatches } from '../../../repository/paginationRepository.js';
 import { findAllGoodsReceipts } from './goodsReceiptService.js';
+import { getMaterialDetailSpecification } from '../materials/materialDocumentSnapshot.js';
 
 const mapGoodsReceiptDetailRows = function* (goodsReceipts = [], { materialId = '' } = {}) {
     for (const goodsReceipt of goodsReceipts) {
@@ -12,22 +13,24 @@ const mapGoodsReceiptDetailRows = function* (goodsReceipts = [], { materialId = 
         const receptionDate = formatDateLongWithTime(goodsReceipt.receptionDate);
         for (const detail of goodsReceipt.details || []) {
             if (detail.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED || (materialId && detail.materialId !== materialId)) continue;
+            const material = getMaterialDetailSpecification(detail);
 
             yield {
                 referenceNumber: goodsReceipt.referenceNumber,
                 receptionDate,
                 reportMonth: getReportMonthKey(goodsReceipt.receptionDate),
                 receivedByName: goodsReceipt.receivedByName,
+                supplierId: goodsReceipt.supplierId,
                 supplierName: goodsReceipt.supplierName,
                 invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
                 materialId: detail.materialId,
-                materialName: detail.material?.name ?? detail.materialName,
-                materialBase: toNumber(detail.material?.base),
-                materialHeight: toNumber(detail.material?.height),
+                materialName: detail.materialName,
+                materialBase: toNumber(material?.base),
+                materialHeight: toNumber(material?.height),
                 quantity: toNumber(detail.quantity),
-                presentationName: detail.material?.presentation?.name,
+                presentationName: material?.presentation?.name,
                 convertedQuantity: toNumber(detail.convertedQuantity),
-                unitMeasureName: detail.material?.unitMeasure?.symbol || detail.material?.unitMeasure?.name,
+                unitMeasureName: material?.unitMeasure?.symbol || material?.unitMeasure?.name,
                 conversionUnitCost: toNumber(detail.conversionUnitCost),
                 costPerUnitType: toNumber(detail.costPerUnitType),
                 costIsTotal: detail.costIsTotal,

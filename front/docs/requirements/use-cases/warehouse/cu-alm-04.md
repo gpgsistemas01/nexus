@@ -1,16 +1,16 @@
-# `CU-ALM-04` — Retirar material
+# `CU-ALM-04` — Retirar oferta de material
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-ALM-04` |
-| Nombre | Retirar material. |
+| Nombre | Retirar oferta de material. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Disparador | Determina que debe retirar material y solicita la eliminación. |
+| Disparador | Solicita retirar una oferta de proveedor desde Existencias de materiales. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de retiro.<br>3. El recurso objetivo existe.<br>4. El recurso se encuentra en un estado que permite retirarlo. |
-| Flujo principal | 1. **Actor:** selecciona un material y solicita retirarlo **(ver E1)**.<br>2. **Nexus:** identifica el material y solicita confirmar la eliminación.<br>3. **Actor:** pulsa **Confirmar eliminación** **(ver A2)**.<br>4. **Nexus:** comprueba si el material tiene historia protegida o relaciones con proveedores **(ver A1)**; elimina la relación proveedor-material y, cuando no quedan otras relaciones ni historia protegida, elimina también la identidad del material; después actualiza el listado y confirma el retiro **(ver EOP)**. |
-| Flujos alternativos | **A1 — Historia o relaciones protegidas (durante el paso 4):**<br>1. **Nexus:** informa el motivo del rechazo y conserva el artículo, sus ofertas, existencia e historia sin cambios parciales; termina el caso de uso.<br>**A2 — Cancelar el retiro (en el paso 3):**<br>1. **Actor:** pulsa **Cancelar** en la confirmación.<br>2. **Nexus:** cierra el aviso y conserva el material, la oferta y la existencia; termina el caso de uso. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1 o durante el paso 4):**<br>1. **Nexus:** rechaza la solicitud, comunica el motivo y no presenta información ni ejecuta cambios fuera de la autorización del actor; termina el caso de uso.<br>**EOP — Operación no confirmada (durante el paso 4):**<br>1. **Nexus:** comunica que no pudo confirmar el resultado y no anuncia éxito; conserva la captura cuando el formulario sigue disponible. Termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** La relación seleccionada deja de estar disponible y la identidad sólo se elimina si no conserva otras relaciones ni historia protegida.<br>2. **Fallo:** Ante un rechazo, la identidad, las relaciones, la existencia y la historia permanecen sin cambios; no se produce un retiro parcial ni se expone información no autorizada. |
+| Flujo principal | 1. **Actor:** selecciona **Eliminar** en una oferta cuyo stock es cero y sin compras, salidas ni otros registros de inventario **(ver E1)**.<br>2. **Nexus:** muestra el proveedor y advierte que sólo retirará la oferta; conserva el artículo y los documentos históricos.<br>3. **Actor:** pulsa **Confirmar eliminación** **(ver A1)**.<br>4. **Nexus:** comprueba que la oferta existe, que su stock es cero y que no hay registros de inventario para ese artículo y proveedor; elimina sólo la relación proveedor-artículo, actualiza el listado y confirma **(ver E2, E3 y EOP)**. |
+| Flujos alternativos | **A1 — Cancelar el retiro (en el paso 3):**<br>1. **Actor:** pulsa **Cancelar** en la confirmación.<br>2. **Nexus:** cierra el aviso y conserva el artículo, la oferta y la existencia; termina el caso de uso. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1 o durante el paso 4):**<br>1. **Nexus:** rechaza la solicitud, comunica el motivo y no presenta información ni ejecuta cambios fuera de la autorización del actor; termina el caso de uso.<br>**E2 — Existencia distinta de cero (durante el paso 4):**<br>1. **Nexus:** rechaza el retiro porque la oferta aún tiene saldo; conserva el artículo, la oferta y el historial.<br>**E3 — Existe historial (durante el paso 4):**<br>1. **Nexus:** rechaza el retiro y permite desactivar la oferta desde **Editar oferta**.<br>**EOP — Operación no confirmada (durante el paso 4):**<br>1. **Nexus:** comunica que no pudo confirmar el resultado y no anuncia éxito; conserva la captura cuando el formulario sigue disponible. Termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** la oferta deja de estar disponible; la identidad del artículo y sus documentos históricos se conservan, incluso al retirar la última oferta.<br>2. **Fallo:** ante un rechazo, artículo, oferta, existencia e historia permanecen sin cambios. |
 | Requisitos relacionados | `RF-CAT-008`, `RN-007`. |
 
 Familia: [objetivos y realización](index.md).

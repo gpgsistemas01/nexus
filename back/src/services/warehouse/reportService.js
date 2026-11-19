@@ -1,3 +1,4 @@
+import { getMaterialDetailSpecification } from './materials/materialDocumentSnapshot.js';
 import { formatDateLongWithTime, toNumber, getReportMonthKey } from '../../utils/formattersUtils.js';
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
@@ -70,7 +71,7 @@ const mapWasteRows = (wastes = []) => wastes.map((item) => ({
     maxUnitCost: toNumber(item.maxUnitCost)
 }));
 
-const mapIssueDetailRow = ({ issue, detail, material, supplier, requestDate }) => ({
+const mapIssueDetailRow = ({ issue, detail, material, requestDate }) => ({
     referenceNumber: issue.referenceNumber,
     requestDate,
     reportMonth: getReportMonthKey(issue.requestDate),
@@ -79,8 +80,8 @@ const mapIssueDetailRow = ({ issue, detail, material, supplier, requestDate }) =
     clientName: issue.clientName,
     projectNumber: issue.projectNumber,
     fulfillmentStatusName: issue.fulfillmentStatus?.name,
-    materialName: material?.name ?? detail.materialName,
-    supplierName: supplier?.tradeName,
+    materialName: detail.materialName,
+    supplierName: detail.supplierName,
     materialBase: toNumber(material?.base),
     materialHeight: toNumber(material?.height),
     requestedQuantity: toNumber(detail.quantity),
@@ -105,7 +106,7 @@ const mapGoodsIssueDetailRows = function* (goodsIssues = [], { supplierId = '', 
                 || (supplierId && detail.supplierId !== supplierId)
                 || (materialId && detail.materialId !== materialId)) continue;
 
-            yield mapIssueDetailRow({ issue, detail, material: detail.material, supplier: detail.supplier, requestDate });
+            yield mapIssueDetailRow({ issue, detail, material: getMaterialDetailSpecification(detail), requestDate });
         }
     }
 };
@@ -120,7 +121,6 @@ const mapWasteIssueDetailRows = function* (wasteIssues = []) {
                 issue,
                 detail,
                 material: detail.waste,
-                supplier: detail.waste?.supplier,
                 requestDate
             });
         }

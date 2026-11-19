@@ -67,8 +67,7 @@ campos y guarde. Compruebe el proveedor en el listado.
 2. Cambie **Razón social**, **Nombre comercial** o **Activo**, según corresponda.
 3. Pulse **Actualizar** y revise el resultado.
 
-El código del proveedor se conserva; no se captura desde esta edición. Los cambios
-no modifican existencias, costos ni partidas de compras o salidas.
+El código del proveedor se conserva. Existencias y los selectores muestran el nombre comercial vigente. Las compras y salidas conservan el nombre comercial guardado en el documento, incluso si corrige la razón social o el nombre comercial del proveedor.
 
 Desactivar conserva el historial. Edite los datos de la misma empresa; no los
 sustituya por los de otro proveedor. Ante un conflicto, siga

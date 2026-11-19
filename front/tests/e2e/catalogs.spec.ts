@@ -427,6 +427,18 @@ test(
       height: null,
       expectedVersion: 7,
     });
+    await page.route(`**/api/admin/catalogs/materials/${entryId}`, async (route) => {
+      expect(route.request().method()).toBe('DELETE');
+      store.set('materials', []);
+      await route.fulfill({ json: { code: 'DELETED_CATALOG_ENTRY', data: { id: entryId } } });
+    });
+    await page.getByRole('button', { name: 'Eliminar artículo', exact: true }).click();
+    const removal = page.getByRole('dialog', { name: /Eliminar artículo/ });
+    await removal.getByRole('button', { name: 'Confirmar eliminación' }).click();
+    await expect(removal).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Eliminar artículo', exact: true })).toHaveCount(
+      0,
+    );
     await page.goto('/catalogos/roles');
     await expect(
       page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),

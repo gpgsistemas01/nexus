@@ -1,5 +1,5 @@
 <a id="cu-alm-20"></a>
-# `CU-ALM-20` — Retirar consumible
+# `CU-ALM-20` — Retirar oferta de consumible
 
 **Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
@@ -54,8 +54,8 @@ sequenceDiagram
     participant Auth@{ "type": "control" } as authMiddleware.js
     participant Controller@{ "type": "control" } as consumableController.js
     participant Domain@{ "type": "control" } as consumableService.js
-    participant Usage@{ "type": "control" } as supplierMaterialService.js
     participant MaterialService@{ "type": "control" } as materialService.js
+    participant Usage@{ "type": "control" } as supplierMaterialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant DatabaseErrors@{ "type": "control" } as databaseError.js
     participant ErrorHandler@{ "type": "control" } as app.js
@@ -84,7 +84,7 @@ sequenceDiagram
     MaterialService->>FileBaseRepository: getDb()
     FileBaseRepository-->>MaterialService: getDb(): PrismaClient | TransactionClient — tx si se recibió
     MaterialService->>Prisma: db.$transaction(async tx => ...)
-    Prisma->>Prisma: tx.supplierMaterial.findUnique({ id })
+    Prisma->>Prisma: tx.supplierMaterial.findUnique({ id, select: currentStock/supplierId/material.type })
     break UUID de relación mal formado
         Prisma-->>MaterialService: error 22P02 y rollback
         MaterialService->>DatabaseErrors: normalizeDatabaseError(error)
@@ -98,23 +98,21 @@ sequenceDiagram
         Prisma-->>MaterialService: findUnique(): Promise[null]
         Domain-->>Controller: throw MaterialNotFound
     else Relación encontrada
-        MaterialService->>Usage: existsMaterialUsage({ tx, materialId })
-        Usage->>FileBaseRepository: getDb(tx)
-        FileBaseRepository-->>Usage: getDb(): PrismaClient | TransactionClient — conserva tx
-        Usage->>Prisma: material.findFirst({ relaciones históricas: some })
-        alt Existe historia protegida
-            Usage-->>MaterialService: existsMaterialUsage(): Promise[boolean] (true)
-            Domain-->>Controller: throw MaterialDeleteRelationConflict y rollback
-        else Sin historia protegida
-            Usage-->>MaterialService: existsMaterialUsage(): Promise[boolean] (false)
-            MaterialService->>Prisma: tx.supplierMaterial.delete({ id })
-            MaterialService->>Prisma: tx.supplierMaterial.count({ materialId })
-            opt No quedan relaciones con proveedores
-                MaterialService->>Prisma: tx.material.delete({ materialId })
+        alt Existencia distinta de cero
+            MaterialService-->>Controller: throw MaterialDeleteStockConflict y rollback
+        else Existencia en cero
+            MaterialService->>Usage: existsDeletableSupplierMaterial({ tx, id, supplierId })
+            Usage->>Prisma: supplierMaterial.findFirst({ id, currentStock: 0, material sin historial del proveedor })
+            alt Hay compras, salidas u otros registros de inventario
+                MaterialService-->>Domain: throw MaterialDeleteHistoryConflict y rollback
+                Domain-->>Controller: throw MaterialDeleteHistoryConflict
+            else Oferta sin historial
+                MaterialService->>Prisma: tx.supplierMaterial.delete({ id })
+                Note over MaterialService,Prisma: Material, Supplier y documentos históricos se conservan
+                Prisma-->>MaterialService: delete(): Promise[{ id, materialId }]
+                Domain-->>Controller: deleteConsumable(): Promise[SupplierMaterial]
+                Controller-->>Client: HTTP 200 { material: { id, materialId }, code }
             end
-            Prisma-->>MaterialService: delete(): Promise[{ id: string }]
-            Domain-->>Controller: deleteConsumable(): Promise[Material]
-            Controller-->>Client: HTTP 200 { material: { id }, code }
         end
     end
     opt AppError propagado

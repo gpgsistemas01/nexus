@@ -20,6 +20,7 @@ import { resolveIssueSupplyChange } from '../issues/issueSupplyRules.js';
 import { buildGoodsIssueContextWhere } from './goodsIssueHelpers.js';
 import { GOODS_ISSUE_DETAIL_SELECT } from './goodsIssueDetailSelect.js';
 import { resolveGoodsIssueDetailFulfillmentStatusName } from './goodsIssueFulfillmentRules.js';
+import { getMaterialDetailSpecification } from '../materials/materialDocumentSnapshot.js';
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueDetailService');
 
@@ -34,6 +35,7 @@ export const supplyGoodsIssue = async ({ id, goodsIssueDto, type, tx }) => {
                 select: {
                     id: true,
                     materialId: true,
+                    materialSpecification: true,
                     material: { select: { presentation: { select: { name: true } } } },
                     supplierId: true,
                     materialName: true,
@@ -68,7 +70,10 @@ export const supplyGoodsIssue = async ({ id, goodsIssueDto, type, tx }) => {
 
         // Consumir el id valida pertenencia y duplicados en el mismo recorrido.
         currentById.delete(detail.id);
-        const change = resolveIssueSupplyChange({ current, requested: detail });
+        const change = resolveIssueSupplyChange({
+            current: { ...current, material: getMaterialDetailSpecification(current) },
+            requested: detail
+        });
         if (!change) continue;
 
         const { data, quantityToSupply } = change;
@@ -81,6 +86,7 @@ export const supplyGoodsIssue = async ({ id, goodsIssueDto, type, tx }) => {
                 materialId: current.materialId,
                 supplierId: current.supplierId,
                 goodsIssueDetailId: current.id,
+                materialSpecification: current.materialSpecification,
                 quantity: quantityToSupply
             });
         }

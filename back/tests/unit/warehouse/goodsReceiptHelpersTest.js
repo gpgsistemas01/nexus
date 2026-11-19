@@ -6,6 +6,10 @@ vi.mock('../../../src/services/warehouse/materials/materialService.js', () => ({
     }))
 }));
 
+vi.mock('../../../src/repository/warehouse/stockLockRepository.js', () => ({
+    lockMaterialIdentitiesForPurchase: vi.fn()
+}));
+
 import { buildGoodsReceiptDetails, buildGoodsReceiptStockOffers, calculateGoodsReceiptDetail } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
 import {
     cancelGoodsReceiptDetailAndTotals,

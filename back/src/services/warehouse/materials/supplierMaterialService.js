@@ -39,34 +39,44 @@ const buildMaterialUsageFilters = () => MATERIAL_USAGE_RELATIONS.map(relation =>
     [relation]: { some: {} }
 }));
 
-const buildUnusedMaterialFilters = () => MATERIAL_USAGE_RELATIONS.map(relation => ({
-    [relation]: { none: {} }
-}));
+export const findMaterialsWithUsage = materialIds => getDb().material.findMany({
+    where: { id: { in: materialIds }, OR: buildMaterialUsageFilters() },
+    select: { id: true }
+});
 
-const findDeletableMaterialIds = async ({ db, materialIds }) => {
+const withoutOfferHistory = supplierId => ({
+    goodsIssueDetails: { none: { supplierId } },
+    goodsReceiptDetails: { none: { goodsReceipt: { supplierId } } },
+    previousGoodsReceiptDetailChanges: { none: { goodsReceipt: { supplierId } } },
+    correctedGoodsReceiptDetailChanges: { none: { goodsReceipt: { supplierId } } },
+    stockAdjustmentDetails: { none: { supplierId } },
+    movementDetails: { none: { supplierId } },
+    wasteRolls: { none: { supplierId } }
+});
 
-    if (materialIds.length === 0) return new Set();
-
-    const materials = await db.material.findMany({
-        where: {
-            id: { in: materialIds },
-            AND: buildUnusedMaterialFilters()
-        },
-        select: { id: true }
-    });
-
-    return new Set(materials.map(({ id }) => id));
-};
-
-export const existsMaterialUsage = async ({ tx, materialId }) => Boolean(
-    await getDb(tx).material.findFirst({
-        where: {
-            id: materialId,
-            OR: buildMaterialUsageFilters()
-        },
+export const existsDeletableSupplierMaterial = async ({ tx, id, supplierId }) => Boolean(
+    await tx.supplierMaterial.findFirst({
+        where: { id, currentStock: 0, material: withoutOfferHistory(supplierId) },
         select: { id: true }
     })
 );
+
+const findDeletableSupplierMaterialIds = async ({ db, rows }) => {
+    const candidates = [];
+    for (const { id, currentStock, supplier } of rows) {
+        if (Number(currentStock) === 0) {
+            candidates.push({ id, material: withoutOfferHistory(supplier.id) });
+        }
+    }
+    if (!candidates.length) return new Set();
+
+    const deletable = await db.supplierMaterial.findMany({
+        where: { currentStock: 0, OR: candidates },
+        select: { id: true }
+    });
+
+    return new Set(deletable.map(({ id }) => id));
+};
 
 export const findAllSupplierMaterials = async ({
     skip= 0,
@@ -76,7 +86,8 @@ export const findAllSupplierMaterials = async ({
     type = null,
     orderBy = 'id',
     orderDir = 'asc',
-    canReadCosts = false
+    canReadCosts = false,
+    canRemoveOffers = false
 }) => {
 
     const where = { AND: [] };
@@ -157,19 +168,48 @@ export const findAllSupplierMaterials = async ({
         return 0;
     });
 
-    const deletableMaterialIds = await findDeletableMaterialIds({
-        db,
-        materialIds: [...new Set(supplierMaterials.map(({ material }) => material.id))]
-    });
+    if (!canRemoveOffers) return page;
+    const deletableSupplierMaterialIds = await findDeletableSupplierMaterialIds({ db, rows: sorted });
 
     return {
         ...page,
         data: sorted.map(supplierMaterial => ({
             ...supplierMaterial,
-            canDelete: deletableMaterialIds.has(supplierMaterial.material.id)
+            canDelete: deletableSupplierMaterialIds.has(supplierMaterial.id)
         }))
     };
 }
+
+export const SUPPLIER_MATERIAL_DETAIL_SELECT = {
+    id: true,
+    version: true,
+    isActive: true,
+    currentStock: true,
+    convertedQuantity: true,
+    maxUnitCost: true,
+    referenceConeWeightKg: true,
+    referenceRollTotalWeightKg: true,
+    material: {
+        select: {
+            id: true,
+            version: true,
+            type: true,
+            name: true,
+            minStock: true,
+            base: true,
+            height: true,
+            presentation: true,
+            unitMeasure: true
+        }
+    },
+    supplier: {
+        select: {
+            id: true,
+            tradeName: true,
+            isActive: true
+        }
+    }
+};
 
 export const findSupplierMaterialByIds = async ({
     tx,
@@ -186,36 +226,7 @@ export const findSupplierMaterialByIds = async ({
                 supplierId
             }
         },
-        select: {
-            id: true,
-            version: true,
-            isActive: true,
-            currentStock: true,
-            convertedQuantity: true,
-            maxUnitCost: true,
-            referenceConeWeightKg: true,
-            referenceRollTotalWeightKg: true,
-            material: {
-                select: {
-                    id: true,
-                    version: true,
-                    type: true,
-                    name: true,
-                    minStock: true,
-                    base: true,
-                    height: true,
-                    presentation: true,
-                    unitMeasure: true
-                }
-            },
-            supplier: {
-                select: {
-                    id: true,
-                    tradeName: true,
-                    isActive: true
-                }
-            }
-        }
+        select: SUPPLIER_MATERIAL_DETAIL_SELECT
     });
 
     if (!supplierMaterial) throw new MaterialNotFound();

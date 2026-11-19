@@ -120,7 +120,8 @@
         "type": "number"
       },
       "canDelete": {
-        "type": "boolean"
+        "type": "boolean",
+        "description": "En listados con permiso de escritura, indica saldo cero y ausencia de historial para la oferta."
       },
       "material": {
         "$ref": "../openapi.json#/components/schemas/Material"
@@ -540,7 +541,12 @@
         "description": "Decimal persistido; puede recibirse como texto JSON."
       },
       "materialName": {
-        "type": "string"
+        "type": "string",
+        "description": "Nombre persistido al registrar la operación; usarlo para mostrar el detalle histórico."
+      },
+      "supplierName": {
+        "type": "string",
+        "description": "Nombre comercial del proveedor al guardar la partida. Se conserva al editar una salida pendiente."
       },
       "supplierId": {
         "type": [
@@ -554,19 +560,29 @@
       },
       "material": {
         "type": "object",
-        "description": "Material o consumible con presentation y unitMeasure.",
+        "description": "Tipo, dimensiones, presentación y unidad. El nombre histórico se devuelve en materialName.",
         "additionalProperties": true
       },
       "waste": {
         "type": "object",
         "description": "Merma con presentation y unitMeasure.",
         "additionalProperties": true
+      },
+      "materialSpecification": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Tipo, medidas, presentación y unidad conservados antes de editar la identidad de un artículo sin proveedor. Si es nulo, la partida usa los datos relacionados de material.",
+        "additionalProperties": true
       }
     },
     "additionalProperties": true,
     "required": [
       "id",
-      "quantity"
+      "quantity",
+      "materialName",
+      "supplierName"
     ]
   },
   "GoodsReceipt": {
@@ -683,7 +699,8 @@
         "description": "Costo capturado: por presentación si costIsTotal=false, o total sin IVA del detalle si costIsTotal=true."
       },
       "materialName": {
-        "type": "string"
+        "type": "string",
+        "description": "Nombre persistido al registrar la compra; usarlo para mostrar el detalle histórico."
       },
       "status": {
         "type": "string",
@@ -722,13 +739,21 @@
       },
       "material": {
         "type": "object",
-        "description": "Artículo con sus relaciones presentation y unitMeasure.",
+        "description": "Tipo, dimensiones, presentación y unidad. El nombre histórico se devuelve en materialName.",
         "additionalProperties": true
       },
       "costIsTotal": {
         "type": "boolean",
         "default": false,
         "description": "Si es true, costPerUnitType es el total sin IVA del detalle; el costo unitario se divide entre quantity. En nuevas partidas de KILOGRAMOS/METRO LINEAL con medidas persistidas 1 × 1, el servidor activa el modo automáticamente, incluso si se envía false. Para otras presentaciones es manual. Se conserva en las correcciones."
+      },
+      "materialSpecification": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Tipo, medidas, presentación y unidad conservados antes de editar la identidad de un artículo sin proveedor. Si es nulo, la partida usa los datos relacionados de material.",
+        "additionalProperties": true
       }
     },
     "additionalProperties": true,
@@ -736,7 +761,8 @@
       "id",
       "materialId",
       "quantity",
-      "costPerUnitType"
+      "costPerUnitType",
+      "materialName"
     ],
     "description": "Partida de compra. La cancelación se expresa en status; no devuelve isCancelled."
   },
@@ -889,13 +915,12 @@
     },
     "additionalProperties": false,
     "required": [
-      "name",
       "supplierId",
       "maxUnitCost",
       "isActive",
-      "expectedVersion",
-      "expectedMaterialVersion"
-    ]
+      "expectedVersion"
+    ],
+    "description": "Actualiza costo máximo y estado de la oferta. Si se envían datos o la versión del artículo, se validan contra el catálogo vigente."
   },
   "MaterialStockRequest": {
     "type": "object",

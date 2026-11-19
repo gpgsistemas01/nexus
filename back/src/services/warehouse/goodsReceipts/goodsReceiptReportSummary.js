@@ -18,7 +18,8 @@ export const createMonthlyGoodsReceiptSummary = () => {
 
     const add = row => {
         const supplierName = row.supplierName || 'Sin proveedor';
-        const supplier = suppliers.get(supplierName) || {
+        const supplierKey = row.supplierId || supplierName;
+        const supplier = suppliers.get(supplierKey) || {
             supplierName,
             netPurchaseAmount: 0,
             monthlyPercentage: 0
@@ -28,7 +29,7 @@ export const createMonthlyGoodsReceiptSummary = () => {
         monthlyNetPurchaseAmount += netPurchaseAmount;
 
         supplier.netPurchaseAmount += netPurchaseAmount;
-        suppliers.set(supplierName, supplier);
+        suppliers.set(supplierKey, supplier);
 
         const materialKey = row.materialId || row.materialName || 'Sin material';
         const material = materials.get(materialKey) || {

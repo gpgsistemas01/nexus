@@ -205,7 +205,7 @@ export const inventorySections = (
             {
                 name: 'name',
                 label: isWaste ? 'Nombre de la merma' : isCreating ? 'Nombre' : labels.name,
-                isReadOnly: isStock,
+                isReadOnly: isStock || (action === 'edit' && !isWaste),
                 isWide: true,
             },
             ...(!isCreating || !isWaste
@@ -394,7 +394,7 @@ export const inventorySections = (
                           label: labels.minStock,
                           type: 'number' as const,
                           step: quantityStep,
-                          isReadOnly: isStock,
+                          isReadOnly: isStock || (action === 'edit' && !isWaste),
                       },
                   ]
                 : []),

@@ -55,7 +55,7 @@ export const createMaterialDtoForRegister = (body = {}) => {
 export const createMaterialDtoForEdit = (body = {}) => ({
     ...createVersionDto(body),
     ...(body.expectedMaterialVersion !== undefined && { expectedMaterialVersion: body.expectedMaterialVersion }),
-    name: body.name.trim(),
+    ...(body.name !== undefined && { name: body.name.trim() }),
     supplierId: body.supplierId,
     ...buildMaterialSecondaryDataDto(body)
 });

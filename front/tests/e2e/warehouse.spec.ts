@@ -207,7 +207,7 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await page.goto('/almacen/materiales');
   await expect(page.getByRole('cell', { name: 'Lona Proveedor Central' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Nueva existencia' })).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Editar', exact: true })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Editar oferta', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Exportar Excel', exact: true })).toBeHidden();
   await page.getByRole('button', { name: 'Menú', exact: true }).click();
@@ -374,8 +374,8 @@ test(
       method: 'POST',
       body: { materialId: ids.material, supplierId: ids.supplier, newStock: 0 },
     });
-    await page.getByRole('button', { name: 'Editar', exact: true }).click();
-    dialog = page.getByRole('dialog', { name: 'Editar existencia de material', exact: true });
+    await page.getByRole('button', { name: 'Editar oferta', exact: true }).click();
+    dialog = page.getByRole('dialog', { name: 'Editar oferta de material', exact: true });
     await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
       'Proveedor Central',
     );
@@ -386,20 +386,17 @@ test(
       dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true }),
     ).toHaveValue('m²');
     await expect(dialog.getByRole('spinbutton', { name: 'Base' })).not.toBeEditable();
-    await dialog.getByRole('textbox', { name: 'Material', exact: true }).fill('Lona revisada');
+    await expect(dialog.getByRole('textbox', { name: 'Material', exact: true })).not.toBeEditable();
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes[1]).toEqual({
       method: 'PATCH',
       url: `/api/warehouse/materials/${ids.material}`,
       body: {
-        name: 'Lona revisada',
-        minStock: 5,
         maxUnitCost: 100,
         isActive: true,
         supplierId: ids.supplier,
         expectedVersion: 3,
-        expectedMaterialVersion: 7,
       },
     });
     await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
@@ -618,7 +615,7 @@ test('mermas: agregar stock y editar datos usan contratos independientes', async
   expect(writes[0]?.method).toBe('POST');
   expect(writes[0]?.body).toMatchObject({ quantity: 2, observations: '' });
   expect(writes[0]?.body.operationId).toMatch(/^[\da-f-]{36}$/);
-  await page.getByRole('button', { name: 'Editar', exact: true }).click();
+  await page.getByRole('button', { name: 'Editar merma', exact: true }).click();
   dialog = page.getByRole('dialog', { name: 'Editar merma', exact: true });
   await dialog.getByRole('textbox', { name: 'Nombre de la merma' }).fill('Sobrante revisado');
   await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -866,7 +863,7 @@ test('merma histórica: conserva pesos, referencia y medidas como consulta al ed
     }),
   );
   await page.goto('/almacen/mermas');
-  await page.getByRole('button', { name: 'Editar', exact: true }).click();
+  await page.getByRole('button', { name: 'Editar merma', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Editar merma', exact: true });
   await expect(
     dialog.getByRole('heading', { name: 'Referencia histórica', exact: true }),

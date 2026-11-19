@@ -5,6 +5,7 @@ import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
 import { formatDateLongWithTime } from '../../utils/formattersUtils.js';
 import { MATERIAL_TYPES } from '../../shared/constants/inventory.js';
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+import { getMaterialDetailSpecification, materialDetailTypeWhere } from '../warehouse/materials/materialDocumentSnapshot.js';
 
 const serviceLogger = createServiceLogger('inventory.movementQueryService');
 
@@ -26,6 +27,7 @@ const MOVEMENT_DETAIL_SELECT = {
     quantity: true,
     previousStock: true,
     newStock: true,
+    materialSpecification: true,
     material: {
         select: {
             name: true,
@@ -160,9 +162,9 @@ const getMovementSearchFilter = (search) => {
     };
 };
 
-const resolveMaterialBase = (detail) => detail.material?.base ?? null;
+const resolveMaterialBase = (detail) => getMaterialDetailSpecification(detail)?.base ?? null;
 
-const resolveMaterialHeight = (detail) => detail.material?.height ?? null;
+const resolveMaterialHeight = (detail) => getMaterialDetailSpecification(detail)?.height ?? null;
 
 const resolveMaterialName = (detail) => detail.material?.name;
 
@@ -273,7 +275,7 @@ const findInventoryMovements = async ({
         };
         const where = {
 
-            material: { type },
+            AND: [materialDetailTypeWhere(type), getMovementSearchFilter(search)],
 
             ...(materialId && {
                 materialId
@@ -295,8 +297,6 @@ const findInventoryMovements = async ({
                 }
             }),
 
-            ...getMovementSearchFilter(search),
-
             ...(Object.keys(movementFilters).length > 0 && {
                 movement: movementFilters
             })
@@ -304,7 +304,7 @@ const findInventoryMovements = async ({
 
         const page = await findPage({
             model: db.movementDetail,
-            totalWhere: { material: { type } },
+            totalWhere: materialDetailTypeWhere(type),
             hasFilters: Boolean(search || materialId || supplierId || Object.keys(movementFilters).length),
             includeCounts,
             query: {

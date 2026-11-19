@@ -563,7 +563,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## MutationConfirmation
 
-**Fuente:** [src/shared/http/recordContract.ts](../../../../../src/shared/http/recordContract.ts) · línea 37, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/recordContract.ts](../../../../../src/shared/http/recordContract.ts) · línea 52, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const database = {
+  $transaction: callback => callback(database),
+  $queryRaw: vi.fn(),
   unitMeasure: {
     count: vi.fn(),
     create: vi.fn(),
@@ -134,7 +136,7 @@ describe('catalogService', () => {
   });
 
   it('reports a missing entry using its catalog type', async () => {
-    database.unitMeasure.update.mockRejectedValueOnce({ code: 'P2025' });
+    database.$queryRaw.mockResolvedValueOnce([]);
 
     await expect(updateCatalogEntry('unit-measures', '4fe1eb70-6ad3-4a22-95d6-2a95c362c01c', {
       name: 'Metro',
@@ -149,7 +151,14 @@ describe('catalogService', () => {
   });
 
   it('reports a malformed URL identifier as a missing catalog entry', async () => {
-    database.unitMeasure.update.mockRejectedValueOnce({ code: 'P2023' });
+    database.$queryRaw.mockRejectedValueOnce({
+      code: 'P2010',
+      meta: {
+        driverAdapterError: {
+          cause: { originalCode: '22P02', originalMessage: 'invalid input syntax for type uuid' }
+        }
+      }
+    });
 
     await expect(updateCatalogEntry('unit-measures', 'not-a-uuid', {
       name: 'Metro',

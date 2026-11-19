@@ -54,6 +54,7 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
             symbol: '',
             type: String(value.type),
             hasSuppliers: !isRecord(value._count) || Number(value._count.supplierMaterials) > 0,
+            hasHistory: value.hasHistory === true,
             presentationId: readText(value, 'presentationId'),
             unitMeasureId: readText(value, 'unitMeasureId'),
             presentation: readText(value.presentation, 'name'),
@@ -80,6 +81,16 @@ export const catalogService = {
         const params = pageParams(query);
         const result = await requestPage(`${API_PATHS.catalogs}/${catalog}?${params}`, signal);
         return { ...result, data: result.data.map((value) => normalizeEntry(value, catalog)) };
+    },
+    async removeArticle(id: string, signal: AbortSignal) {
+        const result = await apiClient.request(
+            `${API_PATHS.catalogs}/materials/${encodeURIComponent(id)}`,
+            {
+                method: 'DELETE',
+                signal,
+            },
+        );
+        confirmMutation(result, successCodeMessages.DELETED_CATALOG_ENTRY);
     },
     async save(
         catalog: CatalogName,

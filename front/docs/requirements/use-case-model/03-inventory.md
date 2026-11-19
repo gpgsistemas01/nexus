@@ -32,8 +32,8 @@ direction LR
     systemBoundary warehousePackage1["Nexus · Materiales"]
         ucMaterialQuery("CU-ALM-01 Consultar materiales")
         ucMaterialCreate("CU-ALM-02 Crear existencia de material")
-        ucMaterialEdit("CU-ALM-03 Editar material")
-        ucMaterialRemove("CU-ALM-04 Retirar material")
+        ucMaterialEdit("CU-ALM-03 Editar oferta de material")
+        ucMaterialRemove("CU-ALM-04 Retirar oferta de material")
         ucMaterialInventoryReport("CU-ALM-06 Generar reporte de inventario de materiales")
         ucMaterialStock("CU-ALM-05 Ajustar existencia de material")
     end
@@ -136,8 +136,8 @@ direction LR
     systemBoundary warehousePackage3["Nexus · Consumibles"]
         ucConsumableQuery("CU-ALM-17 Consultar consumibles")
         ucConsumableCreate("CU-ALM-18 Crear existencia de consumible")
-        ucConsumableEdit("CU-ALM-19 Editar consumible")
-        ucConsumableRemove("CU-ALM-20 Retirar consumible")
+        ucConsumableEdit("CU-ALM-19 Editar oferta de consumible")
+        ucConsumableRemove("CU-ALM-20 Retirar oferta de consumible")
         ucConsumableReport("CU-ALM-22 Generar reporte de inventario de consumibles")
         ucConsumableStock("CU-ALM-21 Ajustar existencia de consumible")
     end

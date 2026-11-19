@@ -7,6 +7,7 @@ import {
     updateSupplierMaterialStock
 } from "../warehouse/materials/supplierMaterialStockService.js";
 import { INVENTORY_MOVEMENT_TYPES } from '../../constants/inventory.js';
+import { assertMaterialDetailMatchesInventory } from '../warehouse/materials/materialDocumentSnapshot.js';
 
 export const createInventoryMovement = ({
     tx = null,
@@ -34,14 +35,23 @@ export const applyInventoryMovement = async ({
     supplierMaterials
 }) => {
     const { grouped } = buildStockUpdateSummary({ details });
+    const includeSpecification = details.some(detail => detail.materialSpecification);
     const offers = supplierMaterials ?? await findSupplierMaterialsForStockMovement({
         tx,
-        where: { OR: [...grouped.keys()].map(parseStockKey) }
+        where: { OR: [...grouped.keys()].map(parseStockKey) },
+        includeSpecification
     });
     const supplierMaterialsByKey = new Map(offers.map(offer => [
         buildStockKey(offer.materialId, offer.supplierId),
         offer
     ]));
+    if (includeSpecification) {
+        for (const detail of details) {
+            if (!detail.materialSpecification) continue;
+            const offer = supplierMaterialsByKey.get(buildStockKey(detail.materialId, detail.supplierId));
+            if (offer) assertMaterialDetailMatchesInventory(detail, offer.material);
+        }
+    }
     const balances = await updateSupplierMaterialStock({ tx, grouped, movementType, supplierMaterialsByKey });
     const isIssue = movementType === INVENTORY_MOVEMENT_TYPES.ISSUE;
     const movementDetails = details.map(detail => {

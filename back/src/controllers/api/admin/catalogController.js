@@ -4,6 +4,7 @@ import {
     findAllCatalogEntries,
     updateCatalogEntry
 } from '../../../services/admin/catalogService.js';
+import { deleteMaterialCatalogEntry } from '../../../services/warehouse/materials/materialService.js';
 import { getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 
 export const getAllCatalogEntries = async (req, res, next) => {
@@ -36,6 +37,15 @@ export const editCatalogEntry = async (req, res, next) => {
             data,
             code: successCodeMessages.UPDATED_CATALOG_ENTRY
         });
+    } catch (error) {
+        return next(error);
+    }
+};
+
+export const removeMaterialCatalogEntry = async (req, res, next) => {
+    try {
+        const data = await deleteMaterialCatalogEntry(req.params.id);
+        return res.status(200).json({ data, code: successCodeMessages.DELETED_CATALOG_ENTRY });
     } catch (error) {
         return next(error);
     }
