@@ -455,7 +455,10 @@ it('Almacén conserva surtido y devolución, mientras sólo administración reci
     '08-users.md',
   );
   expect(admin.permissions).toContain('materials:adjust-stock');
-  expect(selectedChapters(admin.permissions)).toHaveLength(17);
+  expect(selectedChapters(admin.permissions).map(({ file }) => file)).toContain('03-articles.md');
+  expect(selectedChapters(warehouse.permissions).map(({ file }) => file)).toContain(
+    '03-articles.md',
+  );
   const wastes = await readFile(path.resolve('docs/user-manual/05-wastes.md'), 'utf8');
   expect(filterManualContent(wastes, admin.permissions)).toContain('## Ajustar el saldo');
   expect(filterManualContent(wastes, warehouse.permissions)).not.toContain('## Ajustar el saldo');

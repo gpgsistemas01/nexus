@@ -1,3 +1,4 @@
+import { ClientError } from '../../../shared/clientError.js';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { getPieceQuantityError } from '@nexus/piece-quantity';
@@ -160,7 +161,7 @@ export const useInventoryEditor = (options: {
         try {
             if (isIdempotent) {
                 if (!pending)
-                    throw new ApiError(
+                    throw new ClientError(
                         'Se necesita almacenamiento local disponible para recuperar esta operación.',
                     );
 

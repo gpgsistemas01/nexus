@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { AxiosError } from 'axios';
-import { ApiError } from '../../../../src/shared/http/apiError.js';
+import { ResponseContractError } from '../../../../src/shared/clientError.js';
 import { createApiClient } from '../../../../src/shared/http/apiClient.js';
 import { mockHttpAdapter } from '../../../helpers/httpAdapter.js';
 
@@ -153,7 +153,7 @@ describe('cliente Axios compartido: sesión y errores', () => {
 
   it('rechaza HTML de un proxy como resultado JSON válido', async () => {
     const { request } = createApiClient(mockHttpAdapter(() => ({ data: '<html>Login</html>' })));
-    await expect(request('/api/warehouse/materials')).rejects.toBeInstanceOf(ApiError);
+    await expect(request('/api/warehouse/materials')).rejects.toBeInstanceOf(ResponseContractError);
   });
 });
 

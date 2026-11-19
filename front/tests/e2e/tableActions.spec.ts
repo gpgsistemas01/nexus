@@ -34,7 +34,7 @@ for (const width of [390, 960]) {
       );
       await action.click();
     }
-    const dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+    const dialog = page.getByRole('dialog', { name: 'Editar existencia de material', exact: true });
     await expect(dialog).toBeVisible();
     await dialog.getByRole('button', { name: 'Cerrar formulario', exact: true }).click();
     await expect(dialog).toBeHidden();

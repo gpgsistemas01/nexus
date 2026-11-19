@@ -1,3 +1,4 @@
+import { ClientError } from '../../../shared/clientError.js';
 import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue';
 import { createUuid } from '../../../shared/utils/createUuid.js';
 import { ApiError } from '../../../shared/http/apiError.js';
@@ -150,7 +151,7 @@ export const useHistoricalDelivery = (options: {
                 documents: selected.value.map((id) => {
                     const candidate = candidates.value.get(id);
                     if (!candidate)
-                        throw new ApiError(
+                        throw new ClientError(
                             'No se encontró una salida seleccionada. Vuelve a buscar antes de confirmar.',
                         );
 
@@ -225,7 +226,7 @@ export const useHistoricalDelivery = (options: {
                     for (const candidate of result.documents) {
                         allCandidates.set(candidate.id, candidate);
                         if (allCandidates.size > limits.maxDocuments)
-                            throw new ApiError(
+                            throw new ClientError(
                                 `Hay más de ${limits.maxDocuments} salidas para este corte. Selecciona manualmente hasta ${limits.maxDocuments} por lote.`,
                             );
                     }
@@ -237,7 +238,7 @@ export const useHistoricalDelivery = (options: {
                 }
 
                 if (!complete)
-                    throw new ApiError(
+                    throw new ClientError(
                         'Hay demasiadas páginas para seleccionar todos los resultados de una vez. Selecciona manualmente hasta 100 salidas por lote.',
                     );
 

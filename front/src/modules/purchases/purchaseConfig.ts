@@ -1,13 +1,13 @@
 export const PURCHASE_CONFIG = {
     materials: {
-        title: 'Compras de Materiales',
+        title: 'Compras de materiales',
         label: 'Materiales',
         item: 'Material',
         path: 'materiales',
         type: 'MATERIAL',
     },
     consumables: {
-        title: 'Compras de Consumibles',
+        title: 'Compras de consumibles',
         label: 'Consumibles',
         item: 'Consumible',
         path: 'consumibles',

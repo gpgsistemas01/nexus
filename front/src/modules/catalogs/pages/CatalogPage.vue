@@ -30,7 +30,10 @@ const { search, applySearch, clearSearch } = useListSearch(list);
 const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor<CatalogTarget>({
     canOpen: () => canManage.value,
     reload: list.load,
-    savedMessage: 'El catálogo se guardó correctamente.',
+    savedMessage:
+        props.catalog === 'materials'
+            ? 'El artículo se guardó correctamente.'
+            : 'El catálogo se guardó correctamente.',
 });
 
 onMounted(() => {
@@ -46,7 +49,7 @@ onMounted(() => {
         :total="total"
         :is-loading="isLoading"
         :error="error"
-        loading-label="Cargando catálogo…"
+        :loading-label="catalog === 'materials' ? 'Cargando artículos…' : 'Cargando catálogo…'"
         @search="applySearch"
         @clear="clearSearch"
         @refresh="list.load"

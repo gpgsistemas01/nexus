@@ -13,4 +13,4 @@ export const issueHeaderValidation = [
     validateTextOptional({ fieldName: 'observations', maxLength: FORM_FIELD_LIMITS.OBSERVATIONS })
 ];
 
-export const issueImmediateSupplyValidation = body('supplyImmediately').optional().isBoolean({ strict: true }).withMessage(errorMap.isSupplied.INVALID_BOOLEAN);
+export const issueImmediateSupplyValidation = body('supplyImmediately').optional().custom(value => typeof value === 'boolean').withMessage(errorMap.isSupplied.INVALID_BOOLEAN);

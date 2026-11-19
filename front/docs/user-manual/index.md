@@ -27,8 +27,9 @@ Empiece por [Primera jornada: recorrido de inducción](00-induction.md).
 | --- | --- |
 | [1. Acceso y sesión](01-access.md) | Ingresar, recordar usuario, recuperar acceso y salir. |
 | [2. Navegación y controles](02-navigation-and-controls.md) | Menú, filtros, tablas, selectores y formularios. |
-| [3. Materiales](03-materials.md) | Consultar, registrar, editar, ajustar e importar materiales desde Excel. |
-| [4. Consumibles](04-consumables.md) | Consultar, editar e importar consumibles por operación. |
+| [Artículos](03-articles.md) | Registrar y editar materiales y consumibles sin proveedor ni stock. |
+| [3. Existencias de materiales](03-materials.md) | Consultar, registrar, editar, ajustar e importar materiales desde Excel. |
+| [4. Existencias de consumibles](04-consumables.md) | Consultar, editar e importar consumibles por operación. |
 | [5. Mermas](05-wastes.md) | Capturar medidas y pesos, editar, importar, agregar existencias y ajustar. |
 | [6. Catálogos](06-catalogs.md) | Áreas, roles, presentaciones, unidades, motivos y estados. |
 | [7. Personas](07-persons.md) | Personas y sus responsabilidades por área. |

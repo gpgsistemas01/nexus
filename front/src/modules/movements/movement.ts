@@ -38,7 +38,7 @@ export const MOVEMENT_CONFIG = {
         itemLabel: 'Consumible',
         path: 'consumibles',
     },
-    wastes: { title: 'Movimientos de merma', label: 'Mermas', itemLabel: 'Merma', path: 'mermas' },
+    wastes: { title: 'Movimientos de mermas', label: 'Mermas', itemLabel: 'Merma', path: 'mermas' },
 } as const;
 
 export const MOVEMENT_TYPES = [

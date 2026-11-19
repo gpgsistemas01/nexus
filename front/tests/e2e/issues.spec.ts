@@ -145,7 +145,7 @@ for (const [path, resource] of [
 for (const [path, resource, title, label] of [
   ['materiales', 'materials', 'Salidas de materiales', 'Material'],
   ['consumibles', 'consumables', 'Salidas de consumibles', 'Consumible'],
-  ['mermas', 'wastes', 'Salidas de merma', 'Merma'],
+  ['mermas', 'wastes', 'Salidas de mermas', 'Merma'],
 ] as const) {
   test(`salidas ${path}: menú Vue, alta sin errores iniciales y payload de solicitud`, async ({
     page,

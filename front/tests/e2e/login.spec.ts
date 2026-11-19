@@ -62,7 +62,7 @@ test(
     await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
     await expect(page).toHaveURL(/\/almacen\/materiales$/);
     await expect(
-      page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+      page.getByRole('heading', { name: 'Tabla de Existencias de materiales', exact: true }),
     ).toBeVisible();
     expect(requests).toEqual([
       { url: '/api/auth/login', data: { name: 'usuario', password: ' legado ' } },
@@ -182,7 +182,7 @@ test('login: un 502 inicial conserva las credenciales y permite un nuevo intento
   expect(refreshCalls).toBe(0);
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+    page.getByRole('heading', { name: 'Tabla de Existencias de materiales', exact: true }),
   ).toBeVisible();
   expect(attempts).toBe(2);
   expect(refreshCalls).toBe(0);
@@ -229,7 +229,7 @@ test('login confirmado recupera una carga diferida fallida sin repetir credencia
   await page.getByLabel('Contraseña', { exact: true }).fill('legado');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+    page.getByRole('heading', { name: 'Tabla de Existencias de materiales', exact: true }),
   ).toBeVisible();
   expect(hasFailed).toBe(true);
   expect(attempts).toBe(1);

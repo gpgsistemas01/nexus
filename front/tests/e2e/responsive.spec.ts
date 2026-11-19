@@ -9,8 +9,8 @@ import { mockCatalogs } from './catalogFixtures.js';
 
 const permissions = Object.values(PERMISSIONS);
 const views = [
-  ['/almacen/materiales', 'Nuevo material', mockWarehouse],
-  ['/almacen/consumibles', 'Nuevo consumible', mockWarehouse],
+  ['/almacen/materiales', 'Nueva existencia', mockWarehouse],
+  ['/almacen/consumibles', 'Nueva existencia', mockWarehouse],
   ['/almacen/mermas', 'Nueva merma', mockWarehouse],
   ['/compras/materiales', 'Nueva compra', mockPurchases],
   ['/compras/consumibles', 'Nueva compra', mockPurchases],
@@ -114,11 +114,11 @@ test('inventario desde 900 px muestra todas las columnas sin desplazamiento hori
     'Base',
     'Altura',
     'Stock actual',
-    'Stock Mínimo',
+    'Stock mínimo',
     'Presentación',
     'Cantidad',
     'Unidad',
-    'Costo Unitario de Conversión',
+    'Costo máximo unitario',
     'Activo',
   ]) {
     await expect(table.locator('thead')).toContainText(column);

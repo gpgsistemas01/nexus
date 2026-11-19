@@ -13,10 +13,11 @@ export const MANUAL_CHAPTERS = [
     chapter('00-induction.md', 'Primera jornada: recorrido de inducción', [], 'start'),
     chapter('01-access.md', 'Acceso y sesión', [], 'start'),
     chapter('02-navigation-and-controls.md', 'Navegación y controles', [], 'start'),
-    chapter('03-materials.md', 'Materiales', [P.MATERIALS_READ]),
-    chapter('04-consumables.md', 'Consumibles', [P.MATERIALS_READ]),
+    chapter('03-articles.md', 'Artículos', [P.MATERIAL_CATALOGS_MANAGE]),
+    chapter('03-materials.md', 'Existencias de materiales', [P.MATERIALS_READ]),
+    chapter('04-consumables.md', 'Existencias de consumibles', [P.MATERIALS_READ]),
     chapter('05-wastes.md', 'Mermas', [P.WASTES_PAGE_VIEW]),
-    chapter('06-catalogs.md', 'Catálogos', [P.CATALOGS_MANAGE, P.MATERIAL_CATALOGS_MANAGE]),
+    chapter('06-catalogs.md', 'Catálogos', [P.CATALOGS_MANAGE]),
     chapter('07-persons.md', 'Personas', [P.PERSONS_PAGE_VIEW]),
     chapter('08-users.md', 'Usuarios', [P.USERS_MANAGE]),
     chapter('09-clients.md', 'Clientes', [P.CLIENTS_PAGE_VIEW, P.CLIENTS_CREATE]),
@@ -87,8 +88,20 @@ const moduleDefinition = (id, title, chapter, any, tags, reportPermission) => ({
 export const MANUAL_MODULES = [
     moduleDefinition('inicio', 'Acceso, navegación y recuperación', null, [], ['common']),
     ...[
-        ['materiales', 'Materiales', '03-materials.md', P.MATERIALS_READ, 'materials'],
-        ['consumibles', 'Consumibles', '04-consumables.md', P.MATERIALS_READ, 'consumables'],
+        [
+            'materiales',
+            'Existencias de materiales',
+            '03-materials.md',
+            P.MATERIALS_READ,
+            'materials',
+        ],
+        [
+            'consumibles',
+            'Existencias de consumibles',
+            '04-consumables.md',
+            P.MATERIALS_READ,
+            'consumables',
+        ],
         ['mermas', 'Mermas', '05-wastes.md', P.WASTES_PAGE_VIEW, 'wastes'],
     ].map(([id, title, chapter, permission, resource]) =>
         moduleDefinition(
@@ -132,15 +145,24 @@ export const MANUAL_MODULES = [
             ),
         ];
     }),
-    ...Object.entries(PUBLIC_CATALOGS).map(([key, definition]) =>
-        moduleDefinition(
-            `catalogos-${key}`,
-            `Catálogos — ${definition.label}`,
-            '06-catalogs.md',
-            [key === 'materials' ? P.MATERIAL_CATALOGS_MANAGE : P.CATALOGS_MANAGE],
-            ['common', 'catalogs', `catalog-${key}`],
-        ),
+    moduleDefinition(
+        'almacen-articulos',
+        'Almacén — Artículos',
+        '03-articles.md',
+        [P.MATERIAL_CATALOGS_MANAGE],
+        ['common', 'articles', 'catalog-materials'],
     ),
+    ...Object.entries(PUBLIC_CATALOGS)
+        .filter(([key]) => key !== 'materials')
+        .map(([key, definition]) =>
+            moduleDefinition(
+                `catalogos-${key}`,
+                `Catálogos — ${definition.label}`,
+                '06-catalogs.md',
+                [P.CATALOGS_MANAGE],
+                ['common', 'catalogs', `catalog-${key}`],
+            ),
+        ),
     moduleDefinition(
         'personas',
         'Personas',

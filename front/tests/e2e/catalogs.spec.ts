@@ -327,26 +327,32 @@ for (const type of ['Material', 'Consumible']) {
         { id: entryId, name: 'PIEZA', symbol: 'PZA.', version: 0, isActive: true },
       ]);
       await page.goto('/catalogos/materials');
+      await expect(page).toHaveURL(/\/almacen\/articulos$/);
       await expect(
-        page.getByRole('heading', { name: 'Tabla de Materiales', exact: true }),
+        page.getByRole('heading', { name: 'Tabla de Artículos', exact: true }),
       ).toBeVisible();
       await page.getByRole('button', { name: 'Menú', exact: true }).click();
       await expect(
         page
           .getByRole('navigation', { name: 'Navegación principal' })
-          .getByRole('link', { name: 'Materiales', exact: true }),
-      ).toHaveAttribute('href', '/catalogos/materials');
+          .getByRole('button', { name: 'Almacén', exact: true }),
+      ).toHaveAttribute('aria-expanded', 'true');
+      await expect(
+        page
+          .getByRole('navigation', { name: 'Navegación principal' })
+          .getByRole('link', { name: 'Artículos', exact: true }),
+      ).toHaveAttribute('href', '/almacen/articulos');
       await page
         .getByRole('navigation', { name: 'Navegación principal' })
-        .getByRole('link', { name: 'Materiales', exact: true })
+        .getByRole('link', { name: 'Artículos', exact: true })
         .click();
       await expect(
         page.getByRole('cell', { name: 'Material de catálogo', exact: true }),
       ).toBeVisible();
       for (const name of ['Proveedor', 'Existencia', 'Costo', 'Activo'])
         await expect(page.getByRole('columnheader', { name, exact: true })).toHaveCount(0);
-      await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-      const create = page.getByRole('dialog', { name: 'Registrar material', exact: true });
+      await page.getByRole('button', { name: 'Nuevo artículo', exact: true }).click();
+      const create = page.getByRole('dialog', { name: 'Registrar artículo', exact: true });
       const name = `Artículo ${type}`;
       await create.getByLabel('Nombre', { exact: true }).fill(name);
       await create.getByRole('combobox', { name: 'Tipo', exact: true }).press('ArrowDown');
@@ -373,7 +379,7 @@ for (const type of ['Material', 'Consumible']) {
         .filter({ hasText: 'Material de catálogo' })
         .getByRole('button', { name: 'Editar registro', exact: true })
         .click();
-      const edit = page.getByRole('dialog', { name: 'Editar material', exact: true });
+      const edit = page.getByRole('dialog', { name: 'Editar artículo', exact: true });
       for (const label of ['Tipo', 'Presentación', 'Unidad de medida'])
         await expect(edit.getByRole('combobox', { name: label, exact: true })).toBeDisabled();
       await expect(edit.getByLabel('Base', { exact: true })).toHaveAttribute('readonly', '');
@@ -401,9 +407,9 @@ test(
     store.set('unit-measures', [
       { id: entryId, name: 'PIEZA', symbol: 'PZA.', version: 0, isActive: true },
     ]);
-    await page.goto('/catalogos/materials');
+    await page.goto('/almacen/articulos');
     await page.getByRole('button', { name: 'Editar registro', exact: true }).click();
-    const dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+    const dialog = page.getByRole('dialog', { name: 'Editar artículo', exact: true });
     await dialog.getByRole('combobox', { name: 'Tipo', exact: true }).press('ArrowDown');
     await page.getByRole('option', { name: 'Consumible', exact: true }).click();
     await expect(dialog.getByRole('combobox', { name: 'Presentación', exact: true })).toBeEnabled();

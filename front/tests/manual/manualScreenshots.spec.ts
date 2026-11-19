@@ -119,8 +119,10 @@ test('materiales y consumibles: consulta, alta y ajuste', async ({ page }) => {
   await page.goto('/almacen/materiales');
   await expect(page.getByRole('cell', { name: /^Lona(?: Proveedor Central)?$/ })).toBeVisible();
   await capture(page, '03-materials-list');
-  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Crear material', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: 'Registrar existencia de material', exact: true }),
+  ).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 1400 });
   await chooseOption(page, 'Proveedor', 'Proveedor Central');
   await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO');
@@ -134,12 +136,14 @@ test('materiales y consumibles: consulta, alta y ajuste', async ({ page }) => {
   await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
   await page.goto('/almacen/consumibles');
   await expect(
-    page.getByRole('heading', { name: 'Tabla de Consumibles', exact: true }),
+    page.getByRole('heading', { name: 'Tabla de Existencias de consumibles', exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('cell', { name: /^Lona(?: Proveedor Central)?$/ })).toBeVisible();
   await capture(page, '06-consumables-list');
-  await page.getByRole('button', { name: 'Nuevo consumible', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Crear consumible', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: 'Registrar existencia de consumible', exact: true }),
+  ).toBeVisible();
   await capture(page, '07-consumable-create');
 });
 
@@ -155,13 +159,17 @@ test('mermas: consulta, pesos de una captura y entrada adicional', async ({ page
   await page.getByRole('button', { name: 'Nueva merma', exact: true }).click();
   await chooseOption(page, 'Proveedor', 'Proveedor Central');
   await chooseOption(page, 'Material de referencia del proveedor', 'Lona · ROLLO · 2 × 50');
-  const dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
+  const dialog = page.getByRole('dialog', { name: 'Registrar merma', exact: true });
   await dialog.getByLabel('Nombre de la merma', { exact: true }).fill('Sobrante de lona');
   await dialog.getByLabel('Peso del rollo completo con cono (kg)', { exact: true }).fill('21');
   await dialog.getByLabel('Peso del cono de la merma (kg)', { exact: true }).fill('1');
   await dialog.getByLabel('Peso de la merma con cono (kg)', { exact: true }).fill('5');
   await dialog.getByLabel('Cantidad inicial', { exact: true }).fill('2');
-  await expect(dialog.getByLabel('Peso neto de la merma (kg)', { exact: true })).toHaveValue('4');
+  await expect(
+    dialog
+      .locator('dl div')
+      .filter({ has: page.getByText('Peso neto de la merma (kg)', { exact: true }) }),
+  ).toContainText('4');
   await dialog
     .getByRole('heading', { name: 'Material de origen', exact: true })
     .evaluate((element) => element.scrollIntoView({ block: 'start' }));
@@ -177,6 +185,14 @@ test('mermas: consulta, pesos de una captura y entrada adicional', async ({ page
   await page.getByRole('button', { name: 'Agregar stock', exact: true }).click();
   await expect(page.getByLabel('Cantidad a agregar', { exact: true })).toBeVisible();
   await capture(page, '10-waste-add-stock');
+});
+
+test('artículos: listado y formulario sin registrar existencias', async ({ page }) => {
+  const permissions = Object.values(PERMISSIONS);
+  await mockCatalogs(page, permissions);
+  await readOnly(page);
+  for (const filename of ['11a-articles-list.png', '12a-article-form.png'])
+    await captureRecipe(page, filename, path.resolve('docs/user-manual'), { ...user, permissions });
 });
 
 test('catálogos: listado y formulario propio de unidades', async ({ page }) => {

@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import InventoryEditor from '../components/InventoryEditor.vue';
 import { useInventoryEditor } from '../composables/useInventoryEditor.js';
 import { inventorySections } from '../formFields.js';
-import { INVENTORY_CONFIG } from '../inventory.js';
+import { inventoryActionTitle } from '../inventoryDisplay.js';
 import type { EditorTarget, InventoryResource, StockAdditionTarget } from '../inventory.js';
 import type { LookupCreation, LookupItem } from '../../../shared/lookup.js';
 
@@ -41,6 +41,7 @@ const { values, errors, message, isSubmitting, isPending, isConflicted, lookups,
 const sections = computed(() =>
     inventorySections(props.resource, props.target, preview.value, {
         template: editor.selectedTemplate.value,
+        article: editor.selectedArticle.value,
         presentationName: editor.presentationName.value,
         usesMeasurements: editor.usesMeasurements.value,
         isPerPiece: editor.isPerPiece.value,
@@ -49,9 +50,8 @@ const sections = computed(() =>
         supplier: props.initialSupplier,
     }),
 );
-const title = computed(
-    () =>
-        `${{ create: 'Crear', edit: 'Editar', stock: 'Ajustar stock de', 'add-stock': 'Agregar stock de', delete: 'Eliminar' }[props.target.action]} ${INVENTORY_CONFIG[props.resource].singular}`,
+const title = computed(() =>
+    inventoryActionTitle(props.resource, props.target.action, props.creationContext),
 );
 const context = props.target.row
     ? `${props.target.row.name} · ${props.target.row.supplierName} · Stock actual: ${props.target.row.currentStock}`

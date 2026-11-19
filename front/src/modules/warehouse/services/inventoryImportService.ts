@@ -1,3 +1,4 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import {
     INVENTORY_IMPORT_LIMITS,
@@ -7,7 +8,6 @@ import {
 import { UUID_V4_PATTERN } from '@nexus/input-validation';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { confirmMutation, readRecord } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -22,7 +22,9 @@ import type {
 const base = API_PATHS.inventoryImports;
 
 const invalid = () =>
-    new ApiError('No se pudo leer la importación. Revisa su estado antes de reintentar.');
+    new ResponseContractError(
+        'No se pudo leer la importación. Revisa su estado antes de reintentar.',
+    );
 
 const scalarRecord = (value: unknown) =>
     value === null ||

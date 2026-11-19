@@ -1,11 +1,10 @@
 import { isPerPieceMeasure, isFixedUnitPresentation } from '@nexus/waste-measurements';
 import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
 import { materialCatalogService } from '../../../shared/services/materialCatalogService.js';
-import { isRecord } from '../../../shared/utils/isRecord.js';
 import { computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
-import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
+import { getLookupArticle, getLookupPresentation } from '../../../shared/utils/articleOptions.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
 import { unitUsesMeasurements } from '../formModel.js';
 import type { LookupItem } from '../../../shared/lookup.js';
@@ -75,12 +74,7 @@ export const useInventorySelection = (options: {
     const presentationName = computed(() => {
         if (!isCreating) return target.row?.presentation ?? '';
 
-        if (selectsArticle) {
-            const data = selectedArticle.value?.data.material;
-            return isRecord(data) && isRecord(data.presentation)
-                ? String(data.presentation.name ?? '')
-                : '';
-        }
+        if (selectsArticle) return getLookupPresentation(selectedArticle.value);
 
         if (resource !== 'wastes') return String(selectedPresentation.value?.data.name ?? '');
 
@@ -180,8 +174,7 @@ export const useInventorySelection = (options: {
     watch(selectedArticle, (article) => {
         if (!selectsArticle || isPending.value) return;
 
-        const material = article?.data.material;
-        const data = isRecord(material) ? material : {};
+        const data = getLookupArticle(article);
 
         for (const field of [
             'name',
@@ -201,11 +194,6 @@ export const useInventorySelection = (options: {
         void articles.refresh();
     };
 
-    const refreshSuppliers = () => {
-        suppliers.updateSearch('');
-        return suppliers.refresh();
-    };
-
     return {
         lookups,
         selectsArticle,
@@ -220,7 +208,7 @@ export const useInventorySelection = (options: {
                 isCreating ? selectedPresentation.value?.data : { name: target.row?.presentation },
             ),
         ),
-        refreshSuppliers,
+        refreshSuppliers: () => suppliers.refresh(''),
         searchLookup: (field: InventoryField, search: string) =>
             lookupByField[field]?.updateSearch(search),
         loadMore: (field: InventoryField) => lookupByField[field]?.loadMore(),

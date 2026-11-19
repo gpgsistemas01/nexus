@@ -53,3 +53,10 @@ export const chooseOption = async (
     .getByRole('option', { name: option, exact: true })
     .click();
 };
+
+export const referenceValue = (scope: Page | Locator, label: string) =>
+  scope
+    .getByRole('term')
+    .and(scope.getByText(label, { exact: true }))
+    .locator('..')
+    .getByRole('definition');

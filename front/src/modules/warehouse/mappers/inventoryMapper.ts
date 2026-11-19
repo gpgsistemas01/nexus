@@ -1,4 +1,4 @@
-import { ApiError } from '../../../shared/http/apiError.js';
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { InventoryRow, Numeric } from '../inventory.js';
 
@@ -21,7 +21,9 @@ export const normalizeInventoryRow = (raw: Record<string, unknown>): InventoryRo
         !Number.isInteger(raw.version) ||
         (isRecord(raw.material) && !Number.isInteger(material.version))
     ) {
-        throw new ApiError('El servidor devolvió un registro de inventario inesperado.');
+        throw new ResponseContractError(
+            'El servidor devolvió un registro de inventario inesperado.',
+        );
     }
 
     return {

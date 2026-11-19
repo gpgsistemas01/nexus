@@ -12,7 +12,7 @@ const chooseSelect = async (page: Page, label: string, option: string) => {
 for (const [path, title, item] of [
   ['materiales', 'materiales', 'Material'],
   ['consumibles', 'consumibles', 'Consumible'],
-  ['mermas', 'merma', 'Material'],
+  ['mermas', 'mermas', 'Merma'],
 ])
   test(`movimientos: ${path} conserva título, diez columnas, recarga y consulta sin edición`, async ({
     page,
@@ -65,7 +65,7 @@ test('movimientos: menú exclusivo, enlaces Vue, acceso directo y móvil', async
     );
   await menu.getByRole('link', { name: 'Mermas', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Historial de Movimientos de merma', exact: true }),
+    page.getByRole('heading', { name: 'Historial de Movimientos de mermas', exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Exportar Excel', exact: true })).toBeHidden();
   await expect(page.getByRole('combobox', { name: 'Proveedor', exact: true })).toBeDisabled();
@@ -203,7 +203,7 @@ test('movimientos: rechazo de ruta sin permiso y recuperación de lectura fallid
   await page.goto('/movimientos/mermas');
   await expect(
     page
-      .getByRole('region', { name: 'Historial de Movimientos de merma', exact: true })
+      .getByRole('region', { name: 'Historial de Movimientos de mermas', exact: true })
       .getByRole('alert'),
   ).toBeVisible();
   fail = false;

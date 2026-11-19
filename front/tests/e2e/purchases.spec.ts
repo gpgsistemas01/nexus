@@ -82,8 +82,8 @@ test('compras: corregir PIEZA valida cantidad entera y límite sin cerrar la con
 });
 
 for (const [path, title, item] of [
-  ['materiales', 'Materiales', 'Material'],
-  ['consumibles', 'Consumibles', 'Consumible'],
+  ['materiales', 'materiales', 'Material'],
+  ['consumibles', 'consumibles', 'Consumible'],
 ]) {
   test(
     `compras ${path}: alta con detalles, validación diferida y payload sin totales`,
@@ -479,14 +479,14 @@ test('compras: altas rápidas reutilizan editores y seleccionan registros fuera 
   await page
     .getByRole('button', { name: 'Registrar material «Material nuevo»', exact: true })
     .click();
-  const item = page.getByRole('dialog', { name: 'Crear material', exact: true });
+  const item = page.getByRole('dialog', { name: 'Registrar existencia de material', exact: true });
   await item.getByLabel('Nombre', { exact: true }).fill('Material nuevo');
   await item.getByRole('combobox', { name: 'Presentación', exact: true }).click();
   await page.getByRole('option', { name: 'ROLLO', exact: true }).click();
   await item.getByRole('combobox', { name: 'Unidad de medida', exact: true }).click();
   await page.getByRole('option', { name: /Metros cuadrados/ }).click();
-  await item.getByLabel('Base (m)', { exact: true }).fill('2');
-  await item.getByLabel('Altura (m)', { exact: true }).fill('50');
+  await item.getByLabel('Base', { exact: true }).fill('2');
+  await item.getByLabel('Altura', { exact: true }).fill('50');
   await expect(item.getByLabel('Stock inicial', { exact: true })).toHaveCount(0);
   await item.getByRole('button', { name: 'Guardar', exact: true }).click();
   await expect(item).toBeHidden();

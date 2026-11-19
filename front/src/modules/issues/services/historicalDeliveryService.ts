@@ -1,10 +1,10 @@
+import { ClientError, ResponseContractError } from '../../../shared/clientError.js';
 import { UUID_V4_PATTERN } from '@nexus/input-validation';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import {
     HISTORICAL_DELIVERY_LIMITS as limits,
     HISTORICAL_DELIVERY_REVISION_PATTERN,
 } from '@nexus/historical-deliveries';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -16,7 +16,7 @@ import type {
 } from '../historicalDelivery.js';
 
 const invalid = () =>
-    new ApiError(
+    new ResponseContractError(
         'La respuesta de regularización está incompleta. Revisa el estado antes de continuar.',
     );
 
@@ -48,7 +48,9 @@ export const readHistoricalDeliveryCommand = (value: unknown): HistoricalDeliver
         ) ||
         new Set(value.documents.map((item) => item.id)).size !== value.documents.length
     )
-        throw invalid();
+        throw new ClientError(
+            'La regularización pendiente no se puede leer. Conserva su referencia.',
+        );
 
     return value as unknown as HistoricalDeliveryCommand;
 };

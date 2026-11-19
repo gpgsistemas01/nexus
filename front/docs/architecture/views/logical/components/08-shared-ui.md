@@ -100,3 +100,8 @@ Compras agrupa costo unitario con Conversión e importes con IVA/sin IVA; Salida
 selecciona seguimiento y saldos según consulta, surtido o devolución.
 `DetailEntryRow` recibe las columnas aplanadas de la misma tabla, y las fichas
 reciben sus encabezados: reordenar conserva la correspondencia de campo y dato.
+
+En Almacén, `inventoryDisplay.ts` mantiene los nombres compartidos por tabla y
+formulario. `inventorySections` construye una sección por clave tipada y las devuelve en el
+orden declarativo de la operación; las referencias se presentan con `dl`, sin
+inputs adicionales ni campos nuevos en el payload.

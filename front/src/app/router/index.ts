@@ -29,6 +29,13 @@ export const createAppRouter = (
                 component: () => import('../layouts/AppLayout.vue'),
                 children: [
                     {
+                        path: 'articulos',
+                        name: 'catalog-materials',
+                        meta: { permission: PERMISSIONS.MATERIAL_CATALOGS_MANAGE },
+                        component: () => import('../../modules/catalogs/pages/CatalogPage.vue'),
+                        props: { catalog: 'materials' },
+                    },
+                    {
                         path: '',
                         name: 'warehouse-home',
                         component: () => import('../pages/InventoryWorkspace.vue'),
@@ -189,20 +196,18 @@ export const createAppRouter = (
                         path: '',
                         name: 'catalogs-home',
                         component: () => import('../../modules/catalogs/pages/CatalogPage.vue'),
-                        props: { catalog: 'materials' },
+                        props: { catalog: 'departments' },
                     },
-                    ...Object.keys(PUBLIC_CATALOGS).map((catalog) => ({
-                        path: catalog,
-                        name: `catalog-${catalog}`,
-                        meta: {
-                            permission:
-                                catalog === 'materials'
-                                    ? PERMISSIONS.MATERIAL_CATALOGS_MANAGE
-                                    : PERMISSIONS.CATALOGS_MANAGE,
-                        },
-                        component: () => import('../../modules/catalogs/pages/CatalogPage.vue'),
-                        props: { catalog },
-                    })),
+                    { path: 'materials', redirect: '/almacen/articulos' },
+                    ...Object.keys(PUBLIC_CATALOGS)
+                        .filter((catalog) => catalog !== 'materials')
+                        .map((catalog) => ({
+                            path: catalog,
+                            name: `catalog-${catalog}`,
+                            meta: { permission: PERMISSIONS.CATALOGS_MANAGE },
+                            component: () => import('../../modules/catalogs/pages/CatalogPage.vue'),
+                            props: { catalog },
+                        })),
                 ],
             },
             {
@@ -240,6 +245,12 @@ export const createAppRouter = (
                     'catalogs-home',
                 ].includes(String(to.name))
             ) {
+                if (
+                    to.name === 'warehouse-home' &&
+                    user.permissions.includes(PERMISSIONS.MATERIALS_READ)
+                )
+                    return { name: 'materials' };
+
                 const groups = APP_NAVIGATION_GROUPS.filter(
                     (group) => to.name === 'warehouse-home' || group.id === to.meta.navigationGroup,
                 );

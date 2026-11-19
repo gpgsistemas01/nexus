@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { VRow, VCol } from 'vuetify/components/VGrid';
-import { VTextField } from 'vuetify/components/VTextField';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
@@ -82,20 +81,19 @@ const emit = defineEmits<{
                         <h3 :id="`${formId}-${section.id}`">{{ section.title }}</h3>
                         <p v-if="section.description">{{ section.description }}</p>
                     </header>
-                    <VRow density="compact">
-                        <VCol
+                    <dl
+                        v-if="section.summary?.length"
+                        class="reference-values"
+                    >
+                        <div
                             v-for="item in section.summary"
                             :key="item.label"
-                            cols="12"
-                            md="6"
                         >
-                            <VTextField
-                                :label="item.label"
-                                :model-value="item.value"
-                                readonly
-                                class="consultation-field"
-                            />
-                        </VCol>
+                            <dt>{{ item.label }}</dt>
+                            <dd>{{ item.value }}</dd>
+                        </div>
+                    </dl>
+                    <VRow density="compact">
                         <VCol
                             v-for="field in section.fields"
                             :key="field.name"
@@ -173,6 +171,21 @@ const emit = defineEmits<{
     margin-top: 0.35rem;
     font-size: 0.8rem;
     color: rgb(var(--v-theme-muted));
+}
+.reference-values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+.reference-values dt {
+    color: rgb(var(--v-theme-muted));
+    font-size: 0.8rem;
+}
+.reference-values dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 .editor-section :deep(.v-col) {
     padding: 0.45rem;

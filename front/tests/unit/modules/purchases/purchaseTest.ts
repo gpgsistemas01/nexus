@@ -1,4 +1,4 @@
-import { mapMaterialOption } from '../../../../src/shared/utils/mapMaterialOption.js';
+import { mapMaterialOption } from '../../../../src/shared/utils/articleOptions.js';
 import { PURCHASE_CONFIG } from '../../../../src/modules/purchases/purchaseConfig.js';
 import { defineComponent, h } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';

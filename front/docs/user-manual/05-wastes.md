@@ -24,7 +24,7 @@ agrupa totales. Después se añaden los IDs/versiones y los campos necesarios.
 **Cantidad inicial** y observaciones; medidas o pesos según la presentación. El sistema
 genera el ID nuevo y obtiene presentación/unidad del material de referencia.
 
-**Editar datos:** cambie **Material**, **Stock mínimo**, **Costo unitario** y **Activo**.
+**Editar datos:** cambie **Material**, **Stock mínimo**, **Costo máximo unitario** y **Activo**.
 Se conservan IDs/versiones, proveedor, material de origen, medidas, pesos y existencia.
 <!-- manual:end -->
 
@@ -101,7 +101,7 @@ conversión. Los pesos de cono, total y neto se consultan directamente en la tab
 un rollo necesita el peso del rollo completo con cono y los pesos de la merma.
 Tome los pesos en kilogramos y las medidas en metros.
 
-1. Pulse **Nueva merma** para abrir **Crear merma**.
+1. Pulse **Nueva merma** para abrir **Registrar merma**.
 2. Seleccione **Proveedor** y después **Material de referencia del proveedor**.
 3. Escriba **Nombre de la merma**. Revise presentación y unidad heredadas.
 4. Complete los pesos o las medidas habilitadas según la presentación.
@@ -116,7 +116,7 @@ Tome los pesos en kilogramos y las medidas en metros.
 | Peso del cono de la merma (kg) | Peso del cono que se descuenta para obtener el peso neto. |
 | Peso de la merma con cono (kg) | Peso total de una unidad de la merma, incluido su cono. |
 | Peso neto de la merma (kg) | Resultado de consulta; no se captura como un total independiente. |
-| Base (m), Altura (m) | Se calculan para rollos; en otros casos se capturan cuando están habilitadas. |
+| Base, Altura | Se calculan para rollos; en otros casos se capturan cuando están habilitadas. |
 | Cantidad inicial | Número de unidades de esa merma, distinto del peso por unidad. |
 
 ![Selección del material de origen e identidad de la merma.](images/09-waste-create.png)

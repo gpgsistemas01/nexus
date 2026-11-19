@@ -43,7 +43,7 @@ estados o participantes de una operación, consulte el
 ## Primera práctica: encontrar un artículo sin cambiarlo
 
 1. Pulse **Menú**.
-2. Abra **Almacén** y seleccione **Materiales**, **Consumibles** o **Mermas**,
+2. Abra **Almacén** y seleccione **Existencias de materiales**, **Existencias de consumibles** o **Mermas**,
    según el artículo que le indique su responsable.
 3. Espere a que aparezca la tabla. Identifique la columna del nombre y el proveedor.
 4. Escriba parte del nombre en la búsqueda y pulse **Buscar**.

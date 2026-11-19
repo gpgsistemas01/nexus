@@ -39,7 +39,7 @@ correspondientes](../01-test-plan.md#niveles-y-entornos).
 
 `RF-CAT-030`: Materiales reutiliza Catálogos con columnas y captura de identidad, sin Activo. `catalogEditorTest.ts` y `catalogServiceTest.ts` cubren payload, respuesta y edición restringida; `catalogs.spec.ts` prueba consulta/alta/edición con una cuenta sólo de catálogos. La integración `catalogControllersDbTest.js` cubre ambos tipos, ausencia de oferta/stock, validación, identidad protegida y versión obsoleta.
 
-Catálogo de Materiales: particiones sin/con proveedor para habilitación y payload de edición. Almacén: selección del catálogo por ID, datos de stock, alta auxiliar y permisos separados de los demás catálogos.
+Artículos: particiones sin/con proveedor para habilitación y payload de edición. Almacén: selección del catálogo por ID, datos de stock, alta auxiliar y permisos separados de los demás catálogos.
 
 `detailEntry.spec.ts` comprueba alineación con los encabezados, conservación de captura al cambiar el ancho y distinción de proveedores del mismo artículo en tabla y fichas. El nombre comercial es presentación; las solicitudes siguen usando los IDs del material y proveedor.
 
@@ -48,3 +48,18 @@ El alta contextual de Almacén cubre Material/Consumible antes de elegir proveed
 La selección remota cubre escritura cada 300 ms, una sola consulta tras 500 ms de pausa, texto conservado al cambiar resultados y rechazo de respuestas tardías de una búsqueda sustituida.
 
 Compras y salidas contrastan un nombre histórico distinto del catálogo: la tabla muestra el nombre vigente sin modificar el original. La captura de compra verifica que el aviso del proveedor desaparece al seleccionarlo.
+
+Artículos pertenece a Almacén y conserva el permiso `material-catalogs:manage`.
+La navegación cubre su ruta directa, la redirección del enlace anterior, el rechazo
+para consulta operativa y la separación de Catálogos auxiliares. Las capturas del
+manual abren listado y formulario sin guardar registros.
+
+El alta de existencias contrasta los datos del artículo seleccionado con Base,
+Altura, Presentación, Unidad de medida y Stock mínimo mostrados como referencia.
+El recorrido conserva la validación y el payload de alta/edición y comprueba
+que esos datos no se convierten en controles de captura.
+
+El alta contextual de proveedor cubre la lista todavía cerrada: selecciona el
+registro confirmado y realiza una sola lectura del catálogo, conservando el
+resto de la captura. Las opciones anidadas de material y las planas de merma
+comparten lectores de presentación en Almacén, Compras y Salidas.

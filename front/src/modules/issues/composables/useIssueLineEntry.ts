@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { getPieceQuantityError } from '@nexus/piece-quantity';
-import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
+import { getLookupPresentation } from '../../../shared/utils/articleOptions.js';
 import { useForm } from 'vee-validate';
 import {
     addGoodsIssueMaterialValidation,

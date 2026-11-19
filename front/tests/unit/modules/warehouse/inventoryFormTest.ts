@@ -468,3 +468,16 @@ it.each(['KILOGRAMOS', 'METRO LINEAL'])(
     wrapper.unmount();
   },
 );
+
+it('seleccionar un proveedor recién creado consulta su lista una sola vez aunque estuviera cerrada', async () => {
+  const { editor, wrapper } = openEditor('materials', { action: 'create' });
+  await flushPromises();
+  const lookup = vi.mocked(inventoryCatalogService.lookup);
+  expect(lookup.mock.calls.filter(([query]) => query.path === 'suppliers')).toHaveLength(0);
+  editor.selectCreatedSupplier({ id: ids.supplier, title: 'Proveedor nuevo', data: {} });
+  await flushPromises();
+  expect(lookup.mock.calls.filter(([query]) => query.path === 'suppliers')).toHaveLength(1);
+  expect(editor.values.supplierId).toBe(ids.supplier);
+  expect(editor.selectedSupplier.value?.title).toBe('Proveedor nuevo');
+  wrapper.unmount();
+});

@@ -4,9 +4,33 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 [Alcance y notación](index.md#alcance-y-notación).
 
+## ClientError
+
+**Fuente:** [src/shared/clientError.ts](../../../../../src/shared/clientError.ts) · línea 1, columna 1. **Declaración:** class.
+
+**Extensión/implementación:** `extends Error`.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `constructor` | `constructor(message: string)` |
+
+## ResponseContractError
+
+**Fuente:** [src/shared/clientError.ts](../../../../../src/shared/clientError.ts) · línea 8, columna 1. **Declaración:** class.
+
+**Extensión/implementación:** `extends ClientError`.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `constructor` | `constructor(message: string)` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| inheritance | [ClientError](../../../../../src/shared/clientError.ts) | `extends` |
+
 ## DetailEntryRow.defineProps
 
-**Fuente:** [src/shared/components/DetailEntryRow.vue](../../../../../src/shared/components/DetailEntryRow.vue) · línea 7, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/DetailEntryRow.vue](../../../../../src/shared/components/DetailEntryRow.vue) · línea 8, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -468,7 +492,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## ApiRequestConfig
 
-**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 9, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 10, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends AxiosRequestConfig`.
 
@@ -478,7 +502,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## RetriableRequest
 
-**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 12, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 13, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends RecoverableRequest`.
 
@@ -539,7 +563,7 @@ keyof typeof API_PATHS.inventoryCatalogs
 
 ## MutationConfirmation
 
-**Fuente:** [src/shared/http/recordContract.ts](../../../../../src/shared/http/recordContract.ts) · línea 35, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/recordContract.ts](../../../../../src/shared/http/recordContract.ts) · línea 37, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

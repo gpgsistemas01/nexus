@@ -2,8 +2,9 @@
 
 ## Propósito y funcionamiento
 
-La fábrica devuelve validadores según recurso y modo. Cada validador consulta `getValues`
-al ejecutarse; crear el esquema todavía no valida el formulario.
+Las fábricas devuelven esquemas de validación o presentación según recurso y modo.
+Los validadores consultan `getValues` al ejecutarse; construirlos todavía no valida
+el formulario.
 
 ## Modelo general de construcción de un esquema
 
@@ -123,3 +124,25 @@ cuándo se presentan los errores.
 [purchaseTest](../../../../../tests/unit/modules/purchases/purchaseTest.ts) y las
 [pruebas de paridad](../../../../../../back/tests/unit/validators/formValidationParityTest.js)
 protegen captura y solicitudes.
+
+## Secciones del editor de Almacén
+
+**Identificador:** `DIA-VUE-APL-099`. **Fuente:** `inventorySections` en
+`modules/warehouse/formFields.ts` e `InventoryEditor.vue`.
+
+```mermaid
+flowchart TB
+    context[/Recurso, operación y referencias/] --> mode{Alta directa de existencia}
+    mode -->|sí| offer[Artículo y proveedor, referencias y existencia]
+    mode -->|no| registry[Construir cada sección por su clave tipada]
+    registry --> order[Seleccionar secciones en SECTION_ORDER]
+    offer --> schema[/InventoryFormSection array/]
+    order --> schema
+    schema --> view[InventoryEditor presenta campos y referencias]
+```
+
+La fábrica es pura. Comparte las especificaciones de costo, estado y observaciones;
+el registro tipado impide introducir una sección fuera del orden definido.
+`inventoryLabels` proporciona los nombres comunes con la tabla e
+`inventoryActionTitle` los títulos del editor y la eliminación. Validación,
+transporte y persistencia conservan sus propietarios.

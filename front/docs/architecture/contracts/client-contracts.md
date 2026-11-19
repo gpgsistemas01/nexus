@@ -45,7 +45,7 @@ estado. Un `200` incompleto no confirma la operación. La
 | Área | Contrato consumido y datos relevantes |
 | --- | --- |
 | Acceso | `POST /api/auth/login`: `name` recortado y `password` exacta. `GET /api/auth/me`: usuario con ID, nombre y array de permisos. Renovación: `POST /api/auth/refresh`. Cierre: `POST /cerrar-sesion`. |
-| Catálogos | `GET/POST /api/admin/catalogs/:catalog`; edición `PUT /:id`. Lista blanca de seis recursos; nombre/Activo y símbolo sólo en Unidad. Edición añade `expectedVersion`. |
+| Catálogos auxiliares y Artículos | `GET/POST /api/admin/catalogs/:catalog`; edición `PUT /:id`. Seis catálogos auxiliares y `materials` para Artículos. Los auxiliares admiten nombre/Activo y símbolo sólo en Unidad; Artículos utiliza sus campos de identidad y su permiso específico. Edición añade `expectedVersion`. |
 | Personas | `GET/POST /api/admin/persons`, edición `PUT /:id`. Nombre completo y `accesses` con pares área/rol; consulta con `includeAccesses=true`, filtros `department`/`role` y `strictDepartmentFilter=true` al seleccionar un área (`false` sin ella). |
 | Usuarios | `GET/POST /api/admin/users`; edición `PATCH /:id`; contraseña `PATCH /:id/password`. Alta incluye contraseña; editar datos no la reenvía; ambos modos de edición conservan versión. |
 | Clientes | `GET/POST /api/sales/clients`, edición `PUT /:id`. Nombre/Activo y versión al editar. |

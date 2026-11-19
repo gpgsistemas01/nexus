@@ -21,7 +21,7 @@ const headers = computed(() => [
         ? [
               { title: 'Tipo', key: 'type', sortable: false },
               { title: 'Presentación', key: 'presentation', sortable: false },
-              { title: 'Unidad', key: 'unitSymbol', sortable: false },
+              { title: 'Unidad de medida', key: 'unitSymbol', sortable: false },
               { title: 'Base', key: 'base', sortable: false },
               { title: 'Altura', key: 'height', sortable: false },
               { title: 'Stock mínimo', key: 'minStock', sortable: false },

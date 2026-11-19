@@ -42,7 +42,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## NavigationLink
 
-**Fuente:** [src/app/navigation.ts](../../../../../src/app/navigation.ts) · línea 32, columna 1. **Declaración:** interface.
+**Fuente:** [src/app/navigation.ts](../../../../../src/app/navigation.ts) · línea 41, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -52,7 +52,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## NavigationGroup
 
-**Fuente:** [src/app/navigation.ts](../../../../../src/app/navigation.ts) · línea 38, columna 1. **Declaración:** interface.
+**Fuente:** [src/app/navigation.ts](../../../../../src/app/navigation.ts) · línea 47, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

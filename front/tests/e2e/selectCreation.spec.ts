@@ -53,8 +53,11 @@ for (const [path, resource, title] of [
       });
     });
     await page.goto(`/almacen/${path}`);
-    await page.getByRole('button', { name: `Nuevo ${title}`, exact: true }).click();
-    const parent = page.getByRole('dialog', { name: `Crear ${title}`, exact: true });
+    await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+    const parent = page.getByRole('dialog', {
+      name: `Registrar existencia de ${title}`,
+      exact: true,
+    });
     await chooseOption(
       page,
       title === 'material' ? 'Material' : 'Consumible',
@@ -150,14 +153,14 @@ for (const [path, resource, title] of [
       await expect(supplier).toBeHidden();
       const label = resource === 'materials' ? 'Material' : 'Consumible';
       await openCreation(page, parent, label, `Registrar ${title}`, name);
-      const item = page.getByRole('dialog', { name: `Crear ${title}`, exact: true });
+      const item = page.getByRole('dialog', { name: `Registrar ${title}`, exact: true });
       await expect(item.getByLabel('Nombre', { exact: true })).toHaveValue(name);
       await expect(item.getByLabel('Proveedor', { exact: true })).toHaveValue(term);
       await chooseOption(page, 'Presentación', 'ROLLO');
       await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
       if (resource === 'materials') {
-        await item.getByLabel('Base (m)', { exact: true }).fill('2');
-        await item.getByLabel('Altura (m)', { exact: true }).fill('50');
+        await item.getByLabel('Base', { exact: true }).fill('2');
+        await item.getByLabel('Altura', { exact: true }).fill('50');
       }
       await item.getByRole('button', { name: 'Guardar', exact: true }).click();
       await expect(item).toBeHidden();
@@ -228,7 +231,7 @@ test(
   async ({ page }) => {
     await mockWarehouse(page);
     await page.goto('/almacen/materiales');
-    await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+    await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
     await page
       .getByRole('combobox', { name: 'Proveedor', exact: true })
       .fill('Proveedor sin permiso');
@@ -270,7 +273,7 @@ test('select: permite abrir el alta con teclado cuando la búsqueda no tiene res
     route.fulfill({ json: { data: [], recordsTotal: 0, recordsFiltered: 0 } }),
   );
   await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+  await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
   const input = page.getByRole('combobox', { name: 'Proveedor', exact: true });
   await input.fill('Proveedor teclado');
   const action = page.getByRole('button', {
@@ -297,8 +300,11 @@ test('select: coincidencias existentes, filtros y catálogos sólo consultables 
     .fill('Filtro nuevo');
   await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: 'Crear material', exact: true });
+  await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+  const dialog = page.getByRole('dialog', {
+    name: 'Registrar existencia de material',
+    exact: true,
+  });
   await dialog.getByRole('combobox', { name: 'Proveedor', exact: true }).fill('Proveedor Central');
   await expect(page.getByRole('option', { name: 'Proveedor Central', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
@@ -325,8 +331,11 @@ test(
       });
     });
     await page.goto('/almacen/materiales');
-    await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
-    const dialog = page.getByRole('dialog', { name: 'Crear material', exact: true });
+    await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+    const dialog = page.getByRole('dialog', {
+      name: 'Registrar existencia de material',
+      exact: true,
+    });
     const field = dialog.getByRole('combobox', { name: 'Proveedor', exact: true });
     await field.click();
     await expect(

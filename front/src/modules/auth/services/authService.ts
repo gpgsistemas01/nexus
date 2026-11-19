@@ -1,3 +1,4 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { errorMessages } from '@nexus/api-messages';
 import { apiClient } from '../../../shared/http/apiClient.js';
@@ -30,6 +31,9 @@ export const loginRequest = async (
         if (data.code !== successCodeMessages.SUCCESS_LOGIN)
             throw new LoginRequestError(LOGIN_MESSAGES.INVALID_RESPONSE);
     } catch (cause) {
+        if (cause instanceof ResponseContractError)
+            throw new LoginRequestError(LOGIN_MESSAGES.INVALID_RESPONSE);
+
         if (!(cause instanceof ApiError)) throw cause;
 
         if (cause.status === 401) throw new LoginRequestError(errorMessages.LOGIN_ERROR);
@@ -42,9 +46,7 @@ export const loginRequest = async (
         throw new LoginRequestError(
             cause.code === 'NETWORK_ERROR' || [502, 503, 504].includes(cause.status)
                 ? LOGIN_MESSAGES.CONNECTION_FAILED
-                : cause.code === 'INVALID_RESPONSE'
-                  ? LOGIN_MESSAGES.INVALID_RESPONSE
-                  : LOGIN_MESSAGES.REQUEST_FAILED,
+                : LOGIN_MESSAGES.REQUEST_FAILED,
         );
     }
 };

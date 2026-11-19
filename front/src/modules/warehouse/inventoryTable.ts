@@ -1,3 +1,4 @@
+import { inventoryLabels } from './inventoryDisplay.js';
 import type { DataTableHeader } from 'vuetify';
 import type { InventoryPermissions, InventoryResource, InventoryRow } from './inventory.js';
 
@@ -11,18 +12,18 @@ const column = (title: string, key: string, sortable = false): DataTableHeader<I
 export const inventoryHeaders = (
     resource: InventoryResource,
     permissions: InventoryPermissions,
+    hasMeasurements = resource !== 'consumables',
 ): DataTableHeader<InventoryRow>[] => {
+    const labels = inventoryLabels(resource);
     const isConsumable = resource === 'consumables';
-    const headers: DataTableHeader<InventoryRow>[] = [
-        column(isConsumable ? 'Consumible' : 'Material', 'name', true),
-    ];
-    if (!isConsumable)
+    const headers: DataTableHeader<InventoryRow>[] = [column(labels.name, 'name', true)];
+    if (hasMeasurements)
         headers.push({
             title: 'Medidas',
             align: 'center',
             children: [
-                column('Base', 'base', resource === 'materials'),
-                column('Altura', 'height', resource === 'materials'),
+                column(labels.base, 'base', resource === 'materials'),
+                column(labels.height, 'height', resource === 'materials'),
             ],
         });
 
@@ -38,10 +39,10 @@ export const inventoryHeaders = (
         });
 
     headers.push(
-        column('Presentación', 'presentation'),
-        ...(isConsumable ? [column('Unidad de medida', 'unitMeasure')] : []),
-        column(isConsumable ? 'Existencia' : 'Stock actual', 'currentStock'),
-        column('Stock Mínimo', 'minStock', resource === 'materials'),
+        column(labels.presentation, 'presentation'),
+        ...(isConsumable ? [column(labels.unitMeasure, 'unitMeasure')] : []),
+        column(labels.currentStock, 'currentStock'),
+        column(labels.minStock, 'minStock', resource === 'materials'),
     );
     if (!isConsumable)
         headers.push({
@@ -50,12 +51,9 @@ export const inventoryHeaders = (
             children: [column('Cantidad', 'convertedQuantity'), column('Unidad', 'unitMeasure')],
         });
 
-    if (permissions.canReadCosts)
-        headers.push(
-            column(isConsumable ? 'Costo Unitario' : 'Costo Unitario de Conversión', 'maxUnitCost'),
-        );
+    if (permissions.canReadCosts) headers.push(column(labels.maxUnitCost, 'maxUnitCost'));
 
-    if (permissions.canReadState) headers.push(column('Activo', 'isActive'));
+    if (permissions.canReadState) headers.push(column(labels.isActive, 'isActive'));
 
     if (permissions.canWrite || permissions.canAdjust || permissions.canAdd)
         headers.push(column('Acciones', 'actions'));

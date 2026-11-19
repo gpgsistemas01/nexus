@@ -1,3 +1,4 @@
+import { ClientError } from '../../../shared/clientError.js';
 import {
     INVENTORY_IMPORT_LIMITS,
     INVENTORY_IMPORT_MODES as modes,
@@ -177,7 +178,7 @@ export const useInventoryImport = (options: {
             if (disposed) return;
 
             if (saved.resource !== options.resource)
-                throw new ApiError('La importación pendiente pertenece a otro módulo.');
+                throw new ClientError('La importación pendiente pertenece a otro módulo.');
 
             batch.value = saved;
             mode.value = saved.mode;
@@ -203,7 +204,9 @@ export const useInventoryImport = (options: {
                 pending.value?.id ??
                 (batch.value?.status === statuses.DRAFT ? batch.value.id : null);
             if (recoveryRequired.value && !id)
-                throw new ApiError('Conserva la referencia pendiente y contacta al administrador.');
+                throw new ClientError(
+                    'Conserva la referencia pendiente y contacta al administrador.',
+                );
 
             if (id) await inventoryImportService.cancel(id, controller.signal);
 
@@ -227,7 +230,7 @@ export const useInventoryImport = (options: {
         filename: () => `plantilla_${options.resource}_${mode.value}`,
         request: (query, signal) => {
             if (!isInventoryImportMode(mode.value))
-                throw new ApiError('Selecciona una operación vigente.');
+                throw new ClientError('Selecciona una operación vigente.');
 
             return inventoryImportService.template(options.resource, mode.value, query, signal);
         },

@@ -7,7 +7,6 @@ en los selectores de Nexus.
 
 | Catálogo | Uso principal | Acción de alta |
 | --- | --- | --- |
-| Materiales | Identidades de materiales y consumibles, sin proveedor ni existencia. | Nuevo material |
 | Áreas | Organización y asignaciones de personas o solicitudes. | Nueva área |
 | Roles | Responsabilidad o rol asignado. | Nuevo rol |
 | Presentaciones | Forma en que se maneja el artículo. | Nueva presentación |
@@ -25,12 +24,6 @@ en los selectores de Nexus.
 
 En **Filtrar por columna**, busque por **Nombre**, **Activo** y, cuando se muestre,
 por **Símbolo**. Los filtros se aplican al catálogo completo y pueden combinarse.
-
-<!-- module:end -->
-
-<!-- module:any reference catalog-materials -->
-
-Busque por nombre y use la paginación y el contador para recorrer el catálogo completo.
 
 <!-- module:end -->
 
@@ -67,21 +60,7 @@ Desactivar retira el registro de nuevas selecciones y conserva los documentos qu
 
 <!-- module:end -->
 
-<!-- module:any reference catalog-materials -->
 
-## Registrar y editar materiales
-
-La tabla incluye materiales y consumibles una vez por identidad, con tipo, presentación, unidad, medidas y stock mínimo. No muestra proveedor, stock, costo ni Activo.
-
-1. Busque el nombre antes de registrar. Pulse **Nuevo material**.
-2. Capture **Nombre**, seleccione **Tipo**, **Presentación** y **Unidad de medida**.
-3. Deje **Base** y **Altura** vacías cuando no apliquen, o capture ambas. KILOGRAMOS y METRO LINEAL fijan `1 × 1` y ocultan estas entradas durante el alta.
-4. El **Stock mínimo** es opcional; sin umbral se usa `0`. Pulse **Guardar**. El alta no crea proveedor, existencia ni movimiento.
-5. Para editar, pulse **Editar registro**. **Sin proveedores vinculados**, todos los campos están habilitados. **Con proveedor vinculado**, sólo puede cambiar **Nombre** y **Stock mínimo**; tipo, presentación, unidad y medidas quedan protegidos. Pulse **Actualizar**. Estos datos se comparten entre todas las ofertas del artículo.
-
-Almacén y Sistemas acceden a este catálogo. El proveedor se vincula al registrar el artículo en Almacén o confirmar una compra; los ajustes de stock se realizan en Almacén. Si otro usuario modificó el artículo, actualice el catálogo y vuelva a abrir la edición.
-
-<!-- module:end -->
 
 ## Resolver un rechazo
 

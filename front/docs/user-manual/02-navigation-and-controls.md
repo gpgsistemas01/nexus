@@ -11,6 +11,17 @@ teléfono, use **Menú** para abrirlo o cerrarlo, o seleccione una sección.
 
 Puede guardar la dirección de una página como favorito.
 
+Los títulos identifican la sección y el recurso: Compras de materiales, Salidas de
+consumibles o Movimientos de mermas. **Nuevo/Nueva** inicia el alta; el formulario
+usa **Registrar**, **Editar**, **Consultar**, **Surtir** o **Devolver** según la acción.
+**Nueva existencia** vincula un artículo con un proveedor; **Nuevo artículo**
+registra los datos del material o consumible.
+
+En **Almacén**, **Artículos** administra los datos de materiales y consumibles;
+**Existencias de materiales** y **Existencias de consumibles** muestran proveedores,
+costos y stock. **Mermas** conserva su operación independiente. **Artículos** sólo
+aparece con permiso de administración de artículos.
+
 ### Áreas operativas: Almacén y Salidas
 
 Las cuentas asignadas únicamente a Impresión, Router, Taller/Herrería (TALLER 3D),
@@ -20,7 +31,7 @@ no concede las funciones de Almacén.
 
 | Sección                                   | Qué puede hacer el área operativa                                                                |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Almacén: Materiales, Consumibles y Mermas | Consultar la tabla, buscar, filtrar, ordenar, recorrer páginas y actualizar la consulta.         |
+| Almacén: Existencias de materiales, Existencias de consumibles y Mermas | Consultar la tabla, buscar, filtrar, ordenar, recorrer páginas y actualizar la consulta.         |
 | Salidas: Materiales, Consumibles y Mermas | Consultar, registrar y editar solicitudes de sus áreas asignadas, según el estado del documento. |
 
 En Almacén no hay acciones de alta, edición, eliminación, entrada o ajuste de

@@ -62,16 +62,14 @@ export type EditorTarget =
 
 export const INVENTORY_CONFIG = {
     materials: {
-        title: 'Materiales',
-        tableTitle: 'Existencias',
+        title: 'Existencias de materiales',
         singular: 'material',
         read: PERMISSIONS.MATERIALS_READ,
         write: PERMISSIONS.MATERIALS_WRITE,
         adjust: PERMISSIONS.MATERIALS_ADJUST_STOCK,
     },
     consumables: {
-        title: 'Consumibles',
-        tableTitle: 'Consumibles',
+        title: 'Existencias de consumibles',
         singular: 'consumible',
         read: PERMISSIONS.MATERIALS_READ,
         write: PERMISSIONS.MATERIALS_WRITE,
@@ -79,7 +77,6 @@ export const INVENTORY_CONFIG = {
     },
     wastes: {
         title: 'Mermas',
-        tableTitle: 'Mermas',
         singular: 'merma',
         read: PERMISSIONS.WASTES_READ,
         write: PERMISSIONS.WASTES_WRITE,

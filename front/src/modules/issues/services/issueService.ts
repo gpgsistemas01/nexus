@@ -1,5 +1,5 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { successCodeMessages } from '@nexus/api-success-codes';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
@@ -54,7 +54,7 @@ export const issueService = {
             resource,
         );
         if (document.id !== id)
-            throw new ApiError('La salida recibida no coincide con la solicitada.');
+            throw new ResponseContractError('La salida recibida no coincide con la solicitada.');
 
         return document;
     },

@@ -1,3 +1,5 @@
+import { getLookupArticle } from '../../shared/utils/articleOptions.js';
+import { inventoryLabels } from './inventoryDisplay.js';
 import { isRollPresentation } from '@nexus/waste-measurements';
 import { isPiecePresentation } from '@nexus/piece-quantity';
 import { isRecord } from '../../shared/utils/isRecord.js';
@@ -5,6 +7,20 @@ import { numberText, convertedQuantityText } from '../../shared/utils/formatNumb
 import type { EditorTarget, InventoryField, InventoryResource } from './inventory.js';
 import type { LookupItem } from '../../shared/lookup.js';
 import type { previewWaste } from './formModel.js';
+
+const SECTION_ORDER = [
+    'origin',
+    'identity',
+    'measurements',
+    'reference',
+    'weights',
+    'history',
+    'presentation',
+    'stock',
+    'inventory',
+    'notes',
+] as const;
+type SectionId = (typeof SECTION_ORDER)[number];
 
 export interface InventoryFieldSpec {
     name: InventoryField;
@@ -22,7 +38,7 @@ export interface InventorySummaryItem {
     value: string;
 }
 export interface InventoryFormSection {
-    id: string;
+    id: SectionId;
     title: string;
     description?: string;
     fields: InventoryFieldSpec[];
@@ -35,6 +51,7 @@ export const inventorySections = (
     preview: ReturnType<typeof previewWaste>,
     options: {
         template?: LookupItem;
+        article?: LookupItem;
         presentationName?: string;
         usesMeasurements: boolean;
         isPerPiece?: boolean;
@@ -44,6 +61,7 @@ export const inventorySections = (
     },
 ): InventoryFormSection[] => {
     const { action, row } = target;
+    const labels = inventoryLabels(resource);
     const isCreating = action === 'create';
     const fromPurchase = isCreating && options.creationContext === 'goodsReceipt';
     const isWaste = resource === 'wastes';
@@ -61,51 +79,105 @@ export const inventorySections = (
     )
         ? 1
         : undefined;
-    const sections: InventoryFormSection[] = [];
-    if (action === 'delete') return sections;
+    const costField: InventoryFieldSpec = {
+        name: 'maxUnitCost',
+        label: labels.maxUnitCost,
+        type: 'number',
+    };
+    const stateField: InventoryFieldSpec = {
+        name: 'isActive',
+        label: labels.isActive,
+        type: 'checkbox',
+    };
+    const notesField: InventoryFieldSpec = {
+        name: 'observations',
+        label: 'Observaciones',
+        type: 'textarea',
+        isWide: true,
+    };
+    const sections: Partial<Record<SectionId, Omit<InventoryFormSection, 'id'>>> = {};
+    if (action === 'delete') return [];
 
-    if (isCreating && !isWaste && !fromPurchase)
+    if (isCreating && !isWaste && !fromPurchase) {
+        const article = options.article ? getLookupArticle(options.article) : undefined;
+        const presentation = isRecord(article?.presentation) ? article.presentation : {};
+        const unit = isRecord(article?.unitMeasure) ? article.unitMeasure : {};
         return [
             {
-                id: 'identity',
+                id: 'identity' as const,
                 title: 'Artículo y proveedor',
-                description:
-                    'Selecciona un artículo del catálogo. Se vinculará al proveedor al guardar.',
+                description: 'Selecciona el artículo y el proveedor de la existencia.',
                 fields: [
+                    { name: 'materialId', label: labels.name, type: 'lookup', isWide: true },
                     { name: 'supplierId', label: 'Proveedor', type: 'lookup', isWide: true },
-                    {
-                        name: 'materialId',
-                        label: resource === 'consumables' ? 'Consumible' : 'Material',
-                        type: 'lookup',
-                        isWide: true,
-                    },
                 ],
             },
+            ...(article
+                ? [
+                      {
+                          id: 'reference' as const,
+                          title: 'Datos del artículo',
+                          fields: [],
+                          description:
+                              'Corresponden al artículo seleccionado y se administran en Artículos.',
+                          summary: [
+                              ...(resource === 'materials' ||
+                              article.base != null ||
+                              article.height != null
+                                  ? [
+                                        {
+                                            label: labels.base,
+                                            value: numberText(
+                                                article.base == null ? null : Number(article.base),
+                                            ),
+                                        },
+                                        {
+                                            label: labels.height,
+                                            value: numberText(
+                                                article.height == null
+                                                    ? null
+                                                    : Number(article.height),
+                                            ),
+                                        },
+                                    ]
+                                  : []),
+                              {
+                                  label: labels.presentation,
+                                  value: String(presentation.name ?? '—'),
+                              },
+                              {
+                                  label: labels.unitMeasure,
+                                  value: String(unit.symbol || unit.name || '—'),
+                              },
+                              {
+                                  label: labels.minStock,
+                                  value: numberText(Number(article.minStock ?? 0)),
+                              },
+                          ],
+                      },
+                  ]
+                : []),
             {
-                id: 'inventory',
-                title: 'Datos de inventario',
+                id: 'inventory' as const,
+                title: 'Datos de la existencia',
                 fields: [
-                    { name: 'maxUnitCost', label: 'Costo máximo unitario', type: 'number' },
-                    { name: 'isActive', label: 'Activo', type: 'checkbox' },
                     {
                         name: 'newStock',
                         label: 'Cantidad inicial',
                         type: 'number',
                         step: quantityStep,
+                        hint: `Se registra en ${labels.currentStock}.`,
                     },
-                    {
-                        name: 'observations',
-                        label: 'Observaciones',
-                        type: 'textarea',
-                        isWide: true,
-                    },
+                    costField,
+                    stateField,
+                    notesField,
                 ],
             },
         ];
+    }
 
     if (isCreating && isWaste)
-        sections.push({
-            id: 'origin',
+        sections.origin = {
             title: 'Material de origen',
             description: 'Selecciona el proveedor y después el material que origina la merma.',
             fields: [
@@ -118,10 +190,9 @@ export const inventorySections = (
                     hint: !options.hasSupplier ? 'Selecciona primero un proveedor.' : undefined,
                 },
             ],
-        });
+        };
 
-    sections.push({
-        id: 'identity',
+    sections.identity = {
         title: isWaste
             ? 'Datos de la merma'
             : resource === 'consumables'
@@ -133,7 +204,7 @@ export const inventorySections = (
         fields: [
             {
                 name: 'name',
-                label: isWaste ? 'Nombre de la merma' : 'Nombre',
+                label: isWaste ? 'Nombre de la merma' : isCreating ? 'Nombre' : labels.name,
                 isReadOnly: isStock,
                 isWide: true,
             },
@@ -151,9 +222,14 @@ export const inventorySections = (
                       },
                   ]
                 : []),
+        ],
+    };
+    sections.presentation = {
+        title: 'Presentación y unidad',
+        fields: [
             {
                 name: 'presentationId',
-                label: 'Presentación',
+                label: labels.presentation,
                 hint:
                     isCreating && resource === 'consumables' && options.isPerPiece
                         ? 'Esta presentación fija ambas medidas en 1.'
@@ -167,17 +243,16 @@ export const inventorySections = (
             },
             {
                 name: 'unitMeasureId',
-                label: 'Unidad de medida',
+                label: labels.unitMeasure,
                 type: isCreating && !isWaste ? 'lookup' : undefined,
                 isReadOnly: !isCreating || isWaste,
                 displayValue:
                     isWaste && isCreating ? unit || 'Selecciona un material' : row?.unitMeasure,
             },
         ],
-    });
+    };
     if (isWaste && isRoll && (isCreating || row?.referenceRollTotalWeightKg != null))
-        sections.push({
-            id: 'reference',
+        sections.reference = {
             title: 'Rollo completo (muestra)',
             description:
                 'El largo proviene del material de origen. Se utiliza el mismo cono de la merma.',
@@ -209,11 +284,10 @@ export const inventorySections = (
                           },
                       ]
                     : undefined,
-        });
+        };
 
     if (isWaste && isRoll)
-        sections.push({
-            id: 'weights',
+        sections.weights = {
             title: 'Pesos de la merma',
             description: 'Pesos por unidad de merma.',
             fields: [
@@ -238,7 +312,7 @@ export const inventorySections = (
                     value: numberText(isCreating ? preview.weightKg : row?.weightKg),
                 },
             ],
-        });
+        };
 
     if (
         isWaste &&
@@ -246,8 +320,7 @@ export const inventorySections = (
         row?.referenceRollTotalWeightKg == null &&
         (row?.sampleLengthM != null || row?.sampleNetWeightKg != null)
     )
-        sections.push({
-            id: 'history',
+        sections.history = {
             title: 'Referencia histórica',
             description: 'Datos conservados del registro anterior.',
             fields: [],
@@ -258,14 +331,17 @@ export const inventorySections = (
                     value: numberText(row.sampleNetWeightKg),
                 },
             ],
-        });
+        };
 
     if (
         !(isCreating && options.isPerPiece) &&
-        (isWaste || resource === 'consumables' || options.usesMeasurements)
+        (isWaste ||
+            (isCreating && resource === 'consumables') ||
+            options.usesMeasurements ||
+            row?.base != null ||
+            row?.height != null)
     )
-        sections.push({
-            id: 'measurements',
+        sections.measurements = {
             title: options.isPerPiece
                 ? resource === 'consumables'
                     ? 'Medidas de la unidad (1 × 1)'
@@ -281,36 +357,41 @@ export const inventorySections = (
                     : undefined,
             fields: (['base', 'height'] as const).map((name) => ({
                 name,
-                label: options.isPerPiece
-                    ? name === 'base'
-                        ? 'Multiplicador fijo'
-                        : resource === 'consumables'
-                          ? 'Unidad fija (1)'
-                          : 'Medida por pieza (kg o m)'
-                    : name === 'base'
-                      ? 'Base (m)'
-                      : 'Altura (m)',
+                label: labels[name],
+                hint: options.isPerPiece ? 'Medida unitaria fija.' : 'Medida en metros.',
                 type: 'number',
                 isReadOnly: !isCreating || (isWaste && isRoll) || options.isPerPiece,
                 ...(isCreating && isWaste && isRoll
                     ? { displayValue: String(preview[name] ?? '') }
                     : {}),
             })),
-        });
+        };
 
-    sections.push({
-        id: 'inventory',
+    sections.inventory = {
         title: isWaste
             ? 'Inventario de la merma'
             : resource === 'consumables'
               ? 'Inventario del consumible'
               : 'Inventario del material',
+        summary:
+            !isCreating && !isStock
+                ? [
+                      { label: labels.currentStock, value: numberText(row?.currentStock) },
+                      {
+                          label: 'Cantidad convertida',
+                          value: convertedQuantityText(
+                              row?.convertedQuantity,
+                              row?.unitMeasure ?? '',
+                          ),
+                      },
+                  ]
+                : undefined,
         fields: [
             ...(!isStock || row?.minStock !== undefined
                 ? [
                       {
                           name: 'minStock' as const,
-                          label: 'Stock mínimo',
+                          label: labels.minStock,
                           type: 'number' as const,
                           step: quantityStep,
                           isReadOnly: isStock,
@@ -318,37 +399,23 @@ export const inventorySections = (
                   ]
                 : []),
             ...(!fromPurchase && (!isStock || row?.maxUnitCost !== undefined)
-                ? [
-                      {
-                          name: 'maxUnitCost' as const,
-                          label: 'Costo máximo unitario',
-                          type: 'number' as const,
-                          isReadOnly: isStock,
-                      },
-                  ]
+                ? [{ ...costField, isReadOnly: isStock }]
                 : []),
             ...(!fromPurchase && (!isStock || row?.isActive !== undefined)
-                ? [
-                      {
-                          name: 'isActive' as const,
-                          label: 'Activo',
-                          type: 'checkbox' as const,
-                          isReadOnly: isStock,
-                      },
-                  ]
+                ? [{ ...stateField, isReadOnly: isStock }]
                 : []),
         ],
-    });
-    if ((isCreating || isStock) && !fromPurchase)
-        sections.push({
-            id: 'stock',
-            title: 'Existencias y observaciones',
+    };
+
+    if ((isCreating || isStock) && !fromPurchase) {
+        sections.stock = {
+            title: 'Existencias',
             summary: isCreating
                 ? !isWaste
                     ? [{ label: 'Motivo del movimiento', value: 'Stock inicial' }]
                     : undefined
                 : [
-                      { label: 'Stock actual', value: numberText(row?.currentStock) },
+                      { label: labels.currentStock, value: numberText(row?.currentStock) },
                       {
                           label: 'Cantidad convertida actual',
                           value: convertedQuantityText(
@@ -383,9 +450,13 @@ export const inventorySections = (
                     type: 'number',
                     step: quantityStep,
                 },
-                { name: 'observations', label: 'Observaciones', type: 'textarea', isWide: true },
             ],
-        });
+        };
+        sections.notes = { title: 'Notas del movimiento', fields: [notesField] };
+    }
 
-    return sections;
+    return SECTION_ORDER.flatMap((id) => {
+        const section = sections[id];
+        return section ? [{ id, ...section }] : [];
+    });
 };
