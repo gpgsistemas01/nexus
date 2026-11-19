@@ -375,3 +375,14 @@ La revisión de `CP-INT-REC-CAT-001` incluye dos compras concurrentes con artíc
 `CP-INT-CAT-MAT-001` (`RF-CAT-030`): `catalogControllersDbTest.js` crea MATERIAL/CONSUMABLE por el catálogo administrativo, verifica identidad sin oferta ni ajuste, consulta paginada y edición exclusiva de nombre/mínimo. Manipular tipo/medidas no los modifica; una versión anterior devuelve 409 y conserva datos; entradas inválidas no persisten.
 
 El catálogo cubre edición completa sin proveedor, bloqueo al vincularlo y versión obsoleta. `materialControllerDbTest.js` comprueba alta por ID, identidad confiable, vínculo único, decimales y rollback al rechazar fracciones en PIEZA.
+
+## Alta con surtido inmediato
+
+| Diseño | Riesgo y requisitos | Nivel y técnica | Resultado esperado | Caso |
+| --- | --- | --- | --- | --- |
+| `DP-ISS-010` | `RF-ISS-004`, `RF-WST-002`: alta sin descuento, descuento parcial o surtido desde área operativa. | HTTP/Prisma; decisiones por permiso, opción y existencia suficiente/insuficiente; fracción de merma. | Alta y surtido completos en una transacción. Falta de stock revierte documento y movimientos. Permiso insuficiente devuelve 403 sin escrituras. Sin opción conserva pendiente. | `CP-INT-ISS-010` |
+
+`CP-INT-ISS-010` usa las fixtures privadas de `goodsIssueControllerDbTest.js` y
+`wasteIssueControllerDbTest.js`: Almacén y Sistemas surten al crear; un área
+operativa no puede forzarlo. Comprueba documento, saldo, cantidad entregada y
+movimientos en PostgreSQL; restaura stock y limpia sus documentos al finalizar.

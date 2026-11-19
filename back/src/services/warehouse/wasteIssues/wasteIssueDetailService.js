@@ -23,7 +23,7 @@ import { normalizeWasteIssueResponse, WASTE_ISSUE_INCLUDE } from './wasteIssueHe
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueDetailService');
 
-const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getDb().$transaction(async tx => {
+export const supplyWasteIssue = async ({ id, wasteIssueDto, tx }) => {
     await lockWasteIssue({ tx, id });
 
     const issue = await tx.wasteIssue.findUnique({
@@ -100,7 +100,7 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
     });
 
     return normalizeWasteIssueResponse(updatedIssue);
-});
+};
 
 export const updateWasteIssueDetails = ({ id, wasteIssueDto }) => executeServiceOperation({
     logger: serviceLogger,
@@ -108,5 +108,5 @@ export const updateWasteIssueDetails = ({ id, wasteIssueDto }) => executeService
     model: 'wasteIssue',
     data: { id, ...wasteIssueDto },
     fallbackError: new WasteIssueUpdateDatabaseError(),
-    action: () => updateWasteIssueDetailsTransaction({ id, wasteIssueDto })
+    action: () => getDb().$transaction(tx => supplyWasteIssue({ id, wasteIssueDto, tx }))
 });

@@ -941,7 +941,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../openapi.json#/components/schemas/WasteIssueRequest"
+              "$ref": "../openapi.json#/components/schemas/WasteIssueCreateRequest"
             }
           }
         }
@@ -1634,7 +1634,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../openapi.json#/components/schemas/GoodsIssueRequest"
+              "$ref": "../openapi.json#/components/schemas/GoodsIssueCreateRequest"
             }
           }
         }
@@ -1773,7 +1773,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../openapi.json#/components/schemas/GoodsIssueRequest"
+              "$ref": "../openapi.json#/components/schemas/GoodsIssueCreateRequest"
             }
           }
         }

@@ -1,11 +1,13 @@
 import { createIssueDetailsDto, createIssueHeaderDto, createIssueSupplyDetailsDto } from './issueDTO.js';
 
-export const createWasteIssueDtoForRegister = (body = {}) => ({
+const buildWasteIssueDto = (body = {}) => ({
     ...createIssueHeaderDto(body),
     details: createIssueDetailsDto(body.details, { itemIdField: 'wasteId' })
 });
 
-export const createWasteIssueDtoForEdit = (body = {}) => createWasteIssueDtoForRegister(body);
+export const createWasteIssueDtoForRegister = (body = {}) => ({ ...buildWasteIssueDto(body), ...(body.supplyImmediately === true && { supplyImmediately: true }) });
+
+export const createWasteIssueDtoForEdit = (body = {}) => buildWasteIssueDto(body);
 
 export const createWasteIssueHeaderDtoForEdit = (body = {}) => createIssueHeaderDto(body);
 

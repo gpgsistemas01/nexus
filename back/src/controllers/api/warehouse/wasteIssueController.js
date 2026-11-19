@@ -56,6 +56,8 @@ export const registerWasteIssue = async (req, res) => {
         userId: req.user.id
     });
 
+    if (sanitizedWasteIssueDto.supplyImmediately) emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' });
+
     return res.status(201).json({
         wasteIssue,
         code: successCodeMessages.CREATED_WASTE_ISSUE

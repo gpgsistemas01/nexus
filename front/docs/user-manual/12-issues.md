@@ -51,6 +51,12 @@ Materiales y consumibles requieren al menos una unidad; merma admite cantidades 
 Al surtir, revise **Cantidad surtida** y **Pendiente de surtir** antes de capturar la nueva entrega. Al devolver, revise **Cantidad devuelta** y **Saldo entregado**.
 Solicitar no descuenta inventario.
 
+<!-- manual:any goods:issue-details-manage waste:issues-supply -->
+Almacén y Sistemas pueden marcar **Surtir al guardar** al crear una salida. Entrega
+todas las partidas y descuenta sus existencias en la misma operación. Sin marcar,
+queda pendiente. Si falta stock, no se guarda la salida ni se descuentan partidas.
+<!-- manual:end -->
+
 Seleccione un cliente y artículos con proveedor ya registrado. Si su cuenta pertenece
 a un área operativa y falta un registro, solicite el alta al responsable de Almacén.
 Salidas no ofrece alta de proveedores.

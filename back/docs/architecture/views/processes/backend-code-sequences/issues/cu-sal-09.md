@@ -153,6 +153,9 @@ sequenceDiagram
         activate Prisma
         Prisma-->>Domain: create(): Promise[WasteIssue]
         deactivate Prisma
+        opt supplyImmediately con permiso de surtido
+            Note over Domain,Prisma: supplyWasteIssue reutiliza tx: detalles, stock y movimiento.<br/>Un fallo revierte también el alta.
+        end
         Prisma-->>Domain: commit
         Domain-->>Operation: createWasteIssueTransaction(): Promise[WasteIssue]
         Operation-->>Domain: executeServiceOperation(): Promise[WasteIssue]

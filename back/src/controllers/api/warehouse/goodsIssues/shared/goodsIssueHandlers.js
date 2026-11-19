@@ -32,7 +32,7 @@ export const buildListHandler = findAllGoodsIssues => async (req, res) => {
     return res.status(200).json(result);
 };
 
-export const buildRegisterHandler = createGoodsIssue => async (req, res) => {
+export const buildRegisterHandler = (createGoodsIssue, inventoryContext) => async (req, res) => {
 
     const goodsIssueDto = createGoodsIssueDtoForRegister(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
@@ -41,6 +41,8 @@ export const buildRegisterHandler = createGoodsIssue => async (req, res) => {
         accesses: req.user?.accesses,
         goodsIssueDto: sanitizedGoodsIssueDto
     });
+
+    if (sanitizedGoodsIssueDto.supplyImmediately) emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-supplied' });
 
     return res.status(200).json({
         goodsIssue,

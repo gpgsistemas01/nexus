@@ -1,3 +1,6 @@
+import { supplyWasteIssue } from './wasteIssueDetailService.js';
+import { buildInitialIssueSupplyDetails } from '../issues/issueSupplyRules.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import { DOCUMENT_REFERENCE_TYPES } from '../../../constants/documentReferenceTypes.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
@@ -21,7 +24,7 @@ import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
 import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
-import { assertIssueDepartmentAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
+import { assertIssueDepartmentAccess, assertIssueImmediateSupplyAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
 import { assertIssueNotCanceled } from '../issues/issueFulfillmentRules.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
@@ -95,7 +98,7 @@ const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb()
 
     const statusIds = await findWasteIssueFulfillmentStatusIds(tx);
     const pendingStatusId = statusIds.get(FULFILLMENT_STATUS_NAMES.PENDING);
-    const { details: requestedDetails, ...headerDto } = wasteIssueDto;
+    const { details: requestedDetails, supplyImmediately, ...headerDto } = wasteIssueDto;
     const details = await buildWasteIssueDetails({
         tx,
         details: requestedDetails,
@@ -115,6 +118,10 @@ const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb()
         include: WASTE_ISSUE_INCLUDE
     });
 
+    if (supplyImmediately) return supplyWasteIssue({
+        id: issue.id, tx,
+        wasteIssueDto: { details: buildInitialIssueSupplyDetails(issue.details) }
+    });
     return normalizeWasteIssueResponse(issue);
 });
 
@@ -126,6 +133,7 @@ export const createWasteIssue = async ({ wasteIssueDto, userId, accesses = [] })
     fallbackError: new WasteIssueCreateDatabaseError(),
     action: () => {
         assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
+        if (wasteIssueDto.supplyImmediately) assertIssueImmediateSupplyAccess({ accesses, permission: PERMISSIONS.WASTE_ISSUES_SUPPLY });
         return createWasteIssueTransaction({ wasteIssueDto, userId });
     }
 });

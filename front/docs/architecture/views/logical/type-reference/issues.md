@@ -74,7 +74,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 20, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 21, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -91,6 +91,8 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `itemLabel` | `itemLabel: string;` |
 | `selects` | `selects: IssueHeaderSelect[];` |
 | `canCreateClient` | `canCreateClient: boolean;` |
+| `canSupplyOnCreate` | `canSupplyOnCreate: boolean;` |
+| `supplyImmediately` | `supplyImmediately: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -102,7 +104,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 35, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 38, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -114,6 +116,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `remove` | `remove: [id: string];` |
 | `supply` | `supply: [id: string, changes: IssueSupplyChanges];` |
 | `return` | `return: [detail: IssueDetail];` |
+| `update:supplyImmediately` | `'update:supplyImmediately': [value: boolean];` |
 | `submit` | `submit: [];` |
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |

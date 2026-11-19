@@ -182,8 +182,11 @@ sequenceDiagram
             Note over Core: CONSUMABLE selecciona SCO
             Core->>Reference: generateYearlyReferenceNumber({ tx, type: referenceType })
             Core->>Prisma: tx.goodsIssue.create({ data: { type, referenceNumber, ... } })
+            opt supplyImmediately con permiso de surtido
+                Note over Core,Prisma: supplyGoodsIssue reutiliza tx: detalles, stock y movimiento.<br/>Si falla una partida, rollback del alta completa.
+            end
         end
-        Prisma-->>Core: commit de salida pendiente
+        Prisma-->>Core: commit de salida pendiente o surtida
         Core-->>Facade: createGoodsIssue(): Promise[GoodsIssue]
     else Error de dominio o persistencia
         Core-->>Facade: error — rollback si falló la transacción

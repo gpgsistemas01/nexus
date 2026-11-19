@@ -118,6 +118,9 @@ const openReturnDialog = (line: IssueDetail) => {
         :item-label="ISSUE_CONFIG[resource].item"
         :selects="selects"
         :can-create-client="canCreateClient"
+        :can-supply-on-create="editor.canSupplyOnCreate.value"
+        :supply-immediately="editor.supplyImmediately.value"
+        @update:supply-immediately="editor.supplyImmediately.value = $event"
         @create-client="
             emit('createClient', { search: $event, onCreated: headerSelection.selectCreatedClient })
         "

@@ -98,3 +98,8 @@ documento y surtido antes de resolver participantes. `assertIssueNotCanceled`, d
 una salida cancelada responde `409 ISSUE_CANCELED_CONFLICT` también ante una petición
 HTTP directa, sin modificar encabezado, detalles ni existencias. Los estados pendientes,
 parciales y surtidos conservan sus posibilidades de edición de encabezado.
+
+El alta acepta `supplyImmediately` sólo con permiso de surtido. Reutiliza el servicio
+de surtido con el `tx` del alta: documento, detalles, stock y movimiento se
+confirman o revierten juntos. Las cantidades de proyecto se toman de la conversión
+calculada por el servidor. Sin la opción, la solicitud queda pendiente.

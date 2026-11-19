@@ -11,7 +11,7 @@ Se inspeccionan 199 archivos TS/SFC y se describen 259 contratos declarados.
 | [catalogs](catalogs.md) | 14 | 60 |
 | [directory](directory.md) | 12 | 35 |
 | [identity](identity.md) | 21 | 82 |
-| [issues](issues.md) | 50 | 234 |
+| [issues](issues.md) | 50 | 237 |
 | [movements](movements.md) | 10 | 38 |
 | [purchases](purchases.md) | 36 | 169 |
 | [warehouse](warehouse.md) | 40 | 219 |

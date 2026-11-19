@@ -113,7 +113,7 @@ sequenceDiagram
     IssueDto-->>Controller: createWasteIssueDetailsDtoForEdit(): Object (wasteIssueDto)
     deactivate IssueDto
     Controller->>Service: updateWasteIssueDetails({ id, wasteIssueDto: sanitizedWasteIssueDto })
-    Service->>Service: updateWasteIssueDetailsTransaction({ id, wasteIssueDto })
+    Service->>Service: supplyWasteIssue({ id, wasteIssueDto })
     Service->>FileBaseRepository: getDb()
     FileBaseRepository-->>Service: getDb(): PrismaClient | TransactionClient — tx si se recibió
     Service->>Prisma: db.$transaction(async tx => ...)

@@ -2,6 +2,7 @@
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
+import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VAlert } from 'vuetify/components/VAlert';
 import { FORM_FIELD_LIMITS } from '@nexus/input-validation';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
@@ -31,6 +32,8 @@ defineProps<{
     itemLabel: string;
     selects: IssueHeaderSelect[];
     canCreateClient: boolean;
+    canSupplyOnCreate: boolean;
+    supplyImmediately: boolean;
 }>();
 const emit = defineEmits<{
     update: [field: IssueField, value: string | IssueDetail[]];
@@ -41,6 +44,7 @@ const emit = defineEmits<{
     remove: [id: string];
     supply: [id: string, changes: IssueSupplyChanges];
     return: [detail: IssueDetail];
+    'update:supplyImmediately': [value: boolean];
     submit: [];
     close: [];
     reload: [];
@@ -158,6 +162,15 @@ const emit = defineEmits<{
             </VCol>
         </VRow>
         <h3>Detalles de la salida</h3>
+        <VCheckbox
+            v-if="canSupplyOnCreate"
+            label="Surtir al guardar"
+            hint="Entrega toda la cantidad solicitada y descuenta las existencias al guardar."
+            persistent-hint
+            :model-value="supplyImmediately"
+            :disabled="isSubmitting"
+            @update:model-value="emit('update:supplyImmediately', $event === true)"
+        />
         <VAlert
             v-if="errors.details"
             type="error"
