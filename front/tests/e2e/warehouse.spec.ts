@@ -319,7 +319,7 @@ test(
   'materiales: alta desde catálogo, edición versionada y baja de la relación correcta',
   { tag: '@essential' },
   async ({ page }) => {
-    await mockWarehouse(page);
+    await mockWarehouse(page, [...user.permissions, 'suppliers:page-view', 'suppliers:update']);
     const writes: { url: string; method: string; body: unknown }[] = [];
     await page.route('**/api/warehouse/materials**', async (route) => {
       if (route.request().method() === 'GET') return route.fallback();
