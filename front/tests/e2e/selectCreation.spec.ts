@@ -228,45 +228,39 @@ for (const path of ['materiales', 'consumibles', 'mermas']) {
   });
 }
 
-test(
-  'select: permisos y catálogos de consulta no ofrecen altas',
-  { tag: '@essential' },
-  async ({ page }) => {
-    await mockWarehouse(page);
-    await page.goto('/almacen/materiales');
-    await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
-    await page
-      .getByRole('combobox', { name: 'Proveedor', exact: true })
-      .fill('Proveedor sin permiso');
-    await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
-    await mockPurchases(
-      page,
-      purchasePermissions.filter((permission) => permission !== 'materials:write'),
-    );
-    await page.goto('/compras/materiales');
-    await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
-    await page
-      .getByRole('dialog', { name: 'Registrar compra', exact: true })
-      .getByRole('combobox', { name: 'Proveedor', exact: true })
-      .click();
-    await page.getByRole('option', { name: 'Proveedor Central', exact: true }).click();
-    await page
-      .getByRole('combobox', { name: 'Material', exact: true })
-      .fill('Artículo sin permiso');
-    await expect(page.getByRole('button', { name: /Registrar material/ })).toHaveCount(0);
-    await mockIssues(
-      page,
-      issuePermissions.filter((permission) => permission !== 'clients:create'),
-    );
-    await page.goto('/salidas/materiales');
-    await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
-    await page
-      .getByRole('dialog', { name: 'Registrar salida', exact: true })
-      .getByRole('combobox', { name: 'Cliente', exact: true })
-      .fill('Cliente sin permiso');
-    await expect(page.getByRole('button', { name: /Registrar cliente/ })).toHaveCount(0);
-  },
-);
+test('select: permisos y catálogos de consulta no ofrecen altas', async ({ page }) => {
+  await mockWarehouse(page);
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+  await page
+    .getByRole('combobox', { name: 'Proveedor', exact: true })
+    .fill('Proveedor sin permiso');
+  await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
+  await mockPurchases(
+    page,
+    purchasePermissions.filter((permission) => permission !== 'materials:write'),
+  );
+  await page.goto('/compras/materiales');
+  await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: 'Registrar compra', exact: true })
+    .getByRole('combobox', { name: 'Proveedor', exact: true })
+    .click();
+  await page.getByRole('option', { name: 'Proveedor Central', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Material', exact: true }).fill('Artículo sin permiso');
+  await expect(page.getByRole('button', { name: /Registrar material/ })).toHaveCount(0);
+  await mockIssues(
+    page,
+    issuePermissions.filter((permission) => permission !== 'clients:create'),
+  );
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: 'Registrar salida', exact: true })
+    .getByRole('combobox', { name: 'Cliente', exact: true })
+    .fill('Cliente sin permiso');
+  await expect(page.getByRole('button', { name: /Registrar cliente/ })).toHaveCount(0);
+});
 
 test('select: permite abrir el alta con teclado cuando la búsqueda no tiene resultados', async ({
   page,

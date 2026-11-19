@@ -7,7 +7,7 @@ import { historicalPreview, historicalReceipt } from '../fixtures/historicalDeli
 for (const width of [1280, 600, 599, 390]) {
   test(
     `entregas históricas: selección, declaración y recuperación a ${width}px`,
-    { tag: '@essential' },
+    { tag: width === 1280 || width === 390 ? '@essential' : [] },
     async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await mockIssues(page, [...issuePermissions, 'issues:reconcile']);

@@ -162,21 +162,21 @@ No se deduce cobertura total de conteos aprobados ni rendimiento de producción 
 
 ## Selección de navegador en CI
 
-Los push a `features` y los pull requests ejecutan `npm run test:e2e:essential`: casos marcados
-`@essential` de login/refresh, permisos operativos, alta/edición/conflicto,
-compras y salidas, surtido/devolución, reportes, importación con recuperación,
-histórico y selectores auxiliares. Las variantes por recurso de estos recorridos
-se conservan cuando cambian contratos o permisos. CI usa dos trabajadores de
-Playwright para archivos con sesiones y respuestas simuladas independientes.
+Cada push y pull request ejecuta las suites unitarias e integración del backend y
+las comprobaciones de Vue (lint, formato, documentación, unitarias y build). El
+navegador simulado ejecuta sólo los casos `@essential`, seleccionados por riesgo:
+sesión, permisos, importación, operaciones de compra y salida, existencias,
+selectores y flujos representativos por tipo. Una clave común por SHA cancela la
+ejecución duplicada cuando el mismo commit activa push y pull request.
 
-Las unitarias y las pruebas de sistema con Express/PostgreSQL siguen completas.
-Las matrices de móvil, anchuras, rutas, fallos y estados adicionales se conservan
-en `npm run test:e2e`. La regresión completa se ejecuta en los push a `main`/`master` y está disponible en GitHub Actions
-mediante **Run workflow → browser_suite: full** y debe ejecutarse antes de publicar
-y al modificar componentes compartidos, navegación o permisos. La selección esencial
-no acredita todas esas combinaciones visuales; no se retiran pruebas ni se sustituyen
-por unitarias cuando observan interacciones de navegador.
+Las variantes de anchura, recurso y error que no son esenciales permanecen en
+`npm run test:e2e`. La regresión completa y la prueba de sistema con Express y
+PostgreSQL aislado se ejecutan juntas desde GitHub Actions con **Run workflow →
+browser_suite: full**, antes de publicar y al cambiar componentes compartidos,
+navegación o permisos. Esto conserva los niveles unitario e integración en cada
+cambio y evita instalar un segundo backend y una segunda base para cada push.
+Los JUnit conservan el resultado de la selección que sí se ejecutó.
 
-Al cambiar un recorrido esencial, mantener su marca y las variantes necesarias.
-Al cambiar una regla compartida, ejecutar además los archivos afectados de la suite
-completa. Los reportes JUnit conservan el resultado de la selección ejecutada.
+Al modificar un recorrido esencial, conservar su marca y las variantes que cubren
+contratos distintos. Al cambiar una regla compartida, ejecutar además los archivos
+afectados de la regresión completa.

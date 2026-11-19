@@ -71,9 +71,12 @@ contiene la contraseña temporal; no completarlo ni distribuirlo. JUnit `system.
 trazas quedan ignorados; las trazas pueden contener datos de sesión. Tras una
 interrupción, retirar sólo los IDs propios o desechar la base efímera.
 
-La [CI](../../../.github/workflows/ci.yml) queda configurada para ejecutar este recorrido en Node 24,
-con PostgreSQL local aislado, además de conservar las suites unitarias y de navegador
-simulado en Node 24. Publica el JUnit junto a los otros resultados.
+La [CI](../../../.github/workflows/ci.yml) ejecuta este recorrido en Node 24 con
+PostgreSQL local aislado cuando se inicia **Run workflow → browser_suite: full**.
+Las ejecuciones automáticas de push y pull request conservan las suites unitarias,
+de integración y los flujos esenciales con API simulada; omiten la instalación de
+otro backend y la base dedicada de este recorrido. El JUnit se publica junto a los
+otros resultados de esa ejecución manual.
 Esto añade evidencia de la unión cliente/servidor; no acredita por sí solo todos
 los roles, reportes, cálculos ni rollbacks de inventario. Esas integraciones
 permanecen en `back/tests`.

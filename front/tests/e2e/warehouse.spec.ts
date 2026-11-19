@@ -882,7 +882,7 @@ for (const [path, resource, label, type] of [
 ] as const) {
   test(
     `almacén ${resource}: registra artículo antes del proveedor y conserva stock`,
-    { tag: '@essential' },
+    { tag: resource === 'materials' ? '@essential' : [] },
     async ({ page }) => {
       const { store, writes: catalogWrites } = await mockCatalogs(page, [
         ...user.permissions,

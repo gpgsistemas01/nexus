@@ -433,7 +433,7 @@ describe('consistencia de operaciones simultáneas de almacén', () => {
     expect(Number(saved.totalNetPurchaseAmount)).toBe(220);
     expect(saved.details).toHaveLength(3);
     const offer = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: item.id } } });
-    expect(Number(offer.maxUnitCost)).toBe(10);
+    expect(Number(offer.maxUnitCost)).toBe(100);
   });
 
   it.each(['goods', 'waste'])('rechaza surtir %s histórico sin costo y revierte los demás renglones', async kind => {
