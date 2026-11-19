@@ -1,7 +1,7 @@
 <a id="cu-ent-07"></a>
 # `CU-ENT-07` — Consultar compras de consumible
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 

@@ -1,7 +1,7 @@
 <a id="cu-cat-04"></a>
 # `CU-CAT-04` — Generar reporte de proveedores
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

@@ -1,7 +1,7 @@
 <a id="cu-cat-06"></a>
 # `CU-CAT-06` — Crear cliente
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 El listado de Sistemas y el selector de una salida reutilizan el mismo `POST`. El permiso
 `clients:create` autoriza el alta contextual de Almacén; `clients:page-view` continúa siendo un

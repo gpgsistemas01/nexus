@@ -1,7 +1,7 @@
 <a id="cu-cat-25"></a>
 # `CU-CAT-25` — Crear estado de cumplimiento
 
-**Patrones:** `BE-P02`.
+**Patrones:** `[BE-P02](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

@@ -2,19 +2,19 @@
 
 ## Propósito y relación con las referencias técnicas
 
-Esta colección explica decisiones aplicadas al servidor HTTP: el problema que resuelven,
-su implementación, variantes y límites. Los mapas de módulos pertenecen a las
+Esta colección describe mecanismos compartidos del servidor HTTP, su implementación,
+consumidores y límites. Los mapas de módulos pertenecen a las
 [referencias técnicas de la API](../backend-technical-documentation/index.md); los
 contratos de sus núcleos y configuradores, a [reutilización](../reuse-and-refactoring/index.md).
 La estructura de Vue pertenece a la documentación del frontend.
 
-Los capítulos iniciales identifican soluciones confirmadas; los siguientes explican
-arquitectura y mecanismos de la API. El [estándar de codificación](../../../coding-standards/index.md)
-conserva las reglas normativas de estilo y organización.
+Los capítulos describen arquitectura, entrada HTTP, composición, persistencia y pruebas.
+El [estándar de codificación](../../../coding-standards/index.md) contiene las reglas
+normativas de estilo y organización.
 
-Por cada decisión se mantiene una figura que explique configuración o colaboración.
-Cuando el mapa de un módulo o de reutilización ya responde la pregunta, se enlaza esa
-fuente. Las secuencias de procesos complementan la explicación temporal.
+Cada figura identifica los archivos y colaboradores que muestra. Los mapas de módulos,
+la [reutilización](../reuse-and-refactoring/index.md) y las secuencias contienen el
+detalle propio de cada capacidad.
 
 ## Capítulos
 
@@ -59,9 +59,9 @@ repiten la colaboración que ya explica el diagrama enlazado.
 | Responsabilidades y sustitución funcional | [`DIA-SOLID-LECT-001`](15-solid-principles.md#colaboradores-de-lectura-y-contrato-de-sustitución) | [Evaluación SOLID](15-solid-principles.md); son principios, no otro patrón. |
 | Entradas y respuestas seguras | [`DIA-SEC-FRO-001`](../../../coding-standards/09-errors-security-audit-and-logging.md#fronteras-de-una-escritura-de-formulario) | [Estándar de seguridad de la API](../../../coding-standards/09-errors-security-audit-and-logging.md). |
 
-Cada explicación conecta problema, implementación, contrato, configuradores, consumidores
-y límites. La refactorización tiene una representación de extracción y una guía de
+Cada capítulo enlaza el contrato y los consumidores relevantes. La refactorización
+tiene una representación de extracción y una guía de
 revisión en [refactorización y extensión](../reuse-and-refactoring/04-refactoring-and-extension.md); se representa el resultado
 vigente o, si existe una migración aprobada, un antes/después rotulado como actual y
 objetivo. Al cambiar un patrón se actualizan su diagrama canónico, consumidores y
-pruebas; el historial mecánico de archivos permanece en Git.
+pruebas.

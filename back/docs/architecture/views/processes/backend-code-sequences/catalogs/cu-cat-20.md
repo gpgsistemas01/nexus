@@ -1,7 +1,7 @@
 <a id="cu-cat-20"></a>
 # `CU-CAT-20` — Editar unidad de medida
 
-**Patrones:** `BE-P02`.
+**Patrones:** `[BE-P02](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

@@ -1,7 +1,7 @@
 <a id="cu-cat-07"></a>
 # `CU-CAT-07` — Editar cliente
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 

@@ -1,7 +1,7 @@
 <a id="cu-sal-02"></a>
 # `CU-SAL-02` — Crear salida de material
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
 Si el selector crea un cliente, antes de esta secuencia el navegador completa el `POST
 /api/sales/clients` de [`CU-CAT-06`](../catalogs/cu-cat-06.md#cu-cat-06). La salida recibe el

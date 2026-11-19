@@ -22,7 +22,7 @@ sus manuales y diagramas.
 | `RF-AUT-002` | Renovación de sesión durante cualquier operación protegida. |
 | `RF-IAM-003` | `CU-IDA-06/07`: áreas y roles de las cuentas. |
 | `RF-CAT-005`, `RF-CAT-019` a `RF-CAT-021` | Selectores de las altas y ediciones; mantenimiento en `CU-CAT-09` a `CU-CAT-26`. |
-| `RF-REC-006` | `CU-ALM-02`, `CU-ENT-02`: una marca que distingue físicamente el material se registra como otra identidad de catálogo antes de recibirlo. |
+| `RF-REC-006` | `CU-ALM-26`, `CU-ENT-02`: una marca que distingue físicamente el material se registra como otra identidad de catálogo antes de recibirlo. |
 | `RF-REC-009` | `CU-ENT-02/08`: folios de compra separados por contexto. |
 | `RF-REC-010` | `CU-ENT-06/12`: contexto, archivo y hoja del reporte de compras. |
 | `RF-REC-011` | `CU-ENT-01` a `CU-ENT-12`: documentos y detalles del mismo contexto. |

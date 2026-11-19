@@ -1,7 +1,7 @@
 <a id="cu-alm-15"></a>
 # `CU-ALM-15` — Consultar movimientos de mermas
 
-**Patrones:** `BE-P06`.
+**Patrones:** `[BE-P06](../../../development/design-and-construction-patterns/03-patterns-in-code.md#estructura-por-dominio-capas-y-fronteras)`.
 
 ## Participantes y trazabilidad
 

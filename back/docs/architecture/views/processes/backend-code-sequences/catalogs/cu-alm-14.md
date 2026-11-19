@@ -1,7 +1,7 @@
 <a id="cu-alm-14"></a>
 # `CU-ALM-14` — Generar reporte de mermas
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

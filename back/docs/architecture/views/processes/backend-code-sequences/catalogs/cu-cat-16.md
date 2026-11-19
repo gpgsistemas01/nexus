@@ -1,7 +1,7 @@
 <a id="cu-cat-16"></a>
 # `CU-CAT-16` — Crear presentación
 
-**Patrones:** `BE-P02`.
+**Patrones:** `[BE-P02](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

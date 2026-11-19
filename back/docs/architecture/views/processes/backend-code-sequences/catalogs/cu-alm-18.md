@@ -1,7 +1,7 @@
 <a id="cu-alm-18"></a>
-# `CU-ALM-18` — Crear consumible
+# `CU-ALM-18` — Crear existencia de consumible
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
 ```mermaid
 sequenceDiagram

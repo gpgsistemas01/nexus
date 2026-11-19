@@ -1,7 +1,7 @@
 <a id="cu-alm-24"></a>
 # `CU-ALM-24` — Generar reporte de movimientos de consumibles
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

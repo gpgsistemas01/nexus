@@ -1,7 +1,7 @@
 <a id="cu-aut-01"></a>
 # `CU-AUT-01` — Iniciar sesión
 
-**Patrones:** `BE-P01`, `BE-P08`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P08](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 

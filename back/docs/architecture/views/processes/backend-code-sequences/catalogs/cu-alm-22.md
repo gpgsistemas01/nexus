@@ -1,7 +1,7 @@
 <a id="cu-alm-22"></a>
 # `CU-ALM-22` — Generar reporte de inventario de consumibles
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

@@ -51,4 +51,4 @@ sequenceDiagram
 
 ## Secuencias relacionadas
 
-[DIA-VUE-SEQ-010](../02-shared-runtime/03-remote-lookup.md#secuencia-aplicada).
+[DIA-VUE-SEQ-010](../02-shared-runtime/03-remote-lookup.md).

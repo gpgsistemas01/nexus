@@ -2,11 +2,12 @@
 
 ## Alcance y clasificación
 
-Catálogo es una función de datos maestros, no el nombre de una sola capa. Nexus tiene
-seis catálogos auxiliares administrados mediante un módulo común, consultas operativas
-propias para alimentar selectores y recursos con reglas particulares (clientes,
-proveedores, materiales, consumibles y mermas). Estos últimos conservan sus módulos y
-permisos; no pertenecen a `MANAGED_CATALOGS`.
+El módulo administrativo gestiona seis catálogos auxiliares y el catálogo de artículos.
+Artículos usa el mismo endpoint, con validaciones y persistencia propias; sus existencias
+y relaciones con proveedores pertenecen a los módulos operativos de Almacén.
+Clientes, proveedores, consumibles y mermas conservan sus módulos y permisos.
+El contrato funcional de Artículos y de las altas de existencias está en
+[`RF-CAT-030/031`](../../../../../../front/docs/requirements/requirements-specification/catalog/02-catalogs-operational-and-commercial.md#criterios-de-alta-de-artículos).
 
 ## Archivos del módulo administrativo
 
@@ -19,12 +20,11 @@ flowchart TB
     api["catalogApiRoute.js"] --> controller["controllers/api/admin<br/>catalogController.js"]
     api --> auth["authMiddleware.js<br/>permissions.js"]
     api --> validators["catalogValidations.js<br/>validatorMiddleware.js"]
-    web --> auth
     controller --> service["catalogService.js<br/>consulta · creación · edición"]
-    webController --> service
     validators --> registry["constants/catalogs.js<br/>MANAGED_CATALOGS · NAMES"]
     service --> registry
     service --> db["baseRepository.js<br/>getDb()[catalog.model]"]
+    service --> material["warehouse/materials/materialService.js<br/>Artículos"]
 ```
 
 | Responsabilidad | Archivos bajo `src/` |
@@ -36,11 +36,11 @@ flowchart TB
 | Resolución, invariantes y persistencia | `services/admin/catalogService.js`<br/>`repository/baseRepository.js` |
 | Validación y acceso | `validators/forms/catalogValidations.js`<br/>`middleware/validatorMiddleware.js`<br/>`middleware/authMiddleware.js`<br/>`constants/permissions.js` |
 
-## Configuración de los seis catálogos
+## Catálogos auxiliares
 
 Fuente: `src/constants/catalogs.js`. `model` es el delegado del cliente Prisma;
 la correspondencia con el modelo está definida en `prisma/schema.prisma`.
-Todos admiten `isActive` booleano, además de los campos de texto indicados.
+Estos seis registros admiten `isActive` booleano, además de los campos indicados.
 
 | Clave de página y API | Etiqueta | Delegado / modelo Prisma | Texto permitido y longitud máxima |
 | --- | --- | --- | --- |
@@ -50,6 +50,14 @@ Todos admiten `isActive` booleano, además de los campos de texto indicados.
 | `unit-measures` | Unidades de medida | `unitMeasure` / `UnitMeasure` | `name`: 20; `symbol`: 10 |
 | `reasons` | Motivos de ajuste | `stockAdjustmentReason` / `StockAdjustmentReason` | `name`: 100 |
 | `fulfillment-statuses` | Estados de cumplimiento | `fulfillmentStatus` / `FulfillmentStatus` | `name`: 50 |
+
+## Catálogo de artículos
+
+La clave `materials` también usa `MANAGED_CATALOGS`. Su etiqueta visible es **Artículos**;
+el registro almacena `name`, `type`, `presentationId`, `unitMeasureId`, `base`, `height`
+y `minStock`. La validación se delega a `materialCatalogValidation` y
+`materialCatalogEditValidation`, y las operaciones al servicio de materiales. No usa
+`isActive` ni la validación CRUD genérica de los catálogos auxiliares.
 
 El validator resuelve cada clave con `findManagedCatalog` y aplica
 los límites del catálogo; el servicio vuelve a resolver la clave y usa `catalogDTO`
@@ -65,11 +73,11 @@ en el servicio, sin confundirlos con unidades UTF-16.
 
 | Frontera | Contrato verificable |
 | --- | --- |
-| Administración | El registro API monta `/api/admin/catalogs`; el router ofrece GET `/:catalog`, POST `/:catalog` y PUT `/:catalog/:id`. Exige token y `catalogs:manage` a nivel de router. No declara DELETE. |
+| Administración | El registro API monta `/api/admin/catalogs`; el router ofrece GET `/:catalog`, POST `/:catalog` y PUT `/:catalog/:id`. Exige token. Los catálogos auxiliares requieren `catalogs:manage`; Artículos acepta `catalogs:manage` o `material-catalogs:manage`. Este último también autoriza GET de presentaciones y unidades para los selectores. No declara DELETE. |
 | Listado | El controller obtiene paginación/búsqueda; `findAllCatalogEntries` ordena por nombre y devuelve `data`, `recordsTotal` y `recordsFiltered`. Incluye activos e inactivos. |
 | Escrituras | Devuelven `data` y código de éxito. Desactivar/reactivar es editar `isActive`; el servicio no implementa borrado físico ni una operación separada de desactivación. |
 | Errores | `CatalogNotFound` rechaza claves ajenas al registro; `CatalogValidationError` rechaza datos inválidos. En edición, `P2025` y `P2023` se traducen a `CatalogEntryNotFound`; otros errores se propagan. |
-| Página y metadata | `/catalogos/:catalog` exige cookie de sesión y `catalogs:manage`. `getManagedCatalog` entrega nombre, campos, longitudes y etiquetas al controller web; omite `model`. La configuración del navegador se detalla en la [referencia frontend](../../../../../../front/docs/architecture/views/development/code-structure.md). |
+| Interfaz | Vue obtiene las etiquetas y campos de `PUBLIC_CATALOGS`, compartido desde `src/shared/constants/catalogs.js`, y consulta `/api/admin/catalogs/:catalog`. `catalogs:manage` administra los catálogos auxiliares; Artículos usa `material-catalogs:manage`. |
 
 Los nombres de roles y áreas participan en `constants/permissions.js`; crear o renombrar
 un registro no modifica esas políticas. Los nombres de estados se usan mediante
@@ -81,11 +89,11 @@ estos catálogos, no capacidades de configuración dinámica de permisos o estad
 
 ## Lecturas operativas de los mismos datos
 
-La administración y los selectores consultan los mismos modelos mediante módulos
-separados. Los routers de lectura tienen permisos propios, sus servicios filtran
-`isActive: true` para opciones y el navegador conserva adaptadores Select2 por recurso.
-Desactivar deja la fila persistida; ese filtro de opciones no elimina referencias
-históricas ni implica que toda consulta interna filtre activos.
+La administración y las consultas operativas usan los mismos modelos mediante módulos
+separados. Las rutas operativas tienen permisos propios y filtran `isActive: true` para
+opciones. Vue las consulta desde los servicios de cada módulo mediante `RemoteSelect`.
+Desactivar conserva la fila; el filtro de opciones no elimina referencias históricas ni
+implica que toda consulta interna filtre activos.
 
 | Catálogo | Ruta de lectura bajo `/api` | Servicio bajo `src/services` |
 | --- | --- | --- |
@@ -95,6 +103,7 @@ históricas ni implica que toda consulta interna filtre activos.
 | Unidades | `/warehouse/unit-measures` | `warehouse/unitMeasureService.js` |
 | Motivos | `/warehouse/reasons` | `warehouse/reasonService.js` |
 | Cumplimiento | `/warehouse/fulfillment-statuses` | `warehouse/fulfillmentStatusService.js` |
+| Artículos | `/warehouse/materials` | `warehouse/materials/materialService.js` |
 
 El [mapa de lecturas operativas](03-shared-code-and-coverage.md#lecturas-operativas-y-reportes)
 posee sus imports. El [patrón del registro](../design-and-construction-patterns/08-catalog-registry-and-allowlist.md)

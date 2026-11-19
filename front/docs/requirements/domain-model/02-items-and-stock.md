@@ -67,9 +67,11 @@ permite leer las cardinalidades sin cruzar los vínculos comerciales con los cat
 
 ## Interpretación y restricciones
 
+La identidad de Material se registra en Artículos y puede existir sin ofertas.
 El stock de materiales y consumibles pertenece a cada oferta artículo–proveedor. Esa
-combinación es única; otro proveedor crea otra oferta del mismo artículo. Material y
-consumible son clasificaciones separadas; el consumible no tiene dimensiones.
+combinación es única; otro proveedor crea otra oferta de la misma identidad. Material y
+consumible son clasificaciones separadas; los consumibles sólo tienen medidas `1 × 1`
+cuando su presentación es KILOGRAMOS o METRO LINEAL.
 
 La merma conserva proveedor y stock propios. Al registrarla usa un material como
 plantilla y puede precargar pesos de su oferta; los datos guardados de la merma no se

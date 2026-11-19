@@ -1,7 +1,7 @@
 <a id="cu-alm-07"></a>
 # `CU-ALM-07` — Consultar movimientos de materiales
 
-**Patrones:** `BE-P06`.
+**Patrones:** `[BE-P06](../../../development/design-and-construction-patterns/03-patterns-in-code.md#estructura-por-dominio-capas-y-fronteras)`.
 
 ## Participantes y trazabilidad
 

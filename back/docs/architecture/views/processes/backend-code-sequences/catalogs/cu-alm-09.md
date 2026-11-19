@@ -1,7 +1,7 @@
 <a id="cu-alm-09"></a>
 # `CU-ALM-09` — Consultar mermas
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 

@@ -1,7 +1,7 @@
 <a id="cu-ida-01"></a>
 # `CU-IDA-01` — Consultar personas
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 

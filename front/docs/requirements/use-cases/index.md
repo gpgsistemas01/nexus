@@ -1,6 +1,6 @@
 # Casos de uso del cliente Vue
 
-Las 94 fichas describen las tareas del usuario y las respuestas de Nexus.
+Las fichas describen las tareas del usuario y las respuestas de Nexus.
 
 ## Catálogo por familia
 

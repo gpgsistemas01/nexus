@@ -8,6 +8,10 @@ que se inician desde ella; las asociaciones actor–caso fijan quién puede ejec
 El ajuste se asocia sólo con el Administrador. El reporte se asocia con Personal de
 almacén y el Administrador hereda esa participación.
 
+El mantenimiento del catálogo de Artículos es una capacidad independiente de las
+existencias por proveedor. Sólo los usuarios con `material-catalogs:manage` pueden
+consultarla y modificar identidades.
+
 ## Materiales
 
 **Identificador:** `DIA-VUE-CU-004`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
@@ -27,7 +31,7 @@ direction LR
 
     systemBoundary warehousePackage1["Nexus · Materiales"]
         ucMaterialQuery("CU-ALM-01 Consultar materiales")
-        ucMaterialCreate("CU-ALM-02 Crear material")
+        ucMaterialCreate("CU-ALM-02 Crear existencia de material")
         ucMaterialEdit("CU-ALM-03 Editar material")
         ucMaterialRemove("CU-ALM-04 Retirar material")
         ucMaterialInventoryReport("CU-ALM-06 Generar reporte de inventario de materiales")
@@ -45,6 +49,38 @@ direction LR
     ucMaterialInventoryReport ..>:extend ucMaterialQuery
     ucMaterialStock ..>:extend ucMaterialQuery
 ```
+
+## Artículos
+
+**Identificador:** `DIA-VUE-CU-013`. **Pregunta:** ¿quién consulta y mantiene las identidades de artículos?
+
+**Fuente:** `APP_NAVIGATION`, permisos de catálogo y fichas `CU-ALM-25` a `CU-ALM-27`.
+
+```mermaid
+usecase-beta
+%%{init: {"layout": "dagre"}}%%
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary articleCatalog["Nexus · Artículos"]
+        articlesQuery("CU-ALM-25 Consultar artículos")
+        articleCreate("CU-ALM-26 Crear artículo")
+        articleEdit("CU-ALM-27 Editar artículo")
+        materialOffer("CU-ALM-02 Crear existencia de material")
+        consumableOffer("CU-ALM-18 Crear existencia de consumible")
+    end
+
+    warehouse -- articlesQuery
+    articlesQuery -- articleCreate
+    articlesQuery -- articleEdit
+    articleCreate ..>:extend materialOffer
+    articleCreate ..>:extend consumableOffer
+```
+
+Los vínculos con proveedor y las existencias se gestionan desde sus flujos de
+[Almacén](../use-cases/warehouse/index.md) y [Compras](../use-cases/purchases/index.md).
 
 ## Mermas
 
@@ -99,7 +135,7 @@ direction LR
 
     systemBoundary warehousePackage3["Nexus · Consumibles"]
         ucConsumableQuery("CU-ALM-17 Consultar consumibles")
-        ucConsumableCreate("CU-ALM-18 Crear consumible")
+        ucConsumableCreate("CU-ALM-18 Crear existencia de consumible")
         ucConsumableEdit("CU-ALM-19 Editar consumible")
         ucConsumableRemove("CU-ALM-20 Retirar consumible")
         ucConsumableReport("CU-ALM-22 Generar reporte de inventario de consumibles")

@@ -1,7 +1,7 @@
 <a id="cu-sal-03"></a>
 # `CU-SAL-03` — Editar encabezado de salida de material
 
-**Patrones:** `BE-P01`, `BE-P04`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
 ## Participantes y trazabilidad
 

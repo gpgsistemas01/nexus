@@ -1,7 +1,7 @@
 <a id="cu-sal-11"></a>
 # `CU-SAL-11` — Editar detalles de merma de una salida
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P05](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
 ## Participantes y trazabilidad
 

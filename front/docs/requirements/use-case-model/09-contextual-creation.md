@@ -22,8 +22,8 @@ direction LR
     actor warehouse("Personal de almacén")
     systemBoundary supplierContext["Nexus · Alta contextual de proveedor"]
         supplier("CU-CAT-02 Crear proveedor")
-        material("CU-ALM-02 Crear material")
-        consumable("CU-ALM-18 Crear consumible")
+        material("CU-ALM-02 Crear existencia de material")
+        consumable("CU-ALM-18 Crear existencia de consumible")
         materialPurchase("CU-ENT-02 Crear compra de material")
         consumablePurchase("CU-ENT-08 Crear compra de consumible")
     end
@@ -48,25 +48,23 @@ usecase-beta
 direction LR
     actor warehouse("Personal de almacén")
     systemBoundary itemContext["Nexus · Artículo desde Compras"]
-        material("CU-ALM-02 Crear material")
-        consumable("CU-ALM-18 Crear consumible")
+        item("CU-ALM-26 Crear artículo")
         createMaterialPurchase("CU-ENT-02 Crear compra de material")
         editMaterialPurchase("CU-ENT-03 Editar compra de material")
         createConsumablePurchase("CU-ENT-08 Crear compra de consumible")
         editConsumablePurchase("CU-ENT-09 Editar compra de consumible")
     end
-    warehouse -- material
-    warehouse -- consumable
-    material ..>:extend createMaterialPurchase
-    material ..>:extend editMaterialPurchase
-    consumable ..>:extend createConsumablePurchase
-    consumable ..>:extend editConsumablePurchase
+    warehouse -- item
+    item ..>:extend createMaterialPurchase
+    item ..>:extend editMaterialPurchase
+    item ..>:extend createConsumablePurchase
+    item ..>:extend editConsumablePurchase
 ```
 
-Requiere los permisos de artículo y catálogos auxiliares y un proveedor seleccionado.
-El alta conserva ese proveedor y utiliza el contexto de compra, sin existencia
-inicial ni costo máximo. Al volver, el actor completa cantidad y costo y agrega el
-detalle. Registrar el artículo no guarda la compra ni modifica un detalle persistido.
+Requiere `material-catalogs:manage` y, para agregar el detalle, un proveedor
+seleccionado. El alta registra sólo la identidad, sin oferta ni existencia inicial.
+Al volver, el actor completa cantidad y costo y agrega el detalle. Registrar el
+artículo no guarda la compra ni modifica un detalle persistido.
 
 ## Cliente durante una salida
 

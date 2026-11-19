@@ -1,7 +1,7 @@
 <a id="cu-aut-02"></a>
 # `CU-AUT-02` — Cerrar sesión
 
-**Patrones:** `BE-P08`.
+**Patrones:** `[BE-P08](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 
