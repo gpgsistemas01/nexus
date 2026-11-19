@@ -14,7 +14,7 @@ Se inspeccionan 200 archivos TS/SFC y se describen 262 contratos declarados.
 | [issues](issues.md) | 50 | 237 |
 | [movements](movements.md) | 10 | 38 |
 | [purchases](purchases.md) | 36 | 169 |
-| [warehouse](warehouse.md) | 41 | 223 |
+| [warehouse](warehouse.md) | 41 | 231 |
 | [shared](shared.md) | 56 | 193 |
 
 ## Alcance y notación

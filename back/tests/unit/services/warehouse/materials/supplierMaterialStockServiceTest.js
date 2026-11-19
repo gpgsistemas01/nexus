@@ -10,7 +10,7 @@ describe('existencias de la relación material–proveedor', () => {
       supplierMaterialsByKey: new Map([['material:supplier', { materialId: 'material', supplierId: 'supplier', maxUnitCost: 10, material: { base: null, height: null } }]])
     });
     expect(balances.get('material:supplier')).toEqual({ previousStock: 1, newStock: 0 });
-    expect(queryRaw.mock.calls[0][0].values).toEqual(['material', 'supplier', -1, -1]);
+    expect(queryRaw.mock.calls[0][0].values).toEqual(['material', 'supplier', -1, -1, null]);
   });
 
   it('rechaza stock insuficiente con el error de dominio y la identidad del artículo', async () => {

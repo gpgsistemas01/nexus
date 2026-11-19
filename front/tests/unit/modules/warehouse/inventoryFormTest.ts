@@ -427,6 +427,48 @@ it.each([false, true])(
   },
 );
 
+it('alta y ajuste de existencias comparten secciones y orden de campos', () => {
+  const createTarget = { action: 'create' as const };
+  const createSections = inventorySections(
+    'materials',
+    createTarget,
+    previewWaste(initialInventoryValues(createTarget)),
+    { usesMeasurements: true, hasSupplier: true },
+  );
+  const row = normalizeInventoryRow(material);
+  const adjustSections = inventorySections(
+    'materials',
+    { action: 'stock', row },
+    previewWaste(initialInventoryValues({ action: 'stock', row })),
+    { usesMeasurements: true, hasSupplier: true },
+  );
+  const additionSections = inventorySections(
+    'materials',
+    { action: 'add-stock', row },
+    previewWaste(initialInventoryValues({ action: 'add-stock', row })),
+    { usesMeasurements: true, hasSupplier: true },
+  );
+
+  expect(adjustSections.map(({ id }) => id)).toEqual(createSections.map(({ id }) => id));
+  expect(adjustSections.map(({ title }) => title)).toEqual(
+    createSections.map(({ title }) => title),
+  );
+  for (const id of ['inventory', 'stock', 'notes'] as const) {
+    const adjustFields = adjustSections
+      .find((section) => section.id === id)!
+      .fields.map(({ name }) => name)
+      .filter((name) => name !== 'reasonId');
+    const createFields = createSections
+      .find((section) => section.id === id)!
+      .fields.map(({ name }) => name);
+    expect(adjustFields).toEqual(createFields);
+  }
+  expect(additionSections.map(({ id }) => id)).toEqual(createSections.map(({ id }) => id));
+  expect(
+    additionSections.find((section) => section.id === 'stock')?.fields.map(({ name }) => name),
+  ).toContain('quantity');
+});
+
 it.each(['KILOGRAMOS', 'METRO LINEAL'])(
   'la presentación %s fija 1 × 1 sin depender de la unidad seleccionada',
   async (name) => {

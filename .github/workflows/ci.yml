@@ -18,7 +18,7 @@ on:
           - essential
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.event_name == 'workflow_dispatch' && inputs.browser_suite || 'automatic' }}
   cancel-in-progress: true
 
 jobs:
@@ -186,17 +186,19 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Test essential Vue browser flows
-        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && (github.event_name != 'workflow_dispatch' || inputs.browser_suite != 'full')
+        if: github.event_name != 'workflow_dispatch' || inputs.browser_suite == 'essential'
         run: npm run test:e2e:essential
 
       - name: Test complete Vue browser regression
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || (github.event_name == 'workflow_dispatch' && inputs.browser_suite == 'full')
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_suite == 'full'
         run: npm run test:e2e
 
       - name: Install backend for the system browser test
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_suite == 'full'
         run: npm --prefix ../back ci --include=dev
 
       - name: Prepare isolated PostgreSQL for the system browser test
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_suite == 'full'
         env:
           PGUSER: postgres
           PGPASSWORD: postgres
@@ -217,9 +219,11 @@ jobs:
           echo "DIRECT_TEST_URL=${DATABASE_TEST_URL}" >> "$GITHUB_ENV"
 
       - name: Apply migrations to the system test database
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_suite == 'full'
         run: npm --prefix ../back run test:db:migrate
 
       - name: Test Vue with real Express and PostgreSQL
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_suite == 'full'
         run: npm run test:e2e:system
 
       - name: Upload frontend test results

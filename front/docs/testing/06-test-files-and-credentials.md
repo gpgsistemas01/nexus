@@ -83,6 +83,8 @@ Las rutas de la tabla son relativas a `front/`.
 
 Sistema lee variables del proceso; no necesita JSON de cuentas ni carga `.env.test.local`
 automáticamente. Prepararlas en la terminal según el procedimiento siguiente, o en CI.
+En GitHub Actions, el sistema se ejecuta junto con la regresión completa al seleccionar
+**Run workflow → browser_suite: full**; no forma parte de cada push o pull request.
 
 ## 4. Preparar PostgreSQL para sistema
 

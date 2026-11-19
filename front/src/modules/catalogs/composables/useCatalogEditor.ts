@@ -112,7 +112,9 @@ export const useCatalogEditor = (options: {
             row?.unitMeasureId
                 ? {
                       id: row.unitMeasureId,
-                      title: `${row.unitMeasure} (${row.unitSymbol})`,
+                      title: row.unitSymbol
+                          ? `${row.unitMeasure} (${row.unitSymbol})`
+                          : (row.unitMeasure ?? ''),
                       data: {},
                   }
                 : undefined,

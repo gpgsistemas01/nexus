@@ -4,7 +4,12 @@ import InventoryEditor from '../components/InventoryEditor.vue';
 import { useInventoryEditor } from '../composables/useInventoryEditor.js';
 import { inventorySections } from '../formFields.js';
 import { inventoryActionTitle } from '../inventoryDisplay.js';
-import type { EditorTarget, InventoryResource, StockAdditionTarget } from '../inventory.js';
+import type {
+    EditorTarget,
+    InventoryResource,
+    InventoryRow,
+    StockAdditionTarget,
+} from '../inventory.js';
 import type { LookupCreation, LookupItem } from '../../../shared/lookup.js';
 
 const props = defineProps<{
@@ -17,6 +22,8 @@ const props = defineProps<{
     canCreateSupplier?: boolean;
     canCreateArticle?: boolean;
     canEditSupplier?: boolean;
+    isOpeningRelatedEditor?: boolean;
+    actionError?: string;
 }>();
 const emit = defineEmits<{
     saved: [created?: LookupItem];
@@ -26,6 +33,8 @@ const emit = defineEmits<{
     addStock: [target: StockAdditionTarget];
     createSupplier: [request: LookupCreation];
     createArticle: [request: LookupCreation];
+    editArticle: [row: InventoryRow];
+    editSupplier: [row: InventoryRow];
 }>();
 const editor = useInventoryEditor({
     resource: props.resource,
@@ -59,6 +68,14 @@ const context =
     props.target.row && !isEditingOffer
         ? `${props.target.row.name} · ${props.target.row.supplierName} · Stock actual: ${props.target.row.currentStock}`
         : '';
+
+const editArticle = () => {
+    if (props.target.action === 'edit' && props.target.row) emit('editArticle', props.target.row);
+};
+
+const editSupplier = () => {
+    if (props.target.action === 'edit' && props.target.row) emit('editSupplier', props.target.row);
+};
 </script>
 
 <template>
@@ -92,6 +109,8 @@ const context =
         :is-editing-offer="isEditingOffer"
         :can-edit-article="canCreateArticle"
         :can-edit-supplier="canEditSupplier"
+        :is-opening-related-editor="isOpeningRelatedEditor"
+        :action-error="actionError"
         @create-article="
             emit('createArticle', {
                 search: $event,
@@ -106,6 +125,8 @@ const context =
         @search="editor.searchLookup"
         @more="editor.loadMore"
         @retry="editor.retryLookup"
+        @edit-article="editArticle"
+        @edit-supplier="editSupplier"
         @submit="editor.submit"
         @close="emit('close')"
         @reload="emit('reload')"
