@@ -16,6 +16,7 @@ const props = defineProps<{
     canAddStock?: boolean;
     canCreateSupplier?: boolean;
     canCreateArticle?: boolean;
+    canEditSupplier?: boolean;
 }>();
 const emit = defineEmits<{
     saved: [created?: LookupItem];
@@ -53,9 +54,11 @@ const sections = computed(() =>
 const title = computed(() =>
     inventoryActionTitle(props.resource, props.target.action, props.creationContext),
 );
-const context = props.target.row
-    ? `${props.target.row.name} · ${props.target.row.supplierName} · Stock actual: ${props.target.row.currentStock}`
-    : '';
+const isEditingOffer = props.target.action === 'edit' && props.resource !== 'wastes';
+const context =
+    props.target.row && !isEditingOffer
+        ? `${props.target.row.name} · ${props.target.row.supplierName} · Stock actual: ${props.target.row.currentStock}`
+        : '';
 </script>
 
 <template>
@@ -86,7 +89,9 @@ const context = props.target.row
             !initialSupplier &&
             !isPending
         "
-        :is-editing-offer="target.action === 'edit' && resource !== 'wastes'"
+        :is-editing-offer="isEditingOffer"
+        :can-edit-article="canCreateArticle"
+        :can-edit-supplier="canEditSupplier"
         @create-article="
             emit('createArticle', {
                 search: $event,

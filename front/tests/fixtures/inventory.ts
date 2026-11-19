@@ -51,6 +51,20 @@ export const material = {
   material: { ...template, version: 7, minStock: '5' },
   supplier: { id: ids.supplier, tradeName: 'Proveedor Central' },
 };
+export const consumableMaterial = {
+  ...material,
+  material: {
+    ...template,
+    version: 7,
+    name: 'Guantes de trabajo',
+    type: 'CONSUMABLE',
+    base: null,
+    height: null,
+    presentation: { id: ids.presentation, name: 'PIEZA' },
+    unitMeasure: { id: ids.unit, name: 'Pieza', symbol: 'PZA' },
+    minStock: '0',
+  },
+};
 export const waste = {
   id: ids.waste,
   version: 2,

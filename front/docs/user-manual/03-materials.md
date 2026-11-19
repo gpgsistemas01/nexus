@@ -120,12 +120,13 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 
 Nombre, presentación, unidad, medidas y mínimo pertenecen al catálogo; no se vuelven a capturar aquí. PIEZA exige cantidades enteras; KILOGRAMOS y METRO LINEAL admiten decimales y conservan `1 × 1`.
 
-Si falta el artículo, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar material «texto escrito»**, complete **Presentación**, **Unidad de medida**, medidas cuando apliquen y mínimo, y guarde. No necesita elegir antes un proveedor. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Almacén → Artículos**.
+Si falta el artículo, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar material «texto escrito»** o presione **Enter** en el selector. Complete **Presentación**, **Unidad de medida** y mínimo; capture medidas sólo cuando la presentación las requiera. KILOGRAMOS y METRO LINEAL fijan `1 × 1` y ocultan esos campos. No necesita elegir antes un proveedor. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Almacén → Artículos**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
 y espere la búsqueda. Si ya existe, selecciónelo; si falta, pulse
-**Registrar proveedor «texto escrito»** al final de la lista. Abrir el selector
+**Registrar proveedor «texto escrito»** al final de la lista o presione **Enter**.
+Abrir el selector
 vacío no muestra el botón. Complete **Razón social**, revise **Nombre comercial**,
 guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
 <!-- manual:end -->
@@ -133,7 +134,8 @@ guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
 ![Formulario para crear un material.](images/04-material-create.png)
 
 Desde una compra se omiten cantidad inicial y costo máximo. La recepción registra
-la existencia; el costo máximo se configura en **Almacén**. No duplique la entrada.
+la existencia y eleva el costo máximo de la oferta sólo si el mayor costo unitario
+sin IVA de las partidas nuevas supera el valor guardado. No duplique la entrada.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
@@ -143,9 +145,12 @@ la existencia; el costo máximo se configura en **Almacén**. No duplique la ent
 2. Cambie **Costo máximo unitario** o **Activo**.
 3. Pulse **Guardar** y compruebe el registro actualizado.
 
-El stock y su conversión se conservan: no se capturan desde esta edición. Para cambiar
+El artículo, el proveedor y el saldo se muestran como referencia. Para cambiar
 nombre o stock mínimo, abra **Almacén → Artículos**. Los datos comerciales del proveedor
-se editan en **Directorio comercial → Proveedores**.
+se editan en **Directorio comercial → Proveedores**. Los accesos directos aparecen
+si la cuenta puede editar en el módulo correspondiente.
+
+![Edición de oferta con los datos del artículo y el proveedor como referencia.](images/05a-material-offer-edit.png)
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->
@@ -187,10 +192,9 @@ resultados de la consulta.
 <!-- manual:any materials:write -->
 Al seleccionar el artículo, **Datos del artículo** muestra Base, Altura,
 Presentación, Unidad de medida y Stock mínimo con los valores de Artículos.
-Son datos de referencia, sin nuevas entradas de captura. La cantidad inicial se
+Son campos de sólo lectura en el alta y la edición. La cantidad inicial se
 registra en **Stock actual**; **Costo máximo unitario** y **Activo** corresponden
-a las columnas del mismo nombre. Al editar, se muestran existencia y conversión
-actuales.
+a las columnas del mismo nombre.
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->

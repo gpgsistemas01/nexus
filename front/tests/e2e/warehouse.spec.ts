@@ -361,12 +361,10 @@ test(
       ['Unidad de medida', 'm²'],
       ['Stock mínimo', '5'],
     ]) {
-      const term = reference.getByRole('term').filter({ hasText: new RegExp(`^${label}$`) });
-      await expect(term).toBeVisible();
-      await expect(term.locator('..').getByRole('definition')).toHaveText(value);
+      const field = reference.getByRole('textbox', { name: label, exact: true });
+      await expect(field).toHaveValue(value);
+      await expect(field).not.toBeEditable();
     }
-    await expect(reference.getByRole('textbox')).toHaveCount(0);
-    await expect(reference.getByRole('spinbutton')).toHaveCount(0);
 
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
@@ -376,17 +374,17 @@ test(
     });
     await page.getByRole('button', { name: 'Editar oferta', exact: true }).click();
     dialog = page.getByRole('dialog', { name: 'Editar oferta de material', exact: true });
-    await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
-      'Proveedor Central',
-    );
-    await expect(dialog.getByRole('textbox', { name: 'Presentación', exact: true })).toHaveValue(
-      'ROLLO',
-    );
-    await expect(
-      dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true }),
-    ).toHaveValue('m²');
-    await expect(dialog.getByRole('spinbutton', { name: 'Base' })).not.toBeEditable();
-    await expect(dialog.getByRole('textbox', { name: 'Material', exact: true })).not.toBeEditable();
+    for (const [label, value] of [
+      ['Material', 'Lona'],
+      ['Proveedor', 'Proveedor Central'],
+      ['Presentación', 'ROLLO'],
+      ['Unidad de medida', 'm²'],
+      ['Base', '2'],
+    ]) {
+      const field = dialog.getByRole('textbox', { name: label, exact: true });
+      await expect(field).toHaveValue(value);
+      await expect(field).not.toBeEditable();
+    }
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes[1]).toEqual({
@@ -909,10 +907,14 @@ for (const [path, resource, label, type] of [
       });
       await main.getByLabel('Cantidad inicial', { exact: true }).fill('4');
       const term = `Artículo nuevo ${resource}`;
-      await main.getByRole('combobox', { name: label, exact: true }).fill(term);
-      await page
-        .getByRole('button', { name: `Registrar ${label.toLowerCase()} «${term}»`, exact: true })
-        .click();
+      const picker = main.getByRole('combobox', { name: label, exact: true });
+      await picker.fill(term);
+      const createOption = page.getByRole('button', {
+        name: `Registrar ${label.toLowerCase()} «${term}»`,
+        exact: true,
+      });
+      await expect(createOption).toBeVisible();
+      await picker.press('Enter');
       const auxiliary = page.getByRole('dialog', {
         name: `Registrar ${label.toLowerCase()}`,
         exact: true,

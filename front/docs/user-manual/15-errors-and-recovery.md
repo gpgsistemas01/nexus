@@ -28,10 +28,12 @@ Si el saldo o el estado impiden operar, vuelva a consultar el documento y las ex
 
 El costo puede ser cero sólo en el alta inicial. Si un artículo sin costo impide
 registrar o surtir una salida, solicite su configuración al responsable de **Almacén**.
-Las compras no actualizan ese costo.
+Al recibir una compra, Nexus eleva el costo máximo de la oferta si el costo unitario
+sin IVA de una partida nueva supera el valor guardado. Las correcciones y cancelaciones
+de partidas no recalculan ese máximo.
 
 <!-- manual:any materials:write wastes:write -->
-En **Almacén**, edite el artículo y capture un costo máximo mayor que cero.
+En **Almacén**, edite la oferta correspondiente y capture un costo máximo mayor que cero.
 Un costo vacío o cero impide guardar la edición.
 <!-- manual:end -->
 

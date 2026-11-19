@@ -12,7 +12,8 @@ del selector**; el nombre no tiene que existir previamente en el catálogo.
 2. Espere a que termine la búsqueda. Si el cliente ya aparece, seleccione esa opción
    y continúe la salida.
 3. Si falta, al final de la lista aparecerá **Registrar cliente «Cliente nuevo»**.
-   Pulse ese botón. El texto entre comillas es el que escribió en el selector.
+   Pulse ese botón o presione **Enter** en el selector. El texto entre comillas
+   es el que escribió en el selector.
 4. En el modal **Registrar cliente**, revise **Nombre**, precargado con ese texto,
    y corríjalo si es necesario. Mantenga **Activo** marcado para utilizarlo en la salida.
 5. Pulse **Guardar** una sola vez y espere la confirmación.

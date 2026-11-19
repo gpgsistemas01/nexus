@@ -123,7 +123,7 @@ test('materiales y consumibles: consulta, alta y ajuste', async ({ page }) => {
   await expect(
     page.getByRole('dialog', { name: 'Registrar existencia de material', exact: true }),
   ).toBeVisible();
-  await page.setViewportSize({ width: 1440, height: 1400 });
+  await page.setViewportSize({ width: 1440, height: 1800 });
   await chooseOption(page, 'Proveedor', 'Proveedor Central');
   await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO');
   await page.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }).fill('4');
@@ -134,17 +134,36 @@ test('materiales y consumibles: consulta, alta y ajuste', async ({ page }) => {
   await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
   await capture(page, '05-material-stock');
   await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await page.setViewportSize({ width: 1440, height: 1800 });
+  await page.getByRole('button', { name: 'Editar oferta', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: 'Editar oferta de material', exact: true }),
+  ).toBeVisible();
+  await capture(page, '05a-material-offer-edit');
+  await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await mockWarehouse(page, user.permissions, { consumableExample: true });
   await page.goto('/almacen/consumibles');
   await expect(
     page.getByRole('heading', { name: 'Tabla de Existencias de consumibles', exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole('cell', { name: /^Lona(?: Proveedor Central)?$/ })).toBeVisible();
+  await expect(
+    page.getByRole('cell', { name: /^Guantes de trabajo(?: Proveedor Central)?$/ }),
+  ).toBeVisible();
   await capture(page, '06-consumables-list');
   await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
   await expect(
     page.getByRole('dialog', { name: 'Registrar existencia de consumible', exact: true }),
   ).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 1800 });
+  await chooseOption(page, 'Proveedor', 'Proveedor Central');
+  await chooseOption(page, 'Consumible', 'Guantes de trabajo · PIEZA');
   await capture(page, '07-consumable-create');
+  await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await page.getByRole('button', { name: 'Editar oferta', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: 'Editar oferta de consumible', exact: true }),
+  ).toBeVisible();
+  await capture(page, '07a-consumable-offer-edit');
 });
 
 test('mermas: consulta, pesos de una captura y entrada adicional', async ({ page }) => {
@@ -299,6 +318,30 @@ test('salidas: consulta, borrador local y selección de surtido', async ({ page 
     .getByRole('spinbutton', { name: 'Cantidad de proyecto: Lona', exact: true })
     .fill('180');
   await capture(page, '24-issue-supply');
+});
+
+test('salidas: alta contextual de cliente desde el selector', async ({ page }) => {
+  await mockIssues(page);
+  await readOnly(page);
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
+  const issueDialog = page.getByRole('dialog', { name: 'Registrar salida', exact: true });
+  const client = issueDialog.getByRole('combobox', { name: 'Cliente', exact: true });
+  await client.fill('Cliente nuevo');
+  const createOption = page.getByRole('button', {
+    name: 'Registrar cliente «Cliente nuevo»',
+    exact: true,
+  });
+  await expect(createOption).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({
+    path: path.join(imageDirectory, '23a-issue-client-create-option.png'),
+    animations: 'disabled',
+    caret: 'hide',
+  });
+  await createOption.click();
+  await expect(page.getByRole('dialog', { name: 'Registrar cliente', exact: true })).toBeVisible();
+  await capture(page, '23b-issue-client-create-form');
 });
 
 test('salidas: devolución de un detalle existente ya surtido', async ({ page }) => {

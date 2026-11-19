@@ -3647,6 +3647,7 @@
       "tags": [
         "Compras de materiales"
       ],
+      "description": "Al recibir las partidas, actualiza existencias y conserva el mayor costo unitario sin IVA por oferta entre el costo máximo guardado y los costos de las partidas recibidas.",
       "summary": "Crear compra de materiales"
     }
   },
@@ -3775,6 +3776,7 @@
       "tags": [
         "Compras de consumibles"
       ],
+      "description": "Al recibir las partidas, actualiza existencias y conserva el mayor costo unitario sin IVA por oferta entre el costo máximo guardado y los costos de las partidas recibidas.",
       "summary": "Crear compra de consumibles"
     }
   },
@@ -3848,6 +3850,7 @@
       "tags": [
         "Compras de materiales"
       ],
+      "description": "Al recibir nuevas partidas, actualiza existencias y conserva el mayor costo unitario sin IVA por oferta entre el costo máximo guardado y los costos de las partidas recibidas.",
       "summary": "Editar compra de materiales"
     },
     "get": {
@@ -3981,6 +3984,7 @@
       "tags": [
         "Compras de consumibles"
       ],
+      "description": "Al recibir nuevas partidas, actualiza existencias y conserva el mayor costo unitario sin IVA por oferta entre el costo máximo guardado y los costos de las partidas recibidas.",
       "summary": "Editar compra de consumibles"
     },
     "get": {

@@ -1,7 +1,6 @@
-import { ensureSupplierMaterials } from '../materials/supplierMaterialService.js';
 import { GoodsReceiptDetailAlreadyCanceled } from '../../../errors/warehouse/goodsReceiptError.js';
 import { GOODS_RECEIPT_STATUS_NAMES, GOODS_RECEIPT_DETAIL_STATUSES } from '../../../shared/constants/goodsReceiptStatuses.js';
-import { buildGoodsReceiptDetails, GOODS_RECEIPT_DETAIL_INCLUDE } from './goodsReceiptHelpers.js';
+import { prepareGoodsReceiptDetails, GOODS_RECEIPT_DETAIL_INCLUDE } from './goodsReceiptHelpers.js';
 
 const findActiveGoodsReceiptTotals = async ({ tx, goodsReceiptId }) => {
     const { _sum, _count } = await tx.goodsReceiptDetail.aggregate({
@@ -81,8 +80,7 @@ export const cancelGoodsReceiptDetailAndTotals = ({ tx, goodsReceiptId, detailId
 );
 
 export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, supplierId, details, type = null }) => {
-    const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId, type });
-    await ensureSupplierMaterials({ tx, supplierId, materialIds: processedDetails.map(detail => detail.materialId) });
+    const processedDetails = await prepareGoodsReceiptDetails({ tx, supplierId, type, details });
     const createdDetails = await tx.goodsReceiptDetail.createManyAndReturn({
         data: processedDetails.map(detail => ({
             ...detail,

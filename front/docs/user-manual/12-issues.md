@@ -67,9 +67,16 @@ Salidas no ofrece alta de proveedores.
 1. Abra **Cliente** y **escriba el nombre completo del cliente nuevo en el selector**.
    Por ejemplo, escriba **Cliente nuevo**; el cliente todavía no tiene que estar registrado.
 2. Espere a que termine la búsqueda. Si ya existe, seleccione el registro encontrado.
-3. Si falta, pulse **Registrar cliente «Cliente nuevo»**, al final de la lista.
-   Ese botón aparece después de escribir el nombre, no al abrir el selector vacío.
+3. Si falta, pulse **Registrar cliente «Cliente nuevo»** al final de la lista o
+   presione **Enter** en el selector. El botón aparece después de escribir el
+   nombre, no al abrir el selector vacío.
+
+![El selector de salida ofrece registrar el nombre escrito cuando no hay coincidencia.](images/23a-issue-client-create-option.png)
+
 4. Revise el **Nombre** precargado, mantenga **Activo** marcado y pulse **Guardar**.
+
+![Formulario para registrar el cliente desde la captura de salida.](images/23b-issue-client-create-form.png)
+
 5. Compruebe que regresa a la salida con el cliente seleccionado y continúe su captura.
 
 Si no ve la acción, compruebe que el campo tenga texto, esté habilitado y la búsqueda

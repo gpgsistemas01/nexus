@@ -7,11 +7,12 @@ export const updateSupplierMaterialStocks = ({ tx, changes }) => {
 
     const values = changes.map(change => Prisma.sql`(
         ${change.materialId}::uuid, ${change.supplierId}::uuid,
-        ${change.quantityChange}::numeric, ${change.convertedQuantityChange}::numeric
+        ${change.quantityChange}::numeric, ${change.convertedQuantityChange}::numeric,
+        ${change.receiptUnitCost ?? null}::numeric
     )`);
 
     return tx.$queryRaw(Prisma.sql`
-        WITH changes(material_id, supplier_id, quantity, converted) AS (VALUES ${Prisma.join(values)}),
+        WITH changes(material_id, supplier_id, quantity, converted, receipt_unit_cost) AS (VALUES ${Prisma.join(values)}),
         locked AS MATERIALIZED (
             SELECT stock."id" FROM "SupplierMaterial" AS stock
             JOIN changes ON stock."materialId" = changes.material_id AND stock."supplierId" = changes.supplier_id
@@ -19,7 +20,8 @@ export const updateSupplierMaterialStocks = ({ tx, changes }) => {
         )
         UPDATE "SupplierMaterial" AS stock
         SET "currentStock" = stock."currentStock" + changes.quantity,
-            "convertedQuantity" = stock."convertedQuantity" + changes.converted
+            "convertedQuantity" = stock."convertedQuantity" + changes.converted,
+            "maxUnitCost" = GREATEST(stock."maxUnitCost", changes.receipt_unit_cost)
         FROM changes, locked
         WHERE stock."id" = locked."id"
             AND stock."materialId" = changes.material_id AND stock."supplierId" = changes.supplier_id

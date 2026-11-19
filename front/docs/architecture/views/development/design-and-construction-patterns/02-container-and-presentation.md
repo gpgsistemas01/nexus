@@ -81,6 +81,11 @@ reenvía explícitamente. La presentación puede tener estado visual local o val
 también puede contener un diálogo: la carpeta `pages` identifica su coordinación,
 mientras el Router determina cuáles de esas páginas tienen una URL.
 
+En Existencias, `InventoryEditorPage` conecta el estado del composable con
+`InventoryEditor`. Alta y edición comparten las secciones de `inventorySections`.
+`InventoryFormField` renderiza cada descriptor y `RemoteSelect` concentra la
+interacción de búsqueda y alta por teclado que también usa Compras.
+
 [catalogs.spec.ts](../../../../../tests/e2e/catalogs.spec.ts) comprueba el flujo con API
 simulada; las [pruebas del editor](../../../../../tests/unit/modules/catalogs/catalogEditorTest.ts)
 observan captura, errores y confirmación.

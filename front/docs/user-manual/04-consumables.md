@@ -15,9 +15,10 @@ También puede consultar el costo unitario.
 ## Importar desde Excel
 
 Pulse **Importar Excel** y siga el [procedimiento de materiales y consumibles](03-materials.md#importar-materiales-o-consumibles-desde-excel).
-El selector asigna una sola operación a todo el archivo. En altas con KILOGRAMO
-o METRO LINEAL capture Base = 1 y Altura = 1. Conserve los
-IDs/versiones incluidos para editar o ajustar.
+El selector asigna una sola operación a todo el archivo. Para altas con
+presentación KILOGRAMOS o METRO LINEAL, puede dejar Base y Altura vacías: la
+importación las completa como 1 × 1. Si captura esas columnas, ambos valores
+deben ser 1. Conserve los IDs/versiones incluidos para editar o ajustar.
 
 ![Importación de consumibles con la operación y sus instrucciones.](images/06a-consumable-import.png)
 
@@ -37,29 +38,34 @@ IDs/versiones incluidos para editar o ajustar.
 
 Presentación, unidad, medidas y mínimo provienen del catálogo. PIEZA exige enteros; KILOGRAMOS y METRO LINEAL admiten decimales y representan una unidad `1 × 1`.
 
-Si falta el consumible, **escriba el nombre en Consumible** y pulse **Registrar consumible «texto escrito»** después de la búsqueda. Complete el modal; el tipo Consumible está definido por el módulo y no necesita elegir antes un proveedor. Al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Almacén → Artículos**.
+Si falta el consumible, **escriba el nombre en Consumible** y pulse **Registrar consumible «texto escrito»** o presione **Enter** en el selector después de la búsqueda. Complete el modal; el tipo Consumible está definido por el módulo y no necesita elegir antes un proveedor. Al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Almacén → Artículos**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
 y espere la búsqueda. Si ya existe, selecciónelo; si falta, pulse
-**Registrar proveedor «texto escrito»** al final de la lista. Abrir el selector
+**Registrar proveedor «texto escrito»** al final de la lista o presione **Enter**.
+Abrir el selector
 vacío no muestra el botón. Complete **Razón social**, revise **Nombre comercial**,
 guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
 <!-- manual:end -->
 
-![Formulario de alta de un consumible.](images/07-consumable-create.png)
+![Alta de existencia con los datos del consumible seleccionado como referencia.](images/07-consumable-create.png)
 
 Compruebe presentación y unidad antes de guardar. Desde una compra, la existencia
-se recibe al guardar la compra; no la duplique como cantidad inicial.
+se recibe al guardar la compra; no la duplique como cantidad inicial. La recepción
+eleva el costo máximo de la oferta sólo si el mayor costo unitario sin IVA de las
+partidas nuevas supera el valor guardado.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
 ## Editar una oferta
 
-Pulse **Editar oferta** y cambie **Costo máximo unitario** o **Activo**; después
-pulse **Guardar**. El stock y su conversión se conservan. Para cambiar nombre o stock
-mínimo, abra **Almacén → Artículos**; los datos comerciales se editan en
+Pulse **Editar oferta**, cambie **Costo máximo unitario** o **Activo** y pulse
+**Guardar**. El artículo, el proveedor y el saldo se muestran como referencia.
+Para cambiar nombre o stock mínimo, abra **Almacén → Artículos**. Los datos comerciales se editan en
 **Directorio comercial → Proveedores**.
+
+![Edición de oferta con datos de referencia y campos editables.](images/07a-consumable-offer-edit.png)
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->

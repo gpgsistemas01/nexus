@@ -475,11 +475,10 @@ test('compras: altas rápidas reutilizan editores y seleccionan registros fuera 
   await expect(dialog.getByRole('button', { name: 'Registrar material', exact: true })).toHaveCount(
     0,
   );
-  await dialog.getByRole('combobox', { name: 'Material', exact: true }).fill('Material nuevo');
-  await page
-    .getByRole('button', { name: 'Registrar material «Material nuevo»', exact: true })
-    .click();
-  const item = page.getByRole('dialog', { name: 'Registrar existencia de material', exact: true });
+  const articlePicker = dialog.getByRole('combobox', { name: 'Material', exact: true });
+  await articlePicker.fill('Material nuevo');
+  await articlePicker.press('Enter');
+  const item = page.getByRole('dialog', { name: 'Registrar material', exact: true });
   await item.getByLabel('Nombre', { exact: true }).fill('Material nuevo');
   await item.getByRole('combobox', { name: 'Presentación', exact: true }).click();
   await page.getByRole('option', { name: 'ROLLO', exact: true }).click();

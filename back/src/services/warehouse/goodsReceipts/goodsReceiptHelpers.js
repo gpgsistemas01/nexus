@@ -6,6 +6,7 @@ import { GoodsReceiptNotFound } from "../../../errors/warehouse/goodsReceiptErro
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { lockMaterialIdentitiesForPurchase } from '../../../repository/warehouse/stockLockRepository.js';
 import { materialDocumentDetailsWhere } from '../materials/materialDocumentSnapshot.js';
+import { ensureSupplierMaterials } from '../materials/supplierMaterialService.js';
 
 export const buildGoodsReceiptContextWhere = (type = null) => {
     if (type === null) return {};
@@ -61,15 +62,35 @@ export const calculateGoodsReceiptDetail = ({ material, detail, materialName = m
     };
 };
 
+export const prepareGoodsReceiptDetails = async ({ tx, supplierId, type, details }) => {
+    const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId, type });
+    await ensureSupplierMaterials({ tx, supplierId, materialIds: processedDetails.map(detail => detail.materialId) });
+    return processedDetails;
+};
+
 // Las entradas ya hidratan los artículos al guardar la compra; reutilizan esos datos para el movimiento.
 export const buildGoodsReceiptStockOffers = (goodsReceipt, details = goodsReceipt.details) => {
-    const materials = new Map(goodsReceipt.details.map(detail => [detail.materialId, detail.material]));
-    return [...new Set(details.map(detail => detail.materialId))].map(materialId => ({
-        materialId,
-        supplierId: goodsReceipt.supplierId,
-        material: materials.get(materialId),
-        supplier: { tradeName: goodsReceipt.supplierName }
-    }));
+    const materials = details === goodsReceipt.details
+        ? null
+        : new Map(goodsReceipt.details.map(detail => [detail.materialId, detail.material]));
+    const offers = new Map();
+    for (const { materialId, material, conversionUnitCost } of details) {
+        let offer = offers.get(materialId);
+        if (!offer) {
+            offer = {
+                materialId,
+                supplierId: goodsReceipt.supplierId,
+                material: material ?? materials?.get(materialId),
+                supplier: { tradeName: goodsReceipt.supplierName }
+            };
+            offers.set(materialId, offer);
+        }
+        const unitCost = Number(conversionUnitCost);
+        if (unitCost > (offer.receiptUnitCost ?? 0)) {
+            offer.receiptUnitCost = unitCost;
+        }
+    }
+    return [...offers.values()];
 };
 
 export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => details.reduce((acc, detail) => {

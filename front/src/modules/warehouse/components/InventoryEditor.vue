@@ -25,6 +25,8 @@ defineProps<{
     canCreateArticle?: boolean;
     canCreateSupplier?: boolean;
     isEditingOffer?: boolean;
+    canEditArticle?: boolean;
+    canEditSupplier?: boolean;
 }>();
 const emit = defineEmits<{
     update: [field: InventoryField, value: string | boolean];
@@ -60,9 +62,29 @@ const emit = defineEmits<{
                 variant="tonal"
                 class="mb-4"
             >
-                El nombre y el stock mínimo se editan en Almacén → Artículos; los datos del
-                proveedor, en Proveedores. Aquí puedes actualizar el costo y el estado de esta
-                oferta. El stock se cambia con Ajustar stock.
+                Edita el artículo en Almacén → Artículos y el proveedor en Directorio comercial →
+                Proveedores. Para corregir el saldo, usa Ajustar stock.
+                <div
+                    v-if="canEditArticle || canEditSupplier"
+                    class="d-flex flex-wrap ga-2 mt-3"
+                >
+                    <VBtn
+                        v-if="canEditArticle"
+                        :to="{ name: 'catalog-materials' }"
+                        variant="outlined"
+                        size="small"
+                    >
+                        Ir a Artículos
+                    </VBtn>
+                    <VBtn
+                        v-if="canEditSupplier"
+                        :to="{ name: 'suppliers' }"
+                        variant="outlined"
+                        size="small"
+                    >
+                        Ir a Proveedores
+                    </VBtn>
+                </div>
             </VAlert>
             <VAlert
                 v-if="isPending"
@@ -77,7 +99,10 @@ const emit = defineEmits<{
                     {{ values.quantity || values.initialQuantity }}
                 </p>
             </VAlert>
-            <template v-if="!isPending">
+            <div
+                v-if="!isPending"
+                class="editor-sections"
+            >
                 <section
                     v-for="section in sections"
                     :key="section.id"
@@ -100,7 +125,10 @@ const emit = defineEmits<{
                             <dd>{{ item.value }}</dd>
                         </div>
                     </dl>
-                    <VRow density="compact">
+                    <VRow
+                        v-if="section.fields.length"
+                        density="comfortable"
+                    >
                         <VCol
                             v-for="field in section.fields"
                             :key="field.name"
@@ -142,7 +170,7 @@ const emit = defineEmits<{
                         </VCol>
                     </VRow>
                 </section>
-            </template>
+            </div>
         </template>
         <template #actions>
             <VBtn
@@ -156,12 +184,15 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
+.editor-sections {
+    display: grid;
+    gap: 1rem;
+}
 .editor-section {
     background: rgb(var(--v-theme-surface));
     border: 1px solid rgba(var(--v-theme-primary), 0.15);
     border-radius: 0.85rem;
     padding: 1rem;
-    margin-bottom: 1rem;
     box-shadow: 0 0.2rem 0.65rem rgba(var(--v-theme-on-surface), 0.04);
 }
 .section-heading {
@@ -181,9 +212,9 @@ const emit = defineEmits<{
 }
 .reference-values {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
     gap: 0.75rem 1rem;
-    margin-bottom: 1rem;
+    margin: 0;
 }
 .reference-values dt {
     color: rgb(var(--v-theme-muted));
@@ -193,8 +224,9 @@ const emit = defineEmits<{
     margin: 0;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
 }
-.editor-section :deep(.v-col) {
-    padding: 0.45rem;
+.reference-values + .v-row {
+    margin-block-start: 1rem;
 }
 </style>
