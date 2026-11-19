@@ -42,6 +42,23 @@
 <!-- manual:end -->
 <!-- module:end -->
 
+<!-- manual:any material-catalogs:manage -->
+<!-- module:any articles -->
+
+## Artículos
+
+| Término | Qué significa para su trabajo |
+| --- | --- |
+| Artículo | Identidad de un material o consumible, independiente del proveedor y el stock. |
+| Tipo | Material o Consumible. |
+| Presentación | Forma comercial o física del artículo. |
+| Unidad de medida | Unidad utilizada para controlar cantidades. |
+| Base y Altura | Medidas físicas; no representan existencias. |
+| Stock mínimo | Umbral utilizado para detectar existencias bajas. |
+
+<!-- module:end -->
+<!-- manual:end -->
+
 <!-- manual:any materials:read wastes:page-view -->
 <!-- module:any inventory -->
 
@@ -49,7 +66,7 @@
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Artículo | Registro identificado por proveedor, presentación y unidad. |
+| Artículo | Identidad de un material o consumible, con presentación y unidad. |
 | Proveedor | Suministra artículos; sus existencias se controlan por separado. |
 | Presentación | Forma comercial o física del artículo. |
 | Unidad de medida | Unidad de una cantidad. |
@@ -62,7 +79,7 @@
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Material | Artículo identificado por proveedor, presentación y medidas. |
+| Material | Tipo de artículo con presentación y medidas cuando corresponden. |
 | Base y Altura | Medidas físicas del artículo; no indican cuántas unidades hay disponibles. |
 
 <!-- module:end -->

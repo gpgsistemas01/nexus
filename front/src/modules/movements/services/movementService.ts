@@ -1,6 +1,6 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { reportParams } from '../../../shared/report.js';
 import type { ReportScope } from '../../../shared/report.js';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { lookupParams } from '../../../shared/http/pageParams.js';
@@ -21,15 +21,15 @@ const decimal = (value: unknown): string | number | null => {
     )
         return value as string | number;
 
-    throw new ApiError('El servidor devolvió una cantidad de movimiento inválida.');
+    throw new ResponseContractError('El servidor devolvió una cantidad de movimiento inválida.');
 };
 
 const normalizeRow = (value: unknown): MovementRow => {
     if (!isRecord(value) || typeof value.id !== 'string' || !value.id)
-        throw new ApiError('El servidor devolvió un movimiento incompleto.');
+        throw new ResponseContractError('El servidor devolvió un movimiento incompleto.');
 
     if (value.quantity == null)
-        throw new ApiError('El servidor devolvió un movimiento sin cantidad.');
+        throw new ResponseContractError('El servidor devolvió un movimiento sin cantidad.');
 
     return {
         id: value.id,
@@ -102,7 +102,9 @@ export const movementService = {
 
                 const item = resource === 'wastes' ? row : row.material;
                 if (!isRecord(item))
-                    throw new ApiError('El servidor devolvió una opción de inventario incompleta.');
+                    throw new ResponseContractError(
+                        'El servidor devolvió una opción de inventario incompleta.',
+                    );
 
                 const presentation = isRecord(item.presentation) ? item.presentation.name : '';
                 return {

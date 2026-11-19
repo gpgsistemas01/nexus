@@ -1,4 +1,4 @@
-import { issueHeaderValidation } from './issueValidations.js';
+import { issueHeaderValidation, issueImmediateSupplyValidation } from './issueValidations.js';
 import { validateIssueDetailsArray, validateIssueProjectQuantityDetailsEdition } from '../fields/fieldsValidator.js';
 
 const validateWasteIssueDetails = () => validateIssueDetailsArray({
@@ -7,6 +7,7 @@ const validateWasteIssueDetails = () => validateIssueDetailsArray({
 });
 
 export const wasteIssueValidation = [
+    issueImmediateSupplyValidation,
     ...issueHeaderValidation,
     validateWasteIssueDetails()
 ];

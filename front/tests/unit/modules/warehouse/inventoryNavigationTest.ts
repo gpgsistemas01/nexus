@@ -94,7 +94,13 @@ describe('rutas y permisos de catálogos (DP-VUE-CAT-001)', () => {
   });
   it('Almacén administra materiales sin acceder a Áreas o Roles', async () => {
     const account = { ...user, permissions: ['material-catalogs:manage', 'suppliers:page-view'] };
-    expect((await navigate('/catalogos/materials', account)).name).toBe('catalog-materials');
+    expect((await navigate('/almacen/articulos', account)).name).toBe('catalog-materials');
+    const legacy = await navigate('/catalogos/materials', account);
+    expect(legacy.path).toBe('/almacen/articulos');
+    expect(legacy.meta.navigationGroup).toBe('warehouse');
+    expect(
+      (await navigate('/almacen/articulos', { ...user, permissions: ['materials:read'] })).name,
+    ).toBe('forbidden');
     expect((await navigate('/directorio/proveedores', account)).name).toBe('suppliers');
     expect((await navigate('/catalogos/departments', account)).name).toBe('forbidden');
     expect((await navigate('/catalogos/roles', account)).name).toBe('forbidden');

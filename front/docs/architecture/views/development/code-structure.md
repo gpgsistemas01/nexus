@@ -12,6 +12,11 @@ timeout, sesión y errores. `pageParams`, `lookupParams` y `recordParams` compar
 la consulta paginada; cada dominio añade sus filtros y valida su respuesta. El
 [contrato HTTP](../../contracts/client-contracts.md) precisa JSON, multipart y Blob.
 
+La utilidad `shared/utils/articleOptions.ts` reúne el adaptador de opciones de
+material y la lectura común de artículo/presentación. La selección de Almacén y
+las entradas de Compras y Salidas la reutilizan; los servicios conservan HTTP y
+la utilidad trabaja sólo con los datos recibidos.
+
 ## Reportes y tablas adaptables
 
 Todas las páginas de inventario, identidad, directorio, compras, salidas y movimientos

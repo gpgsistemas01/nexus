@@ -2,9 +2,12 @@
 
 ## Alcance de una secuencia
 
-Los mensajes identifican funciones, eventos, retornos y asignaciones del código Vue.
-Los participantes conservan el archivo propietario. Las condiciones de los marcos
-usan los identificadores del código y las figuras mantienen sus IDs estables.
+Una secuencia explica una interacción relevante entre responsabilidades: intención del
+usuario, coordinación de la página o composable, consulta HTTP cuando aplica y resultado
+visible. Muestra sólo decisiones que cambian el recorrido, como permiso, modo, cancelación,
+fallo recuperable o respuesta obsoleta. No transcribe cada función, `ref`, asignación,
+watcher o llamada interna. El diagrama se mantiene en el nivel necesario para responder
+su pregunta; las fuentes enlazadas permiten verificar el comportamiento real.
 
 ## Distribución de participantes
 
@@ -19,29 +22,29 @@ usan los identificadores del código y las figuras mantienen sus IDs estables.
 
 Los [símbolos de secuencia](../diagram-reading.md#secuencias) definen las formas.
 `IssueDocument`, `PurchaseDetail` y `DirectoryEntry` son contratos intercambiados;
-sus atributos y relaciones se consultan en los
-[modelos de clases y tipos](../logical/class-and-type-models/index.md).
+sus campos se consultan en los [modelos de clases y tipos](../logical/class-and-type-models/index.md).
 
 ## Tecnología y alcance
 
-Vue, Vue Router, VeeValidate, Axios y SweetAlert2 sustentan la implementación.
-Se representan las llamadas escritas en los archivos propios; las instancias internas
-de esas bibliotecas no añaden participantes.
+Vue, Vue Router, VeeValidate, Axios y SweetAlert2 sustentan la implementación. Las
+bibliotecas se omiten como participantes salvo que su frontera sea relevante para la
+pregunta; no se representan sus detalles internos.
 
 ## Contratos que deben distinguirse
 
 | Etiqueta | Fuente |
 | --- | --- |
-| `directoryService.save(...)` | Invocación del servicio desde el editor. |
-| `operation(controller.signal)` | Callback definido por el editor y ejecutado por `useRecordSave`. |
-| `options.onSaved(result)` | Callback proporcionado al coordinador por el consumidor. |
-| `emit('saved', result)` | Evento del componente; el receptor conecta su handler. |
-| `{ values, errors, message }` | Valores expuestos y props; no representa una función nueva. |
-| `alt target.mode === 'header'` | Condición del recorrido escrito en el código. |
-| `...` dentro de argumentos | Argumentos omitidos de la llamada existente; no designa una función ni un campo adicional. |
+| Evento del formulario | Intención como Guardar, Buscar, Cancelar o Seleccionar. |
+| Coordinador | Responsabilidad que valida el modo, permiso o estado antes de continuar. |
+| Servicio de recurso | Frontera HTTP para consultar o guardar; los detalles de URL se incluyen sólo si distinguen el comportamiento. |
+| Retorno | Resultado relevante para la interfaz: datos, confirmación, error o cancelación. |
+| Condición | Regla que modifica el recorrido, expresada en lenguaje funcional cuando el nombre interno no aporta al lector. |
 
-Las continuaciones se enlazan junto a las fuentes. La numeración expresa orden de
-mensajes; no representa duración ni acredita una transacción del servidor.
+La numeración expresa orden de mensajes; no representa duración ni acredita una
+transacción del servidor. Se conserva una secuencia por interacción compartida o por
+variante que cambie reglas, permisos, payload o recuperación. Variantes que sólo cambian
+un valor permanecen en la misma figura; detalles internos se dejan a la referencia de
+código.
 
 ## Localización de la implementación
 

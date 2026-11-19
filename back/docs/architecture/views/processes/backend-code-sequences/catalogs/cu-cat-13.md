@@ -1,7 +1,7 @@
 <a id="cu-cat-13"></a>
 # `CU-CAT-13` — Crear rol
 
-**Patrones:** `BE-P02`.
+**Patrones:** `[BE-P02](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

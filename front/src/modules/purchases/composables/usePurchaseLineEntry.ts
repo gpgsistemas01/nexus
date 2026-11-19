@@ -4,7 +4,7 @@ import { addGoodsReceiptMaterialValidation } from '@nexus/form-validation';
 import { usesAutomaticTotalCost } from '@nexus/purchase-calculations';
 import { getPieceQuantityError } from '@nexus/piece-quantity';
 import { isRecord } from '../../../shared/utils/isRecord.js';
-import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
+import { getLookupPresentation } from '../../../shared/utils/articleOptions.js';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';

@@ -20,10 +20,10 @@ const editor = useCatalogEditor({
 const { values, errors, message, isSubmitting, isConflicted } = editor;
 const isEditing = props.target.action === 'edit';
 const entityLabel =
-    props.catalog === 'materials' &&
-    props.target.action === 'create' &&
-    props.target.materialType === 'CONSUMABLE'
-        ? 'consumible'
+    props.catalog === 'materials' && props.target.action === 'create' && props.target.materialType
+        ? props.target.materialType === 'CONSUMABLE'
+            ? 'consumible'
+            : 'material'
         : definition.entityLabel;
 const title = `${isEditing ? 'Editar' : 'Registrar'} ${entityLabel}`;
 </script>

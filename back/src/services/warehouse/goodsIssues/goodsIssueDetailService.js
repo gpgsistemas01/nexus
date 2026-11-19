@@ -23,7 +23,7 @@ import { resolveGoodsIssueDetailFulfillmentStatusName } from './goodsIssueFulfil
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueDetailService');
 
-const supplyGoodsIssue = async ({ id, goodsIssueDto, type }) => getDb().$transaction(async tx => {
+export const supplyGoodsIssue = async ({ id, goodsIssueDto, type, tx }) => {
     await lockGoodsIssue({ tx, id });
     const issue = await tx.goodsIssue.findUnique({
         where: { id, ...buildGoodsIssueContextWhere(type) },
@@ -113,7 +113,7 @@ const supplyGoodsIssue = async ({ id, goodsIssueDto, type }) => getDb().$transac
             details: { select: GOODS_ISSUE_DETAIL_SELECT }
         }
     });
-});
+};
 
 export const updateGoodsIssueDetails = ({ id, goodsIssueDto, type = MATERIAL_TYPES.MATERIAL }) => executeServiceOperation({
     logger: serviceLogger,
@@ -121,5 +121,5 @@ export const updateGoodsIssueDetails = ({ id, goodsIssueDto, type = MATERIAL_TYP
     model: 'goodsIssue',
     data: { id, ...goodsIssueDto },
     fallbackError: new GoodsIssueUpdateDatabaseError(),
-    action: () => supplyGoodsIssue({ id, goodsIssueDto, type })
+    action: () => getDb().$transaction(tx => supplyGoodsIssue({ id, goodsIssueDto, type, tx }))
 });

@@ -1,7 +1,7 @@
 <a id="cu-ent-01"></a>
 # `CU-ENT-01` — Consultar compras de material
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 

@@ -557,6 +557,12 @@
       },
       "MaterialOfferCreateRequest": {
         "$ref": "./components/warehouse-schemas.json#/MaterialOfferCreateRequest"
+      },
+      "GoodsIssueCreateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsIssueCreateRequest"
+      },
+      "WasteIssueCreateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/WasteIssueCreateRequest"
       }
     },
     "parameters": {

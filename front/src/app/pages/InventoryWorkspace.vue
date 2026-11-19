@@ -4,7 +4,7 @@ import { PERMISSIONS } from '@nexus/permissions';
 import { usePageAccess } from '../composables/usePageAccess.js';
 import CatalogEditorPage from '../../modules/catalogs/pages/CatalogEditorPage.vue';
 import type { CatalogEntry } from '../../modules/catalogs/catalog.js';
-import { mapMaterialOption } from '../../shared/utils/mapMaterialOption.js';
+import { mapMaterialOption } from '../../shared/utils/articleOptions.js';
 import InventoryPage from '../../modules/warehouse/pages/InventoryPage.vue';
 import DirectoryCreationPage from './DirectoryCreationPage.vue';
 import type { InventoryResource } from '../../modules/warehouse/inventory.js';

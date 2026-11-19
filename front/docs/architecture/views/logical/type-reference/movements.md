@@ -45,7 +45,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## MovementTable.defineProps
 
-**Fuente:** [src/modules/movements/components/MovementTable.vue](../../../../../src/modules/movements/components/MovementTable.vue) · línea 9, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/movements/components/MovementTable.vue](../../../../../src/modules/movements/components/MovementTable.vue) · línea 10, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -63,7 +63,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## MovementTable.defineEmits
 
-**Fuente:** [src/modules/movements/components/MovementTable.vue](../../../../../src/modules/movements/components/MovementTable.vue) · línea 16, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/movements/components/MovementTable.vue](../../../../../src/modules/movements/components/MovementTable.vue) · línea 17, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

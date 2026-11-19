@@ -45,13 +45,10 @@ el API rechaza su captura o modificación con el código de campo de `errorMap`.
 La nueva muestra se registra exclusivamente desde merma.
 
 Las validaciones de alta permiten omitir ambas medidas; si se informa una, exigen la
-pareja positiva y responden con los códigos de campo de `errorMap`. El DTO normaliza
-las medidas omitidas como `null`; la conversión sin dimensiones conserva la cantidad.
-El formulario reutiliza `updateMaterialMeasurementFields` al abrir el modal y cambiar
-la unidad con Select2: sólo habilita medidas para metros y litros durante el alta,
-oculta y limpia la sección en pieza y otras unidades, y conserva la identidad bloqueada
-en edición y ajustes. Abrir el selector de unidad no descarta su selección. No se añade
-una consulta de unidad ni una validación duplicada en el servicio.
+pareja positiva y responden con los códigos de campo de `errorMap`. Para consumibles y
+presentaciones KILOGRAMOS o METRO LINEAL, el backend exige medidas `1 × 1`. El DTO
+normaliza medidas omitidas como `null`; la conversión sin dimensiones conserva la
+cantidad. Vue muestra los campos según el artículo y la presentación seleccionados.
 
 ### Datos, resultados y efectos del módulo
 

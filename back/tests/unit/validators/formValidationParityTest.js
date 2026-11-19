@@ -1,3 +1,4 @@
+import { issueImmediateSupplyValidation } from '../../../src/validators/forms/issueValidations.js';
 import { describe, expect, it } from 'vitest';
 import { validationResult } from 'express-validator';
 import * as fields from '../../../src/validators/fields/fieldsValidator.js';
@@ -170,3 +171,11 @@ describe('captura coherente entre navegador y servidor (DP-VAL-004)', () => {
         }
     );
 });
+
+it.each([[true, true], [false, true], [undefined, true], ['true', false], ['false', false], [1, false], [null, false]])(
+    'surtido al guardar acepta únicamente booleanos JSON o campo ausente (%j)',
+    async (supplyImmediately, valid) => {
+        const errors = await run([issueImmediateSupplyValidation], { supplyImmediately });
+        expect(errors.map(error => error.path)).toEqual(valid ? [] : ['supplyImmediately']);
+    }
+);

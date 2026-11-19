@@ -32,7 +32,7 @@ it('cancelar al desmontar antes de terminar de abrir no deja una confirmación g
   const controller = new AbortController();
   const submit = vi.fn();
   const confirming = confirmAction({
-    title: 'Eliminar material',
+    title: 'Eliminar existencia de material',
     description: 'Proveedor de prueba',
     signal: controller.signal,
     submit,

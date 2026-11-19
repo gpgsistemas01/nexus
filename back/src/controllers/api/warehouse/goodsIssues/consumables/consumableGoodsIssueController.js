@@ -10,7 +10,7 @@ import { buildReadHandler, buildListHandler, buildRegisterHandler, buildEditHand
 
 export const getConsumableGoodsIssue = buildReadHandler(findAllConsumableGoodsIssues);
 export const getAllConsumableGoodsIssues = buildListHandler(findAllConsumableGoodsIssues);
-export const registerConsumableGoodsIssue = buildRegisterHandler(createConsumableGoodsIssue);
+export const registerConsumableGoodsIssue = buildRegisterHandler(createConsumableGoodsIssue, 'consumable');
 export const editConsumableGoodsIssue = buildEditHandler(updateConsumableGoodsIssue);
 export const editConsumableGoodsIssueHeader = buildHeaderHandler(updateConsumableGoodsIssueHeader);
 export const editConsumableGoodsIssueDetails = buildDetailsHandler({

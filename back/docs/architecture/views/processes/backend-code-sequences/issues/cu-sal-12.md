@@ -1,7 +1,7 @@
 <a id="cu-sal-12"></a>
 # `CU-SAL-12` — Surtir merma
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P05](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
 ## Participantes y trazabilidad
 
@@ -113,7 +113,7 @@ sequenceDiagram
     IssueDto-->>Controller: createWasteIssueDetailsDtoForEdit(): Object (wasteIssueDto)
     deactivate IssueDto
     Controller->>Service: updateWasteIssueDetails({ id, wasteIssueDto: sanitizedWasteIssueDto })
-    Service->>Service: updateWasteIssueDetailsTransaction({ id, wasteIssueDto })
+    Service->>Service: supplyWasteIssue({ id, wasteIssueDto })
     Service->>FileBaseRepository: getDb()
     FileBaseRepository-->>Service: getDb(): PrismaClient | TransactionClient — tx si se recibió
     Service->>Prisma: db.$transaction(async tx => ...)

@@ -48,8 +48,8 @@
 - Validators rechazan forma y límites de entrada sin duplicar decisiones transaccionales.
   Una regla específica de un formulario permanece privada en `validators/forms`; sólo
   los validadores de campo independientes del recurso se exportan desde `validators/fields`.
-- Módulos de `application` coordinan casos de uso del navegador; `pages` componen y
-  registran el contexto; `ui` y `views/shared` contienen presentación reutilizable.
+- En Vue, los módulos funcionales coordinan casos de uso; las páginas componen el
+  contexto y `shared` contiene presentación reutilizable. La API no importa esos módulos.
 - Antes de agregar un proceso se revisan factories, componentes y flujos equivalentes.
   Si sólo cambia material por merma u otro contexto, se parametriza el proceso común y
   se mantienen separadas únicamente reglas, permisos, persistencia o lenguaje propios.
@@ -93,11 +93,8 @@ que el cliente determine un discriminador persistido y reutiliza el núcleo com�
   pública puede compartirse, pero el servidor calcula el resultado que persiste.
 - Precisión, identificadores de permisos y cálculos compartidos tienen un propietario
   único en `shared`. Las políticas de autorización permanecen en el servidor.
-- Las páginas proporcionan callbacks de apertura a DataTables y Select2. Los adaptadores
-  de plugins no importan páginas. El AJAX de cada plugin recibe la consulta del recurso.
-- La captura de detalles pertenece al contexto del formulario; los plugins la reciben
-  para mostrarla o editarla. Una selección se decodifica una vez antes de construir
-  la partida. Los payloads se adaptan en `application/warehouse/issues/issueDetails.js`.
-- Los controllers de reportes adaptan filtros HTTP y envían el archivo. Las consultas y
+- Los módulos Vue realizan las consultas HTTP y mantienen captura y presentación. La API
+  recibe DTOs y aplica validación, autorización y reglas de dominio antes de persistir.
+- Los servicios de reportes adaptan filtros HTTP y envían el archivo. Las consultas y
   resúmenes pertenecen al dominio; `utils/reports/warehouseReportExcel.js` construye filas
   y fórmulas sin conocer `req` ni `res`, conservando el consumo por lotes.

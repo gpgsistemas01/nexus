@@ -1,7 +1,7 @@
 <a id="cu-ida-09"></a>
 # `CU-IDA-09` — Generar reporte de usuarios
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

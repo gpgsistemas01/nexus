@@ -82,7 +82,7 @@ onMounted(() => {
     />
     <RecordListPanel
         v-model:search="search"
-        :title="config.tableTitle"
+        :title="config.title"
         :title-id="`inventory-${resource}-title`"
         :total="total"
         :is-loading="isLoading"
@@ -119,13 +119,7 @@ onMounted(() => {
                 prepend-icon="$plus"
                 @click="inventory.openEditor({ action: 'create' })"
             >
-                {{
-                    resource === 'wastes'
-                        ? 'Nueva merma'
-                        : resource === 'consumables'
-                          ? 'Nuevo consumible'
-                          : 'Nuevo material'
-                }}
+                {{ resource === 'wastes' ? 'Nueva merma' : 'Nueva existencia' }}
             </VBtn>
         </template>
         <InventoryTable

@@ -2,7 +2,7 @@
 
 ## Consultar existencias
 
-Abra **Almacén → Materiales**. **Tabla de Existencias** muestra material, proveedor,
+Abra **Almacén → Existencias de materiales**. **Tabla de Existencias de materiales** muestra material, proveedor,
 presentación, unidad y stock. Las columnas agrupadas distinguen dimensiones y conversión.
 Busque y filtre para localizar el registro correcto.
 
@@ -20,7 +20,7 @@ para su cuenta; no se elige una operación diferente en cada fila.
 y observaciones. El sistema genera los IDs nuevos; Stock actual y Conversión
 son referencias.
 
-**Editar datos:** cambie **Material**, **Stock mínimo**, **Costo unitario** y **Activo**.
+**Editar datos:** cambie **Material**, **Stock mínimo**, **Costo máximo unitario** y **Activo**.
 Se conservan IDs/versiones, proveedor, presentación, unidad, medidas y existencias.
 <!-- manual:end -->
 
@@ -112,14 +112,14 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 <!-- manual:any materials:write -->
 ## Registrar un material
 
-1. Pulse **Nuevo material** para abrir **Crear material**.
+1. Pulse **Nueva existencia** para abrir **Registrar existencia de material**.
 2. Elija **Proveedor** y **Material**. La búsqueda incluye todo el catálogo, aunque el artículo todavía no tenga proveedor.
-3. Complete **Costo máximo unitario**, **Activo**, **Cantidad inicial** y **Observaciones**.
+3. Complete **Cantidad inicial**, **Costo máximo unitario**, **Activo** y **Observaciones**.
 4. Pulse **Guardar**. Se vincula el artículo al proveedor y se registra el stock inicial en una sola operación.
 
 Nombre, presentación, unidad, medidas y mínimo pertenecen al catálogo; no se vuelven a capturar aquí. PIEZA exige cantidades enteras; KILOGRAMOS y METRO LINEAL admiten decimales y conservan `1 × 1`.
 
-Si falta el artículo, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar material «texto escrito»**, complete **Presentación**, **Unidad de medida**, medidas cuando apliquen y mínimo, y guarde. No necesita elegir antes un proveedor. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Catálogos → Materiales**.
+Si falta el artículo, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar material «texto escrito»**, complete **Presentación**, **Unidad de medida**, medidas cuando apliquen y mínimo, y guarde. No necesita elegir antes un proveedor. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Almacén → Artículos**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
@@ -139,7 +139,7 @@ la existencia; el costo máximo se configura en **Almacén**. No duplique la ent
 ## Editar datos
 
 1. Localice el registro y pulse **Editar**.
-2. Cambie **Nombre**, **Stock mínimo**, **Costo máximo unitario** o **Activo**, según corresponda.
+2. Cambie **Material**, **Stock mínimo**, **Costo máximo unitario** o **Activo**, según corresponda.
 3. Pulse **Guardar** y compruebe el registro actualizado.
 
 Proveedor, presentación, unidad y medidas son de consulta. El stock y su conversión
@@ -182,4 +182,17 @@ Desmarcar **Activo** conserva el registro y su historia para consulta.
 
 Revise los filtros y pulse **Exportar Excel**. El archivo incluye todos los
 resultados de la consulta.
+<!-- manual:end -->
+
+<!-- manual:any materials:write -->
+Al seleccionar el artículo, **Datos del artículo** muestra Base, Altura,
+Presentación, Unidad de medida y Stock mínimo con los valores de Artículos.
+Son datos de referencia, sin nuevas entradas de captura. La cantidad inicial se
+registra en **Stock actual**; **Costo máximo unitario** y **Activo** corresponden
+a las columnas del mismo nombre. Al editar, se muestran existencia y conversión
+actuales.
+<!-- manual:end -->
+
+<!-- manual:any materials:adjust-stock -->
+El stock se modifica mediante **Ajustar stock**.
 <!-- manual:end -->

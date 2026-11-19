@@ -1,7 +1,7 @@
 <a id="cu-cat-23"></a>
 # `CU-CAT-23` — Editar motivo de ajuste
 
-**Patrones:** `BE-P02`.
+**Patrones:** `[BE-P02](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

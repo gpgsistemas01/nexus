@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { getLookupArticle } from '../utils/articleOptions.js';
 import { isRecord } from '../utils/isRecord.js';
 import { numberText } from '../utils/formatNumbers.js';
 import type { LookupItem } from '../lookup.js';
 
 const props = defineProps<{ columns: string[]; selected?: LookupItem }>();
-const article = computed(() => {
-    const data = props.selected?.data;
-    return data && isRecord(data.material) ? data.material : (data ?? {});
-});
+const article = computed(() => getLookupArticle(props.selected));
 
 const mobileReference = computed(() => {
     const data = article.value;

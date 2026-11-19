@@ -1,7 +1,7 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { normalizeInventoryRow } from '../mappers/inventoryMapper.js';
 import { inventoryParams } from './inventoryPageRequest.js';
@@ -13,7 +13,7 @@ import type {
     InventoryResource,
 } from '../inventory.js';
 import type { LookupItem } from '../../../shared/lookup.js';
-import { mapMaterialOption } from '../../../shared/utils/mapMaterialOption.js';
+import { mapMaterialOption } from '../../../shared/utils/articleOptions.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 
 export const inventoryService = {
@@ -80,7 +80,7 @@ export const inventoryService = {
             signal,
         );
         if (!isRecord(result.material))
-            throw new ApiError(
+            throw new ResponseContractError(
                 'No se pudo identificar el artículo registrado. Actualiza las opciones antes de continuar.',
             );
 

@@ -2406,5 +2406,93 @@
         ]
       }
     }
+  },
+  "GoodsIssueCreateRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/advisorId"
+      },
+      "clientId": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/clientId"
+      },
+      "departmentId": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/departmentId"
+      },
+      "requesterId": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/requesterId"
+      },
+      "projectNumber": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/projectNumber"
+      },
+      "requestDate": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/requestDate"
+      },
+      "observations": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/observations"
+      },
+      "details": {
+        "$ref": "./warehouse-schemas.json#/GoodsIssueRequest/properties/details"
+      },
+      "supplyImmediately": {
+        "type": "boolean",
+        "default": false,
+        "description": "Surtir todas las partidas al guardar. Requiere permiso de surtido de Almacén o Sistemas. Alta, stock y movimientos se confirman en una transacción; sin stock se revierte toda la operación."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate",
+      "details"
+    ]
+  },
+  "WasteIssueCreateRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/advisorId"
+      },
+      "clientId": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/clientId"
+      },
+      "departmentId": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/departmentId"
+      },
+      "requesterId": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/requesterId"
+      },
+      "projectNumber": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/projectNumber"
+      },
+      "requestDate": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/requestDate"
+      },
+      "observations": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/observations"
+      },
+      "details": {
+        "$ref": "./warehouse-schemas.json#/WasteIssueRequest/properties/details"
+      },
+      "supplyImmediately": {
+        "type": "boolean",
+        "default": false,
+        "description": "Surtir todas las partidas al guardar. Requiere permiso de surtido de Almacén o Sistemas. Alta, stock y movimientos se confirman en una transacción; sin stock se revierte toda la operación."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate",
+      "details"
+    ]
   }
 }

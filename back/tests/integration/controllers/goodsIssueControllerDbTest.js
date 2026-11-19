@@ -1,3 +1,4 @@
+import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { readFileSync } from 'node:fs';
@@ -14,6 +15,7 @@ const ids = {};
 const issues = {};
 let app;
 let prisma;
+let sessionAccesses;
 const reportFinders = {};
 const issuePath = resource => `/goods-issues/${resource === 'consumable' ? 'consumables' : 'materials'}`;
 
@@ -85,7 +87,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         reportFinders.consumable = (await import('../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js')).findConsumableGoodsIssueReportRows;
         app = createControllerTestApp({ registerRoutes: router => {
             router.use((req, _res, next) => {
-                req.user = { accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] };
+                req.user = { accesses: sessionAccesses ?? [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] };
                 next();
             });
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
@@ -540,6 +542,45 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(await getIssueCounter(prefix)).toEqual(beforeCounter);
         expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(beforeIssues);
         expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } })).toEqual(beforeStock);
+    });
+
+    it.each(['material', 'consumable'])('registra y surte %s en una transacción o revierte todo si falta stock', async resource => {
+        sessionAccesses = resource === 'material' ? [{ roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }] : [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS }];
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+        const before = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+        try {
+            await prisma.supplierMaterial.update({ where, data: { currentStock: 5 } });
+            const created = await request(app).post(issuePath(resource)).send({ ...header(), supplyImmediately: true, details: [detail(resource)] }).expect(200);
+            expect(created.body.goodsIssue.fulfillmentStatus).toMatchObject({ name: 'Surtido' });
+            const saved = await prisma.goodsIssue.findUniqueOrThrow({ where: { id: created.body.goodsIssue.id }, include: { details: true } });
+            expect(Number(saved.details[0].suppliedQuantity)).toBe(2);
+            expect(saved.details[0].isSupplied).toBe(true);
+            expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where })).currentStock)).toBe(3);
+            const movement = await prisma.inventoryMovement.findFirstOrThrow({ where: { goodsIssueId: saved.id }, include: { details: true } });
+            expect(movement.type).toBe('ISSUE');
+            expect(Number(movement.details[0].quantity)).toBe(-2);
+            const count = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
+            const movementCount = await prisma.inventoryMovement.count();
+            await request(app).post(issuePath(resource)).send({ ...header(), supplyImmediately: true, details: [{ ...detail(resource), quantity: 4 }] }).expect(409);
+            expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(count);
+            expect(await prisma.inventoryMovement.count()).toBe(movementCount);
+            expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where })).currentStock)).toBe(3);
+        } finally {
+            await prisma.supplierMaterial.update({ where, data: { currentStock: before.currentStock } });
+            sessionAccesses = undefined;
+        }
+    });
+
+    it('rechaza surtir desde un área operativa aunque manipule el alta', async () => {
+        const count = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
+        const before = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } });
+        sessionAccesses = [{ roleKey: ROLE_KEYS.AUXILIARY, departmentKey: DEPARTMENT_KEYS.SALES, departmentId: ids.department }];
+        try {
+            const response = await request(app).post(issuePath('material')).send({ ...header(), supplyImmediately: true, details: [detail('material')] }).expect(403);
+            expect(response.body.code).toBe('FORBIDDEN');
+            expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(count);
+            expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } })).toEqual(before);
+        } finally { sessionAccesses = undefined; }
     });
 
 });

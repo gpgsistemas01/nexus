@@ -1,7 +1,7 @@
+import { ClientError, ResponseContractError } from '../../../shared/clientError.js';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
@@ -25,11 +25,13 @@ const mutationCodes = {
 
 const readAccesses = (value: unknown): PersonAccess[] => {
     if (!Array.isArray(value))
-        throw new ApiError('No se recibieron las responsabilidades de la persona.');
+        throw new ResponseContractError('No se recibieron las responsabilidades de la persona.');
 
     return value.map((access) => {
         if (!isRecord(access) || !isRecord(access.department) || !isRecord(access.role)) {
-            throw new ApiError('Se recibió una responsabilidad incompleta. Actualiza el listado.');
+            throw new ResponseContractError(
+                'Se recibió una responsabilidad incompleta. Actualiza el listado.',
+            );
         }
 
         return {
@@ -102,7 +104,7 @@ export const identityService = {
     },
     async export(resource: IdentityResource, query: IdentityQuery, signal: AbortSignal) {
         if (resource === 'persons' && query.role) {
-            throw new ApiError(
+            throw new ClientError(
                 'Limpia el filtro de rol para exportar las responsabilidades por área.',
             );
         }

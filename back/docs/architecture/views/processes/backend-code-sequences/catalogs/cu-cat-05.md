@@ -1,7 +1,7 @@
 <a id="cu-cat-05"></a>
 # `CU-CAT-05` — Consultar clientes
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 ## Participantes y trazabilidad
 

@@ -1,3 +1,5 @@
+import { computed, ref } from 'vue';
+import { ISSUE_CONFIG } from '../issueConfig.js';
 import { useForm } from 'vee-validate';
 import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { issueService } from '../services/issueService.js';
@@ -24,6 +26,10 @@ export const useIssueEditor = (options: {
     onDenied: (status: number) => void;
 }) => {
     const { mode, document } = options.target;
+    const supplyImmediately = ref(false);
+    const canSupplyOnCreate = computed(
+        () => mode === 'create' && options.has(ISSUE_CONFIG[options.resource].supplyPermission),
+    );
     const isReadOnly = mode === 'view' || mode === 'return';
     const canEditHeader = ['create', 'edit', 'header'].includes(mode);
     const canEditDetails = mode === 'create' || mode === 'edit';
@@ -80,7 +86,11 @@ export const useIssueEditor = (options: {
               issueService.save({
                   resource: options.resource,
                   target,
-                  payload: mapIssueFormToRequest(values, options.resource, target.mode),
+                  payload: {
+                      ...mapIssueFormToRequest(values, options.resource, target.mode),
+                      ...(canSupplyOnCreate.value &&
+                          supplyImmediately.value && { supplyImmediately: true }),
+                  },
                   signal,
               }),
           )
@@ -88,6 +98,8 @@ export const useIssueEditor = (options: {
 
     return {
         ...record,
+        supplyImmediately,
+        canSupplyOnCreate,
         values: form.values,
         errors: form.errors,
         isReadOnly,

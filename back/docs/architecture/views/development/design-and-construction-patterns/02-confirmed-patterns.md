@@ -1,6 +1,6 @@
 # 2. Resumen de patrones confirmados de la API
 
-| Frontera | Decisión aplicada | Evidencia |
+| Frontera | Implementación | Código |
 | --- | --- | --- |
 | Arquitectura | Monolito modular y capas por dominio. | Rutas, controllers, servicios y repositories. |
 | Entrada HTTP | Pipeline de autenticación, permisos, validación y adaptación. | `src/routes/api` y `src/middleware`. |
@@ -13,5 +13,5 @@
 
 El cliente Vue queda fuera de estos patrones; consume el contrato HTTP y los módulos
 públicos de `src/shared`, mientras la API conserva validación y autorización.
-La [evaluación SOLID](15-solid-principles.md) explica principios y límites de estas
-decisiones.
+La [evaluación SOLID](15-solid-principles.md) relaciona estos principios con las
+responsabilidades actuales del código.

@@ -16,7 +16,6 @@ servidor estático entrega `dist` y la API procesa autenticación, permisos y da
 | Cómo se coordina una operación y se recupera un rechazo | [Secuencias](views/processes/index.md) y [estados de interacción](views/logical/states/index.md). |
 | Qué mecanismos reutiliza el código | [Patrones y aplicaciones Vue](views/development/design-and-construction-patterns/index.md). |
 | Cómo se compila y ejecuta | [Vista física](views/physical/index.md). |
-| Qué decisiones estructuran el cliente y qué límites producen | [Decisiones arquitectónicas](decisions.md). |
 
 La [organización 4+1](views/index.md) agrupa los modelos anteriores por vista.
 

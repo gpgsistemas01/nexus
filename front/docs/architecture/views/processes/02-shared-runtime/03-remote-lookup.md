@@ -1,111 +1,82 @@
 # Búsqueda, paginación y selección remota
 
-**Casos relacionados:** RD-VUE-006; RN-VUE-003/005; soporte de captura.
+**Pregunta:** ¿cómo se actualizan las opciones de un selector desde el servidor sin
+mostrar resultados obsoletos? **Aplicaciones:** selectores de Compras, Salidas, Almacén
+y Directorio.
 
-`refresh(search)` cambia la búsqueda y recarga la primera página en una sola operación; cancela el debounce anterior. Sin argumento conserva la búsqueda. Las altas rápidas de Compras usan `refresh('')` para evitar dos solicitudes consecutivas.
+## Apertura y primera carga
 
-`RemoteSelect` conserva el texto controlado y `useRemoteLookup` espera 500 ms sin
-pulsaciones antes de consultar. Cada cambio reinicia la espera y cancela la petición
-anterior; una respuesta tardía no sustituye la búsqueda vigente.
-
-## Primera apertura y reutilización
-
-**Identificador:** `DIA-VUE-SEQ-058`. Apertura sin texto de búsqueda. La
-[política de carga](../../../contracts/client-contracts.md#página-de-datos-y-selección-remota)
-define la vida útil de las opciones y la precarga del área.
+**Identificador:** `DIA-VUE-SEQ-058`. La página evita repetir una consulta ya solicitada o
+que sigue en curso.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario
-    box Interfaz
-    participant Select@{ "type": "boundary" } as RemoteSelect.vue
-    end
-    box Coordinación
-    participant Page@{ "type": "control" } as PurchaseEditorPage.vue
-    participant Lookup@{ "type": "control" } as useRemoteLookup.ts
-    participant Editor@{ "type": "control" } as usePurchaseEditor.ts
-    end
-    box Integración
-    participant Service@{ "type": "boundary" } as purchaseLookupService.ts
-    end
-    U->>Select: nowrap: update:menu = true
-    Select->>Select: nowrap: updateMenu(true)
-    Select->>Page: nowrap: emit('search', '')
-    Page->>Lookup: nowrap: editor.suppliers.updateSearch('')
-    alt nowrap: !hasRequested && !isLoading.value
-        Lookup->>Lookup: nowrap: load(1)
-        Lookup->>Editor: nowrap: request(search.value, nextPage, requestController.signal)
-        Editor->>Service: nowrap: purchaseLookupService.list(query, signal)
-        Service-->>Editor: nowrap: result
-        Editor-->>Lookup: nowrap: result
-        Lookup->>Lookup: nowrap: items.value = [...previous, ...additions]
-        Lookup-->>Page: nowrap: suppliers.state
-        Page-->>Select: nowrap: state
-    else nowrap: hasRequested || isLoading.value
-        Lookup-->>Page: nowrap: undefined
+    actor Usuario
+    participant Select@{ "type": "boundary" } as Selector remoto
+    participant Page@{ "type": "control" } as Página del recurso
+    participant Lookup@{ "type": "control" } as Estado de búsqueda
+    participant Service@{ "type": "boundary" } as Servicio de consulta
+    participant API@{ "type": "boundary" } as API
+    Usuario->>Select: abrir opciones
+    Select->>Page: solicitar búsqueda vigente
+    Page->>Lookup: actualizar consulta
+    alt No hay resultados cargados ni solicitud en curso
+        Lookup->>Service: pedir la primera página
+        Service->>API: consultar opciones del recurso
+        API-->>Service: opciones y conteo
+        Service-->>Lookup: página recibida
+        Lookup-->>Page: opciones y estado de carga
+        Page-->>Select: mostrar resultados
+    else Ya hay una consulta vigente
+        Lookup-->>Page: conservar resultados y carga actuales
     end
 ```
 
-## Secuencia aplicada
+## Escritura, paginación y recuperación
 
 **Identificador:** `DIA-VUE-SEQ-010`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario
-    box Interfaz
-    participant Select@{ "type": "boundary" } as Remote<br/>Select.vue
+    actor Usuario
+    participant Select@{ "type": "boundary" } as Selector remoto
+    participant Page@{ "type": "control" } as Página del recurso
+    participant Lookup@{ "type": "control" } as Estado de búsqueda
+    participant Service@{ "type": "boundary" } as Servicio de consulta
+    participant API@{ "type": "boundary" } as API
+    Usuario->>Select: escribir una búsqueda
+    Select->>Page: emitir texto de búsqueda
+    Page->>Lookup: reemplazar consulta y reiniciar páginas
+    Note over Lookup: esperar 500 ms y cancelar la petición anterior
+    Lookup->>Service: solicitar página para la búsqueda vigente
+    Service->>API: consultar opciones del recurso
+    API-->>Service: página, conteo o error
+    Service-->>Lookup: devolver resultado
+    alt La respuesta pertenece a la consulta actual
+        Lookup-->>Page: actualizar opciones y disponibilidad de más páginas
+        Page-->>Select: presentar opciones o acción de reintento
+    else La respuesta llegó tarde o se canceló
+        Lookup-->>Page: ignorar resultado obsoleto
     end
-    box Coordinación
-    participant Page@{ "type": "control" } as Purchase<br/>Editor<br/>Page.vue
-    participant Editor@{ "type": "control" } as usePurchase<br/>Editor.ts
-    participant Lookup@{ "type": "control" } as useRemote<br/>Lookup.ts
-    participant Selection@{ "type": "control" } as useSelected<br/>Option.ts
-    end
-    box Integración
-    participant Service@{ "type": "boundary" } as purchase<br/>Lookup<br/>Service.ts
-    end
-    U->>Select: nowrap: update:search
-    Select->>Page: nowrap: emit('search', value)
-    Page->>Lookup: nowrap: editor.suppliers.updateSearch(value)
-    Lookup->>Lookup: nowrap: resetOptions()
-    Lookup->>Lookup: nowrap: isLoading.value = isEnabled.value
-    Lookup->>Lookup: nowrap: ++sequence
-    Lookup->>Lookup: nowrap: controller?.abort()
-    Lookup->>Lookup: nowrap: setTimeout(() => load(), LOOKUP_SEARCH_DELAY_MS)
-    Lookup->>Editor: nowrap: request(search.value, nextPage,<br/>requestController.signal)
-    Editor->>Service: nowrap: purchaseLookupService.list({<br/>kind: 'suppliers', resource: options.resource,<br/>search, page, capture: true }, signal)
-    Service-->>Editor: nowrap: result
-    Editor-->>Lookup: nowrap: result
-    opt nowrap: requestId === sequence
-        Lookup->>Lookup: nowrap: items.value = [...previous, ...additions]
-        Lookup->>Lookup: nowrap: hasMore.value = result.data.length > 0 &&<br/>recordsRead < result.recordsFiltered
-        Lookup-->>Page: nowrap: suppliers.state
-        Page-->>Select: nowrap: state: LookupState
-        Select->>Selection: nowrap: useSelectedOption(toRef(() =><br/>props.state.items), getId, getInitialOption)
-        Selection-->>Select: nowrap: selected
-    end
-    U->>Select: nowrap: intersect
-    Select->>Page: nowrap: emit('more')
-    Page->>Lookup: nowrap: suppliers.loadMore()
-    opt nowrap: !isLoading.value && !error.value && hasMore.value
-        Lookup->>Lookup: nowrap: load(page.value + 1)
+    opt El usuario llega al final de las opciones
+        Select->>Page: solicitar más resultados
+        Page->>Lookup: cargar la siguiente página
     end
 ```
 
-Si la lectura falla, `useRemoteLookup` publica `error` y calcula `canRetry` mediante
-`isReadRetryable`. `RemoteSelect` emite `retry` sólo cuando ofrece ese botón;
-la página llama `retry()`, que repite `load(requestedPage)` sin saltar de página.
-La [presentación del error](../../../interface-standards.md#carga-y-recuperación)
-no bloquea los otros campos del formulario.
+`RemoteSelect` conserva la selección por ID aunque la página visible de opciones cambie.
+Un error de lectura recuperable habilita **Reintentar**; la nueva lectura usa la página
+solicitada. `refresh` sirve a las altas contextuales para actualizar opciones después
+de crear un registro.
 
-## Fuentes de los participantes
+## Fuentes
 
 [RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue),
-[PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue),
-[usePurchaseEditor.ts](../../../../../src/modules/purchases/composables/usePurchaseEditor.ts),
 [useRemoteLookup.ts](../../../../../src/shared/composables/useRemoteLookup.ts),
 [useSelectedOption.ts](../../../../../src/shared/composables/useSelectedOption.ts),
-[purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts).
+[purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts),
+[issueLookupService.ts](../../../../../src/modules/issues/services/issueLookupService.ts),
+[pageRequest.ts](../../../../../src/shared/http/pageRequest.ts),
+[apiClient.ts](../../../../../src/shared/http/apiClient.ts).

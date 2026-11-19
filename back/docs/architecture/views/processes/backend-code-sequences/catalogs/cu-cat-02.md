@@ -1,7 +1,7 @@
 <a id="cu-cat-02"></a>
 # `CU-CAT-02` — Crear proveedor
 
-**Patrones:** `BE-P01`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`.
 
 El origen visual no altera el contrato backend: tanto el listado de Sistemas como el selector de una
 compra llaman al mismo `POST`. `suppliers:manage` autoriza el alta de Almacén, mientras

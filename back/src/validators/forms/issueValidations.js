@@ -1,3 +1,5 @@
+import { body } from 'express-validator';
+import { errorMap } from '../../messages/codeMessages.js';
 import { FORM_FIELD_LIMITS } from '../../shared/constants/inputValidation.js';
 import { validateDate, validateProjectNumber, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
 
@@ -10,3 +12,5 @@ export const issueHeaderValidation = [
     validateDate('requestDate'),
     validateTextOptional({ fieldName: 'observations', maxLength: FORM_FIELD_LIMITS.OBSERVATIONS })
 ];
+
+export const issueImmediateSupplyValidation = body('supplyImmediately').optional().custom(value => typeof value === 'boolean').withMessage(errorMap.isSupplied.INVALID_BOOLEAN);

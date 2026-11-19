@@ -85,7 +85,7 @@ no una demostración de todos los CU.
 | `CU-ALM-06` | `inventoryReportControllerDbTest.js`, `reportExcelUtilsTest.js`. | Exportación XLSX real con más de 5000 filas, tipos, alcances, orden, vacío y stock conservado. | **Integración existente**, sin atribuirle privacidad de costos no comprobada. |
 | `CU-ALM-07..08` | `movementContextDbTest.js`. | Routers reales con cookie/JWT, filtros, paginación, separación de tipos y XLSX personalizado/mensual. | **Integración existente**, incluidos 401/403 para los accesos probados. |
 | `CU-ALM-09` | `wasteControllerTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Unitaria de consulta con filtros, búsqueda, proveedor, orden, paginación y servicio simulado. | **Unitaria existente.** |
-| `CU-ALM-10` | `wasteControllerFlowTest.js`, `wasteRegistrationBoundaryTest.js`, `inventoryFormTest.ts`, `wasteWeightDbTest.js`, `materialControllerDbTest.js`. | Límites, duplicado, origen MATERIAL en m², referencia de rollo completo y neto/largo recalculados; rechazo sin efectos y payload sin derivados de muestra; entrada EME inicial, cantidad cero sin documentos ni folio y rollback de entrada/movimiento/contador (`CP-INT-MER-004`). | **Unitarias e integración existentes**; interacción real Select2/Swal/modal requiere navegador. |
+| `CU-ALM-10` | `wasteControllerFlowTest.js`, `wasteRegistrationBoundaryTest.js`, `inventoryFormTest.ts`, `wasteWeightDbTest.js`, `materialControllerDbTest.js`. | Límites, duplicado, origen MATERIAL en m², referencia de rollo completo y neto/largo recalculados; rechazo sin efectos y payload sin derivados de muestra; entrada EME inicial, cantidad cero sin documentos ni folio y rollback de entrada/movimiento/contador (`CP-INT-MER-004`). | **Unitarias e integración existentes**; el recorrido de formulario Vue se verifica en las pruebas de navegador del frontend. |
 | `CU-ALM-11` | `wasteControllerFlowTest.js`, `wasteWeightDbTest.js`. | Edición de campos permitidos, rechazo de pesos inmutables y conservación de muestras históricas. | **Unitarias e integración existentes**, limitadas a las reglas descritas. |
 | `CU-ALM-12` | `wasteWeightDbTest.js`, `wasteControllerFlowTest.js`, `warehouseConcurrencyControllerDbTest.js`. | Ajuste AME independiente de EME, por controller HTTP y coincidente con entrada, diferencias sobre saldo vigente y movimientos reales; la variante de material usa servicio directo. | **Evidencia parcial existente**; el harness de concurrencia no monta validadores ni permisos de la ruta de producción. |
 | `CU-ALM-13` | `wasteControllerTest.js`, `inventoryFormTest.ts`, `wasteStockAdditionModalTest.js`, `wasteWeightDbTest.js`. | Agregar stock conserva pesos, suma cantidad y genera entrada EME; confirmar duplicado sólo abre modal, permite revisar captura y evita escritura directa. | **Unitarias e integración existentes**; falta recorrido completo de navegador. |
@@ -100,6 +100,7 @@ no una demostración de todos los CU.
 | `CU-ALM-22` | Sin prueba funcional directa del filtro de consumibles. | Filtros visibles, tres alcances, ofertas de ambos tipos, conjunto vacío y contenido del archivo limitado a `CONSUMABLE`. | **Brecha**; las pruebas generales de `reportControllerTest.js` y `reportServiceTest.js` no comprueban este caso ni sustituyen la integración del archivo. |
 | `CU-ALM-23` | Integración HTTP/Prisma: contexto, conteos, paginación, filtros cruzados y permisos. | Historial de consumibles separado, con proveedor y selector propios. | `movementContextDbTest.js`. |
 | `CU-ALM-24` | Integración con Excel real personalizado y mensual, contenido y permisos. | Descargar desde la consulta y revisar hoja, folios y saldos. | `movementContextDbTest.js`. |
+| `CU-ALM-25..27` | `catalogControllersDbTest.js` (`CP-INT-CAT-MAT-001`) y `materialControllerDbTest.js`. | HTTP/Prisma verifica búsqueda y paginación de identidades sin duplicar por proveedor, alta sin oferta/stock, edición completa sin vínculos y bloqueo de tipo/medidas cuando ya existe una oferta. | **Integración existente**; la cobertura de interfaz Vue está en la [matriz frontend](../../../front/docs/testing/04-use-case-coverage.md). |
 | `CU-CAT-01..03` | `supplierControllerDbTest.js`. | Integración de alta, consulta y actualización con fixtures y limpieza en base aislada. | **Integración existente.** |
 | `CU-CAT-04` | `records.spec.ts` y `front/tests/system/application.spec.ts`. | Descarga/reintento de interfaz y XLSX real con búsqueda: incluye fixture de proveedor y excluye otra. | **Navegador y sistema representativos.** Faltan otras combinaciones/roles y volúmenes. |
 | `CU-CAT-05..07` | `clientControllerDbTest.js`. | Integración de alta, listado, actualización y error específico con fixtures y limpieza. | **Integración existente.** |
@@ -140,9 +141,9 @@ booleanos/textos válidos conservan `false`; tipos incorrectos se rechazan con c
 por campo antes del controller. La integración comprueba que no cambian documentos,
 saldos ni movimientos ante esos rechazos.
 
-La recuperación compartida de lecturas de listados se verifica en `DP-UI-001` con
-`createDataTableTest.js` y `apiClientTest.ts`: reintento limitado, Swal ante error
-definitivo y ausencia de resultados tardíos. Esta evidencia transversal no sustituye
+La recuperación compartida de lecturas se verifica en Vue con
+`listInteractionTest.ts`, `catalogListTest.ts` y `apiClientTest.ts`: cancelación,
+respuestas tardías y presentación del error. Esta evidencia transversal no sustituye
 los filtros, permisos o consultas de cada caso ni un recorrido real de navegador.
 `DP-VAL-002` añade el contrato de acceso (`CU-AUT-01`) con router y servicio reales:
 captura inválida, rechazo genérico de credenciales y acceso válido. La renovación

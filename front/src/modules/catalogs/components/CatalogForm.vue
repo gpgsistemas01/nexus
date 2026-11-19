@@ -42,12 +42,14 @@ const emit = defineEmits<{
 <template>
     <RecordEditorDialog
         :title="title"
-        eyebrow="CATÁLOGOS"
+        :eyebrow="isMaterial ? 'ALMACÉN' : 'CATÁLOGOS'"
         :max-width="isMaterial ? 800 : 600"
         :is-submitting="isSubmitting"
         :is-conflicted="isConflicted"
         :message="message"
-        reload-label="Cerrar y actualizar catálogo"
+        :reload-label="
+            isMaterial ? 'Cerrar y actualizar artículos' : 'Cerrar y actualizar catálogo'
+        "
         :submit-label="isEditing ? 'Actualizar' : 'Guardar'"
         :note="
             isMaterial
@@ -70,9 +72,13 @@ const emit = defineEmits<{
             @update:model-value="emit('update', 'name', $event ?? '')"
             @blur="emit('blur', 'name')"
         />
-        <template v-if="isMaterial">
+        <div
+            v-if="isMaterial"
+            class="article-fields"
+        >
             <VSelect
                 v-if="!isTypeFixed"
+                class="article-fields__wide"
                 label="Tipo"
                 :items="[
                     { title: 'Material', value: 'MATERIAL' },
@@ -136,6 +142,7 @@ const emit = defineEmits<{
                 />
             </template>
             <VTextField
+                class="article-fields__wide"
                 label="Stock mínimo"
                 type="number"
                 min="0"
@@ -146,7 +153,7 @@ const emit = defineEmits<{
                 @update:model-value="emit('update', 'minStock', $event ?? '')"
                 @blur="emit('blur', 'minStock')"
             />
-        </template>
+        </div>
         <VTextField
             v-if="hasSymbol"
             label="Símbolo"
@@ -168,3 +175,19 @@ const emit = defineEmits<{
         />
     </RecordEditorDialog>
 </template>
+
+<style scoped>
+.article-fields {
+    display: grid;
+    gap: 0 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.article-fields__wide {
+    grid-column: 1 / -1;
+}
+@media (max-width: 599px) {
+    .article-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+</style>

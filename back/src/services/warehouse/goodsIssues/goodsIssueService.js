@@ -1,3 +1,6 @@
+import { supplyGoodsIssue } from './goodsIssueDetailService.js';
+import { buildInitialIssueSupplyDetails } from '../issues/issueSupplyRules.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import {
     GoodsIssueNotFound,
@@ -23,7 +26,7 @@ import { findFulfillmentStatusIdByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
 import { handleServiceError } from "../../serviceErrorHandler.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { assertIssueDepartmentAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
+import { assertIssueDepartmentAccess, assertIssueImmediateSupplyAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../shared/constants/fulfillmentStatuses.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
@@ -143,8 +146,10 @@ export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MA
 
     try {
 
-        const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
+        const { requesterId, advisorId, departmentId, clientId, details, supplyImmediately, ...goodsIssueData } = goodsIssueDto;
         assertIssueDepartmentAccess({ accesses, departmentId });
+
+        if (supplyImmediately) assertIssueImmediateSupplyAccess({ accesses, permission: PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE });
 
         const headerData = await resolveIssueHeaderData({
             requesterId,
@@ -193,6 +198,13 @@ export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MA
                 }
             });
 
+            if (supplyImmediately) {
+                const supplied = await supplyGoodsIssue({
+                    id: goodsIssue.id, type, tx,
+                    goodsIssueDto: { details: buildInitialIssueSupplyDetails(goodsIssue.details) }
+                });
+                return { goodsIssue: { ...goodsIssue, ...supplied } };
+            }
             return { goodsIssue };
         });
 

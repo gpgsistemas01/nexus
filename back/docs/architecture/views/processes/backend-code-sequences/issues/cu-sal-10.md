@@ -1,7 +1,7 @@
 <a id="cu-sal-10"></a>
 # `CU-SAL-10` — Editar encabezado de salida de merma
 
-**Patrones:** `BE-P01`, `BE-P04`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
 ## Participantes y trazabilidad
 

@@ -34,7 +34,14 @@ const emit = defineEmits<{
     action: [target: EditorTarget];
     query: [query: Partial<InventoryQuery>];
 }>();
-const headers = computed(() => inventoryHeaders(props.resource, props.permissions));
+const headers = computed(() =>
+    inventoryHeaders(
+        props.resource,
+        props.permissions,
+        props.resource !== 'consumables' ||
+            props.rows.some((row) => row.base != null && row.height != null),
+    ),
+);
 const { sortBy, changesFromOptions } = useTableQuery(
     () => props.query,
     () => INVENTORY_SORT_COLUMNS,

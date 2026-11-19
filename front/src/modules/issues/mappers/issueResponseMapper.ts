@@ -1,5 +1,5 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { FULFILLMENT_STATUS_NAMES } from '@nexus/issue-statuses';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
@@ -8,7 +8,7 @@ import type { LookupItem } from '../../../shared/lookup.js';
 import type { HistoricalDeliveryEvidence } from '../historicalDelivery.js';
 
 const createInvalidResponseError = () =>
-    new ApiError('El servidor devolvió una salida incompleta. Actualiza la consulta.');
+    new ResponseContractError('El servidor devolvió una salida incompleta. Actualiza la consulta.');
 
 const readOptionalRelation = (value: unknown): Record<string, unknown> =>
     isRecord(value) ? value : {};

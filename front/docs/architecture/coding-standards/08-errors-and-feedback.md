@@ -29,7 +29,7 @@ export const confirmMutation = (
     errorMessage = 'No se pudo confirmar la operación. Actualiza el listado antes de reintentar.',
 ): MutationConfirmation => {
     if (!isRecord(value) || value.code !== expected) {
-        throw new ApiError(errorMessage);
+        throw new ResponseContractError(errorMessage);
     }
 
     return { code: value.code, message: getSuccessMessage(value.code) };
@@ -42,10 +42,12 @@ HTTP sea exitoso. En
 comprobación precede a normalizar y devolver el registro; el coordinador anuncia éxito
 después.
 
-Los rechazos locales de captura, respuesta inválida o recuperación también usan
-`ApiError`, con estado `0`: no simulan un rechazo HTTP definitivo. En importaciones y
-entregas históricas, un contrato inválido conserva la captura y la clave pendientes;
-sólo un rechazo HTTP definitivo permite descartarlas según la regla de la operación.
+`ApiError` conserva estado, código y errores de campo del rechazo HTTP. Los fallos
+de transporte sin respuesta usan estado `0`. `ClientError` describe problemas de captura
+o recuperación detectados en Vue. `ResponseContractError` indica que Vue recibió datos
+incompatibles con el contrato de la operación. Ambos se muestran sin activar el manejo
+de errores de campo o de permisos HTTP. En importaciones y entregas históricas, un
+contrato inválido conserva la captura y la clave pendientes.
 
 ## Descargas y recursos
 

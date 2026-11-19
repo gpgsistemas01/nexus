@@ -26,7 +26,7 @@ estados técnicos no son catálogos administrables vigentes.
 | Información del negocio | Datos y relaciones principales |
 | --- | --- |
 | Personas y cuentas | Participantes del negocio, cuentas de ingreso, responsabilidades organizacionales y asignaciones de acceso. |
-| Materiales y consumibles | Clasificación, nombre, presentación y unidad; dimensiones de materiales cuando corresponden. Los consumibles carecen de dimensiones. |
+| Artículos | Identidad compartida de materiales y consumibles: clasificación, nombre, presentación, unidad, medidas aplicables y stock mínimo. KILOGRAMOS y METRO LINEAL usan medidas `1 × 1`; los demás consumibles no guardan dimensiones. |
 | Ofertas de proveedor | Artículo y proveedor asociados, existencia, cantidad convertida, costo máximo y actividad. Un artículo puede tener ofertas de varios proveedores. |
 | Mermas | Material de referencia, proveedor, datos físicos, pesos y existencias propios; muestra del rollo completo cuando la presentación es Rollo. |
 | Compras | Proveedor, comprobante, receptor, fecha, observaciones, detalles recibidos, cantidades, costos e importes. |

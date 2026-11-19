@@ -22,7 +22,7 @@ export const ISSUE_CONFIG = {
         supplyPermission: PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE,
     },
     wastes: {
-        title: 'Salidas de merma',
+        title: 'Salidas de mermas',
         label: 'Mermas',
         item: 'Merma',
         path: 'mermas',

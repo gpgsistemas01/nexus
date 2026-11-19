@@ -1,5 +1,5 @@
+import { ResponseContractError } from '../clientError.js';
 import { apiClient } from './apiClient.js';
-import { ApiError } from './apiError.js';
 import { isRecord } from '../utils/isRecord.js';
 
 export interface PageResult<T> {
@@ -22,7 +22,7 @@ export const requestPage = async (
         !Number.isSafeInteger(page.recordsTotal) ||
         page.recordsTotal < 0
     ) {
-        throw new ApiError('El servidor devolvió un listado inesperado.');
+        throw new ResponseContractError('El servidor devolvió un listado inesperado.');
     }
 
     return page as PageResult<Record<string, unknown>>;

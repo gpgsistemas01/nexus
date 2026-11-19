@@ -1,7 +1,7 @@
 <a id="cu-cat-15"></a>
 # `CU-CAT-15` — Consultar presentación
 
-**Patrones:** `BE-P02`.
+**Patrones:** `[BE-P02](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

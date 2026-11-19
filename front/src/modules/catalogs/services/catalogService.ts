@@ -1,8 +1,8 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { pageParams } from '../../../shared/http/pageParams.js';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
@@ -20,7 +20,7 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
         Number(value.version) < 0 ||
         (catalog === 'unit-measures' && typeof value.symbol !== 'string')
     )
-        throw new ApiError('El servidor devolvió un registro de catálogo incompleto.');
+        throw new ResponseContractError('El servidor devolvió un registro de catálogo incompleto.');
 
     if (catalog === 'materials') {
         if (
@@ -28,7 +28,9 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
             !isRecord(value.presentation) ||
             !isRecord(value.unitMeasure)
         )
-            throw new ApiError('El servidor devolvió un material de catálogo incompleto.');
+            throw new ResponseContractError(
+                'El servidor devolvió un material de catálogo incompleto.',
+            );
 
         const decimal = (input: unknown) => {
             if (input === null) return '';
@@ -38,7 +40,9 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
                 !Number.isFinite(Number(input)) ||
                 Number(input) < 0
             )
-                throw new ApiError('El servidor devolvió una medida o mínimo inválido.');
+                throw new ResponseContractError(
+                    'El servidor devolvió una medida o mínimo inválido.',
+                );
 
             return String(input);
         };
@@ -108,7 +112,7 @@ export const catalogService = {
             target.materialType &&
             entry.type !== target.materialType
         )
-            throw new ApiError(
+            throw new ResponseContractError(
                 'El servidor devolvió un artículo de otro catálogo. Actualiza las opciones antes de continuar.',
             );
 

@@ -64,3 +64,7 @@ la API valida y calcula el resultado persistido.
 El [estándar de seguridad](../../security-standards.md) concentra las reglas sobre
 texto, secretos y fronteras. Las comprobaciones están en el
 [diseño de seguridad](../../../testing/design/07-shared.md#seguridad-de-texto-y-avisos).
+
+Vue usa las reglas públicas para orientar la captura. Express valida cada solicitud
+recibida y responde con códigos de error por campo. Los servicios comprueban permisos,
+existencias, estado y vigencia de los datos antes de escribir.

@@ -118,3 +118,8 @@ En móvil utiliza un drawer temporal. Compartir el layout conserva esos estados.
 Revisar foco, teclado, errores iniciales, ancho móvil y recuperación en el recorrido
 afectado. jsdom comprueba estado y contratos; la distribución y la interacción real
 se verifican en navegador, conforme al [plan de pruebas](../testing/01-test-plan.md).
+
+Los enlaces del menú y los títulos reutilizan la configuración de cada módulo.
+Artículos nombra el registro maestro; Existencias nombra su operación por
+proveedor. Las acciones usan Nuevo/Nueva para iniciar y Registrar, Editar,
+Consultar, Surtir o Devolver en el formulario, con el recurso en singular.

@@ -13,7 +13,7 @@ const buildGoodsIssueDto = (body = {}) => ({
     })
 });
 
-export const createGoodsIssueDtoForRegister = (body = {}) => buildGoodsIssueDto(body);
+export const createGoodsIssueDtoForRegister = (body = {}) => ({ ...buildGoodsIssueDto(body), ...(body.supplyImmediately === true && { supplyImmediately: true }) });
 
 export const createGoodsIssueDtoForEdit = (body = {}) => buildGoodsIssueDto(body);
 

@@ -1,7 +1,7 @@
 import { API_PATHS } from '../http/apiPaths.js';
 import { lookupParams } from '../http/pageParams.js';
 import { requestPage } from '../http/pageRequest.js';
-import { mapMaterialOption } from '../utils/mapMaterialOption.js';
+import { mapMaterialOption } from '../utils/articleOptions.js';
 import type { LookupQuery } from '../lookup.js';
 
 export const materialCatalogService = {

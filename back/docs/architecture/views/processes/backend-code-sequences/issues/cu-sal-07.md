@@ -1,7 +1,7 @@
 <a id="cu-sal-07"></a>
 # `CU-SAL-07` — Generar reporte de salidas de material
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

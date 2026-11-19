@@ -61,18 +61,18 @@ La comparación con el catálogo y la matriz técnica confirma que cada identifi
 aparece una vez, conserva su referencia de patrones y contiene su secuencia Mermaid. Los casos extensos separan
 entrada/coordinación y colaboración interna. Las preparaciones de partidas y los
 movimientos de inventario amplían sus llamadas en niveles de detalle. Cada uno de los
-94 casos conserva sus archivos propios y representa también los configuradores que
+97 casos conserva sus archivos propios y representa también los configuradores que
 construyen handlers, mediante componentes separados de las líneas de ejecución.
 
 | Grupo propietario | Rango cubierto | Casos | Estado |
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
-| Almacén | `CU-ALM-01..24` | 24 | Completo |
+| Almacén | `CU-ALM-01..27` | 27 | Completo |
 | Catálogos | `CU-CAT-01..26` | 26 | Completo |
 | Entradas | `CU-ENT-01..12` | 12 | Completo |
 | Salidas | `CU-SAL-01..21` | 21 | Completo |
-| **Total** | Seis grupos propietarios | **94** | **94 de 94** |
+| **Total** | Seis grupos propietarios | **97** | **97 de 97** |
 
 Los casos `CU-AUT-01` y `CU-AUT-02` se conservan aquí porque iniciar y cerrar sesión son
 objetivos funcionales con código propio, no para repetir la autenticación dentro de cada

@@ -1,5 +1,5 @@
+import { ResponseContractError } from '../../../shared/clientError.js';
 import { GOODS_RECEIPT_DETAIL_STATUSES } from '@nexus/purchase-statuses';
-import { ApiError } from '../../../shared/http/apiError.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { PURCHASE_CONFIG } from '../purchaseConfig.js';
@@ -12,7 +12,7 @@ import type {
 } from '../purchase.js';
 
 const createInvalidResponseError = () =>
-    new ApiError('El servidor devolvió una compra incompleta. Actualiza la consulta.');
+    new ResponseContractError('El servidor devolvió una compra incompleta. Actualiza la consulta.');
 
 const readPurchaseDecimal = (value: unknown): Decimal => {
     if (

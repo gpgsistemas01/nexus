@@ -1,3 +1,4 @@
+import { ClientError } from '../../../shared/clientError.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { createUuid } from '../../../shared/utils/createUuid.js';
@@ -25,7 +26,7 @@ export const createPendingWasteOperation = (
                 (value) => value === null || ['string', 'number', 'boolean'].includes(typeof value),
             )
         ) {
-            throw new ApiError(
+            throw new ClientError(
                 'La captura pendiente no se puede leer. Conserva sus datos y contacta al administrador.',
             );
         }

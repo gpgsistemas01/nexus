@@ -376,7 +376,7 @@ test(
     );
     await page.reload();
     await expect(
-      page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+      page.getByRole('heading', { name: 'Tabla de Existencias de materiales', exact: true }),
     ).toBeVisible();
     await expect(page.getByRole('button', { name: 'Importar Excel', exact: true })).toHaveCount(0);
   },

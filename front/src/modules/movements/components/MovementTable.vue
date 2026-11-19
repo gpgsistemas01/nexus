@@ -4,6 +4,7 @@ import type { DataTableHeader } from 'vuetify';
 import { useTableQuery } from '../../../shared/composables/useTableQuery.js';
 import ServerTable from '../../../shared/components/ServerTable.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
+import { MOVEMENT_CONFIG } from '../movement.js';
 import type { MovementQuery, MovementRow, MovementResource } from '../movement.js';
 
 const props = defineProps<{
@@ -27,7 +28,7 @@ const headers = computed<DataTableHeader<MovementRow>[]>(() => [
     { title: 'Tipo', key: 'type', sortable: true, nowrap: true },
     { title: 'Folio', key: 'referenceNumber', sortable: true, nowrap: true },
     {
-        title: props.resource === 'consumables' ? 'Consumible' : 'Material',
+        title: MOVEMENT_CONFIG[props.resource].itemLabel,
         key: 'materialName',
         sortable: false,
         nowrap: true,

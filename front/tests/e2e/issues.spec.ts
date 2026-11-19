@@ -145,7 +145,7 @@ for (const [path, resource] of [
 for (const [path, resource, title, label] of [
   ['materiales', 'materials', 'Salidas de materiales', 'Material'],
   ['consumibles', 'consumables', 'Salidas de consumibles', 'Consumible'],
-  ['mermas', 'wastes', 'Salidas de merma', 'Merma'],
+  ['mermas', 'wastes', 'Salidas de mermas', 'Merma'],
 ] as const) {
   test(`salidas ${path}: menú Vue, alta sin errores iniciales y payload de solicitud`, async ({
     page,
@@ -178,6 +178,12 @@ for (const [path, resource, title, label] of [
     await expect(
       dialog.getByRole('button', { name: 'Registrar cliente', exact: true }),
     ).toHaveCount(0);
+    const immediateSupply = dialog.getByRole('checkbox', {
+      name: 'Surtir al guardar',
+      exact: true,
+    });
+    await expect(immediateSupply).not.toBeChecked();
+    if (resource === 'materials') await immediateSupply.check();
     await dialog.getByLabel('Observaciones', { exact: true }).fill('A'.repeat(501));
     await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue('A'.repeat(500));
     await dialog.getByLabel('Observaciones', { exact: true }).fill('');
@@ -235,6 +241,7 @@ for (const [path, resource, title, label] of [
         ? [{ wasteId: ids.waste, quantity: 2 }]
         : [{ materialId: ids.material, supplierId: ids.supplier, quantity: 2 }],
     );
+    expect(writes[0]!.data.supplyImmediately).toBe(resource === 'materials' ? true : undefined);
     expect(writes[0]!.data).not.toHaveProperty('status');
     expect(writes[0]!.data.departmentId).toBe(departmentId);
     await page.getByLabel('Observaciones contiene:', { exact: true }).fill('otro filtro');
@@ -570,6 +577,12 @@ test(
     ]);
     await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Editar salida', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
+    const createDialog = page.getByRole('dialog');
+    await expect(
+      createDialog.getByRole('checkbox', { name: 'Surtir al guardar', exact: true }),
+    ).toHaveCount(0);
+    await createDialog.getByRole('button', { name: 'Regresar', exact: true }).click();
     expect(writes).toHaveLength(0);
     await mockIssues(page, ['materials:read']);
     await page.goto('/salidas/materiales');

@@ -1,6 +1,7 @@
+import { ResponseContractError } from '../clientError.js';
 import axios, { CanceledError } from 'axios';
 import type { AxiosAdapter, AxiosRequestConfig } from 'axios';
-import { ApiError, normalizeApiError } from './apiError.js';
+import { normalizeApiError } from './apiError.js';
 import { recoverConnection } from './connectionRecovery.js';
 import type { RecoverableRequest } from './connectionRecovery.js';
 import { API_PATHS } from './apiPaths.js';
@@ -57,15 +58,11 @@ export const createApiClient = (adapter?: AxiosAdapter) => {
             if (options.responseType === 'blob') return response.data as T;
 
             if (!isRecord(response.data))
-                throw new ApiError(
-                    'El servidor devolvió una respuesta inesperada.',
-                    response.status,
-                    'INVALID_RESPONSE',
-                );
+                throw new ResponseContractError('El servidor devolvió una respuesta inesperada.');
 
             return response.data as T;
         } catch (cause) {
-            if (axios.isCancel(cause)) throw cause;
+            if (axios.isCancel(cause) || cause instanceof ResponseContractError) throw cause;
 
             throw await normalizeApiError(cause);
         }

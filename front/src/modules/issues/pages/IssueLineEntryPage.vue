@@ -2,7 +2,7 @@
 import { DECIMAL_INPUT_FORMAT } from '@nexus/input-validation';
 import { useIssueLineEntry } from '../composables/useIssueLineEntry.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
-import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
+import { getLookupPresentation } from '../../../shared/utils/articleOptions.js';
 import type { IssueResource, IssueDetail } from '../issue.js';
 import IssueLineEntryForm from '../components/IssueLineEntryForm.vue';
 

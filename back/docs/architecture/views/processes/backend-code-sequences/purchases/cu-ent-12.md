@@ -1,7 +1,7 @@
 <a id="cu-ent-12"></a>
 # `CU-ENT-12` — Generar reporte de compras de consumible
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

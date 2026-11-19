@@ -1,7 +1,7 @@
 <a id="cu-alm-06"></a>
 # `CU-ALM-06` — Generar reporte de inventario de materiales
 
-**Patrones:** `BE-P07`.
+**Patrones:** `[BE-P07](../../../development/design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia)`.
 
 ## Participantes y trazabilidad
 

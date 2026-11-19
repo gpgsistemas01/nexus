@@ -6,7 +6,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryEditor.defineProps
 
-**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 12, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 11, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -37,7 +37,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryEditor.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 28, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -248,9 +248,19 @@ Generado con `npm run docs:generate`. No editar manualmente.
 'unavailable' | 'canceled' | 'confirmed'
 ```
 
+## SectionId
+
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 23, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+(typeof SECTION_ORDER)[number]
+```
+
 ## InventoryFieldSpec
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 9, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 25, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -270,7 +280,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventorySummaryItem
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 20, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 36, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -279,11 +289,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryFormSection
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 24, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 40, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `id` | `id: string;` |
+| `id` | `id: SectionId;` |
 | `title` | `title: string;` |
 | `description` | `description?: string;` |
 | `fields` | `fields: InventoryFieldSpec[];` |
@@ -291,6 +301,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
+| dependency | [SectionId](../../../../../src/modules/warehouse/formFields.ts) | `id` |
 | association | [InventoryFieldSpec](../../../../../src/modules/warehouse/formFields.ts) | `fields` |
 | association | [InventorySummaryItem](../../../../../src/modules/warehouse/formFields.ts) | `summary` |
 
@@ -432,7 +443,7 @@ string | number | null
 
 ## InventoryValues
 
-**Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 90, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 87, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -457,7 +468,7 @@ string | number | null
 
 ## InventoryField
 
-**Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 110, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 107, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -471,7 +482,7 @@ keyof InventoryValues
 
 ## InventoryPayload
 
-**Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 111, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 108, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

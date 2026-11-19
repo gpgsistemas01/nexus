@@ -56,7 +56,6 @@
                 "architecture/views/index.md",
                 "architecture/views/diagram-reading.md",
                 "architecture/views/overview.md",
-                "architecture/decisions.md",
                 "architecture/views/scenarios/",
                 "architecture/views/logical/index.md",
                 "architecture/views/logical/components/",

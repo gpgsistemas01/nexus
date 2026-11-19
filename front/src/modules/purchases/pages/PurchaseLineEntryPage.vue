@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePurchaseLineEntry } from '../composables/usePurchaseLineEntry.js';
 import { PURCHASE_CONFIG } from '../purchaseConfig.js';
-import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
+import { getLookupPresentation } from '../../../shared/utils/articleOptions.js';
 import type { PurchaseResource, PurchaseDetail } from '../purchase.js';
 import type { ItemCreation } from '../../../shared/lookup.js';
 import type { LookupItem } from '../../../shared/lookup.js';

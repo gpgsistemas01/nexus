@@ -22,3 +22,9 @@ export const assertIssueDepartmentAccess = ({ accesses = [], departmentId }) => 
         throw new AppError('Sólo puede registrar salidas para sus áreas autorizadas.', 'FORBIDDEN', 403);
     }
 };
+
+export const assertIssueImmediateSupplyAccess = ({ accesses = [], permission }) => {
+    if (!getGrantedPermissions(accesses).includes(permission)) {
+        throw new AppError('No tiene permiso para surtir salidas al registrarlas.', 'FORBIDDEN', 403);
+    }
+};

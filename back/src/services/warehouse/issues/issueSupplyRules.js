@@ -41,3 +41,12 @@ export const resolveIssueSupplyChange = ({ current, requested }) => {
         }
     };
 };
+
+// El alta obtiene IDs, cantidades y conversiones del documento recién persistido.
+export const buildInitialIssueSupplyDetails = details => details.map(detail => ({
+    id: detail.id,
+    isSupplied: true,
+    quantityToSupply: Number(detail.quantity),
+    expectedSuppliedQuantity: 0,
+    projectConvertedQuantity: Number(detail.convertedQuantity)
+}));

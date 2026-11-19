@@ -1,7 +1,7 @@
 <a id="cu-sal-16"></a>
 # `CU-SAL-16` — Crear salida de consumible
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+**Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 
 Si el selector crea un cliente, antes de esta secuencia el navegador completa el `POST
 /api/sales/clients` de [`CU-CAT-06`](../catalogs/cu-cat-06.md#cu-cat-06). La salida recibe el
@@ -182,8 +182,11 @@ sequenceDiagram
             Note over Core: CONSUMABLE selecciona SCO
             Core->>Reference: generateYearlyReferenceNumber({ tx, type: referenceType })
             Core->>Prisma: tx.goodsIssue.create({ data: { type, referenceNumber, ... } })
+            opt supplyImmediately con permiso de surtido
+                Note over Core,Prisma: supplyGoodsIssue reutiliza tx: detalles, stock y movimiento.<br/>Si falla una partida, rollback del alta completa.
+            end
         end
-        Prisma-->>Core: commit de salida pendiente
+        Prisma-->>Core: commit de salida pendiente o surtida
         Core-->>Facade: createGoodsIssue(): Promise[GoodsIssue]
     else Error de dominio o persistencia
         Core-->>Facade: error — rollback si falló la transacción

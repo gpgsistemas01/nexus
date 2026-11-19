@@ -99,7 +99,7 @@ export const verifyInventoryAccess = async (page: Page, user: SessionUser) => {
     await expect(page.getByRole('columnheader', { name: /Costo/ })).toHaveCount(0);
   if (!user.permissions.includes(P.MATERIALS_WRITE))
     await expect(
-      page.getByRole('button', { name: /Nuevo material|Editar|Eliminar/, exact: true }),
+      page.getByRole('button', { name: /Nueva existencia|Editar|Eliminar/, exact: true }),
     ).toHaveCount(0);
   if (!user.permissions.includes(P.MATERIALS_ADJUST_STOCK))
     await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toHaveCount(0);
@@ -173,9 +173,9 @@ export const captureRecipe = async (
     if (number === 3) await verifyInventoryAccess(page, user);
     const action = (
       {
-        4: 'Nuevo material',
+        4: 'Nueva existencia',
         5: 'Ajustar stock',
-        7: 'Nuevo consumible',
+        7: 'Nueva existencia',
         9: 'Nueva merma',
         10: 'Agregar stock',
       } as Record<number, string>
@@ -208,6 +208,9 @@ export const captureRecipe = async (
             .evaluate((element) => element.scrollIntoView({ block: 'start' }));
       }
     }
+  } else if (filename === '11a-articles-list.png' || filename === '12a-article-form.png') {
+    await go(page, '/almacen/articulos');
+    if (filename === '12a-article-form.png') await openAction(page, 'Nuevo artículo');
   } else if (number <= 12) {
     await go(page, '/catalogos/unit-measures');
     if (number === 12) await openAction(page, 'Nueva unidad de medida');

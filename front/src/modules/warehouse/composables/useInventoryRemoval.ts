@@ -2,7 +2,7 @@ import { onBeforeUnmount, ref } from 'vue';
 import { confirmAction } from '../../../shared/ui/feedback.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
-import { INVENTORY_CONFIG } from '../inventory.js';
+import { inventoryActionTitle } from '../inventoryDisplay.js';
 import type { InventoryResource, InventoryRow } from '../inventory.js';
 
 export const useInventoryRemoval = (options: {
@@ -20,7 +20,7 @@ export const useInventoryRemoval = (options: {
 
         try {
             const confirmed = await confirmAction({
-                title: `Eliminar ${INVENTORY_CONFIG[options.resource].singular}: ${row.name}`,
+                title: `${inventoryActionTitle(options.resource, 'delete')}: ${row.name}`,
                 description: `Se eliminará la relación con ${row.supplierName}. Si no quedan otros proveedores, también se eliminará el material.`,
                 signal: controller.signal,
                 submit: async () => {

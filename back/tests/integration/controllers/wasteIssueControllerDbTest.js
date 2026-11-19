@@ -1,3 +1,4 @@
+import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 
@@ -42,7 +43,7 @@ describe('waste issue controller database integration', () => {
     prisma = prismaModule.prisma;
     app = createControllerTestApp({
       registerRoutes: router => {
-        router.use((req, _res, next) => { req.user = { id: ids.user, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] }; next(); });
+        router.use((req, _res, next) => { req.user = { id: ids.user, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS }] }; next(); });
         router.get('/waste-issues/:id', controller.getWasteIssue);
         router.get('/waste-issues', controller.getAllWasteIssues);
         router.get('/waste-movements', movementController.getAllWasteMovements);
@@ -493,4 +494,21 @@ describe('waste issue controller database integration', () => {
     expect(issue.details[0].isSupplied).toBe(false);
     expect(movements).toBe(0);
   });
+  it('registra merma surtida y revierte el alta completa cuando no alcanza el stock', async () => {
+    const before = await prisma.waste.findUniqueOrThrow({ where: { id: ids.waste } });
+    const body = { requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client, departmentId: ids.department, projectNumber: 'DIRECTO', requestDate: '2026-08-11T12:30:00.000Z', supplyImmediately: true, details: [{ wasteId: ids.waste, quantity: 0.5 }] };
+    try {
+      await prisma.waste.update({ where: { id: ids.waste }, data: { currentStock: 1 } });
+      const created = await request(app).post('/waste-issues').send(body).expect(201);
+      expect(created.body.wasteIssue.fulfillmentStatus).toMatchObject({ name: 'Surtido' });
+      const saved = await prisma.wasteIssueDetail.findFirstOrThrow({ where: { wasteIssueId: created.body.wasteIssue.id } });
+      expect(Number(saved.suppliedQuantity)).toBe(0.5);
+      expect(Number((await prisma.waste.findUniqueOrThrow({ where: { id: ids.waste } })).currentStock)).toBe(0.5);
+      const count = await prisma.wasteIssue.count({ where: { createdById: ids.user } });
+      await request(app).post('/waste-issues').send({ ...body, details: [{ wasteId: ids.waste, quantity: 1 }] }).expect(409);
+      expect(await prisma.wasteIssue.count({ where: { createdById: ids.user } })).toBe(count);
+      expect(Number((await prisma.waste.findUniqueOrThrow({ where: { id: ids.waste } })).currentStock)).toBe(0.5);
+    } finally { await prisma.waste.update({ where: { id: ids.waste }, data: { currentStock: before.currentStock } }); }
+  });
+
 });

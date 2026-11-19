@@ -2,7 +2,7 @@
 
 ## Consultar consumibles
 
-Abra **Almacén → Consumibles**. La **Tabla de Consumibles** distingue existencia,
+Abra **Almacén → Existencias de consumibles**. La **Tabla de Existencias de consumibles** distingue existencia,
 stock mínimo, presentación y unidad de medida. Lea la unidad para interpretar la cantidad.
 
 <!-- manual:any inventory:costs-read -->
@@ -30,14 +30,14 @@ IDs/versiones incluidos para editar o ajustar.
 <!-- manual:any materials:write -->
 ## Registrar un consumible
 
-1. Pulse **Nuevo consumible**.
+1. Pulse **Nueva existencia**.
 2. Elija **Proveedor** y **Consumible** del catálogo completo.
-3. Complete **Costo máximo unitario**, **Activo**, **Cantidad inicial** y **Observaciones**.
+3. Complete **Cantidad inicial**, **Costo máximo unitario**, **Activo** y **Observaciones**.
 4. Pulse **Guardar** y compruebe el saldo. Se crea la relación con el proveedor sin duplicar el artículo.
 
 Presentación, unidad, medidas y mínimo provienen del catálogo. PIEZA exige enteros; KILOGRAMOS y METRO LINEAL admiten decimales y representan una unidad `1 × 1`.
 
-Si falta el consumible, **escriba el nombre en Consumible** y pulse **Registrar consumible «texto escrito»** después de la búsqueda. Complete el modal; el tipo Consumible está definido por el módulo y no necesita elegir antes un proveedor. Al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Catálogos → Materiales**.
+Si falta el consumible, **escriba el nombre en Consumible** y pulse **Registrar consumible «texto escrito»** después de la búsqueda. Complete el modal; el tipo Consumible está definido por el módulo y no necesita elegir antes un proveedor. Al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Almacén → Artículos**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
@@ -56,7 +56,7 @@ se recibe al guardar la compra; no la duplique como cantidad inicial.
 <!-- manual:any materials:write -->
 ## Editar datos
 
-Pulse **Editar** y cambie **Nombre**, **Stock mínimo**, **Costo máximo unitario**
+Pulse **Editar** y cambie **Consumible**, **Stock mínimo**, **Costo máximo unitario**
 o **Activo**; después pulse **Guardar**. Proveedor, presentación y unidad son de
 consulta. El stock, su conversión y la medida por pieza del alta se conservan. Nombre y mínimo se comparten entre proveedores; costo y Activo
 afectan la oferta seleccionada.
@@ -101,3 +101,11 @@ La cantidad comprada expresa kg o metros, respectivamente: 4 kilos a $20 por kil
 suman $80 antes de IVA. Las medidas representan la unidad y no multiplican el precio.
 Esta regla también aplica al alta desde Compras y Excel. En Excel, Base y Altura
 vacías se completan en 1; los valores distintos de 1 se rechazan.
+
+<!-- manual:any materials:write -->
+El formulario conserva los nombres de las columnas: Consumible, Presentación,
+Unidad de medida, Stock mínimo, Costo máximo unitario y Activo. Los datos
+heredados de Artículos se muestran como referencia; Cantidad inicial se registra
+en **Existencia**.
+
+<!-- manual:end -->
