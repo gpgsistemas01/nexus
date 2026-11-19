@@ -399,7 +399,7 @@ test(
       await expect(field).not.toBeEditable();
     }
     await page.getByRole('button', { name: 'Editar artículo', exact: true }).click();
-    let relatedDialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+    let relatedDialog = page.getByRole('dialog', { name: 'Editar artículo', exact: true });
     await expect(relatedDialog.getByRole('textbox', { name: 'Nombre', exact: true })).toHaveValue(
       'Lona',
     );
