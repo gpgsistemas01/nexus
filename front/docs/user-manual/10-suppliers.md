@@ -22,8 +22,9 @@ primero ese material y su proveedor; después registre la merma.
 1. Abra **Proveedor** y **escriba el nombre comercial completo** que desea registrar;
    por ejemplo, **Proveedor nuevo**. Abrir el selector vacío no muestra el botón.
 2. Espere a que termine la búsqueda. Si el proveedor ya aparece, selecciónelo.
-   Si falta, pulse **Registrar proveedor «Proveedor nuevo»** al final de la lista,
-   sin cerrar la captura principal. El nombre del botón corresponde al texto escrito.
+   Si falta, pulse **Registrar proveedor «Proveedor nuevo»** al final de la lista
+   o presione **Enter** en el selector, sin cerrar la captura principal. El nombre
+   del botón corresponde al texto escrito.
 3. En el modal **Registrar proveedor**, complete **Razón social** y revise el **Nombre comercial** precargado.
 4. Mantenga **Activo** marcado si utilizará el proveedor en la operación.
 5. Pulse **Guardar** y espere la confirmación.

@@ -16,9 +16,12 @@ const openCreation = async (
   label: string,
   action: string,
   term: string,
+  method: 'keyboard' | 'click' = 'keyboard',
 ) => {
-  await scope.getByRole('combobox', { name: label, exact: true }).fill(term);
-  await page.getByRole('button', { name: `${action} «${term}»`, exact: true }).click();
+  const input = scope.getByRole('combobox', { name: label, exact: true });
+  await input.fill(term);
+  if (method === 'keyboard') await input.press('Enter');
+  else await page.getByRole('button', { name: `${action} «${term}»`, exact: true }).click();
 };
 
 for (const [path, resource, title] of [
@@ -65,7 +68,7 @@ for (const [path, resource, title] of [
       parent,
     );
     await parent.getByLabel('Cantidad inicial', { exact: true }).fill('5');
-    await openCreation(page, parent, 'Proveedor', 'Registrar proveedor', term);
+    await openCreation(page, parent, 'Proveedor', 'Registrar proveedor', term, 'click');
     const child = page.getByRole('dialog', { name: 'Registrar proveedor', exact: true });
     await expect(child.getByLabel('Nombre comercial', { exact: true })).toHaveValue(term);
     await expect(child.locator('[aria-invalid="true"]')).toHaveCount(0);

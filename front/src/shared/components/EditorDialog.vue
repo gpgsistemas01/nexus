@@ -125,6 +125,8 @@ const titleId = useId();
 
 <style scoped>
 .editor-dialog {
+    --editor-inline-padding: 1.25rem;
+
     border-radius: 1rem;
     background: rgb(var(--v-theme-background));
     box-shadow: 0 1.25rem 3rem rgba(var(--v-theme-on-surface), 0.18);
@@ -134,7 +136,7 @@ const titleId = useId();
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    padding: 1rem 1.5rem;
+    padding: 1rem var(--editor-inline-padding);
     background: rgb(var(--v-theme-modal-header));
     border-bottom: 5px solid rgb(var(--v-theme-accent));
     color: white;
@@ -152,7 +154,7 @@ const titleId = useId();
     line-height: 1.25;
 }
 .editor-body {
-    padding: 1.25rem !important;
+    padding: 1.25rem var(--editor-inline-padding) !important;
     background: linear-gradient(180deg, rgba(var(--v-theme-primary), 0.08), transparent 16rem);
 }
 .editor-context {
@@ -161,7 +163,7 @@ const titleId = useId();
     color: rgb(var(--v-theme-muted));
 }
 .editor-actions {
-    padding: 1rem 1.25rem;
+    padding: 1rem var(--editor-inline-padding);
     flex-wrap: wrap;
     gap: 0.75rem;
     background: rgb(var(--v-theme-surface));
@@ -173,11 +175,11 @@ const titleId = useId();
     font-size: 0.75rem;
 }
 @media (max-width: 600px) {
-    .editor-title {
-        padding: 1rem;
+    .editor-dialog {
+        --editor-inline-padding: 1rem;
     }
     .editor-body {
-        padding: 0.75rem !important;
+        padding-block: 1rem !important;
     }
     .editor-note {
         flex-basis: 100%;

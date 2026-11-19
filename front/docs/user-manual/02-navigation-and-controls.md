@@ -122,8 +122,9 @@ el nombre que desea registrar. Abrir el selector vacío no muestra esa acción.
 3. Si falta y tiene permiso, busque al final de la lista el botón
    **Registrar cliente «texto escrito»**, **Registrar proveedor «texto escrito»**,
    **Registrar material «texto escrito»** o **Registrar consumible «texto escrito»**, según el campo.
-4. Pulse el botón sin cerrar la captura principal. El texto escrito se precarga
-   en el formulario secundario; complete sus demás campos y pulse **Guardar**.
+4. Pulse el botón o presione **Enter** en el selector. Si la búsqueda sigue en curso,
+   Nexus espera el resultado y abre el alta si corresponde. El nombre se precarga
+   en el formulario secundario. Complete sus demás campos y pulse **Guardar**.
 5. Compruebe que vuelve al formulario principal con el registro nuevo seleccionado.
    Continúe la captura y guarde la operación principal cuando esté completa.
 

@@ -1,4 +1,3 @@
-import { ensureSupplierMaterials } from '../materials/supplierMaterialService.js';
 import { MATERIAL_DOCUMENT_DISPLAY_SELECT } from '../materials/materialService.js';
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { findPage } from '../../../repository/paginationRepository.js';
@@ -26,7 +25,7 @@ import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import {
     buildGoodsReceiptContextWhere,
-    buildGoodsReceiptDetails,
+    prepareGoodsReceiptDetails,
     buildGoodsReceiptStockOffers,
     calculateGoodsReceiptTotals,
     GOODS_RECEIPT_DETAIL_INCLUDE
@@ -42,6 +41,18 @@ import { assertGoodsReceiptInvoiceAvailable } from "./goodsReceiptInvoiceService
 
 const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptService');
 
+const receiveGoodsReceiptDetails = ({ tx, receipt, details = receipt.details }) => applyInventoryMovement({
+    tx,
+    reference: { goodsReceiptId: receipt.id },
+    supplierMaterials: buildGoodsReceiptStockOffers(receipt, details),
+    details: details.map(detail => ({
+        materialId: detail.materialId,
+        goodsReceiptDetailId: detail.id,
+        supplierId: receipt.supplierId,
+        quantity: detail.quantity
+    })),
+    movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
+});
 const throwIfInvoiceAlreadyExists = (err) => {
     if (err?.code !== PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) return;
 
@@ -174,8 +185,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId, type });
-            await ensureSupplierMaterials({ tx, supplierId, materialIds: processedDetails.map(detail => detail.materialId) });
+            const processedDetails = await prepareGoodsReceiptDetails({ tx, supplierId, type, details });
             const totals = calculateGoodsReceiptTotals(processedDetails);
             referenceNumber = await generateYearlyReferenceNumber({ type: referenceType, tx });
 
@@ -217,18 +227,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
                 }
             });
 
-            await applyInventoryMovement({
-                tx,
-                reference: { goodsReceiptId: goodsReceipt.id },
-                supplierMaterials: buildGoodsReceiptStockOffers(goodsReceipt),
-                details: goodsReceipt.details.map(detail => ({
-                    materialId: detail.materialId,
-                    goodsReceiptDetailId: detail.id,
-                    supplierId: goodsReceipt.supplierId,
-                    quantity: detail.quantity
-                })),
-                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
-            });
+            await receiveGoodsReceiptDetails({ tx, receipt: goodsReceipt });
 
             return goodsReceipt;
         });
@@ -335,18 +334,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
                 type
             });
 
-            await applyInventoryMovement({
-                tx,
-                reference: { goodsReceiptId: id },
-                supplierMaterials: buildGoodsReceiptStockOffers(updatedReceipt, createdDetails),
-                details: createdDetails.map(detail => ({
-                    materialId: detail.materialId,
-                    goodsReceiptDetailId: detail.id,
-                    supplierId: goodsReceipt.supplierId,
-                    quantity: detail.quantity
-                })),
-                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
-            });
+            await receiveGoodsReceiptDetails({ tx, receipt: updatedReceipt, details: createdDetails });
 
             return updatedReceipt;
         });

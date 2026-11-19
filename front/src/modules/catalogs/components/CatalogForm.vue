@@ -179,7 +179,7 @@ const emit = defineEmits<{
 <style scoped>
 .article-fields {
     display: grid;
-    gap: 0 1rem;
+    gap: 1.25rem 1rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .article-fields__wide {

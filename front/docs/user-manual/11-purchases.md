@@ -47,7 +47,11 @@ Todos los detalles pertenecen al **Proveedor** del encabezado; no se repite en e
 <!-- module:end -->
 
 Capture el costo por presentación; el servidor calcula los importes definitivos.
-Las compras no actualizan el costo máximo del inventario: se configura en **Almacén**.
+Al recibir materiales o consumibles, Nexus compara el **Costo máximo unitario**
+de cada oferta con el mayor costo unitario sin IVA entre sus partidas nuevas.
+Si el costo nuevo es mayor o la oferta no tiene costo, guarda el nuevo valor junto
+con la recepción. El máximo se mantiene por artículo y proveedor. Para corregirlo
+manualmente, use **Editar oferta** en Almacén.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 ### Registrar un proveedor durante la compra
@@ -55,7 +59,8 @@ Las compras no actualizan el costo máximo del inventario: se configura en **Alm
 En **Proveedor**, escriba el **nombre comercial completo** del proveedor nuevo y
 espere a que termine la búsqueda. Si ya existe, selecciónelo. Si falta, pulse
 **Registrar proveedor «texto escrito»** al final de la lista. Con el campo vacío
-no aparece el botón. Complete **Razón social**, revise **Nombre comercial** y
+no aparece el botón. También puede presionar **Enter** después de la búsqueda.
+Complete **Razón social**, revise **Nombre comercial** y
 **Activo**, guarde y compruebe que el proveedor queda seleccionado en la compra.
 <!-- manual:end -->
 
@@ -68,7 +73,8 @@ Seleccione primero el proveedor de la compra. El selector de artículos consulta
 
 En **Material**, **escriba el nombre completo** del artículo que falta, espere la
 búsqueda y revise las opciones. Si necesita el alta, pulse
-**Registrar material «texto escrito»** al final de la lista. Con el selector vacío
+**Registrar material «texto escrito»** al final de la lista o presione **Enter**.
+Con el selector vacío
 no aparece el botón.
 
 <!-- module:end -->
@@ -77,11 +83,13 @@ no aparece el botón.
 
 En **Consumible**, **escriba el nombre completo** del artículo que falta, espere
 la búsqueda y revise las opciones. Si necesita el alta, pulse
-**Registrar consumible «texto escrito»** al final de la lista. Con el selector vacío
+**Registrar consumible «texto escrito»** al final de la lista o presione **Enter**.
+Con el selector vacío
 no aparece el botón.
 
 <!-- module:end -->
 
+También puede pulsar **Enter** en el selector para abrir el alta cuando el nombre es nuevo.
 Complete el formulario auxiliar y guarde. En consumibles, revise la sección de medidas: seleccionar la presentación KILOGRAMOS o METRO LINEAL fija ambas medidas en 1 × 1 y oculta esos campos durante el alta. Después de pulsar **Agregar**, la tabla de detalles muestra medidas, unidad y cantidad convertida. El artículo nuevo queda seleccionado;
 todavía debe capturar **Cantidad** y **Costo por presentación**,
 pulsar **Agregar** y guardar la compra. El alta auxiliar guarda sólo la identidad del catálogo: no crea vínculo con el proveedor ni existencia. Si cancela la compra, el artículo queda disponible en el catálogo. La asociación y la existencia se registran al guardar la compra.

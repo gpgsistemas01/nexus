@@ -86,6 +86,8 @@ const reference = (column: string) => {
     .detail-entry__mobile-reference {
         display: block;
         color: rgb(var(--v-theme-muted));
+        margin-block-start: 0.25rem;
+        overflow-wrap: anywhere;
     }
     .detail-entry {
         display: grid;

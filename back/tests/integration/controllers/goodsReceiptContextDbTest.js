@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
@@ -262,14 +263,16 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[0].id } };
         let offer = await prisma.supplierMaterial.findUniqueOrThrow({ where });
         expect(Number(offer.currentStock)).toBe(2);
-        expect(offer.maxUnitCost).toBeNull();
+        expect(offer.maxUnitCost === null ? null : Number(offer.maxUnitCost)).toBe(10);
         expect(await prisma.supplierMaterial.count({ where: { materialId: { in: [catalog[2].id, catalog[3].id] } } })).toBe(0);
         await purchase(0.5).expect(200);
         offer = await prisma.supplierMaterial.findUniqueOrThrow({ where });
         expect(Number(offer.currentStock)).toBe(2.5);
         expect(await prisma.supplierMaterial.count({ where: { supplierId: ids.supplier, materialId: catalog[0].id } })).toBe(1);
         await request(app).patch(`${path(resource)}/${created.body.goodsReceipt.id}`).send({ ...purchaseBody(resource), details: [{ materialId: catalog[2].id, quantity: 1, costPerUnitType: 10 }] }).expect(200);
-        expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[2].id } } })).currentStock)).toBe(1);
+        const addedOffer = await prisma.supplierMaterial.findUniqueOrThrow({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[2].id } } });
+        expect(Number(addedOffer.currentStock)).toBe(1);
+        expect(addedOffer.maxUnitCost === null ? null : Number(addedOffer.maxUnitCost)).toBe(10);
         await prisma.supplierMaterial.update({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: catalog[1].id } }, data: { isActive: false } });
         const before = await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } });
         await request(app).post(path(resource)).send({ ...purchaseBody(resource), details: [catalog[3], catalog[1]].map(row => ({ materialId: row.id, quantity: 1, costPerUnitType: 10 })) }).expect(409);
@@ -297,8 +300,10 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids.consumable } };
         const original = await prisma.material.findUniqueOrThrow({ where: { id: ids.consumable }, select: { presentationId: true, base: true, height: true } });
         const presentation = await prisma.presentation.findUniqueOrThrow({ where: { name } });
+        const originalOffer = await prisma.supplierMaterial.findUniqueOrThrow({ where, select: { maxUnitCost: true } });
         try {
             await prisma.material.update({ where: { id: ids.consumable }, data: { presentationId: presentation.id, base: 1, height: 1 } });
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: null } });
             const before = await prisma.supplierMaterial.findUniqueOrThrow({ where });
             const response = await request(app).post(path('consumable')).send({
                 ...purchaseBody('consumable'),
@@ -314,29 +319,69 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
             const after = await prisma.supplierMaterial.findUniqueOrThrow({ where });
             expect(Number(after.currentStock)).toBe(Number(before.currentStock) + 0.75);
             expect(Number(after.convertedQuantity)).toBe(Number(before.convertedQuantity) + 0.75);
+            expect(Number(after.maxUnitCost)).toBe(200);
         } finally {
             await prisma.material.update({ where: { id: ids.consumable }, data: original });
+            await prisma.supplierMaterial.update({ where, data: originalOffer });
         }
     });
 
-    it.each(['material', 'consumable'])('comprar %s conserva el costo de almacén, incluso si aún no se capturó', async resource => {
+    it.each(['material', 'consumable'])('comprar %s conserva el mayor costo unitario por oferta', async resource => {
         const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
         try {
-            for (const maxUnitCost of [10, null]) {
+            for (const maxUnitCost of [250, 10, 0, null]) {
                 await prisma.supplierMaterial.update({ where, data: { maxUnitCost } });
                 const response = await request(app).post(path(resource)).send({
                     ...purchaseBody(resource), maxUnitCost: 999,
-                    details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 100, maxUnitCost: 999 }]
+                    details: [
+                        { materialId: ids[resource], quantity: 2, costPerUnitType: 100, maxUnitCost: 999 },
+                        { materialId: ids[resource], quantity: 1, costPerUnitType: 200 }
+                    ]
                 }).expect(200);
                 const saved = await prisma.goodsReceiptDetail.findMany({ where: { goodsReceiptId: response.body.goodsReceipt.id } });
-                expect(Number(saved[0].costPerUnitType)).toBe(100);
+                expect(saved.map(detail => Number(detail.costPerUnitType)).sort((a, b) => a - b)).toEqual([100, 200]);
                 const offer = await prisma.supplierMaterial.findUnique({ where });
-                expect(offer.maxUnitCost === null ? null : Number(offer.maxUnitCost)).toBe(maxUnitCost);
+                const expected = Math.max(maxUnitCost ?? 0, ...saved.map(detail => Number(detail.conversionUnitCost)));
+                expect(offer.maxUnitCost === null ? null : Number(offer.maxUnitCost)).toBe(expected);
             }
         } finally {
             await prisma.supplierMaterial.update({ where, data: { maxUnitCost: 10 } });
         }
     });
+    it('migra el máximo vigente de consumibles sin cambiar saldos ni costos de materiales', async () => {
+        const migration = await readFile(new URL('../../../prisma/migrations/20261119200000_reconcile_consumable_max_unit_costs/migration.sql', import.meta.url), 'utf8');
+        const rollback = new Error('Revertir datos de verificación de migración');
+        await expect(prisma.$transaction(async tx => {
+            const confirmed = await tx.status.findUniqueOrThrow({ where: { name: 'Confirmada' } });
+            await tx.goodsReceipt.update({ where: { id: receipts.consumable.id }, data: { statusId: confirmed.id } });
+            const line = {
+                goodsReceiptId: receipts.consumable.id, materialId: ids.consumable,
+                materialName: receipts.consumable.details[0].materialName,
+                quantity: 1, convertedQuantity: 1, costPerUnitType: 600,
+                netPurchaseAmount: 600, grossPurchaseAmount: 696
+            };
+            await tx.goodsReceiptDetail.createMany({ data: [
+                { ...line, conversionUnitCost: 500 },
+                { ...line, conversionUnitCost: 600 },
+                { ...line, conversionUnitCost: 800, status: 'CANCELED' }
+            ] });
+            const read = materialId => tx.supplierMaterial.findUniqueOrThrow({
+                where: { supplierId_materialId: { materialId, supplierId: ids.supplier } }
+            });
+            const before = await read(ids.consumable);
+            const material = await read(ids.material);
+            await tx.$executeRawUnsafe(migration);
+            const after = await read(ids.consumable);
+            expect(Number(after.maxUnitCost)).toBe(600);
+            expect(after.currentStock).toEqual(before.currentStock);
+            expect(await read(ids.material)).toEqual(material);
+            await tx.supplierMaterial.update({ where: { id: after.id }, data: { maxUnitCost: 900 } });
+            await tx.$executeRawUnsafe(migration);
+            expect(Number((await read(ids.consumable)).maxUnitCost)).toBe(900);
+            throw rollback;
+        })).rejects.toBe(rollback);
+    });
+
     const getCounter = prefix => prisma.referenceNumberCounter.findUnique({
         where: { prefix_year: { prefix, year: new Date().getFullYear() } }
     });

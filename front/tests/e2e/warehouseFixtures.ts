@@ -1,10 +1,18 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { ids, material, pageOf, template, user, waste } from '../fixtures/inventory.js';
+import {
+  consumableMaterial,
+  ids,
+  material,
+  pageOf,
+  template,
+  user,
+  waste,
+} from '../fixtures/inventory.js';
 
 export const mockWarehouse = async (
   page: Page,
   permissions = user.permissions,
-  options: { materialName?: string } = {},
+  options: { materialName?: string; consumableExample?: boolean } = {},
 ) => {
   await page.route('**/api/auth/me', (route) =>
     route.fulfill({ json: { user: { ...user, permissions } } }),
@@ -15,23 +23,25 @@ export const mockWarehouse = async (
       return route.fulfill({ status: 500, json: { code: 'UNEXPECTED_TEST_WRITE' } });
     const data = path.endsWith('/material-templates')
       ? [template]
-      : path.endsWith('/materials') || path.endsWith('/consumables')
-        ? [
-            options.materialName
-              ? { ...material, material: { ...material.material, name: options.materialName } }
-              : material,
-          ]
-        : path.endsWith('/wastes')
-          ? [waste]
-          : path.endsWith('/suppliers')
-            ? [{ id: ids.supplier, tradeName: 'Proveedor Central' }]
-            : path.endsWith('/presentations')
-              ? [template.presentation]
-              : path.endsWith('/unit-measures')
-                ? [template.unitMeasure]
-                : path.endsWith('/reasons')
-                  ? [{ id: ids.reason, name: 'Conteo físico' }]
-                  : [];
+      : path.endsWith('/consumables') && options.consumableExample
+        ? [consumableMaterial]
+        : path.endsWith('/materials') || path.endsWith('/consumables')
+          ? [
+              options.materialName
+                ? { ...material, material: { ...material.material, name: options.materialName } }
+                : material,
+            ]
+          : path.endsWith('/wastes')
+            ? [waste]
+            : path.endsWith('/suppliers')
+              ? [{ id: ids.supplier, tradeName: 'Proveedor Central' }]
+              : path.endsWith('/presentations')
+                ? [template.presentation]
+                : path.endsWith('/unit-measures')
+                  ? [template.unitMeasure]
+                  : path.endsWith('/reasons')
+                    ? [{ id: ids.reason, name: 'Conteo físico' }]
+                    : [];
     return route.fulfill({ json: pageOf<unknown>(data) });
   });
 };

@@ -45,6 +45,7 @@ export const updateSupplierMaterialStock = async ({
         return {
             materialId: offer.materialId,
             supplierId: offer.supplierId,
+            receiptUnitCost: offer.receiptUnitCost,
             quantityChange,
             convertedQuantityChange: calculateConvertedQuantity({ quantity: quantityChange, ...offer.material })
         };

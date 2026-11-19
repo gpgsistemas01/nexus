@@ -56,7 +56,7 @@ const supplierName = computed(() => {
             />
             <small
                 v-if="supplierName"
-                class="d-block text-medium-emphasis"
+                class="d-block mt-1 text-medium-emphasis"
             >
                 {{ supplierName }}
             </small>

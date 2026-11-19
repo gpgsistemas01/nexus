@@ -3,7 +3,7 @@ import { VAutocomplete } from 'vuetify/components/VAutocomplete';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { Intersect as vIntersect } from 'vuetify/directives/intersect';
-import { computed, ref, toRef } from 'vue';
+import { computed, ref, toRef, watch } from 'vue';
 import { useSelectedOption } from '../composables/useSelectedOption.js';
 import type { LookupItem, LookupState } from '../lookup.js';
 
@@ -38,6 +38,9 @@ const emit = defineEmits<{
 }>();
 const isMenuOpen = ref(false);
 const search = ref('');
+const searchTerm = computed(() => search.value.trim());
+const createButton = ref<{ $el: HTMLElement }>();
+let pendingCreateSearch: string | undefined;
 const currentItem = useSelectedOption(
     toRef(() => props.state.items),
     () => props.modelValue,
@@ -48,25 +51,63 @@ const visibleItems = computed(() =>
         ? [currentItem.value, ...props.state.items]
         : props.state.items,
 );
-const canCreate = computed(
-    () =>
-        !!props.createLabel &&
-        !!search.value.trim() &&
-        !props.isDisabled &&
-        !props.state.isLoading &&
-        !props.state.error &&
-        !visibleItems.value.some(
-            (item) =>
-                item.title.trim().toLocaleLowerCase() === search.value.trim().toLocaleLowerCase(),
-        ),
+const canRequestCreation = computed(
+    () => !!props.createLabel && !!searchTerm.value && !props.isDisabled,
 );
+const canCreate = computed(() => {
+    if (!canRequestCreation.value || props.state.isLoading || props.state.error) return false;
+
+    const normalizedTerm = searchTerm.value.toLocaleLowerCase();
+    return !visibleItems.value.some(
+        (item) => item.title.trim().toLocaleLowerCase() === normalizedTerm,
+    );
+});
+const inputHint = computed(() => {
+    if (props.hint) return props.hint;
+
+    if (canCreate.value && isMenuOpen.value) return 'Presiona Enter para abrir el registro.';
+
+    return props.createLabel ? 'Escribe el nombre para buscar o registrar.' : undefined;
+});
 
 const createRecord = () => {
     if (!canCreate.value) return;
 
+    pendingCreateSearch = undefined;
     isMenuOpen.value = false;
-    emit('create', search.value.trim());
+    emit('create', searchTerm.value);
 };
+
+const onInputKeydown = (event: KeyboardEvent) => {
+    if (!(event.target instanceof HTMLInputElement) || !isMenuOpen.value || event.isComposing)
+        return;
+
+    if (event.key === 'Enter' && (canCreate.value || props.state.isLoading)) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (canCreate.value) createRecord();
+        else if (canRequestCreation.value) pendingCreateSearch = search.value;
+    } else if (
+        event.key === 'ArrowDown' &&
+        canCreate.value &&
+        !visibleItems.value.some((item) => !item.isDisabled)
+    ) {
+        event.preventDefault();
+        event.stopPropagation();
+        createButton.value?.$el.focus();
+    }
+};
+
+watch(
+    () => props.state.isLoading,
+    (isLoading) => {
+        if (isLoading || pendingCreateSearch === undefined) return;
+
+        const confirmedSearch = pendingCreateSearch;
+        pendingCreateSearch = undefined;
+        if (isMenuOpen.value && search.value === confirmedSearch) createRecord();
+    },
+);
 
 const updateValue = (value: string | null) => {
     currentItem.value = visibleItems.value.find((item) => item.id === value);
@@ -74,11 +115,15 @@ const updateValue = (value: string | null) => {
 };
 
 const searchOptions = (value: string) => {
+    if (value !== search.value) pendingCreateSearch = undefined;
+
     search.value = value;
     if (isMenuOpen.value && value !== currentItem.value?.title) emit('search', value);
 };
 
 const updateMenu = (isOpen: boolean) => {
+    if (!isOpen) pendingCreateSearch = undefined;
+
     isMenuOpen.value = isOpen;
     if (isOpen && !props.isDisabled)
         emit('search', search.value === currentItem.value?.title ? '' : search.value);
@@ -109,7 +154,7 @@ const loadWhenVisible = (isVisible: boolean) => {
         :item-props="(item) => ({ disabled: item.isDisabled === true })"
         :loading="state.isLoading"
         :disabled="isDisabled"
-        :hint="hint || (createLabel ? 'Escribe el nombre para buscar o registrar.' : undefined)"
+        :hint="inputHint"
         :persistent-hint="!!hint && isDisabled"
         :error-messages="error || state.error"
         :aria-label="label"
@@ -120,6 +165,8 @@ const loadWhenVisible = (isVisible: boolean) => {
         no-filter
         clearable
         no-data-text="No hay resultados. Escribe para buscar."
+        @keydown.capture="onInputKeydown"
+        @keydown.enter.stop
         @update:model-value="updateValue"
         @update:search="searchOptions($event ?? '')"
         @update:menu="updateMenu"
@@ -150,7 +197,8 @@ const loadWhenVisible = (isVisible: boolean) => {
         <template #append-item>
             <VBtn
                 v-if="canCreate"
-                variant="text"
+                ref="createButton"
+                variant="tonal"
                 size="small"
                 block
                 prepend-icon="$plus"
@@ -158,7 +206,7 @@ const loadWhenVisible = (isVisible: boolean) => {
                 @click.stop="createRecord"
                 @keydown.enter.stop
             >
-                {{ createLabel }} «{{ search.trim() }}»
+                {{ createLabel }} «{{ searchTerm }}»
             </VBtn>
             <div
                 v-if="state.error && state.canRetry !== false"

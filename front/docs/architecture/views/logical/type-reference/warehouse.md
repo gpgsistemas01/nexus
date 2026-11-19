@@ -26,6 +26,8 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `canCreateArticle` | `canCreateArticle?: boolean;` |
 | `canCreateSupplier` | `canCreateSupplier?: boolean;` |
 | `isEditingOffer` | `isEditingOffer?: boolean;` |
+| `canEditArticle` | `canEditArticle?: boolean;` |
+| `canEditSupplier` | `canEditSupplier?: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -38,7 +40,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryEditor.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 31, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -593,6 +595,7 @@ string | number | boolean | null
 | `canAddStock` | `canAddStock?: boolean;` |
 | `canCreateSupplier` | `canCreateSupplier?: boolean;` |
 | `canCreateArticle` | `canCreateArticle?: boolean;` |
+| `canEditSupplier` | `canEditSupplier?: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -602,7 +605,7 @@ string | number | boolean | null
 
 ## InventoryEditorPage.defineEmits
 
-**Fuente:** [src/modules/warehouse/pages/InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue) · línea 20, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue) · línea 21, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

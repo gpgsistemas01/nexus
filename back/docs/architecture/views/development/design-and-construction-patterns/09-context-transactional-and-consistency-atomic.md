@@ -39,9 +39,11 @@ flowchart TB
 
 Las comprobaciones y la preparación anteriores a `$transaction` no quedan protegidas
 por su rollback. Los importes documentales de la compra participan en el mismo
-callback que documento, existencias y movimiento. El costo máximo de almacén se
-administra por separado y no se recalcula al comprar, corregir o cancelar.
-Dentro del callback se usa `tx` directamente o se propaga a sus colaboradores.
+callback que documento, existencias y movimiento. Al recibir, la oferta conserva el
+mayor entre su costo máximo actual y el mayor costo unitario sin IVA de las partidas
+nuevas; stock y costo se actualizan en la misma escritura. Corregir o cancelar una
+partida no recalcula el costo máximo. Dentro del callback se usa `tx` directamente
+o se propaga a sus colaboradores.
 
 ## Protección de escrituras concurrentes
 

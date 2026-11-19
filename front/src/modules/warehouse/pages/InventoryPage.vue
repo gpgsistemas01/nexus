@@ -169,6 +169,10 @@ onMounted(() => {
         :can-create-article="
             session.user.value!.permissions.includes(PERMISSIONS.MATERIAL_CATALOGS_MANAGE)
         "
+        :can-edit-supplier="
+            session.user.value!.permissions.includes(PERMISSIONS.SUPPLIERS_PAGE_VIEW) &&
+            session.user.value!.permissions.includes(PERMISSIONS.SUPPLIERS_UPDATE)
+        "
         @create-article="emit('createArticle', $event)"
         @create-supplier="emit('createSupplier', $event)"
         @saved="inventory.onSaved"
