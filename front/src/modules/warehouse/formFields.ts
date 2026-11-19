@@ -16,8 +16,8 @@ const SECTION_ORDER = [
     'weights',
     'history',
     'presentation',
-    'stock',
     'inventory',
+    'stock',
     'notes',
 ] as const;
 type SectionId = (typeof SECTION_ORDER)[number];
@@ -105,7 +105,7 @@ export const inventorySections = (
     const sections: Partial<Record<SectionId, Omit<InventoryFormSection, 'id'>>> = {};
     if (action === 'delete') return [];
 
-    if (!isWaste && !fromPurchase && (isCreating || (action === 'edit' && row))) {
+    if (!isWaste && !fromPurchase && (isCreating || ((action === 'edit' || isStock) && row))) {
         const article = options.article ? getLookupArticle(options.article) : undefined;
         const presentation = isRecord(article?.presentation) ? article.presentation : {};
         const unit = isRecord(article?.unitMeasure) ? article.unitMeasure : {};
@@ -113,72 +113,102 @@ export const inventorySections = (
         const height = row?.height ?? (article?.height == null ? null : Number(article.height));
         const unitName = row?.unitMeasure ?? String(unit.symbol || unit.name || '—');
 
-        return [
-            {
-                id: 'identity',
-                title: 'Artículo y proveedor',
-                fields: isCreating
+        sections.identity = {
+            title: 'Artículo y proveedor',
+            fields: isCreating
+                ? [
+                      { name: 'materialId', label: labels.name, type: 'lookup', isWide: true },
+                      { name: 'supplierId', label: 'Proveedor', type: 'lookup', isWide: true },
+                  ]
+                : [
+                      readOnlyField('name', labels.name, row?.name ?? '—', true),
+                      readOnlyField('supplierId', 'Proveedor', row?.supplierName ?? '—', true),
+                  ],
+        };
+        sections.reference = {
+            title: 'Datos del artículo',
+            fields: [
+                readOnlyField(
+                    'presentationId',
+                    labels.presentation,
+                    row?.presentation ?? String(presentation.name ?? '—'),
+                ),
+                readOnlyField('unitMeasureId', labels.unitMeasure, unitName),
+                readOnlyField('base', labels.base, numberText(base)),
+                readOnlyField('height', labels.height, numberText(height)),
+                readOnlyField(
+                    'minStock',
+                    labels.minStock,
+                    row || article
+                        ? numberText(row?.minStock ?? Number(article?.minStock ?? 0))
+                        : '—',
+                ),
+            ],
+        };
+        sections.inventory = {
+            title: 'Datos de la existencia',
+            summary:
+                !isCreating && !isStock && row
                     ? [
-                          { name: 'materialId', label: labels.name, type: 'lookup', isWide: true },
-                          { name: 'supplierId', label: 'Proveedor', type: 'lookup', isWide: true },
+                          { label: labels.currentStock, value: numberText(row.currentStock) },
+                          {
+                              label: 'Cantidad convertida',
+                              value: convertedQuantityText(row.convertedQuantity, unitName),
+                          },
                       ]
+                    : undefined,
+            fields: [
+                { ...costField, isReadOnly: isStock },
+                { ...stateField, isReadOnly: isStock },
+            ],
+        };
+
+        if (isCreating || isStock) {
+            sections.stock = {
+                title: 'Existencias',
+                summary: isCreating
+                    ? undefined
                     : [
-                          readOnlyField('name', labels.name, row?.name ?? '—', true),
-                          readOnlyField('supplierId', 'Proveedor', row?.supplierName ?? '—', true),
+                          { label: labels.currentStock, value: numberText(row?.currentStock) },
+                          {
+                              label: 'Cantidad convertida actual',
+                              value: convertedQuantityText(
+                                  row?.convertedQuantity,
+                                  row?.unitMeasure ?? '',
+                              ),
+                          },
                       ],
-            },
-            {
-                id: 'reference',
-                title: 'Datos del artículo',
                 fields: [
-                    readOnlyField(
-                        'presentationId',
-                        labels.presentation,
-                        row?.presentation ?? String(presentation.name ?? '—'),
-                    ),
-                    readOnlyField('unitMeasureId', labels.unitMeasure, unitName),
-                    readOnlyField('base', labels.base, numberText(base)),
-                    readOnlyField('height', labels.height, numberText(height)),
-                    readOnlyField(
-                        'minStock',
-                        labels.minStock,
-                        row || article
-                            ? numberText(row?.minStock ?? Number(article?.minStock ?? 0))
-                            : '—',
-                    ),
-                ],
-            },
-            {
-                id: 'inventory',
-                title: 'Datos de la existencia',
-                summary:
-                    !isCreating && row
-                        ? [
-                              { label: labels.currentStock, value: numberText(row.currentStock) },
-                              {
-                                  label: 'Cantidad convertida',
-                                  value: convertedQuantityText(row.convertedQuantity, unitName),
-                              },
-                          ]
-                        : undefined,
-                fields: [
-                    costField,
-                    stateField,
-                    ...(isCreating
+                    ...(action === 'stock'
                         ? [
                               {
-                                  name: 'newStock' as const,
-                                  label: 'Cantidad inicial',
-                                  type: 'number' as const,
-                                  step: quantityStep,
-                                  hint: `Se registra en ${labels.currentStock}.`,
+                                  name: 'reasonId' as const,
+                                  label: 'Motivo del ajuste',
+                                  type: 'lookup' as const,
                               },
-                              notesField,
                           ]
                         : []),
+                    {
+                        name: action === 'add-stock' ? 'quantity' : 'newStock',
+                        label:
+                            action === 'add-stock'
+                                ? 'Cantidad a agregar'
+                                : isCreating
+                                  ? 'Cantidad inicial'
+                                  : 'Nuevo stock',
+                        type: 'number',
+                        step: quantityStep,
+                        hint: isCreating ? `Se registra en ${labels.currentStock}.` : undefined,
+                    },
                 ],
-            },
-        ];
+            };
+            sections.notes = { title: 'Notas del movimiento', fields: [notesField] };
+        }
+
+        return SECTION_ORDER.flatMap((id) => {
+            const section = sections[id];
+            return section ? [{ id, ...section }] : [];
+        });
     }
 
     if (isCreating && isWaste)

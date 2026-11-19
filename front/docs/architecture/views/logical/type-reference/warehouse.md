@@ -28,6 +28,8 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `isEditingOffer` | `isEditingOffer?: boolean;` |
 | `canEditArticle` | `canEditArticle?: boolean;` |
 | `canEditSupplier` | `canEditSupplier?: boolean;` |
+| `isOpeningRelatedEditor` | `isOpeningRelatedEditor?: boolean;` |
+| `actionError` | `actionError?: string;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -40,7 +42,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryEditor.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 31, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue) · línea 33, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -54,6 +56,8 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `reload` | `reload: [];` |
 | `createSupplier` | `createSupplier: [search: string];` |
 | `createArticle` | `createArticle: [search: string];` |
+| `editArticle` | `editArticle: [];` |
+| `editSupplier` | `editSupplier: [];` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -583,7 +587,7 @@ string | number | boolean | null
 
 ## InventoryEditorPage.defineProps
 
-**Fuente:** [src/modules/warehouse/pages/InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue) · línea 10, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue) · línea 15, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -596,6 +600,8 @@ string | number | boolean | null
 | `canCreateSupplier` | `canCreateSupplier?: boolean;` |
 | `canCreateArticle` | `canCreateArticle?: boolean;` |
 | `canEditSupplier` | `canEditSupplier?: boolean;` |
+| `isOpeningRelatedEditor` | `isOpeningRelatedEditor?: boolean;` |
+| `actionError` | `actionError?: string;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -605,7 +611,7 @@ string | number | boolean | null
 
 ## InventoryEditorPage.defineEmits
 
-**Fuente:** [src/modules/warehouse/pages/InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue) · línea 21, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue) · línea 28, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -616,6 +622,8 @@ string | number | boolean | null
 | `addStock` | `addStock: [target: StockAdditionTarget];` |
 | `createSupplier` | `createSupplier: [request: LookupCreation];` |
 | `createArticle` | `createArticle: [request: LookupCreation];` |
+| `editArticle` | `editArticle: [row: InventoryRow];` |
+| `editSupplier` | `editSupplier: [row: InventoryRow];` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -623,6 +631,8 @@ string | number | boolean | null
 | dependency | [StockAdditionTarget](../../../../../src/modules/warehouse/inventory.ts) | `addStock` |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createSupplier` |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createArticle` |
+| dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `editArticle` |
+| dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `editSupplier` |
 
 ## InventoryImportPage.defineProps
 
@@ -654,7 +664,7 @@ string | number | boolean | null
 
 ## InventoryPage.defineProps
 
-**Fuente:** [src/modules/warehouse/pages/InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue) · línea 18, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue) · línea 24, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -666,7 +676,7 @@ string | number | boolean | null
 
 ## InventoryPage.defineEmits
 
-**Fuente:** [src/modules/warehouse/pages/InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue) · línea 20, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue) · línea 26, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

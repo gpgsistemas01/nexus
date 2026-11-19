@@ -341,6 +341,19 @@ test(
       });
     });
     await page.goto('/almacen/materiales');
+    await page.route('**/api/warehouse/suppliers?**', (route) =>
+      route.fulfill({
+        json: pageOf([
+          {
+            id: ids.supplier,
+            version: 4,
+            isActive: true,
+            legalName: 'Proveedor Central S.A.',
+            tradeName: 'Proveedor Central',
+          },
+        ]),
+      }),
+    );
     await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
     let dialog = page.getByRole('dialog', {
       name: 'Registrar existencia de material',
@@ -385,6 +398,19 @@ test(
       await expect(field).toHaveValue(value);
       await expect(field).not.toBeEditable();
     }
+    await page.getByRole('button', { name: 'Editar artículo', exact: true }).click();
+    let relatedDialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+    await expect(relatedDialog.getByRole('textbox', { name: 'Nombre', exact: true })).toHaveValue(
+      'Lona',
+    );
+    await expect(page).toHaveURL(/\/almacen\/materiales$/);
+    await relatedDialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
+    await page.getByRole('button', { name: 'Editar proveedor', exact: true }).click();
+    relatedDialog = page.getByRole('dialog', { name: 'Editar proveedor', exact: true });
+    await expect(
+      relatedDialog.getByRole('textbox', { name: 'Razón social', exact: true }),
+    ).toHaveValue('Proveedor Central S.A.');
+    await relatedDialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes[1]).toEqual({

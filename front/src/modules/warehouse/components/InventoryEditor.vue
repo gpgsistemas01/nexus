@@ -27,6 +27,8 @@ defineProps<{
     isEditingOffer?: boolean;
     canEditArticle?: boolean;
     canEditSupplier?: boolean;
+    isOpeningRelatedEditor?: boolean;
+    actionError?: string;
 }>();
 const emit = defineEmits<{
     update: [field: InventoryField, value: string | boolean];
@@ -39,6 +41,8 @@ const emit = defineEmits<{
     reload: [];
     createSupplier: [search: string];
     createArticle: [search: string];
+    editArticle: [];
+    editSupplier: [];
 }>();
 </script>
 
@@ -57,32 +61,44 @@ const emit = defineEmits<{
     >
         <template #default="{ formId }">
             <VAlert
+                v-if="actionError"
+                type="error"
+                variant="tonal"
+                class="mb-4"
+            >
+                {{ actionError }}
+            </VAlert>
+            <VAlert
                 v-if="isEditingOffer && !isPending"
                 type="info"
                 variant="tonal"
                 class="mb-4"
             >
-                Edita el artículo en Almacén → Artículos y el proveedor en Directorio comercial →
-                Proveedores. Para corregir el saldo, usa Ajustar stock.
+                Los datos de artículo y proveedor se abren en sus formularios desde aquí. Para
+                corregir el saldo, usa Ajustar stock.
                 <div
                     v-if="canEditArticle || canEditSupplier"
                     class="d-flex flex-wrap ga-2 mt-3"
                 >
                     <VBtn
                         v-if="canEditArticle"
-                        :to="{ name: 'catalog-materials' }"
                         variant="outlined"
                         size="small"
+                        :loading="isOpeningRelatedEditor"
+                        :disabled="isOpeningRelatedEditor"
+                        @click="emit('editArticle')"
                     >
-                        Ir a Artículos
+                        Editar artículo
                     </VBtn>
                     <VBtn
                         v-if="canEditSupplier"
-                        :to="{ name: 'suppliers' }"
                         variant="outlined"
                         size="small"
+                        :loading="isOpeningRelatedEditor"
+                        :disabled="isOpeningRelatedEditor"
+                        @click="emit('editSupplier')"
                     >
-                        Ir a Proveedores
+                        Editar proveedor
                     </VBtn>
                 </div>
             </VAlert>
