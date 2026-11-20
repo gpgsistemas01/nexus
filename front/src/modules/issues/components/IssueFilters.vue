@@ -2,6 +2,7 @@
 import { VCol } from 'vuetify/components/VGrid';
 import { computed } from 'vue';
 import { VTextField } from 'vuetify/components/VTextField';
+import DateField from '../../../shared/components/DateField.vue';
 import { VAlert } from 'vuetify/components/VAlert';
 import ListFilters from '../../../shared/components/ListFilters.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
@@ -67,7 +68,7 @@ const hasActiveFilters = computed(
             cols="12"
             md="6"
         >
-            <VTextField
+            <DateField
                 label="Fecha de inicio"
                 type="date"
                 :model-value="values.startDate"
@@ -79,7 +80,7 @@ const hasActiveFilters = computed(
             cols="12"
             md="6"
         >
-            <VTextField
+            <DateField
                 label="Fecha de fin"
                 type="date"
                 :model-value="values.endDate"

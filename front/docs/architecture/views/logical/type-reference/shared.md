@@ -28,6 +28,14 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- | --- |
 | inheritance | [ClientError](../../../../../src/shared/clientError.ts) | `extends` |
 
+## DateField.defineProps
+
+**Fuente:** [src/shared/components/DateField.vue](../../../../../src/shared/components/DateField.vue) · línea 5, columna 27. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `type` | `type: 'date' \| 'datetime-local' \| 'month'` |
+
 ## DetailEntryRow.defineProps
 
 **Fuente:** [src/shared/components/DetailEntryRow.vue](../../../../../src/shared/components/DetailEntryRow.vue) · línea 8, columna 27. **Declaración:** SFC contract.

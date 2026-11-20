@@ -23,6 +23,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Adjustment` | control | [`adjustmentService.js`](../../../../../../src/services/warehouse/adjustmentService.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `Stock` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `StockQuantity` | control | [`stockQuantity.js`](../../../../../../src/shared/inventory/stockQuantity.js) |
 | `Movement` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Offers` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `SupplierMaterial` | control | [`supplierMaterialStockService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialStockService.js) |
@@ -103,6 +104,7 @@ sequenceDiagram
     participant Adjustment@{ "type": "control" } as adjustmentService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
     participant Stock@{ "type": "control" } as stockHelpers.js
+    participant StockQuantity@{ "type": "control" } as stockQuantity.js
     participant Movement@{ "type": "control" } as movementService.js
     participant SupplierMaterial@{ "type": "control" } as supplierMaterialStockService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
@@ -127,7 +129,7 @@ sequenceDiagram
     Adjustment->>Adjustment: calculateStockAdjustmentValues({ supplierMaterial, newStock, base, height })
     Adjustment->>FileFormattersUtils: normalizeDecimal(newStock - previousStock)
     FileFormattersUtils-->>Adjustment: normalizeDecimal(): number
-    Adjustment->>Stock: calculateConvertedQuantity({ currentStock: newStock, base, height })
+    Adjustment->>StockQuantity: calculateConvertedQuantity({ currentStock: newStock, base, height })
     Adjustment->>Stock: assertSufficientStock({ material: supplierMaterial, newStock, newConvertedQuantity })
     Adjustment->>Prisma: tx.stockAdjustment.create({ data })
     Adjustment->>Adjustment: createStockAdjustmentMovement({ tx, adjustment, previousStock, newStock, difference })

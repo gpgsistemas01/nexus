@@ -13,32 +13,32 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    constants["constants (11 módulos)"] --> shared["shared (24 módulos)"]
+    constants["constants (11 módulos)"] --> shared["shared (25 módulos)"]
     controllers["controllers (34 módulos)"] --> dtos["dtos (12 módulos)"]
     controllers["controllers (34 módulos)"] --> errors["errors (25 módulos)"]
     controllers["controllers (34 módulos)"] --> messages["messages (1 módulos)"]
     controllers["controllers (34 módulos)"] --> middleware["middleware (5 módulos)"]
     controllers["controllers (34 módulos)"] --> services["services (84 módulos)"]
-    controllers["controllers (34 módulos)"] --> shared["shared (24 módulos)"]
+    controllers["controllers (34 módulos)"] --> shared["shared (25 módulos)"]
     controllers["controllers (34 módulos)"] --> utils["utils (15 módulos)"]
-    dtos["dtos (12 módulos)"] --> shared["shared (24 módulos)"]
+    dtos["dtos (12 módulos)"] --> shared["shared (25 módulos)"]
     errors["errors (25 módulos)"] --> constants["constants (11 módulos)"]
     errors["errors (25 módulos)"] --> messages["messages (1 módulos)"]
-    errors["errors (25 módulos)"] --> shared["shared (24 módulos)"]
-    messages["messages (1 módulos)"] --> shared["shared (24 módulos)"]
+    errors["errors (25 módulos)"] --> shared["shared (25 módulos)"]
+    messages["messages (1 módulos)"] --> shared["shared (25 módulos)"]
     middleware["middleware (5 módulos)"] --> errors["errors (25 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (1 módulos)"]
     middleware["middleware (5 módulos)"] --> services["services (84 módulos)"]
-    middleware["middleware (5 módulos)"] --> shared["shared (24 módulos)"]
+    middleware["middleware (5 módulos)"] --> shared["shared (25 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (15 módulos)"]
     repository["repository (11 módulos)"] --> constants["constants (11 módulos)"]
     repository["repository (11 módulos)"] --> errors["errors (25 módulos)"]
     repository["repository (11 módulos)"] --> lib["lib (3 módulos)"]
-    repository["repository (11 módulos)"] --> shared["shared (24 módulos)"]
+    repository["repository (11 módulos)"] --> shared["shared (25 módulos)"]
     routes["routes (37 módulos)"] --> controllers["controllers (34 módulos)"]
     routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
     routes["routes (37 módulos)"] --> services["services (84 módulos)"]
-    routes["routes (37 módulos)"] --> shared["shared (24 módulos)"]
+    routes["routes (37 módulos)"] --> shared["shared (25 módulos)"]
     routes["routes (37 módulos)"] --> utils["utils (15 módulos)"]
     routes["routes (37 módulos)"] --> validators["validators (18 módulos)"]
     services["services (84 módulos)"] --> constants["constants (11 módulos)"]
@@ -47,16 +47,16 @@ flowchart LR
     services["services (84 módulos)"] --> lib["lib (3 módulos)"]
     services["services (84 módulos)"] --> messages["messages (1 módulos)"]
     services["services (84 módulos)"] --> repository["repository (11 módulos)"]
-    services["services (84 módulos)"] --> shared["shared (24 módulos)"]
+    services["services (84 módulos)"] --> shared["shared (25 módulos)"]
     services["services (84 módulos)"] --> utils["utils (15 módulos)"]
     services["services (84 módulos)"] --> validators["validators (18 módulos)"]
     utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (15 módulos)"] --> errors["errors (25 módulos)"]
     utils["utils (15 módulos)"] --> services["services (84 módulos)"]
-    utils["utils (15 módulos)"] --> shared["shared (24 módulos)"]
+    utils["utils (15 módulos)"] --> shared["shared (25 módulos)"]
     validators["validators (18 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (18 módulos)"] --> messages["messages (1 módulos)"]
-    validators["validators (18 módulos)"] --> shared["shared (24 módulos)"]
+    validators["validators (18 módulos)"] --> shared["shared (25 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. La interfaz Vue y el esquema Prisma se
@@ -249,12 +249,12 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/inventory/movementQueryService.js`](../../../../src/services/inventory/movementQueryService.js) | `findAllConsumableMovements`, `findAllMaterialMovements`, `findAllWasteMovements` |
 | [`src/services/inventory/movementService.js`](../../../../src/services/inventory/movementService.js) | `applyInventoryMovement`, `createInventoryMovement` |
 | [`src/services/inventory/reportService.js`](../../../../src/services/inventory/reportService.js) | `findMovementReportRows` |
-| [`src/services/inventory/stockHelpers.js`](../../../../src/services/inventory/stockHelpers.js) | `assertPieceQuantity`, `assertSufficientStock`, `calculateConvertedQuantity`, `hasDimensions` |
+| [`src/services/inventory/stockHelpers.js`](../../../../src/services/inventory/stockHelpers.js) | `assertPieceQuantity`, `assertSufficientStock` |
 | [`src/services/jwtService.js`](../../../../src/services/jwtService.js) | `generateAccessToken`, `generateRefreshToken`, `verifyAccessToken`, `verifyRefreshToken`, `verifyToken` |
 | [`src/services/sales/clientService.js`](../../../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
 | [`src/services/sales/reportService.js`](../../../../src/services/sales/reportService.js) | `findClientReportRows` |
 | [`src/services/serviceErrorHandler.js`](../../../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError` |
-| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `calculateStockAdjustmentValues`, `createInitialMaterialStockBatch`, `createMaterialStockAdjustmentsBatch`, `createStockAdjustment` |
+| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `calculateStockAdjustmentValues`, `createMaterialStockAdjustmentsBatch`, `createStockAdjustment` |
 | [`src/services/warehouse/consumables/consumableService.js`](../../../../src/services/warehouse/consumables/consumableService.js) | `createConsumable`, `deleteConsumable`, `findAllConsumables`, `updateConsumable`, `updateConsumableStock` |
 | [`src/services/warehouse/fulfillmentStatusService.js`](../../../../src/services/warehouse/fulfillmentStatusService.js) | `findAllFulfillmentStatuses`, `findFulfillmentStatusIdByName`, `findFulfillmentStatusIdsByName` |
 | [`src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js`](../../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js) | `createConsumableGoodsIssue`, `findAllConsumableGoodsIssues`, `findConsumableGoodsIssueReportRows`, `returnConsumableGoodsIssueDetail`, `updateConsumableGoodsIssue`, `updateConsumableGoodsIssueDetails`, `updateConsumableGoodsIssueHeader` |

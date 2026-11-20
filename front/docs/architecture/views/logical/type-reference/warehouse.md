@@ -257,7 +257,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## SectionId
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 23, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 25, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -267,7 +267,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryFieldSpec
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 25, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 27, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -287,7 +287,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventorySummaryItem
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 36, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 38, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -296,7 +296,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryFormSection
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 40, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 42, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

@@ -1,5 +1,5 @@
 <a id="cu-alm-19"></a>
-# `CU-ALM-19` — Editar oferta de consumible
+# `CU-ALM-19` — Editar existencia de consumible
 
 **Patrones:** `[BE-P01](../../../development/design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas)`, `[BE-P03](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`, `[BE-P04](../../../development/design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría)`.
 

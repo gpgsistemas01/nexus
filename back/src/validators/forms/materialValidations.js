@@ -1,5 +1,6 @@
 import { body } from 'express-validator';
 import { FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../shared/constants/inputValidation.js';
+import { MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../shared/constants/inventory.js';
 import { errorMap } from '../../messages/codeMessages.js';
 import {
     validatePositiveNumberOptional,
@@ -16,9 +17,7 @@ const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRoll
     body(fieldName).not().exists({ values: 'undefined' }).withMessage(errorMap.materialRollReference.READ_ONLY)
 );
 
-import { MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../shared/constants/inventory.js';
-
-export const isGoodsReceiptMaterialCreation = (body = {}) =>
+const isGoodsReceiptMaterialCreation = (body = {}) =>
     body.materialId === undefined && body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
 
 export const materialEditValidation = [
@@ -43,7 +42,7 @@ export const materialStockValidation = [
 const isNewIdentity = (_, { req }) => req.body.materialId === undefined;
 const isSelectedIdentity = (_, { req }) => req.body.materialId !== undefined;
 
-export const consumableValidation = [
+export const materialValidation = [
     ...materialRollReferenceValidation,
     validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME, condition: isNewIdentity }),
     validateUUID('presentationId', { condition: isNewIdentity }),
@@ -59,5 +58,3 @@ export const consumableValidation = [
     validateNumber('newStock', { condition: (_, { req }) => !isGoodsReceiptMaterialCreation(req.body) }),
     createInventoryObservationsValidation()
 ];
-
-export const materialValidation = consumableValidation;

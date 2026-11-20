@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
-import { consumableValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
+import { materialValidation } from '../../../src/validators/forms/materialValidations.js';
 import { validate } from '../../../src/middleware/validatorMiddleware.js';
 
 const suffix = randomUUID().slice(0, 8);
@@ -25,7 +25,7 @@ describe('registro de materiales con y sin medidas', () => {
     app = createControllerTestApp({ registerRoutes: router => {
       router.use((req, _res, next) => { req.user = { id: ids.user, permissions: [] }; next(); });
       router.post('/materials', materialValidation, validate, registerMaterial);
-      router.post('/consumables', consumableValidation, validate, registerConsumable);
+      router.post('/consumables', validate, registerConsumable);
       router.get('/wastes/material-templates', getWasteMaterialTemplates);
       router.post('/wastes', wasteValidation, validate, registerWaste);
     } });

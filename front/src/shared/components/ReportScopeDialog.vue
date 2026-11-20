@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VSelect } from 'vuetify/components/VSelect';
-import { VTextField } from 'vuetify/components/VTextField';
+import DateField from './DateField.vue';
 import EditorDialog from './EditorDialog.vue';
 import type { ReportKind, ReportScope } from '../report.js';
 
@@ -50,7 +50,7 @@ const modes = [
             :disabled="isSubmitting"
             @update:model-value="emit('mode', $event)"
         />
-        <VTextField
+        <DateField
             v-if="kind === 'period' && values.mode === 'specific-month'"
             label="Mes del reporte"
             type="month"

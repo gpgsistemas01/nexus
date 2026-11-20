@@ -74,6 +74,11 @@ Las fichas de todas las tablas conservan sus acciones e inputs, incluidos los de
 de compras y salidas y las asignaciones de personas.
 Los formularios distribuyen los campos según el ancho disponible.
 
+En los desplegables, la opción seleccionada se distingue por el fondo y una
+marca de verificación. Al salir de un campo de fecha, se muestra **día/mes/año**
+con hora de 24 horas cuando corresponde. El mes de un reporte se muestra como
+**mes/año**. Al editar, use el calendario del navegador o el teclado.
+
 Si falta un registro, limpie los filtros. La actualización automática los conserva
 y espera mientras tiene una captura abierta. Ante un fallo, use **Actualizar** o
 **Reintentar**. Evite recargar el navegador con cambios sin guardar.

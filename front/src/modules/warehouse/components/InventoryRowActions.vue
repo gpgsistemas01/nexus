@@ -11,7 +11,7 @@ const emit = defineEmits<{ action: [target: EditorTarget] }>();
         <TableAction
             v-if="permissions.canWrite"
             color="filter-action"
-            :label="isWaste ? 'Editar merma' : 'Editar oferta'"
+            :label="isWaste ? 'Editar merma' : 'Editar existencia'"
             icon="$edit"
             @click="emit('action', { action: 'edit', row })"
         />

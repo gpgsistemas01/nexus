@@ -61,6 +61,26 @@
     --v-field-border-opacity: 0.6;
 }
 
+.v-theme--warehouse .v-list[role='listbox'] [role='option'][aria-selected='true'] {
+    color: rgb(var(--v-theme-primary));
+    background: rgba(var(--v-theme-primary), 0.12);
+    font-weight: 700;
+}
+
+.v-theme--warehouse .v-list[role='listbox'] [role='option'][aria-selected='true']::after {
+    content: '';
+    inline-size: 0.5rem;
+    block-size: 0.85rem;
+    margin-inline-start: 0.75rem;
+    margin-inline-end: 0.25rem;
+    border: solid currentColor;
+    border-width: 0 0.14rem 0.14rem 0;
+    transform: rotate(45deg);
+    grid-area: append;
+    justify-self: end;
+    align-self: center;
+}
+
 .warehouse-checkbox .v-label {
     font-weight: 600;
     opacity: 1;

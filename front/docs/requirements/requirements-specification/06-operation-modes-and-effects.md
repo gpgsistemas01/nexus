@@ -14,7 +14,7 @@ operaciones; no se eligen libremente.
 | --- | --- | --- |
 | **Crear existencia**: artículo y proveedor seleccionados. | artículo, proveedor, costo máximo, estado de la oferta, existencia inicial y observaciones | crea la oferta proveedor–artículo y su stock inicial; presentación, unidad y medidas se consultan en el artículo. Una oferta repetida se rechaza sin alterar stock ni costo. |
 | **Registrar artículo desde una compra**: artículo ausente en el catálogo. | nombre, tipo, presentación, unidad, medidas aplicables y stock mínimo | crea sólo la identidad del artículo, sin proveedor, costo ni existencias. Al confirmar la compra, el artículo se vincula al proveedor y recibe las cantidades de sus detalles. |
-| **Editar oferta**: relación existente. | costo máximo y estado de la oferta seleccionada | conserva existencias e identidad; nombre y stock mínimo se editan en **Artículos**, y los datos del proveedor en **Proveedores** |
+| **Editar existencia**: relación existente. | costo máximo y estado de la oferta seleccionada | conserva existencias e identidad; nombre y stock mínimo se editan en **Artículos**, y los datos del proveedor en **Proveedores** |
 | **Ajustar**: relación existente. | nueva existencia total, motivo y observaciones | crea ajuste y movimiento; no permite elegir otro proveedor, no cambia identidad ni interpreta la cantidad como incremento |
 | **Eliminar oferta**: saldo cero y sin historial para el par artículo y proveedor. | confirmación | retira el vínculo y conserva el artículo |
 | **Eliminar artículo**: sin proveedores vinculados ni referencias de inventario. | confirmación | elimina el registro de Artículos |

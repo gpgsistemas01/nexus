@@ -74,7 +74,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 21, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 22, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -104,7 +104,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 38, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 39, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -135,7 +135,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueFilters.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueFilters.vue](../../../../../src/modules/issues/components/IssueFilters.vue) · línea 10, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueFilters.vue](../../../../../src/modules/issues/components/IssueFilters.vue) · línea 11, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -152,7 +152,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueFilters.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueFilters.vue](../../../../../src/modules/issues/components/IssueFilters.vue) · línea 17, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueFilters.vue](../../../../../src/modules/issues/components/IssueFilters.vue) · línea 18, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

@@ -43,6 +43,9 @@ export default defineConfig(({ mode }) => {
                 '@nexus/piece-quantity': fileURLToPath(
                     new URL('../back/src/shared/inventory/pieceQuantity.js', import.meta.url),
                 ),
+                '@nexus/stock-quantity': fileURLToPath(
+                    new URL('../back/src/shared/inventory/stockQuantity.js', import.meta.url),
+                ),
                 '@nexus/issue-header-rules': fileURLToPath(
                     new URL('../back/src/shared/inventory/issueHeaderRules.js', import.meta.url),
                 ),

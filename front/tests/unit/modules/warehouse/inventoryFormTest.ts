@@ -427,46 +427,53 @@ it.each([false, true])(
   },
 );
 
-it('alta y ajuste de existencias comparten secciones y orden de campos', () => {
+it('alta, edición y ajuste comparten la sección Existencias con los campos de cada operación', () => {
   const createTarget = { action: 'create' as const };
-  const createSections = inventorySections(
-    'materials',
-    createTarget,
-    previewWaste(initialInventoryValues(createTarget)),
-    { usesMeasurements: true, hasSupplier: true },
-  );
   const row = normalizeInventoryRow(material);
-  const adjustSections = inventorySections(
-    'materials',
-    { action: 'stock', row },
-    previewWaste(initialInventoryValues({ action: 'stock', row })),
-    { usesMeasurements: true, hasSupplier: true },
-  );
-  const additionSections = inventorySections(
-    'materials',
-    { action: 'add-stock', row },
-    previewWaste(initialInventoryValues({ action: 'add-stock', row })),
-    { usesMeasurements: true, hasSupplier: true },
-  );
+  const sectionsFor = (target: EditorTarget) =>
+    inventorySections('materials', target, previewWaste(initialInventoryValues(target)), {
+      usesMeasurements: true,
+      hasSupplier: true,
+      initialStock: '1.5',
+      article: { id: ids.material, title: material.material.name, data: material.material },
+    });
+  const createSections = sectionsFor(createTarget);
+  const adjustSections = sectionsFor({ action: 'stock', row });
+  const editSections = sectionsFor({ action: 'edit', row });
+  const additionSections = sectionsFor({ action: 'add-stock', row });
+  const inventory = (sections: typeof createSections) =>
+    sections.find((section) => section.id === 'inventory')!;
 
-  expect(adjustSections.map(({ id }) => id)).toEqual(createSections.map(({ id }) => id));
-  expect(adjustSections.map(({ title }) => title)).toEqual(
-    createSections.map(({ title }) => title),
-  );
-  for (const id of ['inventory', 'stock', 'notes'] as const) {
-    const adjustFields = adjustSections
-      .find((section) => section.id === id)!
-      .fields.map(({ name }) => name)
-      .filter((name) => name !== 'reasonId');
-    const createFields = createSections
-      .find((section) => section.id === id)!
-      .fields.map(({ name }) => name);
-    expect(adjustFields).toEqual(createFields);
+  for (const sections of [createSections, adjustSections, editSections, additionSections]) {
+    expect(sections.map(({ title }) => title)).toEqual([
+      'Material y proveedor',
+      'Datos del material',
+      'Existencias',
+    ]);
   }
-  expect(additionSections.map(({ id }) => id)).toEqual(createSections.map(({ id }) => id));
-  expect(
-    additionSections.find((section) => section.id === 'stock')?.fields.map(({ name }) => name),
-  ).toContain('quantity');
+  expect(inventory(createSections).summary).toEqual([
+    { label: 'Cantidad convertida inicial', value: '150.00' },
+    { label: 'Motivo del movimiento', value: 'Stock inicial' },
+  ]);
+  expect(inventory(createSections).fields.map(({ name }) => name)).toEqual([
+    'newStock',
+    'maxUnitCost',
+    'isActive',
+    'observations',
+  ]);
+  expect(inventory(editSections).summary).toEqual(inventory(adjustSections).summary);
+  expect(inventory(editSections).fields.map(({ name }) => name)).toEqual([
+    'maxUnitCost',
+    'isActive',
+  ]);
+  expect(inventory(adjustSections).fields.map(({ name }) => name)).toEqual([
+    'newStock',
+    'maxUnitCost',
+    'isActive',
+    'reasonId',
+    'observations',
+  ]);
+  expect(inventory(additionSections).fields[0]?.name).toBe('quantity');
 });
 
 it.each(['KILOGRAMOS', 'METRO LINEAL'])(

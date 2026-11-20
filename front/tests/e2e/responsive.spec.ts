@@ -123,7 +123,9 @@ test('inventario desde 900 px muestra todas las columnas sin desplazamiento hori
   ]) {
     await expect(table.locator('thead')).toContainText(column);
   }
-  await expect(table.getByRole('button', { name: 'Editar', exact: true }).first()).toBeVisible();
+  await expect(
+    table.getByRole('button', { name: 'Editar existencia', exact: true }).first(),
+  ).toBeVisible();
   const wrapper = page.locator('.table-frame--fit-columns .v-table__wrapper').first();
   expect(await wrapper.evaluate((element) => element.scrollWidth)).toBeLessThanOrEqual(
     await wrapper.evaluate((element) => element.clientWidth),

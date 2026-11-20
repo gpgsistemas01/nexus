@@ -129,15 +129,13 @@ test('materiales y consumibles: consulta, alta y ajuste', async ({ page }) => {
   await page.getByRole('spinbutton', { name: 'Cantidad inicial', exact: true }).fill('4');
   await capture(page, '04-material-create');
   await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
-  await page.setViewportSize({ width: 1440, height: 1100 });
   await page.getByRole('button', { name: 'Ajustar stock', exact: true }).click();
   await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
   await capture(page, '05-material-stock');
   await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
-  await page.setViewportSize({ width: 1440, height: 1800 });
-  await page.getByRole('button', { name: 'Editar oferta', exact: true }).click();
+  await page.getByRole('button', { name: 'Editar existencia', exact: true }).click();
   await expect(
-    page.getByRole('dialog', { name: 'Editar oferta de material', exact: true }),
+    page.getByRole('dialog', { name: 'Editar existencia de material', exact: true }),
   ).toBeVisible();
   await capture(page, '05a-material-offer-edit');
   await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
@@ -159,9 +157,9 @@ test('materiales y consumibles: consulta, alta y ajuste', async ({ page }) => {
   await chooseOption(page, 'Consumible', 'Guantes de trabajo · PIEZA');
   await capture(page, '07-consumable-create');
   await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
-  await page.getByRole('button', { name: 'Editar oferta', exact: true }).click();
+  await page.getByRole('button', { name: 'Editar existencia', exact: true }).click();
   await expect(
-    page.getByRole('dialog', { name: 'Editar oferta de consumible', exact: true }),
+    page.getByRole('dialog', { name: 'Editar existencia de consumible', exact: true }),
   ).toBeVisible();
   await capture(page, '07a-consumable-offer-edit');
 });

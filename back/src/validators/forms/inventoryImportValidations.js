@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { materialValidation, consumableValidation, materialEditValidation, materialStockValidation } from './materialValidations.js';
+import { materialValidation, materialEditValidation, materialStockValidation } from './materialValidations.js';
 import { wasteValidation, wasteEditValidation, wasteStockAdjustmentValidation } from './wasteValidations.js';
 import { validateRecordVersion } from '../fields/versionValidator.js';
 import { errorMessages } from '../../shared/messages/apiMessages.js';
@@ -13,7 +13,7 @@ export const validateInventoryImportRow = async ({ resource, mode, body }) => {
         ? resource === resources.WASTES ? wasteStockAdjustmentValidation : [...materialStockValidation, validateRecordVersion('expectedMaterialVersion')]
         : mode === modes.UPDATE
         ? resource === resources.WASTES ? wasteEditValidation : materialEditValidation
-        : resource === resources.WASTES ? wasteValidation : resource === resources.CONSUMABLES ? consumableValidation : materialValidation;
+        : resource === resources.WASTES ? wasteValidation : materialValidation;
     for (const validation of validations) await validation.run(capture);
     const errors = validationResult(capture).array({ onlyFirstError: true }).map(error => {
         const meta = typeof error.msg === 'object' ? error.msg : {};

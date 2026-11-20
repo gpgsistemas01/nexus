@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { runContendedOperations } from '../../helpers/concurrentDatabaseOperations.js';
 import { wasteValidation, wasteStockAdditionValidation, wasteStockAdjustmentValidation } from '../../../src/validators/forms/wasteValidations.js';
-import { materialValidation, materialEditValidation, materialStockValidation, consumableValidation } from '../../../src/validators/forms/materialValidations.js';
+import { materialValidation, materialEditValidation, materialStockValidation } from '../../../src/validators/forms/materialValidations.js';
 import { validate } from '../../../src/middleware/validatorMiddleware.js';
 import { lockWasteStock } from '../../../src/repository/warehouse/stockLockRepository.js';
 
@@ -41,7 +41,7 @@ beforeAll(async () => {
     router.patch('/materials/:id/stock', materialStockValidation, validate, materials.editMaterialStock);
     router.patch('/consumables/:id', materialEditValidation, validate, consumables.editConsumable);
     router.post('/materials', materialValidation, validate, materials.registerMaterial);
-    router.post('/consumables', consumableValidation, validate, consumables.registerConsumable);
+    router.post('/consumables', materialValidation, validate, consumables.registerConsumable);
     router.put('/clients/:id', clientEditValidation, validate, client.editClient);
   } });
   ids.user = (await prisma.user.create({ data: { name: `IT Write User ${suffix}`, password: 'integration-only' } })).id;

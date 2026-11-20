@@ -33,7 +33,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
 | `MovementHelpers` | control | [`movementHelpers.js`](../../../../../../src/services/inventory/movementHelpers.js) |
-| `StockChecks` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `StockQuantity` | control | [`stockQuantity.js`](../../../../../../src/shared/inventory/stockQuantity.js) |
 | `DocumentLock` | control | [`documentLockRepository.js`](../../../../../../src/repository/warehouse/documentLockRepository.js) |
 | `StockBalance` | control | [`supplierMaterialStockService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialStockService.js) |
 | `StockUpdateRepo` | control | [`stockUpdateRepository.js`](../../../../../../src/repository/warehouse/stockUpdateRepository.js) |
@@ -221,12 +221,12 @@ sequenceDiagram
     participant StockUpdateRepo@{ "type": "control" } as stockUpdateRepository.js
     participant StockBalance@{ "type": "control" } as supplierMaterialStockService.js
     participant MovementHelpers@{ "type": "control" } as movementHelpers.js
-    participant StockChecks@{ "type": "control" } as stockHelpers.js
+    participant StockQuantity@{ "type": "control" } as stockQuantity.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     Inventory->>StockBalance: updateSupplierMaterialStock({ tx, grouped, movementType, supplierMaterialsByKey })
     loop Preparar cambios por identidad
-        StockBalance->>StockChecks: calculateConvertedQuantity({ quantity, base, height })
-        StockChecks-->>StockBalance: calculateConvertedQuantity(): number
+        StockBalance->>StockQuantity: calculateConvertedQuantity({ quantity, base, height })
+        StockQuantity-->>StockBalance: calculateConvertedQuantity(): number
     end
     StockBalance->>StockUpdateRepo: updateSupplierMaterialStocks({ tx, changes })
     StockUpdateRepo->>Prisma: tx.$queryRaw(CTE de bloqueo ordenado y UPDATE RETURNING)

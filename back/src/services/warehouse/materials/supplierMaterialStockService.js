@@ -2,7 +2,7 @@ import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock, GoodsIssueMissi
 import { buildStockKey } from '../../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { updateSupplierMaterialStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
-import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { calculateConvertedQuantity } from '../../../shared/inventory/stockQuantity.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { MATERIAL_SPECIFICATION_SELECT } from './materialDocumentSnapshot.js';
 

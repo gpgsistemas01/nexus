@@ -51,7 +51,7 @@ Al recibir materiales o consumibles, Nexus compara el **Costo máximo unitario**
 de cada oferta con el mayor costo unitario sin IVA entre sus partidas nuevas.
 Si el costo nuevo es mayor o la oferta no tiene costo, guarda el nuevo valor junto
 con la recepción. El máximo se mantiene por artículo y proveedor. Para corregirlo
-manualmente, use **Editar oferta** en Almacén.
+manualmente, use **Editar existencia** en Almacén.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 ### Registrar un proveedor durante la compra

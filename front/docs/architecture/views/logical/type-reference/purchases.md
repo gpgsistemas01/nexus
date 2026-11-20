@@ -65,7 +65,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseEditor.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseEditor.vue](../../../../../src/modules/purchases/components/PurchaseEditor.vue) · línea 16, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseEditor.vue](../../../../../src/modules/purchases/components/PurchaseEditor.vue) · línea 17, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -101,7 +101,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseEditor.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseEditor.vue](../../../../../src/modules/purchases/components/PurchaseEditor.vue) · línea 37, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseEditor.vue](../../../../../src/modules/purchases/components/PurchaseEditor.vue) · línea 38, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

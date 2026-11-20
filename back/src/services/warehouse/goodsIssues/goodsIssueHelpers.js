@@ -4,7 +4,8 @@ import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/ware
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey } from '../../../utils/formattersUtils.js';
-import { assertPieceQuantity, calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
+import { calculateConvertedQuantity } from '../../../shared/inventory/stockQuantity.js';
+import { assertPieceQuantity } from "../../inventory/stockHelpers.js";
 import { findSupplierMaterialsSnapshot } from "../materials/supplierMaterialService.js";
 import { lockSupplierMaterialsForIssue } from '../../../repository/warehouse/stockLockRepository.js';
 import { assertMaterialDetailMatchesInventory, materialDocumentDetailsWhere } from '../materials/materialDocumentSnapshot.js';

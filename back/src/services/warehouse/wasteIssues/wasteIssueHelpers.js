@@ -10,7 +10,8 @@ import {
 import { GOODS_ISSUE_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { HISTORICAL_DELIVERY_SELECT } from '../issues/historicalDeliverySelect.js';
 import { resolveIssueHeaderData } from '../issues/issueHeaderService.js';
-import { assertPieceQuantity, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { calculateConvertedQuantity } from '../../../shared/inventory/stockQuantity.js';
+import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 
 const normalizeWasteIssueDetailResponse = (detail, historical = false) => ({
     ...detail,

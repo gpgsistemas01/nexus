@@ -11,7 +11,7 @@ import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/au
 import {
     materialEditValidation,
     materialStockValidation,
-    consumableValidation
+    materialValidation
 } from '../../../validators/forms/materialValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
@@ -27,7 +27,7 @@ router.get(
 router.post(
     '/',
     verifyApiTokenRequired,
-    consumableValidation,
+    materialValidation,
     validate,
     authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
     registerConsumable

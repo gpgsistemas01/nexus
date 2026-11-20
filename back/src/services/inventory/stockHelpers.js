@@ -1,36 +1,10 @@
 import { GoodsIssueInsufficientStock, InventoryPieceQuantityConflict } from '../../errors/inventory/stockError.js';
 import { getPieceQuantityError } from '../../shared/inventory/pieceQuantity.js';
-import { toNumber } from '../../utils/formattersUtils.js';
-import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
 
 export const assertPieceQuantity = ({ quantity, item }) => {
     if (getPieceQuantityError(quantity, item?.presentation?.name)) {
         throw new InventoryPieceQuantityConflict();
     }
-};
-
-export const hasDimensions = ({ base, height } = {}) => (
-    (toNumber(base) || 0) > 0 &&
-    (toNumber(height) || 0) > 0
-);
-
-export const calculateConvertedQuantity = ({
-    quantity = null,
-    currentStock = null,
-    base = null,
-    height = null,
-    fallbackToQuantity = true
-}) => {
-
-    const stock = toNumber(currentStock ?? quantity) || 0;
-
-    if (!hasDimensions({ base, height })) {
-        return fallbackToQuantity ? normalizeDecimal(stock) : 0;
-    }
-
-    return normalizeDecimal(
-        stock * (toNumber(base) || 0) * (toNumber(height) || 0)
-    );
 };
 
 const getStockErrorMeta = (material = {}) => ({

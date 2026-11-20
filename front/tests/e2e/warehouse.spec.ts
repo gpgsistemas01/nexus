@@ -207,7 +207,7 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await page.goto('/almacen/materiales');
   await expect(page.getByRole('cell', { name: 'Lona Proveedor Central' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Nueva existencia' })).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Editar oferta', exact: true })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Editar existencia', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Exportar Excel', exact: true })).toBeHidden();
   await page.getByRole('button', { name: 'Menú', exact: true }).click();
@@ -366,7 +366,7 @@ test(
     ).toBeVisible();
     expect(writes).toHaveLength(0);
     await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO');
-    const reference = dialog.getByRole('region', { name: 'Datos del artículo', exact: true });
+    const reference = dialog.getByRole('region', { name: 'Datos del material', exact: true });
     for (const [label, value] of [
       ['Base', '2'],
       ['Altura', '50'],
@@ -379,14 +379,22 @@ test(
       await expect(field).not.toBeEditable();
     }
 
+    const initialQuantity = dialog.getByRole('spinbutton', {
+      name: 'Cantidad inicial',
+      exact: true,
+    });
+    await initialQuantity.fill('1.5');
+    await expect(referenceValue(dialog, 'Cantidad convertida inicial')).toHaveText('150.00');
+    await initialQuantity.fill('0');
+    await expect(referenceValue(dialog, 'Cantidad convertida inicial')).toHaveText('0.00');
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes[0]).toMatchObject({
       method: 'POST',
       body: { materialId: ids.material, supplierId: ids.supplier, newStock: 0 },
     });
-    await page.getByRole('button', { name: 'Editar oferta', exact: true }).click();
-    dialog = page.getByRole('dialog', { name: 'Editar oferta de material', exact: true });
+    await page.getByRole('button', { name: 'Editar existencia', exact: true }).click();
+    dialog = page.getByRole('dialog', { name: 'Editar existencia de material', exact: true });
     for (const [label, value] of [
       ['Material', 'Lona'],
       ['Proveedor', 'Proveedor Central'],
@@ -737,6 +745,12 @@ test(
     await page.getByRole('option', { name: 'Proveedor 045', exact: true }).click();
     await expect(field).toHaveValue('Proveedor 045');
     expect(starts.filter((start) => start === 40)).toHaveLength(1);
+    await field.click();
+    const selected = list.getByRole('option', { name: 'Proveedor 045', selected: true });
+    await expect(selected).toBeVisible();
+    expect(
+      await selected.evaluate((option) => getComputedStyle(option, '::after').content),
+    ).not.toBe('none');
   },
 );
 

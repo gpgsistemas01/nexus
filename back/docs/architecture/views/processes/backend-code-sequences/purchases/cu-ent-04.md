@@ -34,7 +34,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `FileMaterialGoodsReceiptController` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) |
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
-| `Conversion` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `Conversion` | control | [`stockQuantity.js`](../../../../../../src/shared/inventory/stockQuantity.js) |
 | `Totals` | control | [`goodsReceiptTotalsService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) |
 
 ### Configuración y construcción
@@ -228,7 +228,7 @@ sequenceDiagram
     autonumber
     participant Core@{ "type": "control" } as goodsReceiptCorrectionService.js
     participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
-    participant Conversion@{ "type": "control" } as stockHelpers.js
+    participant Conversion@{ "type": "control" } as stockQuantity.js
     participant Formatter@{ "type": "control" } as formattersUtils.js
     Core->>Helpers: calculateGoodsReceiptDetail({ material, detail })
     Helpers->>Numbers: roundTo(quantity * costPerUnitType)
