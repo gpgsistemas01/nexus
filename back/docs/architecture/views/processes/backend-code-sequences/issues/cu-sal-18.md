@@ -23,7 +23,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Helpers` | control | [`goodsIssueHelpers.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) |
 | `DTO` | control | [`goodsIssueDTO.js`](../../../../../../src/dtos/goodsIssueDTO.js) |
 | `Header` | control | [`issueHeaderService.js`](../../../../../../src/services/warehouse/issues/issueHeaderService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`goodsIssueValidations.js`](../../../../../../src/validators/forms/goodsIssueValidations.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
@@ -118,7 +118,7 @@ sequenceDiagram
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant DTO@{ "type": "control" } as DTO funcional<br/>goodsIssueDTO.js
     participant Header@{ "type": "control" } as issueHeaderService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 

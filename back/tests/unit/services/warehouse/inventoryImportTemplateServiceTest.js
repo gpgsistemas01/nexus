@@ -22,6 +22,7 @@ const offer = (resource, index) => {
     const unitMeasure = { symbol: 'pza', name: 'Unidad' };
     const common = {
         currentStock: 2,
+        minStock: 1,
         convertedQuantity: 2,
         maxUnitCost: 10,
         isActive: true,
@@ -34,7 +35,6 @@ const offer = (resource, index) => {
               version: 1,
               name,
               ...common,
-              minStock: 1,
               presentation,
               unitMeasure,
           }
@@ -48,7 +48,6 @@ const offer = (resource, index) => {
                   version: 1,
                   base: null,
                   height: null,
-                  minStock: 1,
                   presentation,
                   unitMeasure,
               },

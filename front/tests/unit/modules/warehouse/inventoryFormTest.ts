@@ -158,6 +158,7 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
         'edit',
         {
           maxUnitCost: 110,
+          minStock: 5,
           isActive: true,
           supplierId: ids.supplier,
           expectedVersion: 3,
@@ -223,6 +224,7 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
       materialId: ids.material,
       supplierId: ids.supplier,
       maxUnitCost: 0,
+      minStock: 0,
       isActive: true,
       newStock: 0,
       observations: '',
@@ -457,17 +459,20 @@ it('alta, edición y ajuste comparten la sección Existencias con los campos de 
   ]);
   expect(inventory(createSections).fields.map(({ name }) => name)).toEqual([
     'newStock',
+    'minStock',
     'maxUnitCost',
     'isActive',
     'observations',
   ]);
   expect(inventory(editSections).summary).toEqual(inventory(adjustSections).summary);
   expect(inventory(editSections).fields.map(({ name }) => name)).toEqual([
+    'minStock',
     'maxUnitCost',
     'isActive',
   ]);
   expect(inventory(adjustSections).fields.map(({ name }) => name)).toEqual([
     'newStock',
+    'minStock',
     'maxUnitCost',
     'isActive',
     'reasonId',

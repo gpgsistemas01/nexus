@@ -30,7 +30,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Inventory` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `DTO` | control | [`goodsReceiptDTO.js`](../../../../../../src/dtos/goodsReceiptDTO.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Invoice` | control | [`goodsReceiptInvoiceService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
@@ -140,7 +140,7 @@ sequenceDiagram
     participant Core@{ "type": "control" } as goodsReceiptService.js
     participant Socket@{ "type": "control" } as socketUtils.js
     participant DTO@{ "type": "control" } as DTO funcional<br/>goodsReceiptDTO.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Note over Controller: Handler generado
     Controller->>DTO: createGoodsReceiptDtoForRegister(req.body)

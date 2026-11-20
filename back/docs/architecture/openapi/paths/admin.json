@@ -1063,6 +1063,39 @@
         },
         {
           "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "MATERIAL",
+              "CONSUMABLE"
+            ]
+          },
+          "description": "Tipo de artículo. Sólo aplica a materials."
+        },
+        {
+          "name": "presentationId",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Identificador de la presentación, incluso de una inactiva. Sólo aplica a materials."
+        },
+        {
+          "name": "unitMeasureId",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Identificador de la unidad de medida, incluso de una inactiva. Sólo aplica a materials."
         }
       ],
       "responses": {
@@ -1097,6 +1130,24 @@
             }
           }
         },
+        "400": {
+          "description": "Filtro de Artículos inválido (CATALOG_FILTER_INVALID).",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "const": "CATALOG_FILTER_INVALID"
+                  }
+                }
+              }
+            }
+          }
+        },
         "401": {
           "$ref": "../openapi.json#/components/responses/Unauthorized"
         },
@@ -1114,7 +1165,7 @@
         "Catálogos"
       ],
       "summary": "Consultar registros de catálogo",
-      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage."
+      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage. En Artículos, los filtros se combinan con el nombre y se aplican antes de contar y paginar. recordsTotal incluye todos los artículos; recordsFiltered cuenta las coincidencias."
     },
     "post": {
       "operationId": "postManagedCatalog",
@@ -1288,14 +1339,6 @@
                         "null"
                       ],
                       "description": "Positiva y opcional; se captura junto con base."
-                    },
-                    "minStock": {
-                      "type": [
-                        "number",
-                        "string"
-                      ],
-                      "minimum": 0,
-                      "description": "Opcional; vacío o ausente en alta usa 0. PIEZA exige un entero."
                     }
                   },
                   "required": [
@@ -1552,14 +1595,6 @@
                       "minLength": 1,
                       "maxLength": 200
                     },
-                    "minStock": {
-                      "type": [
-                        "number",
-                        "string"
-                      ],
-                      "minimum": 0,
-                      "description": "Opcional; vacío o ausente en alta usa 0. PIEZA exige un entero."
-                    },
                     "expectedVersion": {
                       "type": "integer",
                       "minimum": 0
@@ -1601,7 +1636,7 @@
                     "expectedVersion"
                   ],
                   "additionalProperties": false,
-                  "description": "Sin proveedor permite modificar toda la identidad; con proveedor sólo nombre y minStock. Requiere expectedVersion. Un vínculo concurrente rechaza el cambio de identidad con MATERIAL_IDENTITY_LINKED."
+                  "description": "Sin proveedor permite modificar toda la identidad; con proveedor sólo el nombre. Requiere expectedVersion. Un vínculo concurrente rechaza el cambio de identidad con MATERIAL_IDENTITY_LINKED."
                 }
               ]
             }
@@ -1664,7 +1699,7 @@
         "Catálogos"
       ],
       "summary": "Editar registro de catálogo",
-      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage. Sin proveedor vinculado se permite editar toda la identidad. Con proveedor vinculado sólo se editan nombre y stock mínimo. Los documentos anteriores conservan sus especificaciones. En presentaciones y unidades vinculadas a artículos o mermas sólo se edita el estado. expectedVersion es obligatorio."
+      "description": " Materiales usa la tabla Material e incluye ambos tipos, sin proveedor, existencia, costo ni estado activo. Materiales requiere material-catalogs:manage o catalogs:manage; los demás requieren catalogs:manage. La lectura de presentaciones y unidades también admite material-catalogs:manage. Sin proveedor vinculado se permite editar toda la identidad. Con proveedor vinculado sólo se edita el nombre. Los documentos anteriores conservan sus especificaciones. En presentaciones y unidades vinculadas a artículos o mermas sólo se edita el estado. expectedVersion es obligatorio."
     }
   },
   "/api/admin/reports/persons/excel": {

@@ -1,4 +1,4 @@
-import { AppError } from '../../../errors/AppError.js';
+import { ForbiddenError } from '../../../errors/authError.js';
 import { DATA_SCOPES, getGrantedPermissions, hasDataScope } from '../../../constants/permissions.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
@@ -19,12 +19,12 @@ export const buildIssueDepartmentWhere = ({ accesses = [], departmentId = '' } =
 export const assertIssueDepartmentAccess = ({ accesses = [], departmentId }) => {
     const where = buildIssueDepartmentWhere({ accesses, departmentId });
     if (!departmentId || (typeof where.departmentId === 'object' && !where.departmentId.in.length)) {
-        throw new AppError('Sólo puede registrar salidas para sus áreas autorizadas.', 'FORBIDDEN', 403);
+        throw new ForbiddenError('Sólo puede registrar salidas para sus áreas autorizadas.');
     }
 };
 
 export const assertIssueImmediateSupplyAccess = ({ accesses = [], permission }) => {
     if (!getGrantedPermissions(accesses).includes(permission)) {
-        throw new AppError('No tiene permiso para surtir salidas al registrarlas.', 'FORBIDDEN', 403);
+        throw new ForbiddenError('No tiene permiso para surtir salidas al registrarlas.');
     }
 };

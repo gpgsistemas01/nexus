@@ -33,7 +33,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `sections` |
+| association | [InventoryFormSection](../../../../../src/modules/warehouse/inventoryFormTypes.ts) | `sections` |
 | association | [InventoryValues](../../../../../src/modules/warehouse/inventory.ts) | `values` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `errors` |
 | dependency | [LookupState](../../../../../src/shared/lookup.ts) | `lookups` |
@@ -112,7 +112,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| association | [InventoryFieldSpec](../../../../../src/modules/warehouse/formFields.ts) | `field` |
+| association | [InventoryFieldSpec](../../../../../src/modules/warehouse/inventoryFormTypes.ts) | `field` |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `lookup` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `initialOption` |
 
@@ -254,63 +254,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 ```typescript
 'unavailable' | 'canceled' | 'confirmed'
 ```
-
-## SectionId
-
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 25, columna 1. **Declaración:** type.
-
-**Definición completa:**
-
-```typescript
-(typeof SECTION_ORDER)[number]
-```
-
-## InventoryFieldSpec
-
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 27, columna 1. **Declaración:** interface.
-
-| Miembro | Firma completa |
-| --- | --- |
-| `name` | `name: InventoryField;` |
-| `label` | `label: string;` |
-| `type` | `type?: 'number' \| 'lookup' \| 'checkbox' \| 'textarea';` |
-| `step` | `step?: number;` |
-| `isReadOnly` | `isReadOnly?: boolean;` |
-| `isDisabled` | `isDisabled?: boolean;` |
-| `displayValue` | `displayValue?: string;` |
-| `hint` | `hint?: string;` |
-| `isWide` | `isWide?: boolean;` |
-
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `name` |
-
-## InventorySummaryItem
-
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 38, columna 1. **Declaración:** interface.
-
-| Miembro | Firma completa |
-| --- | --- |
-| `label` | `label: string;` |
-| `value` | `value: string;` |
-
-## InventoryFormSection
-
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 42, columna 1. **Declaración:** interface.
-
-| Miembro | Firma completa |
-| --- | --- |
-| `id` | `id: SectionId;` |
-| `title` | `title: string;` |
-| `description` | `description?: string;` |
-| `fields` | `fields: InventoryFieldSpec[];` |
-| `summary` | `summary?: InventorySummaryItem[];` |
-
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | [SectionId](../../../../../src/modules/warehouse/formFields.ts) | `id` |
-| association | [InventoryFieldSpec](../../../../../src/modules/warehouse/formFields.ts) | `fields` |
-| association | [InventorySummaryItem](../../../../../src/modules/warehouse/formFields.ts) | `summary` |
 
 ## InventoryResource
 
@@ -496,6 +439,72 @@ keyof InventoryValues
 ```typescript
 Record<string, string | number | boolean | null>
 ```
+
+## SectionId
+
+**Fuente:** [src/modules/warehouse/inventoryFormTypes.ts](../../../../../src/modules/warehouse/inventoryFormTypes.ts) · línea 3, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+| 'origin'
+    | 'identity'
+    | 'measurements'
+    | 'reference'
+    | 'weights'
+    | 'history'
+    | 'presentation'
+    | 'inventory'
+    | 'stock'
+    | 'notes'
+```
+
+## InventoryFieldSpec
+
+**Fuente:** [src/modules/warehouse/inventoryFormTypes.ts](../../../../../src/modules/warehouse/inventoryFormTypes.ts) · línea 15, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `name` | `name: InventoryField;` |
+| `label` | `label: string;` |
+| `type` | `type?: 'number' \| 'lookup' \| 'checkbox' \| 'textarea';` |
+| `step` | `step?: number;` |
+| `isReadOnly` | `isReadOnly?: boolean;` |
+| `isDisabled` | `isDisabled?: boolean;` |
+| `displayValue` | `displayValue?: string;` |
+| `hint` | `hint?: string;` |
+| `isWide` | `isWide?: boolean;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `name` |
+
+## InventorySummaryItem
+
+**Fuente:** [src/modules/warehouse/inventoryFormTypes.ts](../../../../../src/modules/warehouse/inventoryFormTypes.ts) · línea 26, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `label` | `label: string;` |
+| `value` | `value: string;` |
+
+## InventoryFormSection
+
+**Fuente:** [src/modules/warehouse/inventoryFormTypes.ts](../../../../../src/modules/warehouse/inventoryFormTypes.ts) · línea 30, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `id` | `id: SectionId;` |
+| `title` | `title: string;` |
+| `description` | `description?: string;` |
+| `fields` | `fields: InventoryFieldSpec[];` |
+| `summary` | `summary?: InventorySummaryItem[];` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [SectionId](../../../../../src/modules/warehouse/inventoryFormTypes.ts) | `id` |
+| association | [InventoryFieldSpec](../../../../../src/modules/warehouse/inventoryFormTypes.ts) | `fields` |
+| association | [InventorySummaryItem](../../../../../src/modules/warehouse/inventoryFormTypes.ts) | `summary` |
 
 ## InventoryImportMode
 

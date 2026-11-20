@@ -45,7 +45,7 @@ export const createInventoryImportTemplate = async ({ user, resource, mode, quer
                 id: item.materialId, supplierId: item.supplierId, expectedVersion: item.version,
                 expectedMaterialVersion: item.material.version, name: item.material.name,
                 ...referenceFields(item),
-                minStock: Number(item.material.minStock), maxUnitCost: !user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ) || item.maxUnitCost == null ? '' : Number(item.maxUnitCost),
+                minStock: Number(item.minStock), maxUnitCost: !user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ) || item.maxUnitCost == null ? '' : Number(item.maxUnitCost),
                 isActive: item.isActive ? 'SI' : 'NO'
             }));
         }

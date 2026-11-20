@@ -25,7 +25,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Data` | control | [`warehouseReportExcel.js`](../../../../../../src/utils/reports/warehouseReportExcel.js) |
 | `Summary` | control | [`goodsReceiptReportSummary.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportSummary.js) |
 | `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
@@ -84,7 +84,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as consumableGoodsReceiptReportController.js
     participant Core@{ "type": "control" } as reportController.js
     participant Formatter@{ "type": "control" } as formattersUtils.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
     participant Facade@{ "type": "control" } as consumableGoodsReceiptService.js
     participant Query@{ "type": "control" } as goodsReceiptReportService.js
     participant Data@{ "type": "control" } as warehouseReportExcel.js

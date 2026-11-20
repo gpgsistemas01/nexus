@@ -20,7 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`userController.js`](../../../../../../src/controllers/api/admin/userController.js) |
 | `UserDto` | control | [`userDTO.js`](../../../../../../src/dtos/userDTO.js) |
 | `Domain` | control | [`userService.js`](../../../../../../src/services/admin/userService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`userValidations.js`](../../../../../../src/validators/forms/userValidations.js) |
 
 ## Secuencia de implementación
@@ -36,7 +36,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as userController.js
     participant UserDto@{ "type": "control" } as DTO funcional<br/>userDTO.js
     participant Domain@{ "type": "control" } as userService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: PATCH /api/admin/users/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)

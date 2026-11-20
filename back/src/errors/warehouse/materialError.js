@@ -1,4 +1,12 @@
 import { AppError } from "../AppError.js";
+import { errorMap } from "../../messages/codeMessages.js";
+import { errorMessages } from "../../shared/messages/apiMessages.js";
+
+export class MaterialMeasurementsInvalid extends AppError {
+    constructor(message) {
+        super(message, errorMap.materialMeasurements.INVALID, 400);
+    }
+}
 
 export class MaterialRollReferenceReadOnly extends AppError {
     constructor() {
@@ -8,7 +16,7 @@ export class MaterialRollReferenceReadOnly extends AppError {
 
 export class MaterialIdentityLinkedConflict extends AppError {
     constructor() {
-        super('El artículo tiene proveedores vinculados. Sólo puede editar Nombre y Stock mínimo.', 'MATERIAL_IDENTITY_LINKED', 409);
+        super(errorMessages.MATERIAL_IDENTITY_LINKED, 'MATERIAL_IDENTITY_LINKED', 409);
     }
 }
 
@@ -109,7 +117,7 @@ export class MaterialCatalogDeleteConflict extends AppError {
 
 export class MaterialFieldsManagedInCatalog extends AppError {
     constructor() {
-        super('El nombre y el stock mínimo se editan en Almacén → Artículos.', 'MATERIAL_FIELDS_MANAGED_IN_CATALOG', 409);
+        super('El nombre del artículo se edita en Almacén → Artículos.', 'MATERIAL_FIELDS_MANAGED_IN_CATALOG', 409);
     }
 }
 

@@ -105,7 +105,6 @@ const openRelatedEditor = async (kind: 'article' | 'supplier', row: InventoryRow
             unitMeasure: row.unitMeasure,
             base: row.base == null ? '' : String(row.base),
             height: row.height == null ? '' : String(row.height),
-            minStock: row.minStock == null ? '' : String(row.minStock),
         };
 
         catalogEditor.value = { action: 'edit', row: article };

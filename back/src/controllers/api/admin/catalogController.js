@@ -4,14 +4,17 @@ import {
     findAllCatalogEntries,
     updateCatalogEntry
 } from '../../../services/admin/catalogService.js';
-import { deleteMaterialCatalogEntry } from '../../../services/warehouse/materials/materialService.js';
+import { deleteMaterialCatalogEntry } from '../../../services/warehouse/materials/materialCatalogService.js';
 import { getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 
 export const getAllCatalogEntries = async (req, res, next) => {
     try {
         const { skip, take } = getDataTablePaging(req.query);
         const search = getDataTableSearch(req.query);
-        const result = await findAllCatalogEntries(req.params.catalog, { skip, take, search });
+        const { type, presentationId, unitMeasureId } = req.query;
+        const result = await findAllCatalogEntries(req.params.catalog, {
+            skip, take, search, filters: { type, presentationId, unitMeasureId }
+        });
         return res.status(200).json(result);
     } catch (error) {
         return next(error);

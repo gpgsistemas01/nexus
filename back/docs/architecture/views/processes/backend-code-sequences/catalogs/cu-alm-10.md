@@ -24,7 +24,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Measurements` | control | [`wasteHelpers.js`](../../../../../../src/services/warehouse/wastes/wasteHelpers.js) |
 | `Entry` | control | [`wasteStockEntryService.js`](../../../../../../src/services/warehouse/wastes/wasteStockEntryService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
 | `Templates` | control | [`wasteMaterialService.js`](../../../../../../src/services/warehouse/wastes/wasteMaterialService.js) |
 
@@ -90,7 +90,7 @@ sequenceDiagram
     participant Measurements@{ "type": "control" } as wasteHelpers.js
     participant Entry@{ "type": "control" } as wasteStockEntryService.js
     participant Socket@{ "type": "control" } as socketUtils.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Controller->>Templates: findWasteMaterialTemplates({ search, skip, take, supplierId })
     Templates-->>Controller: findWasteMaterialTemplates(): Promise[Object[]]

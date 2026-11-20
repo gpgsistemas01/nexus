@@ -20,7 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`wasteController.js`](../../../../../../src/controllers/api/warehouse/wasteController.js) |
 | `WasteDto` | control | [`wasteDTO.js`](../../../../../../src/dtos/wasteDTO.js) |
 | `Domain` | control | [`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
 
 ## Secuencia de implementación
@@ -36,7 +36,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as wasteController.js
     participant WasteDto@{ "type": "control" } as DTO funcional<br/>wasteDTO.js
     participant Domain@{ "type": "control" } as wasteService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: PATCH /api/warehouse/wastes/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)

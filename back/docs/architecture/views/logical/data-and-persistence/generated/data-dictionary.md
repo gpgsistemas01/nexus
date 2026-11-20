@@ -183,7 +183,6 @@ usuarios y responsables se mantiene en el
 | `sku` | `String?` | No | UK | — | `@db.VarChar(200)` |
 | `presentationId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `unitMeasureId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `base` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `height` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `type` | `MaterialType` | Sí | — | `MATERIAL` | — |
@@ -221,6 +220,7 @@ usuarios y responsables se mantiene en el
 | `maxUnitCost` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `sku` | `String?` | No | — | — | `@db.VarChar(50)` |
 | `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
+| `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |

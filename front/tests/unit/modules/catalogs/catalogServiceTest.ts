@@ -78,7 +78,6 @@ it('Material devuelve identidad, tipo y medidas sin exigir ni inventar proveedor
           unitMeasure: { name: 'PIEZA', symbol: 'PZA.' },
           base: null,
           height: null,
-          minStock: '0',
         },
       ],
       recordsTotal: 1,
@@ -93,7 +92,6 @@ it('Material devuelve identidad, tipo y medidas sin exigir ni inventar proveedor
     unitSymbol: 'PZA.',
     base: '',
     height: '',
-    minStock: '0',
   });
   expect(result.data[0]).not.toHaveProperty('isActive');
 });
@@ -113,7 +111,6 @@ it('el alta contextual rechaza una respuesta de otro tipo de artículo', async (
         unitMeasure: { name: 'PIEZA', symbol: 'PZA.' },
         base: null,
         height: null,
-        minStock: '0',
       },
     },
   }));

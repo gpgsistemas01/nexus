@@ -11,10 +11,10 @@ sequenceDiagram
     participant Auth@{ "type": "control" } as authMiddleware.js
     participant Controller@{ "type": "control" } as catalogController.js
     participant Domain@{ "type": "control" } as catalogService.js
-    participant Materials@{ "type": "control" } as materialService.js
+    participant Materials@{ "type": "control" } as materialCatalogService.js
     participant Page@{ "type": "control" } as paginationRepository.js
     participant Db@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
     Client->>Route: GET /api/admin/catalogs/materials?search[value]=tornillo&start=0&length=10
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     Auth-->>Route: verifyApiTokenRequired(): Promise[User]
@@ -47,6 +47,6 @@ sequenceDiagram
 | `Auth` | control | [authMiddleware.js](../../../../../../src/middleware/authMiddleware.js) |
 | `Controller` | control | [catalogController.js](../../../../../../src/controllers/api/admin/catalogController.js) |
 | `Domain` | control | [catalogService.js](../../../../../../src/services/admin/catalogService.js) |
-| `Materials` | control | [materialService.js](../../../../../../src/services/warehouse/materials/materialService.js) |
+| `Materials` | control | [materialCatalogService.js](../../../../../../src/services/warehouse/materials/materialCatalogService.js) |
 | `Page` | control | [paginationRepository.js](../../../../../../src/repository/paginationRepository.js) |
-| `ErrorHandler` | control | [app.js](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |

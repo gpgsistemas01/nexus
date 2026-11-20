@@ -14,7 +14,7 @@ for (const [path, title, item] of [
   ['consumibles', 'consumibles', 'Consumible'],
   ['mermas', 'mermas', 'Merma'],
 ])
-  test(`movimientos: ${path} conserva título, diez columnas, recarga y consulta sin edición`, async ({
+  test(`movimientos: ${path} conserva título, columnas, recarga y consulta sin edición`, async ({
     page,
   }) => {
     await mockMovements(page);
@@ -36,7 +36,24 @@ for (const [path, title, item] of [
       'Nuevo stock',
     ])
       await expect(page.getByRole('columnheader', { name, exact: true })).toBeVisible();
-    await expect(page.getByRole('columnheader')).toHaveCount(10);
+    if (path === 'mermas') {
+      await expect(page.getByRole('columnheader')).toHaveText([
+        'Fecha',
+        'Tipo',
+        'Folio',
+        'Merma',
+        'Proveedor',
+        'Medidas',
+        'Cambio de existencia',
+        'Base',
+        'Altura',
+        'Stock anterior',
+        'Movimiento',
+        'Nuevo stock',
+      ]);
+    } else {
+      await expect(page.getByRole('columnheader')).toHaveCount(10);
+    }
     await expect(
       page.getByRole('button', { name: /Editar|Eliminar|Nuevo movimiento/ }),
     ).toHaveCount(0);

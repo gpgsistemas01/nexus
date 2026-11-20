@@ -26,7 +26,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `DTO` | control | [`goodsReceiptDTO.js`](../../../../../../src/dtos/goodsReceiptDTO.js) |
 | `Change` | control | [`goodsReceiptDetailChangeService.js`](../../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) |
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
 | `Numbers` | control | [`numberUtils.js`](../../../../../../src/shared/utils/numberUtils.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
@@ -127,7 +127,7 @@ sequenceDiagram
     participant Core@{ "type": "control" } as goodsReceiptCorrectionService.js
     participant Socket@{ "type": "control" } as socketUtils.js
     participant DTO@{ "type": "control" } as DTO funcional<br/>goodsReceiptDTO.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     participant Change@{ "type": "control" } as goodsReceiptDetailChangeService.js
 

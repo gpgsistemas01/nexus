@@ -1,5 +1,5 @@
 import { materialCatalogValidation, materialCatalogEditValidation } from '../../shared/validation/validators.js';
-import { findMaterialCatalogEntries, createMaterialCatalogEntry, updateMaterialCatalogEntry } from '../warehouse/materials/materialService.js';
+import { findMaterialCatalogEntries, createMaterialCatalogEntry, updateMaterialCatalogEntry } from '../warehouse/materials/materialCatalogService.js';
 import { assertRecordVersion, updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from '../../repository/paginationRepository.js';
 import { findManagedCatalog } from '../../constants/catalogs.js';
@@ -47,9 +47,9 @@ const validateCatalogData = (catalog, data, isEditing = false) => {
     }
 };
 
-export const findAllCatalogEntries = async (catalogName, { skip = 0, take = 10, search = '' } = {}) => {
+export const findAllCatalogEntries = async (catalogName, { skip = 0, take = 10, search = '', filters } = {}) => {
     const catalog = getCatalog(catalogName);
-    if (catalog.model === 'material') return findMaterialCatalogEntries({ skip, take, search });
+    if (catalog.model === 'material') return findMaterialCatalogEntries({ skip, take, search, filters });
     const model = getDb()[catalog.model];
     const where = search ? { name: { contains: search, mode: 'insensitive' } } : {};
 

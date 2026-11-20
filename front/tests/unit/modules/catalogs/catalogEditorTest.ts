@@ -145,7 +145,7 @@ describe('Catálogos Vue: captura y versiones (DP-VUE-CAT-002)', () => {
   });
 });
 
-it('crear Material valida identidad sin proveedor; editar sólo envía nombre, mínimo y versión', async () => {
+it('crear Material valida identidad sin proveedor; editar sólo envía nombre y versión', async () => {
   const create = openEditor('materials');
   create.editor.update('name', 'Consumible');
   await create.editor.submit();
@@ -182,16 +182,14 @@ it('crear Material valida identidad sin proveedor; editar sólo envía nombre, m
       unitMeasureId: entry.id,
       base: '2',
       height: '3',
-      minStock: '0',
     },
   });
   edit.editor.update('name', 'Actualizado');
-  edit.editor.update('minStock', '5');
   await edit.editor.submit();
   expect(edit.request).toHaveBeenCalledWith(
     'materials',
     expect.objectContaining({ action: 'edit' }),
-    { name: 'Actualizado', minStock: 5, expectedVersion: 2 },
+    { name: 'Actualizado', expectedVersion: 2 },
     expect.any(AbortSignal),
   );
   edit.wrapper.unmount();
@@ -207,7 +205,6 @@ it('editar un artículo sin proveedor permite cambiar toda su identidad', async 
       unitMeasureId: entry.id,
       base: '2',
       height: '3',
-      minStock: '0',
       hasSuppliers: false,
     },
   });

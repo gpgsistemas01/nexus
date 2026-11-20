@@ -188,10 +188,11 @@ vacía cuando se recibe cero y el saldo resultante al editar.
 `remoteOptionsTest.ts` cubre selección, cálculo con el peso del rollo completo capturado y largo del material y
 limpieza programática sin reconstruir la selección desde el DOM.
 
-`inventoryFormTest.ts` comprueba medidas según unidad y consumibles siempre
-sin medidas. `inventoryFormTest.ts` omite las referencias históricas del payload.
+`inventoryFormTest.ts` comprueba medidas según unidad y presentación: KILOGRAMOS
+y METRO LINEAL usan `1 × 1`, mientras las dimensiones no aplicables no se capturan.
+El formulario de existencia muestra esas medidas como referencia de sólo lectura.
 `materialControllerDbTest.js` verifica altas directas y desde compra, conversión,
-consumibles sin dimensiones y origen de merma limitado a materiales en m². El rechazo
+consumibles KILOGRAMOS/METRO LINEAL con `1 × 1` y origen de merma limitado a materiales en m². El rechazo
 de identificadores forzados demuestra que el selector del cliente no sustituye el control
 al guardar. `wasteWeightDbTest.js` verifica el cono compartido, el guardado del total de muestra, la ausencia de valores derivados nuevos y la conservación de históricos.
 

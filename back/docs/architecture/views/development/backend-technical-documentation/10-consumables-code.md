@@ -38,7 +38,7 @@ flowchart TB
 
 | Capacidad | Entrada y retorno | Reglas, errores y persistencia |
 | --- | --- | --- |
-| Consumibles: `consumableController.js`, `consumables/consumableService.js` y `consumableApiRoute.js` | Expone listado, alta, edición, retiro y ajuste con contrato propio bajo `/api/warehouse/consumables`. | Fija `type = CONSUMABLE`, elimina dimensiones de entrada y delega identidad, oferta, existencia y movimiento a los servicios de materiales con el contexto tipado. |
+| Consumibles: `consumableController.js`, `consumables/consumableService.js` y `consumableApiRoute.js` | Expone listado, alta, edición, retiro y ajuste con contrato propio bajo `/api/warehouse/consumables`. | Fija `type = CONSUMABLE` y delega identidad, oferta, existencia y movimiento a los servicios de materiales con el contexto tipado. La preparación común aplica `1 × 1` a las presentaciones KILOGRAMOS y METRO LINEAL; las medidas no aplicables permanecen vacías. |
 
 
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |

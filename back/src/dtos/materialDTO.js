@@ -28,8 +28,7 @@ export const createMaterialDtoForRegister = (body = {}) => {
     if (body.materialId !== undefined) return {
         materialId: body.materialId,
         supplierId: body.supplierId,
-        maxUnitCost: body.maxUnitCost,
-        ...(Object.hasOwn(body, 'isActive') && { isActive: body.isActive }),
+        ...buildMaterialSecondaryDataDto(body),
         ...buildMaterialStockDto(body, { includeSupplier: false, includeReason: false })
     };
     const materialData = buildMaterialDataDto(body);
@@ -38,9 +37,6 @@ export const createMaterialDtoForRegister = (body = {}) => {
         return {
             ...materialData,
             creationContext: MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT,
-            ...(body.minStock !== undefined && body.minStock !== null
-                ? { minStock: body.minStock }
-                : {}),
             ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: body.isActive } : {})
         };
     }

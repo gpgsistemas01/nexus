@@ -13,12 +13,13 @@ import {
     convertedQuantityText,
 } from '../../../shared/utils/formatNumbers.js';
 import { getIssueReturnableQuantity, getIssuePendingQuantity } from '../issueRules.js';
-import type { IssueDetail, IssueMode, IssueSupplyChanges } from '../issue.js';
+import { ISSUE_CONFIG } from '../issueConfig.js';
+import type { IssueDetail, IssueMode, IssueResource, IssueSupplyChanges } from '../issue.js';
 
 const props = defineProps<{
     rows: IssueDetail[];
     mode: IssueMode;
-    itemLabel: string;
+    resource: IssueResource;
     isDisabled: boolean;
 }>();
 const emit = defineEmits<{
@@ -26,75 +27,103 @@ const emit = defineEmits<{
     supply: [id: string, changes: IssueSupplyChanges];
     return: [row: IssueDetail];
 }>();
-const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
-    { title: props.itemLabel, key: 'name', align: 'start' as const, nowrap: true, fixed: 'start' },
-    {
-        title: 'Medidas',
-        children: [
-            { title: 'Base', key: 'base', align: 'end' as const },
-            { title: 'Altura', key: 'height', align: 'end' as const },
-        ],
-    },
-    { title: 'Presentación', key: 'presentation', align: 'start' as const },
-    { title: 'Salida', key: 'quantity', align: 'end' as const },
-    {
-        title: 'Conversión',
-        children: [
-            { title: 'Cantidad', key: 'convertedQuantity', align: 'end' as const },
-            { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
-        ],
-    },
-    ...(['supply', 'return', 'view'].includes(props.mode)
-        ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity', align: 'end' as const }]
-        : []),
-    ...(['supply', 'view'].includes(props.mode)
-        ? [{ title: 'Pendiente de surtir', key: 'pendingQuantity', align: 'end' as const }]
-        : []),
-    ...(['return', 'view'].includes(props.mode)
-        ? [
-              { title: 'Cantidad devuelta', key: 'returnedQuantity', align: 'end' as const },
-              { title: 'Saldo entregado', key: 'deliveredQuantity', align: 'end' as const },
-          ]
-        : []),
-    ...(props.mode === 'view'
-        ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus', align: 'start' as const }]
-        : []),
-    ...(props.mode === 'supply'
-        ? [
-              { title: 'Costo unitario de Conversión', key: 'maxUnitCost', align: 'end' as const },
-              {
-                  title: 'Cantidad a surtir',
-                  key: 'quantityToSupply',
-                  align: 'end' as const,
-                  minWidth: 160,
-              },
-              {
-                  title: 'Cantidad de proyecto',
-                  key: 'projectConvertedQuantity',
-                  align: 'end' as const,
-              },
-              { title: 'Diferencia', key: 'difference', align: 'end' as const },
-              {
-                  title: 'Surtir',
-                  key: 'supply',
-                  align: 'center' as const,
-                  fixed: 'end' as const,
-                  sortable: false,
-              },
-          ]
-        : []),
-    ...(['create', 'edit', 'return'].includes(props.mode)
-        ? [
-              {
-                  title: 'Acciones',
-                  key: 'actions',
-                  align: 'center' as const,
-                  fixed: 'end' as const,
-                  sortable: false,
-              },
-          ]
-        : []),
-]);
+
+const groupWasteColumns = (title: string, columns: DataTableHeader<IssueDetail>[]) =>
+    props.resource === 'wastes' && columns.length > 1
+        ? [{ title, align: 'center' as const, children: columns }]
+        : columns;
+
+const conversionCost: DataTableHeader<IssueDetail> = {
+    title: 'Costo unitario de Conversión',
+    key: 'maxUnitCost',
+    align: 'end',
+};
+
+const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
+    const { mode, resource } = props;
+    const isWaste = resource === 'wastes';
+
+    return [
+        {
+            title: ISSUE_CONFIG[resource].item,
+            key: 'name',
+            align: 'start',
+            nowrap: true,
+            fixed: 'start',
+        },
+        {
+            title: 'Medidas',
+            children: [
+                { title: 'Base', key: 'base', align: 'end' },
+                { title: 'Altura', key: 'height', align: 'end' },
+            ],
+        },
+        { title: 'Presentación', key: 'presentation', align: 'start' },
+        { title: 'Salida', key: 'quantity', align: 'end' },
+        {
+            title: 'Conversión',
+            children: [
+                { title: 'Cantidad', key: 'convertedQuantity', align: 'end' },
+                { title: 'Unidad', key: 'unitMeasure', align: 'start' },
+                ...(isWaste && mode === 'supply' ? [conversionCost] : []),
+            ],
+        },
+        ...groupWasteColumns('Surtido registrado', [
+            ...(['supply', 'return', 'view'].includes(mode)
+                ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity', align: 'end' as const }]
+                : []),
+            ...(['supply', 'view'].includes(mode)
+                ? [{ title: 'Pendiente de surtir', key: 'pendingQuantity', align: 'end' as const }]
+                : []),
+        ]),
+        ...(['return', 'view'].includes(mode)
+            ? groupWasteColumns('Devolución', [
+                  { title: 'Cantidad devuelta', key: 'returnedQuantity', align: 'end' },
+                  { title: 'Saldo entregado', key: 'deliveredQuantity', align: 'end' },
+              ])
+            : []),
+        ...(mode === 'view'
+            ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus', align: 'start' as const }]
+            : []),
+        ...(mode === 'supply'
+            ? [
+                  ...(!isWaste ? [conversionCost] : []),
+                  ...groupWasteColumns('Captura de surtido', [
+                      {
+                          title: 'Cantidad a surtir',
+                          key: 'quantityToSupply',
+                          align: 'end',
+                          minWidth: 160,
+                      },
+                      {
+                          title: 'Cantidad de proyecto',
+                          key: 'projectConvertedQuantity',
+                          align: 'end',
+                      },
+                      { title: 'Diferencia', key: 'difference', align: 'end' },
+                  ]),
+                  {
+                      title: 'Surtir',
+                      key: 'supply',
+                      align: 'center' as const,
+                      fixed: 'end' as const,
+                      sortable: false,
+                  },
+              ]
+            : []),
+        ...(['create', 'edit', 'return'].includes(mode)
+            ? [
+                  {
+                      title: 'Acciones',
+                      key: 'actions',
+                      align: 'center' as const,
+                      fixed: 'end' as const,
+                      sortable: false,
+                  },
+              ]
+            : []),
+    ];
+});
 const numeric = ['base', 'height', 'quantity', 'suppliedQuantity', 'returnedQuantity'] as const;
 const sortBy = ref<DataTableSortItem[]>([]);
 

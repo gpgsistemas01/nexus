@@ -63,12 +63,6 @@
           "null"
         ]
       },
-      "minStock": {
-        "type": [
-          "number",
-          "null"
-        ]
-      },
       "maxUnitCost": {
         "type": "number"
       },
@@ -161,6 +155,14 @@
         "type": "integer",
         "minimum": 0,
         "readOnly": true
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "minimum": 0,
+        "description": "Umbral de stock del vínculo artículo–proveedor. Cero desactiva la alerta."
       }
     },
     "additionalProperties": false,
@@ -2239,18 +2241,6 @@
         "exclusiveMinimum": 0,
         "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
       },
-      "minStock": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "minimum": 0,
-        "exclusiveMaximum": 1000000000000,
-        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
-        "multipleOf": 0.01
-      },
       "maxUnitCost": {
         "type": [
           "number",
@@ -2329,13 +2319,6 @@
             ]
           },
           "height": {
-            "type": [
-              "number",
-              "string",
-              "null"
-            ]
-          },
-          "minStock": {
             "type": [
               "number",
               "string",
@@ -2429,6 +2412,9 @@
           "string",
           "null"
         ]
+      },
+      "minStock": {
+        "$ref": "./warehouse-schemas.json#/MaterialUpdateRequest/properties/minStock"
       }
     }
   },

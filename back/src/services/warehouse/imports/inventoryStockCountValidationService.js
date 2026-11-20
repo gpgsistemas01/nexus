@@ -6,6 +6,7 @@ import { calculateWasteStockAdjustmentValues } from '../wastes/wasteStockAdjustm
 import { importCatalogValue } from './inventoryImportContext.js';
 import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
 import { errorMap } from '../../../messages/codeMessages.js';
+import { isAppError } from '../../../errors/AppError.js';
 
 // El conteo reemplaza el saldo. Las columnas de referencia del Excel nunca son una fuente de datos.
 export const validateInventoryStockCountRows = async ({ config, rows, context }) => {
@@ -46,7 +47,7 @@ export const validateInventoryStockCountRows = async ({ config, rows, context })
                     after = { currentStock: values.newStock, convertedQuantity: values.newConvertedQuantity };
                     difference = values.difference;
                 } catch (error) {
-                    if (!error.isOperational) throw error;
+                    if (!isAppError(error)) throw error;
                     add('newStock', error.message, error.code);
                 }
             }

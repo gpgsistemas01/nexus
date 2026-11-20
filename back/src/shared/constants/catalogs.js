@@ -43,7 +43,7 @@ export const PUBLIC_CATALOGS = Object.freeze({
         createButtonLabel: 'Nuevo estado de cumplimiento'
     },
     materials: {
-        fields: ['name', 'type', 'presentationId', 'unitMeasureId', 'base', 'height', 'minStock'],
+        fields: ['name', 'type', 'presentationId', 'unitMeasureId', 'base', 'height'],
         maxLengths: { name: 200 },
         label: 'Artículos',
         entityLabel: 'artículo',

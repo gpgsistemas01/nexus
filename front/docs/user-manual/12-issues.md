@@ -21,7 +21,12 @@ Abra **Salidas → Consumibles**. Aplique búsqueda, fechas, área o cumplimient
 
 <!-- module:any salidas-mermas -->
 
-Abra **Salidas → Mermas**. Aplique búsqueda, fechas, área o cumplimiento y pulse **Buscar**. Su cuenta sólo muestra las áreas autorizadas.
+Abra **Salidas → Mermas**. Aplique búsqueda, fechas, área o cumplimiento y pulse
+**Buscar**. Su cuenta sólo muestra las áreas autorizadas. En las partidas,
+identifique la merma por nombre y proveedor, y revise medidas, presentación,
+cantidad solicitada y conversión. Los grupos **Surtido registrado**, **Captura de
+surtido** y **Devolución** muestran las cantidades de cada operación cuando
+corresponden.
 
 <!-- module:end -->
 Si dispone de una sola área, permanece seleccionada al limpiar filtros.

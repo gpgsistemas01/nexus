@@ -22,6 +22,14 @@ export const MATERIAL_SPECIFICATION_SELECT = {
     unitMeasure: { select: { id: true, name: true, symbol: true } }
 };
 
+export const MATERIAL_DOCUMENT_DISPLAY_SELECT = Object.freeze({
+    type: true,
+    base: true,
+    height: true,
+    presentation: { select: { name: true } },
+    unitMeasure: { select: { name: true, symbol: true } }
+});
+
 const measurement = value => value == null ? null : String(value);
 
 export const createMaterialSpecification = material => ({

@@ -1,6 +1,5 @@
-import { normalizeDatabaseError } from '../../../errors/databaseError.js';
+import { resolveServiceError } from '../../serviceErrorHandler.js';
 import { findPage } from '../../../repository/paginationRepository.js';
-import { isAppError } from '../../../errors/AppError.js';
 import {
     WasteAlreadyExists,
     WasteNotFound,
@@ -29,8 +28,7 @@ import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
 const handleWasteServiceError = ({ err, fallbackError, operationId }) => {
-    const normalizedError = normalizeDatabaseError(err);
-    let error = isAppError(normalizedError) ? normalizedError : fallbackError;
+    let error = resolveServiceError(err, fallbackError);
     if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) error = new WasteNotFound();
     if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) error = new WasteAlreadyExists();
     throw markWasteOperationRejected({ err: error, operationId });

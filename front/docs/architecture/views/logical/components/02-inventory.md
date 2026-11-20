@@ -68,12 +68,12 @@ precisa eventos y callbacks entre dominios.
 | Recurso | Encabezados y celdas |
 | --- | --- |
 | Materiales | Material, Medidas (Base/Altura), Stock actual, Stock Mínimo, Presentación y Conversión (Cantidad/Unidad). Costo/Activo según permiso. |
-| Mermas | La estructura de Materiales y Pesos por unidad (Cono/Total con cono/Neto); referencias históricas de consulta. |
+| Mermas | Merma y proveedor, Medidas, Presentación, Pesos por unidad (Cono/Total con cono/Neto), Existencias (Stock actual/Stock mínimo) y Conversión (Cantidad/Unidad). Costo, estado y acciones según permiso. |
 | Consumibles | Consumible, Existencia, Stock Mínimo, Presentación y Unidad; costo/estado según permiso. |
 
-`inventoryTable` declara columnas y orden admitido; `formFields` declara secciones y
-campos que adapta `InventoryFormField`. La tabla usa paginación de servidor, sin
-descargar el inventario para filtrarlo en memoria. El
+`inventoryTable` declara las columnas y el orden admitido. `formFields` elige las
+secciones de existencias, mermas o alta de artículo desde Compras.
+`InventoryFormField` presenta los campos. La tabla usa paginación de servidor. El
 [contrato HTTP](../../../contracts/client-contracts.md) conserva parámetros y aceptación.
 
 Compras y Almacén consultan artículos mediante `shared/services/materialCatalogService`,

@@ -40,7 +40,7 @@ export const normalizeInventoryRow = (raw: Record<string, unknown>): InventoryRo
         unitMeasure: text(unit.symbol) || text(unit.name),
         base: numberValue(material.base),
         height: numberValue(material.height),
-        minStock: numberValue(material.minStock),
+        minStock: numberValue(raw.minStock),
         currentStock: numberValue(raw.currentStock),
         convertedQuantity: numberValue(raw.convertedQuantity),
         ...(raw.maxUnitCost !== undefined ? { maxUnitCost: numberValue(raw.maxUnitCost) } : {}),

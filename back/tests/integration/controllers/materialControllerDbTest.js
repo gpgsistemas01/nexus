@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
-import { materialValidation } from '../../../src/validators/forms/materialValidations.js';
+import { materialEditValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
 import { validate } from '../../../src/middleware/validatorMiddleware.js';
 
 const suffix = randomUUID().slice(0, 8);
@@ -18,14 +18,16 @@ const body = name => ({
 describe('registro de materiales con y sin medidas', () => {
   beforeAll(async () => {
     prisma = (await import('../../../src/lib/prisma.js')).prisma;
-    const { registerMaterial } = await import('../../../src/controllers/api/warehouse/materialController.js');
-    const { registerConsumable } = await import('../../../src/controllers/api/warehouse/consumableController.js');
+    const { editMaterial, registerMaterial } = await import('../../../src/controllers/api/warehouse/materialController.js');
+    const { editConsumable, registerConsumable } = await import('../../../src/controllers/api/warehouse/consumableController.js');
     const { getWasteMaterialTemplates, registerWaste } = await import('../../../src/controllers/api/warehouse/wasteController.js');
     const { wasteValidation } = await import('../../../src/validators/forms/wasteValidations.js');
     app = createControllerTestApp({ registerRoutes: router => {
       router.use((req, _res, next) => { req.user = { id: ids.user, permissions: [] }; next(); });
       router.post('/materials', materialValidation, validate, registerMaterial);
-      router.post('/consumables', validate, registerConsumable);
+      router.post('/consumables', materialValidation, validate, registerConsumable);
+      router.patch('/materials/:id', materialEditValidation, validate, editMaterial);
+      router.patch('/consumables/:id', materialEditValidation, validate, editConsumable);
       router.get('/wastes/material-templates', getWasteMaterialTemplates);
       router.post('/wastes', wasteValidation, validate, registerWaste);
     } });
@@ -66,7 +68,7 @@ describe('registro de materiales con y sin medidas', () => {
 
   it.each([['materials', 'MATERIAL'], ['consumables', 'CONSUMABLE']])('vincula %s por ID sin duplicar ni alterar el catálogo y conserva decimales', async (resource, type) => {
     const presentation = await prisma.presentation.upsert({ where: { name: 'KILOGRAMOS' }, update: {}, create: { name: 'KILOGRAMOS' } });
-    const identity = await prisma.material.create({ data: { name: `IT Measures selected ${resource} ${suffix}`, type, presentationId: presentation.id, unitMeasureId: ids.kilograms, base: 1, height: 1, minStock: 0 } });
+    const identity = await prisma.material.create({ data: { name: `IT Measures selected ${resource} ${suffix}`, type, presentationId: presentation.id, unitMeasureId: ids.kilograms, base: 1, height: 1 } });
     const countBefore = await prisma.material.count();
     const data = { materialId: identity.id, supplierId: ids.supplier, maxUnitCost: 10, isActive: true, newStock: 7.25,
       name: 'Identidad manipulada', base: 999, height: 999, presentationId: randomUUID(), minStock: 999 };
@@ -83,9 +85,18 @@ describe('registro de materiales con y sin medidas', () => {
     const saved = await prisma.supplierMaterial.findUniqueOrThrow({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: identity.id } }, include: { material: true } });
     expect(saved.material.name).toBe(identity.name);
     expect(Number(saved.material.base)).toBe(1);
-    expect(Number(saved.material.minStock)).toBe(0);
+    expect(Number(saved.minStock)).toBe(999);
     expect(Number(saved.currentStock)).toBe(7.25);
     expect(Number(saved.convertedQuantity)).toBe(7.25);
+    const changed = await request(app).patch(`/${resource}/${identity.id}`).send({
+      supplierId: ids.supplier, minStock: 3.25, maxUnitCost: 10, isActive: true, expectedVersion: saved.version
+    }).expect(200);
+    expect(Number(changed.body.material.minStock)).toBe(3.25);
+    const after = await prisma.supplierMaterial.findUniqueOrThrow({ where: { id: saved.id } });
+    expect(Number(after.minStock)).toBe(3.25);
+    expect(Number(after.currentStock)).toBe(7.25);
+    expect(await prisma.material.findUniqueOrThrow({ where: { id: identity.id } })).toEqual(identity);
+
     await request(app).post(`/${resource}`).send(data).expect(409);
     expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where: { id: saved.id } })).currentStock)).toBe(7.25);
     const wrongResource = resource === 'materials' ? 'consumables' : 'materials';
@@ -154,7 +165,7 @@ describe('registro de materiales con y sin medidas', () => {
     });
 
     expect(saved.currentStock.toString()).toBe('0');
-    expect(saved.material.minStock.toString()).toBe('999999999999.99');
+    expect(saved.minStock.toString()).toBe('999999999999.99');
     expect(saved.maxUnitCost.toString()).toBe('12.123456');
     expect(saved.isActive).toBe(true);
   });
@@ -182,7 +193,11 @@ describe('registro de materiales con y sin medidas', () => {
     const data = { ...body(`unit-${unit}-${context}`), unitMeasureId: ids[unit], presentationId: presentation.id,
       base: 1, height: 1, newStock: 7.5, ...(context === 'goodsReceipt' ? { creationContext: context } : {}) };
     for (const invalid of [{ height: 2 }]) {
-      await request(app).post('/consumables').send({ ...data, ...invalid }).expect(400);
+      const rejected = await request(app).post('/consumables').send({ ...data, ...invalid }).expect(400);
+      expect(rejected.body).toEqual({
+        code: 'PER_PIECE_MEASURE_INVALID',
+        message: 'La presentación KILOGRAMOS o METRO LINEAL requiere medidas 1 × 1.'
+      });
       expect(await prisma.material.count({ where: { name: data.name } })).toBe(0);
     }
     await request(app).post('/consumables').send({ ...data, base: null, height: null }).expect(200);

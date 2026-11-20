@@ -11,6 +11,7 @@ const withCatalog = async run => {
     for (const table of ['Presentation', 'UnitMeasure', 'Material']) {
       await db.query(`CREATE TEMP TABLE "${table}" (LIKE public."${table}" INCLUDING ALL)`);
     }
+    await db.query('ALTER TABLE "Material" ADD COLUMN "minStock" DECIMAL(18,6) NOT NULL DEFAULT 0');
     await run(db);
   } finally { await db.end(); }
 };

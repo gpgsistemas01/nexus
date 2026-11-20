@@ -21,7 +21,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Query` | control | [`reportService.js`](../../../../../../src/services/warehouse/reportService.js) |
 | `List` | control | [`goodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js) |
 | `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `FileMaterialGoodsIssueReportController` | control | [`materialGoodsIssueReportController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueReportController.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
@@ -106,7 +106,7 @@ sequenceDiagram
     participant List@{ "type": "control" } as goodsIssueService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Excel@{ "type": "control" } as reportExcelUtils.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 

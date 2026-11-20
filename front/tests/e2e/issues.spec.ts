@@ -458,24 +458,47 @@ for (const [path, label, name] of [
       await dialog.getByRole('button', { name: 'Regresar', exact: true }).click();
       await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
       dialog = page.getByRole('dialog');
-      await expect(dialog.getByRole('columnheader')).toHaveText([
-        label,
-        'Medidas',
-        'Presentación',
-        'Salida',
-        'Conversión',
-        'Cantidad surtida',
-        'Pendiente de surtir',
-        'Costo unitario de Conversión',
-        'Cantidad a surtir',
-        'Cantidad de proyecto',
-        'Diferencia',
-        'Surtir',
-        'Base',
-        'Altura',
-        'Cantidad',
-        'Unidad',
-      ]);
+      await expect(dialog.getByRole('columnheader')).toHaveText(
+        path === 'mermas'
+          ? [
+              label,
+              'Medidas',
+              'Presentación',
+              'Salida',
+              'Conversión',
+              'Surtido registrado',
+              'Captura de surtido',
+              'Surtir',
+              'Base',
+              'Altura',
+              'Cantidad',
+              'Unidad',
+              'Costo unitario de Conversión',
+              'Cantidad surtida',
+              'Pendiente de surtir',
+              'Cantidad a surtir',
+              'Cantidad de proyecto',
+              'Diferencia',
+            ]
+          : [
+              label,
+              'Medidas',
+              'Presentación',
+              'Salida',
+              'Conversión',
+              'Cantidad surtida',
+              'Pendiente de surtir',
+              'Costo unitario de Conversión',
+              'Cantidad a surtir',
+              'Cantidad de proyecto',
+              'Diferencia',
+              'Surtir',
+              'Base',
+              'Altura',
+              'Cantidad',
+              'Unidad',
+            ],
+      );
       await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toHaveCSS(
         'overflow-x',
         'auto',
@@ -520,21 +543,40 @@ for (const [path, label, name] of [
         )
         .toEqual(['Editar salida', 'Devolver material surtido', 'Consultar salida']);
       await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
-      await expect(page.getByRole('dialog').getByRole('columnheader')).toHaveText([
-        label,
-        'Medidas',
-        'Presentación',
-        'Salida',
-        'Conversión',
-        'Cantidad surtida',
-        'Cantidad devuelta',
-        'Saldo entregado',
-        'Acciones',
-        'Base',
-        'Altura',
-        'Cantidad',
-        'Unidad',
-      ]);
+      await expect(page.getByRole('dialog').getByRole('columnheader')).toHaveText(
+        path === 'mermas'
+          ? [
+              label,
+              'Medidas',
+              'Presentación',
+              'Salida',
+              'Conversión',
+              'Cantidad surtida',
+              'Devolución',
+              'Acciones',
+              'Base',
+              'Altura',
+              'Cantidad',
+              'Unidad',
+              'Cantidad devuelta',
+              'Saldo entregado',
+            ]
+          : [
+              label,
+              'Medidas',
+              'Presentación',
+              'Salida',
+              'Conversión',
+              'Cantidad surtida',
+              'Cantidad devuelta',
+              'Saldo entregado',
+              'Acciones',
+              'Base',
+              'Altura',
+              'Cantidad',
+              'Unidad',
+            ],
+      );
       await page.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
       const returning = page.getByRole('dialog', {
         name: 'Devolver detalle de salida',

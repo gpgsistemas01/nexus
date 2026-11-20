@@ -42,11 +42,10 @@ keyof CatalogValues
 | `unitMeasureId` | `unitMeasureId?: string;` |
 | `base` | `base?: string;` |
 | `height` | `height?: string;` |
-| `minStock` | `minStock?: string;` |
 
 ## CatalogEntry
 
-**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 16, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 15, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends Omit<CatalogValues, 'isActive'>`.
 
@@ -65,9 +64,21 @@ keyof CatalogValues
 | --- | --- | --- |
 | dependency | [CatalogValues](../../../../../src/modules/catalogs/catalog.ts) | `type argument` |
 
+## ArticleFilters
+
+**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 30, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `type` | `type: '' \| (typeof ARTICLE_TYPE_OPTIONS)[number]['value'];` |
+| `presentationId` | `presentationId: string;` |
+| `unitMeasureId` | `unitMeasureId: string;` |
+
 ## CatalogQuery
 
-**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 26, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 41, columna 1. **Declaración:** interface.
+
+**Extensión/implementación:** `extends Partial<ArticleFilters>`.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -75,9 +86,13 @@ keyof CatalogValues
 | `page` | `page: number;` |
 | `length` | `length: number;` |
 
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [ArticleFilters](../../../../../src/modules/catalogs/catalog.ts) | `type argument` |
+
 ## CatalogTarget
 
-**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 31, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 46, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -92,7 +107,7 @@ keyof CatalogValues
 
 ## CatalogForm.defineProps
 
-**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 10, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 11, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -126,7 +141,7 @@ keyof CatalogValues
 
 ## CatalogForm.defineEmits
 
-**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 30, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 31, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -223,7 +238,7 @@ Required<CatalogValues>
 
 ## CatalogPage.defineProps
 
-**Fuente:** [src/modules/catalogs/pages/CatalogPage.vue](../../../../../src/modules/catalogs/pages/CatalogPage.vue) · línea 18, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/catalogs/pages/CatalogPage.vue](../../../../../src/modules/catalogs/pages/CatalogPage.vue) · línea 19, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

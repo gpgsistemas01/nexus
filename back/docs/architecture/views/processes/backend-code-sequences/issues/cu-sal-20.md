@@ -23,7 +23,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Inventory` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `DTO` | control | [`goodsIssueDTO.js`](../../../../../../src/dtos/goodsIssueDTO.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Fulfillment` | control | [`fulfillmentStatusService.js`](../../../../../../src/services/warehouse/fulfillmentStatusService.js) |
 | `Status` | control | [`issueFulfillmentRules.js`](../../../../../../src/services/warehouse/issues/issueFulfillmentRules.js) |
 | `ValidationRules` | control | [`issueReturnValidations.js`](../../../../../../src/validators/forms/issueReturnValidations.js) |
@@ -128,7 +128,7 @@ sequenceDiagram
     participant Core@{ "type": "control" } as goodsIssueReturnService.js
     participant Socket@{ "type": "control" } as socketUtils.js
     participant DTO@{ "type": "control" } as DTO funcional<br/>goodsIssueDTO.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Note over Controller: Handler generado
     Controller->>DTO: createGoodsIssueDtoForReturn(req.body)

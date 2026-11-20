@@ -20,7 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`materialController.js`](../../../../../../src/controllers/api/warehouse/materialController.js) |
 | `MaterialDto` | control | [`materialDTO.js`](../../../../../../src/dtos/materialDTO.js) |
 | `Domain` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`materialValidations.js`](../../../../../../src/validators/forms/materialValidations.js) |
 
 ## Secuencia de implementación
@@ -36,7 +36,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as materialController.js
     participant MaterialDto@{ "type": "control" } as DTO funcional<br/>materialDTO.js
     participant Domain@{ "type": "control" } as materialService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: PATCH /api/warehouse/materials/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)

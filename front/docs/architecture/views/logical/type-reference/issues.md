@@ -43,23 +43,24 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 18, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 19, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `rows` | `rows: IssueDetail[];` |
 | `mode` | `mode: IssueMode;` |
-| `itemLabel` | `itemLabel: string;` |
+| `resource` | `resource: IssueResource;` |
 | `isDisabled` | `isDisabled: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `rows` |
 | dependency | [IssueMode](../../../../../src/modules/issues/issue.ts) | `mode` |
+| dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 
 ## IssueDetailsTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 24, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 25, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -74,7 +75,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 22, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 23, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -88,7 +89,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `canEditHeader` | `canEditHeader: boolean;` |
 | `canEditDetails` | `canEditDetails: boolean;` |
 | `mode` | `mode: IssueMode;` |
-| `itemLabel` | `itemLabel: string;` |
+| `resource` | `resource: IssueResource;` |
 | `selects` | `selects: IssueHeaderSelect[];` |
 | `canCreateClient` | `canCreateClient: boolean;` |
 | `canSupplyOnCreate` | `canSupplyOnCreate: boolean;` |
@@ -100,11 +101,12 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | association | [IssueValues](../../../../../src/modules/issues/issue.ts) | `values` |
 | dependency | [IssueField](../../../../../src/modules/issues/issue.ts) | `errors` |
 | dependency | [IssueMode](../../../../../src/modules/issues/issue.ts) | `mode` |
+| dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 | association | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `selects` |
 
 ## IssueEditor.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 39, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 40, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

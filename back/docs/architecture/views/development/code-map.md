@@ -17,8 +17,8 @@ flowchart LR
     controllers["controllers (34 módulos)"] --> dtos["dtos (12 módulos)"]
     controllers["controllers (34 módulos)"] --> errors["errors (25 módulos)"]
     controllers["controllers (34 módulos)"] --> messages["messages (1 módulos)"]
-    controllers["controllers (34 módulos)"] --> middleware["middleware (5 módulos)"]
-    controllers["controllers (34 módulos)"] --> services["services (84 módulos)"]
+    controllers["controllers (34 módulos)"] --> middleware["middleware (6 módulos)"]
+    controllers["controllers (34 módulos)"] --> services["services (85 módulos)"]
     controllers["controllers (34 módulos)"] --> shared["shared (25 módulos)"]
     controllers["controllers (34 módulos)"] --> utils["utils (15 módulos)"]
     dtos["dtos (12 módulos)"] --> shared["shared (25 módulos)"]
@@ -26,33 +26,33 @@ flowchart LR
     errors["errors (25 módulos)"] --> messages["messages (1 módulos)"]
     errors["errors (25 módulos)"] --> shared["shared (25 módulos)"]
     messages["messages (1 módulos)"] --> shared["shared (25 módulos)"]
-    middleware["middleware (5 módulos)"] --> errors["errors (25 módulos)"]
-    middleware["middleware (5 módulos)"] --> messages["messages (1 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (84 módulos)"]
-    middleware["middleware (5 módulos)"] --> shared["shared (25 módulos)"]
-    middleware["middleware (5 módulos)"] --> utils["utils (15 módulos)"]
+    middleware["middleware (6 módulos)"] --> errors["errors (25 módulos)"]
+    middleware["middleware (6 módulos)"] --> messages["messages (1 módulos)"]
+    middleware["middleware (6 módulos)"] --> services["services (85 módulos)"]
+    middleware["middleware (6 módulos)"] --> shared["shared (25 módulos)"]
+    middleware["middleware (6 módulos)"] --> utils["utils (15 módulos)"]
     repository["repository (11 módulos)"] --> constants["constants (11 módulos)"]
     repository["repository (11 módulos)"] --> errors["errors (25 módulos)"]
     repository["repository (11 módulos)"] --> lib["lib (3 módulos)"]
     repository["repository (11 módulos)"] --> shared["shared (25 módulos)"]
     routes["routes (37 módulos)"] --> controllers["controllers (34 módulos)"]
-    routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (37 módulos)"] --> services["services (84 módulos)"]
+    routes["routes (37 módulos)"] --> middleware["middleware (6 módulos)"]
+    routes["routes (37 módulos)"] --> services["services (85 módulos)"]
     routes["routes (37 módulos)"] --> shared["shared (25 módulos)"]
     routes["routes (37 módulos)"] --> utils["utils (15 módulos)"]
     routes["routes (37 módulos)"] --> validators["validators (18 módulos)"]
-    services["services (84 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (84 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (84 módulos)"] --> errors["errors (25 módulos)"]
-    services["services (84 módulos)"] --> lib["lib (3 módulos)"]
-    services["services (84 módulos)"] --> messages["messages (1 módulos)"]
-    services["services (84 módulos)"] --> repository["repository (11 módulos)"]
-    services["services (84 módulos)"] --> shared["shared (25 módulos)"]
-    services["services (84 módulos)"] --> utils["utils (15 módulos)"]
-    services["services (84 módulos)"] --> validators["validators (18 módulos)"]
+    services["services (85 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (85 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (85 módulos)"] --> errors["errors (25 módulos)"]
+    services["services (85 módulos)"] --> lib["lib (3 módulos)"]
+    services["services (85 módulos)"] --> messages["messages (1 módulos)"]
+    services["services (85 módulos)"] --> repository["repository (11 módulos)"]
+    services["services (85 módulos)"] --> shared["shared (25 módulos)"]
+    services["services (85 módulos)"] --> utils["utils (15 módulos)"]
+    services["services (85 módulos)"] --> validators["validators (18 módulos)"]
     utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (15 módulos)"] --> errors["errors (25 módulos)"]
-    utils["utils (15 módulos)"] --> services["services (84 módulos)"]
+    utils["utils (15 módulos)"] --> services["services (85 módulos)"]
     utils["utils (15 módulos)"] --> shared["shared (25 módulos)"]
     validators["validators (18 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (18 módulos)"] --> messages["messages (1 módulos)"]
@@ -253,7 +253,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/jwtService.js`](../../../../src/services/jwtService.js) | `generateAccessToken`, `generateRefreshToken`, `verifyAccessToken`, `verifyRefreshToken`, `verifyToken` |
 | [`src/services/sales/clientService.js`](../../../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
 | [`src/services/sales/reportService.js`](../../../../src/services/sales/reportService.js) | `findClientReportRows` |
-| [`src/services/serviceErrorHandler.js`](../../../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError` |
+| [`src/services/serviceErrorHandler.js`](../../../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError`, `resolveServiceError` |
 | [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `calculateStockAdjustmentValues`, `createMaterialStockAdjustmentsBatch`, `createStockAdjustment` |
 | [`src/services/warehouse/consumables/consumableService.js`](../../../../src/services/warehouse/consumables/consumableService.js) | `createConsumable`, `deleteConsumable`, `findAllConsumables`, `updateConsumable`, `updateConsumableStock` |
 | [`src/services/warehouse/fulfillmentStatusService.js`](../../../../src/services/warehouse/fulfillmentStatusService.js) | `findAllFulfillmentStatuses`, `findFulfillmentStatusIdByName`, `findFulfillmentStatusIdsByName` |
@@ -268,7 +268,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js) | `cancelConsumableGoodsReceiptDetailLine`, `correctConsumableGoodsReceiptDetailLine`, `createConsumableGoodsReceipt`, `findAllConsumableGoodsReceipts`, `findConsumableGoodsReceiptReportRows`, `updateConsumableGoodsReceipt` |
 | [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js) | `cancelGoodsReceiptDetailLine` |
 | [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js) | `correctGoodsReceiptDetailLine` |
-| [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) | `GOODS_RECEIPT_DETAIL_STATUS`, `createGoodsReceiptDetailChange`, `createGoodsReceiptDetailChangeMovementAndUpdateStock`, `findReceiptDetailForChange` |
+| [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) | `GOODS_RECEIPT_DETAIL_STATUS`, `createGoodsReceiptDetailChange`, `createGoodsReceiptDetailChangeMovementAndUpdateStock`, `findReceiptDetailForChange`, `resolveGoodsReceiptDetailChangeError` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) | `GOODS_RECEIPT_DETAIL_INCLUDE`, `buildGoodsReceiptContextWhere`, `buildGoodsReceiptDetails`, `buildGoodsReceiptStockOffers`, `calculateGoodsReceiptDetail`, `calculateGoodsReceiptTotals`, `prepareGoodsReceiptDetails` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) | `assertGoodsReceiptInvoiceAvailable` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptReportService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportService.js) | `findGoodsReceiptReportRows` |
@@ -292,9 +292,10 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `assertIssueNotCanceled`, `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
 | [`src/services/warehouse/issues/issueSupplyRules.js`](../../../../src/services/warehouse/issues/issueSupplyRules.js) | `buildInitialIssueSupplyDetails`, `resolveIssueSupplyChange` |
-| [`src/services/warehouse/materials/materialDocumentSnapshot.js`](../../../../src/services/warehouse/materials/materialDocumentSnapshot.js) | `MATERIAL_SPECIFICATION_SELECT`, `assertMaterialDetailMatchesInventory`, `createMaterialSpecification`, `getMaterialDetailSpecification`, `materialDetailTypeWhere`, `materialDocumentDetailsWhere` |
-| [`src/services/warehouse/materials/materialHelpers.js`](../../../../src/services/warehouse/materials/materialHelpers.js) | `assertMaterialRollReference`, `prepareMaterialData`, `withRetry` |
-| [`src/services/warehouse/materials/materialService.js`](../../../../src/services/warehouse/materials/materialService.js) | `MATERIAL_CATALOG_SELECT`, `MATERIAL_DOCUMENT_DISPLAY_SELECT`, `createMaterial`, `createMaterialCatalogEntry`, `deleteMaterial`, `deleteMaterialCatalogEntry`, `existsMaterial`, `findAllMaterials`, `findMaterialCatalog`, `findMaterialCatalogEntries`, `findMaterialsSnapshot`, `updateMaterial`, `updateMaterialCatalogEntry`, `updateMaterialStock` |
+| [`src/services/warehouse/materials/materialCatalogService.js`](../../../../src/services/warehouse/materials/materialCatalogService.js) | `createMaterialCatalogEntry`, `deleteMaterialCatalogEntry`, `findMaterialCatalog`, `findMaterialCatalogEntries`, `updateMaterialCatalogEntry` |
+| [`src/services/warehouse/materials/materialDocumentSnapshot.js`](../../../../src/services/warehouse/materials/materialDocumentSnapshot.js) | `MATERIAL_DOCUMENT_DISPLAY_SELECT`, `MATERIAL_SPECIFICATION_SELECT`, `assertMaterialDetailMatchesInventory`, `createMaterialSpecification`, `getMaterialDetailSpecification`, `materialDetailTypeWhere`, `materialDocumentDetailsWhere` |
+| [`src/services/warehouse/materials/materialHelpers.js`](../../../../src/services/warehouse/materials/materialHelpers.js) | `DEFAULT_MATERIAL_SNAPSHOT_SELECT`, `assertMaterialRollReference`, `buildMaterialData`, `findMaterialByIdentity`, `getMaterialMeasurementError`, `prepareMaterialData`, `throwMaterialWriteError`, `withRetry` |
+| [`src/services/warehouse/materials/materialService.js`](../../../../src/services/warehouse/materials/materialService.js) | `createMaterial`, `deleteMaterial`, `existsMaterial`, `findAllMaterials`, `findMaterialsSnapshot`, `updateMaterial`, `updateMaterialStock` |
 | [`src/services/warehouse/materials/supplierMaterialService.js`](../../../../src/services/warehouse/materials/supplierMaterialService.js) | `SUPPLIER_MATERIAL_DETAIL_SELECT`, `createSupplierMaterial`, `ensureSupplierMaterials`, `existsDeletableSupplierMaterial`, `findAllSupplierMaterials`, `findMaterialsWithUsage`, `findSupplierMaterialById`, `findSupplierMaterialByIds`, `findSupplierMaterialsSnapshot` |
 | [`src/services/warehouse/materials/supplierMaterialStockService.js`](../../../../src/services/warehouse/materials/supplierMaterialStockService.js) | `adjustSupplierMaterialStock`, `findSupplierMaterialsForStockMovement`, `updateSupplierMaterialStock` |
 | [`src/services/warehouse/presentationService.js`](../../../../src/services/warehouse/presentationService.js) | `findAllPresentations`, `findUniquePresentation` |

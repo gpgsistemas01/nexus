@@ -5,6 +5,7 @@ import type { LookupState, LookupItem } from '../../../shared/lookup.js';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
+import { ARTICLE_TYPE_OPTIONS } from '../catalog.js';
 import type { CatalogField, CatalogValues } from '../catalog.js';
 
 defineProps<{
@@ -54,7 +55,7 @@ const emit = defineEmits<{
         :note="
             isMaterial
                 ? isEditing && !canEditIdentity
-                    ? 'Puede editar Nombre y Stock mínimo. Los documentos registrados conservan el nombre que tenían al guardarse.'
+                    ? 'Puede editar el nombre. Los documentos registrados conservan el nombre que tenían al guardarse.'
                     : 'Puede editar todos los campos mientras el artículo no tenga proveedores vinculados.'
                 : 'Desactiva un registro para conservar su historial.'
         "
@@ -80,10 +81,7 @@ const emit = defineEmits<{
                 v-if="!isTypeFixed"
                 class="article-fields__wide"
                 label="Tipo"
-                :items="[
-                    { title: 'Material', value: 'MATERIAL' },
-                    { title: 'Consumible', value: 'CONSUMABLE' },
-                ]"
+                :items="ARTICLE_TYPE_OPTIONS"
                 :model-value="values.type"
                 :error-messages="errors.type"
                 :disabled="!canEditIdentity || isTypeFixed || isSubmitting || isConflicted"
@@ -141,18 +139,6 @@ const emit = defineEmits<{
                     @blur="emit('blur', 'height')"
                 />
             </template>
-            <VTextField
-                class="article-fields__wide"
-                label="Stock mínimo"
-                type="number"
-                min="0"
-                step="0.01"
-                :model-value="values.minStock"
-                :error-messages="errors.minStock"
-                :disabled="isSubmitting || isConflicted"
-                @update:model-value="emit('update', 'minStock', $event ?? '')"
-                @blur="emit('blur', 'minStock')"
-            />
         </div>
         <VTextField
             v-if="hasSymbol"

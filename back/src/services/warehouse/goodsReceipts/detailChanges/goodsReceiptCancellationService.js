@@ -1,15 +1,10 @@
-import { normalizeDatabaseError } from '../../../../errors/databaseError.js';
 import { lockSupplierMaterialStock } from '../../../../repository/warehouse/stockLockRepository.js';
 import { lockGoodsReceipt } from '../../../../repository/warehouse/documentLockRepository.js';
-import { isAppError } from '../../../../errors/AppError.js';
 import { GOODS_RECEIPT_DETAIL_CHANGE_TYPES } from '../../../../constants/goodsReceiptDetailChanges.js';
-import { GoodsIssueInsufficientStock } from '../../../../errors/inventory/stockError.js';
 import {
-    GoodsReceiptCorrectionInsufficientStock,
     GoodsReceiptDetailChangeReasonNotFound,
     GoodsReceiptDetailAlreadyCanceled,
-    GoodsReceiptNotFound,
-    GoodsReceiptUpdateDatabaseError
+    GoodsReceiptNotFound
 } from '../../../../errors/warehouse/goodsReceiptError.js';
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
@@ -19,6 +14,7 @@ import {
     createGoodsReceiptDetailChange,
     createGoodsReceiptDetailChangeMovementAndUpdateStock,
     findReceiptDetailForChange,
+    resolveGoodsReceiptDetailChangeError,
     GOODS_RECEIPT_DETAIL_STATUS
 } from './goodsReceiptDetailChangeService.js';
 import { findGoodsReceiptDetailChangeReason } from '../../reasonService.js';
@@ -93,12 +89,6 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId, type 
             ...getModelLogContext('goodsReceiptDetailChange', { id, detailId })
         });
 
-        if (err instanceof GoodsIssueInsufficientStock) {
-            throw new GoodsReceiptCorrectionInsufficientStock(err.meta);
-        }
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-
-        throw new GoodsReceiptUpdateDatabaseError();
+        throw resolveGoodsReceiptDetailChangeError(err);
     }
 };

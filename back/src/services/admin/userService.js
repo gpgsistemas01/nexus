@@ -1,7 +1,5 @@
-import { handleServiceError } from '../serviceErrorHandler.js';
-import { normalizeDatabaseError } from '../../errors/databaseError.js';
+import { handleServiceError, resolveServiceError } from '../serviceErrorHandler.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
-import { isAppError } from '../../errors/AppError.js';
 import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from '../../repository/paginationRepository.js';
 import {
@@ -291,10 +289,7 @@ export const updateUser = async ({ id, userDto }) => {
         logServiceError(serviceLogger, err, { operation: 'admin.userService' });
 
         if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new UserNotFound();
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-
-        throw new UserUpdateDatabaseError();
+        throw resolveServiceError(err, new UserUpdateDatabaseError());
     }
 };
 
@@ -316,9 +311,6 @@ export const updateUserPassword = async ({ id, userDto }) => {
         logServiceError(serviceLogger, err, { operation: 'admin.userService' });
 
         if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new UserNotFound();
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-
-        throw new UserUpdateDatabaseError();
+        throw resolveServiceError(err, new UserUpdateDatabaseError());
     }
 };

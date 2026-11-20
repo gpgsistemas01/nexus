@@ -11,7 +11,6 @@ export interface CatalogValues {
     unitMeasureId?: string;
     base?: string;
     height?: string;
-    minStock?: string;
 }
 export interface CatalogEntry extends Omit<CatalogValues, 'isActive'> {
     isActive?: boolean;
@@ -23,7 +22,23 @@ export interface CatalogEntry extends Omit<CatalogValues, 'isActive'> {
     id: string;
     version: number;
 }
-export interface CatalogQuery {
+export const ARTICLE_TYPE_OPTIONS = [
+    { title: 'Material', value: 'MATERIAL' },
+    { title: 'Consumible', value: 'CONSUMABLE' },
+] as const;
+
+export interface ArticleFilters {
+    type: '' | (typeof ARTICLE_TYPE_OPTIONS)[number]['value'];
+    presentationId: string;
+    unitMeasureId: string;
+}
+export const EMPTY_ARTICLE_FILTERS: Readonly<ArticleFilters> = {
+    type: '',
+    presentationId: '',
+    unitMeasureId: '',
+};
+
+export interface CatalogQuery extends Partial<ArticleFilters> {
     search: string;
     page: number;
     length: number;
@@ -46,11 +61,6 @@ export const buildCatalogPayload = (
     catalog === 'materials'
         ? {
               name: values.name.trim(),
-              ...(values.minStock === '' || values.minStock === undefined
-                  ? target.action === 'edit'
-                      ? { minStock: 0 }
-                      : {}
-                  : { minStock: Number(values.minStock) }),
               ...(target.action === 'edit' ? { expectedVersion: target.row.version } : {}),
               ...(target.action === 'create' || !target.row.hasSuppliers
                   ? {

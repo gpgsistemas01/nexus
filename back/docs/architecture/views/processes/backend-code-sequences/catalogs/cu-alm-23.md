@@ -17,7 +17,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Route` | boundary | [`movementApiRoute.js`](../../../../../../src/routes/api/admin/movementApiRoute.js) |
 | `Controller` | control | [`movementController.js`](../../../../../../src/controllers/api/admin/movementController.js) |
 | `Domain` | control | [`movementQueryService.js`](../../../../../../src/services/inventory/movementQueryService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
 
 ## Secuencia de implementación
@@ -30,7 +30,7 @@ sequenceDiagram
     participant Auth@{ "type": "control" } as authMiddleware.js
     participant Controller@{ "type": "control" } as movementController.js
     participant Domain@{ "type": "control" } as movementQueryService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: GET /api/admin/movements/consumables
 

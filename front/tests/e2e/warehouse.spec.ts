@@ -175,9 +175,28 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   await expect(
     page.getByRole('cell', { name: 'Sobrante de lona Proveedor Central' }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('columnheader', { name: 'Pesos por unidad (kg)', exact: true }),
-  ).toBeVisible();
+  await expect(page.locator('thead tr').first().getByRole('columnheader')).toHaveText([
+    'Merma',
+    'Medidas',
+    'Presentación',
+    'Pesos por unidad (kg)',
+    'Existencias',
+    'Conversión',
+    'Costo máximo unitario',
+    'Activo',
+    'Acciones',
+  ]);
+  await expect(page.locator('thead tr').nth(1).getByRole('columnheader')).toHaveText([
+    'Base',
+    'Altura',
+    'Cono',
+    'Total con cono',
+    'Neto',
+    'Stock actual',
+    'Stock mínimo',
+    'Cantidad',
+    'Unidad',
+  ]);
   await page.getByRole('button', { name: 'Detalles de peso', exact: true }).click();
   await expect(page.getByText('Rollo completo con cono (kg)', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Cerrar detalles', exact: true }).click();
@@ -269,6 +288,7 @@ test(
         supplierId: ids.supplier,
         maxUnitCost: 12.5,
         newStock: 4,
+        minStock: 0,
         isActive: true,
         observations: '',
       },
@@ -372,13 +392,15 @@ test(
       ['Altura', '50'],
       ['Presentación', 'ROLLO'],
       ['Unidad de medida', 'm²'],
-      ['Stock mínimo', '5'],
     ]) {
       const field = reference.getByRole('textbox', { name: label, exact: true });
       await expect(field).toHaveValue(value);
       await expect(field).not.toBeEditable();
     }
 
+    const minimum = dialog.getByRole('spinbutton', { name: 'Stock mínimo', exact: true });
+    await expect(minimum).toHaveValue('0');
+    await minimum.fill('2.5');
     const initialQuantity = dialog.getByRole('spinbutton', {
       name: 'Cantidad inicial',
       exact: true,
@@ -391,7 +413,7 @@ test(
     await expect(dialog).toBeHidden();
     expect(writes[0]).toMatchObject({
       method: 'POST',
-      body: { materialId: ids.material, supplierId: ids.supplier, newStock: 0 },
+      body: { materialId: ids.material, supplierId: ids.supplier, newStock: 0, minStock: 2.5 },
     });
     await page.getByRole('button', { name: 'Editar existencia', exact: true }).click();
     dialog = page.getByRole('dialog', { name: 'Editar existencia de material', exact: true });
@@ -419,12 +441,16 @@ test(
       relatedDialog.getByRole('textbox', { name: 'Razón social', exact: true }),
     ).toHaveValue('Proveedor Central S.A.');
     await relatedDialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
+    const editMinimum = dialog.getByRole('spinbutton', { name: 'Stock mínimo', exact: true });
+    await expect(editMinimum).toHaveValue('5');
+    await editMinimum.fill('6');
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes[1]).toEqual({
       method: 'PATCH',
       url: `/api/warehouse/materials/${ids.material}`,
       body: {
+        minStock: 6,
         maxUnitCost: 100,
         isActive: true,
         supplierId: ids.supplier,

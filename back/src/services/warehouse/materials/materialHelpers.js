@@ -1,6 +1,16 @@
-import { getPerPieceMeasureError, getUnitPresentationMeasurementsError, isFixedUnitPresentation, applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
-import { AppError } from '../../../errors/AppError.js';
-import { ExcededMaxRetriesSkuError, MaterialRollReferenceReadOnly } from "../../../errors/warehouse/materialError.js";
+import {
+    applyUnitPresentationMeasurements,
+    getPerPieceMeasureError,
+    getUnitPresentationMeasurementsError,
+    isFixedUnitPresentation
+} from '../../../shared/inventory/wasteMeasurements.js';
+import {
+    ExcededMaxRetriesSkuError,
+    MaterialAlreadyExists,
+    MaterialMeasurementsInvalid,
+    MaterialNotFound,
+    MaterialRollReferenceReadOnly
+} from "../../../errors/warehouse/materialError.js";
 import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
@@ -8,6 +18,8 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
+import { resolveServiceError } from '../../serviceErrorHandler.js';
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialHelpers');
@@ -21,17 +33,21 @@ export const assertMaterialRollReference = ({ referenceConeWeightKg, referenceRo
     }
 };
 
+export const getMaterialMeasurementError = ({ material, presentation, unit, type }) =>
+    type === MATERIAL_TYPES.CONSUMABLE || isFixedUnitPresentation(presentation)
+        ? getUnitPresentationMeasurementsError(material, presentation)
+        : getPerPieceMeasureError(unit, material);
+
 export const prepareMaterialData = async ({ tx, materialDto, materialId = null, context = null, requireSupplier = true }) => {
 
-    const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...input } = materialDto;
+    const { presentationId, unitMeasureId, supplierId, minStock, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...input } = materialDto;
 
     // La transacción comparte una conexión: cada consulta debe terminar antes de enviar la siguiente.
     const unit = context?.units?.get(unitMeasureId) ?? await findUniqueUnitMeasure({ tx, id: unitMeasureId });
     const presentation = context?.presentations?.get(presentationId) ?? await findUniquePresentation({ tx, id: presentationId });
     const rest = applyUnitPresentationMeasurements(input, presentation);
-    const measureError = rest.type === 'CONSUMABLE' || isFixedUnitPresentation(presentation)
-        ? getUnitPresentationMeasurementsError(rest, presentation) : getPerPieceMeasureError(unit, rest);
-    if (measureError) throw new AppError(measureError, 'PER_PIECE_MEASURE_INVALID', 400);
+    const measureError = getMaterialMeasurementError({ material: rest, presentation, unit, type: rest.type });
+    if (measureError) throw new MaterialMeasurementsInvalid(measureError);
     const supplier = requireSupplier
         ? context?.suppliers?.get(supplierId) ?? await findUniqueSupplier({ tx, id: supplierId })
         : null;
@@ -40,7 +56,7 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null, 
 
     if (supplier?.isActive === false) throw new SupplierInactiveConflict();
 
-    assertPieceQuantity({ quantity: rest.minStock, item: { presentation } });
+    assertPieceQuantity({ quantity: minStock, item: { presentation } });
 
     return {
         rest,
@@ -48,6 +64,7 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null, 
             presentationId,
             unitMeasureId,
             supplierId,
+            minStock,
             maxUnitCost,
             isActive
         }
@@ -90,3 +107,47 @@ export const withRetry = async (fn) => {
 
     throw new ExcededMaxRetriesSkuError();
 };
+
+export const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
+    id: true,
+    type: true,
+    name: true,
+    presentation: { select: { name: true } },
+    base: true,
+    height: true
+};
+
+export const throwMaterialWriteError = ({ err, fallbackError }) => {
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
+        throw new MaterialNotFound();
+    }
+
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) {
+        throw new MaterialAlreadyExists();
+    }
+
+    throw resolveServiceError(err, fallbackError);
+};
+
+export const buildMaterialData = ({ rest, relations }) => ({
+    ...rest,
+    presentation: {
+        connect: { id: relations.presentationId }
+    },
+    unitMeasure: {
+        connect: { id: relations.unitMeasureId }
+    }
+});
+
+export const findMaterialByIdentity = ({ tx, rest, relations, excludeId }) => tx.material.findFirst({
+    where: {
+        ...(excludeId && { id: { not: excludeId } }),
+        name: { equals: rest.name, mode: 'insensitive' },
+        presentationId: relations.presentationId,
+        unitMeasureId: relations.unitMeasureId,
+        base: rest.base ?? null,
+        height: rest.height ?? null,
+        type: rest.type ?? MATERIAL_TYPES.MATERIAL
+    },
+    select: { id: true }
+});

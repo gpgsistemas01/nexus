@@ -2,6 +2,11 @@ import { normalizeDatabaseError } from '../errors/databaseError.js';
 import { isAppError } from '../errors/AppError.js';
 import { getModelLogContext, logServiceError } from '../utils/logger.js';
 
+export const resolveServiceError = (error, fallbackError) => {
+    const normalizedError = normalizeDatabaseError(error);
+    return isAppError(normalizedError) ? normalizedError : fallbackError;
+};
+
 export const handleServiceError = ({
     logger,
     error,
@@ -15,10 +20,7 @@ export const handleServiceError = ({
         ...getModelLogContext(model, data)
     });
 
-    const normalizedError = normalizeDatabaseError(error);
-    if (isAppError(normalizedError)) throw normalizedError;
-
-    throw fallbackError;
+    throw resolveServiceError(error, fallbackError);
 };
 
 export const executeServiceOperation = async ({ action, ...errorContext }) => {

@@ -1,10 +1,11 @@
-import { getPerPieceMeasureError, getUnitPresentationMeasurementsError, isFixedUnitPresentation, applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
+import { applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
 import { randomUUID } from 'node:crypto';
 import { setImmediate } from 'node:timers/promises';
 import { validateInventoryImportRow } from '../../../validators/forms/inventoryImportValidations.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { assertWasteMaterialReference, prepareWasteMeasurements } from '../wastes/wasteHelpers.js';
+import { getMaterialMeasurementError } from '../materials/materialHelpers.js';
 import { createMaterialDtoForRegister, createMaterialDtoForEdit } from '../../../dtos/materialDTO.js';
 import { createWasteDtoForRegister, createWasteDtoForEdit } from '../../../dtos/wasteDTO.js';
 import { loadInventoryImportContext, importKey, importCatalogValue, materialImportIdentity, wasteImportIdentity } from './inventoryImportContext.js';
@@ -12,14 +13,15 @@ import { validateInventoryStockCountRows } from './inventoryStockCountValidation
 import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
 import { errorMap } from '../../../messages/codeMessages.js';
+import { isAppError } from '../../../errors/AppError.js';
 
-const snapshot = (item, material = item) => ({
-    name: material.name, minStock: Number(material.minStock),
+const snapshot = item => ({
+    name: item.name, minStock: Number(item.minStock),
     maxUnitCost: item.maxUnitCost == null ? null : Number(item.maxUnitCost), isActive: item.isActive
 });
 const editable = dto => ({ name: dto.name, minStock: dto.minStock ?? 0, maxUnitCost: dto.maxUnitCost, isActive: dto.isActive });
-const offerSnapshot = item => ({ maxUnitCost: item.maxUnitCost == null ? null : Number(item.maxUnitCost), isActive: item.isActive });
-const offerEditable = dto => ({ maxUnitCost: dto.maxUnitCost, isActive: dto.isActive });
+const offerSnapshot = item => ({ minStock: Number(item.minStock), maxUnitCost: item.maxUnitCost == null ? null : Number(item.maxUnitCost), isActive: item.isActive });
+const offerEditable = dto => ({ minStock: dto.minStock, maxUnitCost: dto.maxUnitCost, isActive: dto.isActive });
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const issue = (field, message, code = errorMap.inventoryImport.VALIDATION) => ({ field, message, code });
 
@@ -89,14 +91,11 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                         || (config.type && target.material.version !== dto.expectedMaterialVersion)) {
                         add('expectedVersion', 'El registro cambió desde que se descargó la plantilla.');
                     }
-                    before = config.type ? offerSnapshot(target) : snapshot(target, target.material ?? target);
+                    before = config.type ? offerSnapshot(target) : snapshot(target);
                     identity = config.type ? `${body.id}:${body.supplierId}` : body.id;
                     if (config.type) {
                         if (dto.name !== target.material.name) add('name', 'El nombre se modifica en Almacén → Artículos.');
-                        if (Number(dto.minStock) !== Number(target.material.minStock)) add('minStock', 'El stock mínimo se modifica en Almacén → Artículos.');
-                        const signature = JSON.stringify([dto.name, dto.minStock, dto.expectedMaterialVersion]);
-                        if (shared.has(body.id) && shared.get(body.id) !== signature) add('name', 'Las filas del mismo material deben conservar iguales nombre, mínimo y versión del material.');
-                        shared.set(body.id, signature);
+                        assertPieceQuantity({ quantity: dto.minStock, item: target.material });
                     }
                 } else if (config.resource === 'wastes') {
                     domainField = 'materialId';
@@ -118,7 +117,9 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                     const presentation = context.presentations.get(dto.presentationId);
                     const unit = context.units.get(dto.unitMeasureId);
                     dto = applyUnitPresentationMeasurements(dto, presentation);
-                    const measureError = isFixedUnitPresentation(presentation) || config.type === 'CONSUMABLE' ? getUnitPresentationMeasurementsError(dto, presentation) : getPerPieceMeasureError(unit, dto);
+                    const measureError = getMaterialMeasurementError({
+                        material: dto, presentation, unit, type: config.type
+                    });
                     if (measureError) add('height', measureError);
                     if (!presentation || !context.units.has(dto.unitMeasureId)) add('presentationName', 'Presentación o unidad inexistente, inactiva o ambigua.');
                     else {
@@ -128,18 +129,16 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                         const materialIdentity = materialImportIdentity({ ...dto, type: config.type });
                         const existing = context.identities.get(materialIdentity);
                         if (existing && context.offers.has(`${existing.id}:${dto.supplierId}`)) add('name', 'Este artículo ya existe para el proveedor. Utiliza una plantilla de actualización.');
-                        if (existing && Number(existing.minStock) !== Number(dto.minStock)) add('minStock', 'El mínimo pertenece al material existente. Conserva su valor o actualízalo por separado.');
                         if (existing && existing.name !== dto.name) add('name', 'Conserva el nombre del material existente o modifícalo mediante una actualización.');
-                        const signature = JSON.stringify([dto.name, dto.minStock]);
-                        if (shared.has(materialIdentity) && shared.get(materialIdentity) !== signature) add('name', 'El mismo material debe conservar nombre y mínimo comunes entre proveedores.');
-                        shared.set(materialIdentity, signature);
+                        if (shared.has(materialIdentity) && shared.get(materialIdentity) !== dto.name) add('name', 'El mismo artículo debe conservar el mismo nombre entre proveedores.');
+                        shared.set(materialIdentity, dto.name);
                         reference = { materialVersion: existing?.version ?? null, materialId: existing?.id ?? null };
                         identity = `${materialIdentity}:${dto.supplierId}`;
                         if (!context.initialStockReason) add('newStock', 'Falta configurar el motivo Stock inicial.');
                     }
                 }
             } catch (error) {
-                if (!error.isOperational) throw error;
+                if (!isAppError(error)) throw error;
                 errors.push(issue(domainField, error.message, error.code));
             }
             if (identity && targets.has(identity)) add('name', `El registro está repetido: coincide con la fila ${targets.get(identity)} del archivo.`);

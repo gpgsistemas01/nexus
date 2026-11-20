@@ -239,9 +239,9 @@ UnitMeasure, StockAdjustmentReason y FulfillmentStatus). La migración
 `20261016131000_record_versions` instala un trigger BEFORE UPDATE que incrementa el
 contador en PostgreSQL; así también lo hacen las consultas SQL de stock/costos.
 No se incrementa de nuevo en Prisma. Los formularios envían `expectedVersion`;
-la edición de material/consumible envía además `expectedMaterialVersion` porque el
-nombre y mínimo pertenecen al Material compartido, mientras costo/estado pertenecen
-a su oferta. Se condiciona el UPDATE a la versión consultada; un conflicto responde
+la edición de existencias de materiales y consumibles usa la versión de
+`SupplierMaterial`, que guarda mínimo, costo y estado por proveedor. Las plantillas
+que incluyen referencias al artículo comprueban también `expectedMaterialVersion`. Se condiciona el UPDATE a la versión consultada; un conflicto responde
 `409 RECORD_VERSION_CONFLICT` y revierte toda la operación. Los ajustes de saldo
 comprueban la versión después de bloquear la existencia y antes de generar folio.
 Las entradas aditivas usan idempotencia y sumas atómicas, sin rechazar entradas nuevas

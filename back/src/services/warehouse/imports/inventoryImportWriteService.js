@@ -25,7 +25,7 @@ const createMaterials = async ({ tx, config, rows, context, userId }) => {
             identities.set(key, material);
         }
         const offer = { id: randomUUID(), materialId: material.id, supplierId: relations.supplierId,
-            maxUnitCost: relations.maxUnitCost, isActive: relations.isActive };
+            minStock: relations.minStock, maxUnitCost: relations.maxUnitCost, isActive: relations.isActive };
         offers.push(offer);
         initialStock.push({ materialId: material.id, supplierId: offer.supplierId, newStock, observations,
             supplierMaterial: { ...offer, currentStock: 0, convertedQuantity: 0,
@@ -90,7 +90,7 @@ export const writeInventoryImport = async ({ tx, config, rows, context, userId }
         const offers = changed.map(row => {
             const dto = row.dto;
             return { materialId: row.id, supplierId: dto.supplierId, version: dto.expectedVersion,
-                maxUnitCost: dto.maxUnitCost, isActive: dto.isActive };
+                minStock: dto.minStock, maxUnitCost: dto.maxUnitCost, isActive: dto.isActive };
         });
         await updateImportedSupplierMaterials({ tx, offers });
     }

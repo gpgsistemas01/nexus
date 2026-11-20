@@ -120,7 +120,8 @@ describe('fronteras y contenido del libro de inventario', () => {
                 expect(instruction('Catálogos')).not.toContain('UUID | nombre');
                 if (resource === 'wastes') expect(instruction('Catálogos')).toContain('Material de referencia');
             } else if (mode === 'update') {
-                expect(instruction('Qué hacer')).toContain('No modifica las existencias');
+                expect(instruction('Qué hacer')).toContain('El saldo');
+                expect(instruction('Columnas editables')).toContain('Stock mínimo');
                 expect(instruction('Cantidad inicial')).toBeUndefined();
                 expect(instruction('Conteo físico')).toBeUndefined();
                 expect(instruction('Catálogos')).toBeUndefined();

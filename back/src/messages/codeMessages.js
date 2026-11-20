@@ -31,6 +31,7 @@ export const errorMap = {
         TOO_LONG: 'SAMPLE_WEIGHT_TOO_LONG'
     },
     materialRollReference: { READ_ONLY: 'MATERIAL_ROLL_REFERENCE_READ_ONLY' },
+    materialMeasurements: { INVALID: 'PER_PIECE_MEASURE_INVALID' },
     wasteIssue: {
         STATE_CONFLICT: 'WASTE_ISSUE_STATE_CONFLICT',
         DUPLICATE_WASTE: 'WASTE_ISSUE_DUPLICATE_WASTE',
@@ -245,6 +246,7 @@ export const errorMap = {
     catalog: {
         NOT_FOUND: 'CATALOG_NOT_FOUND',
         ENTRY_NOT_FOUND: 'CATALOG_ENTRY_NOT_FOUND',
+        FILTER_INVALID: 'CATALOG_FILTER_INVALID',
         VALIDATION_ERROR: 'CATALOG_VALIDATION_ERROR',
         MEASUREMENT_IN_USE: 'CATALOG_MEASUREMENT_IN_USE'
     },

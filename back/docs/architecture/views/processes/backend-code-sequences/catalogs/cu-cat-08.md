@@ -18,7 +18,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`reportController.js`](../../../../../../src/controllers/api/sales/reportController.js) |
 | `Query` | control | [`clientService.js`](../../../../../../src/services/sales/clientService.js) |
 | `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
 
 ## Secuencia de implementación
@@ -32,7 +32,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as reportController.js
     participant Query@{ "type": "control" } as clientService.js
     participant Excel@{ "type": "control" } as reportExcelUtils.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: GET /api/sales/reports/clients/excel
 

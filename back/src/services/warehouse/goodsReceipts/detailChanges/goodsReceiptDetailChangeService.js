@@ -2,11 +2,24 @@ import { buildGoodsReceiptContextWhere } from '../goodsReceiptHelpers.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
 import { applyInventoryMovement } from '../../../inventory/movementService.js';
 import { normalizeDecimal } from '../../../../shared/utils/numberUtils.js';
+import { GoodsIssueInsufficientStock } from '../../../../errors/inventory/stockError.js';
+import {
+    GoodsReceiptCorrectionInsufficientStock,
+    GoodsReceiptUpdateDatabaseError
+} from '../../../../errors/warehouse/goodsReceiptError.js';
+import { resolveServiceError } from '../../../serviceErrorHandler.js';
 
 export const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     ACTIVE: 'ACTIVE',
     CANCELED: 'CANCELED'
 });
+
+export const resolveGoodsReceiptDetailChangeError = error => {
+    if (error instanceof GoodsIssueInsufficientStock) {
+        return new GoodsReceiptCorrectionInsufficientStock(error.meta);
+    }
+    return resolveServiceError(error, new GoodsReceiptUpdateDatabaseError());
+};
 
 export const findReceiptDetailForChange = ({ tx, goodsReceiptId, detailId, type = null }) => (
     tx.goodsReceiptDetail.findFirst({

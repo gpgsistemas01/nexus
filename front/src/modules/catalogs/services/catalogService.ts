@@ -7,7 +7,14 @@ import { readText } from '../../../shared/http/recordContract.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
-import type { CatalogEntry, CatalogName, CatalogQuery, CatalogTarget } from '../catalog.js';
+import { EMPTY_ARTICLE_FILTERS } from '../catalog.js';
+import type {
+    ArticleFilters,
+    CatalogEntry,
+    CatalogName,
+    CatalogQuery,
+    CatalogTarget,
+} from '../catalog.js';
 
 const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
     if (
@@ -40,9 +47,7 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
                 !Number.isFinite(Number(input)) ||
                 Number(input) < 0
             )
-                throw new ResponseContractError(
-                    'El servidor devolvió una medida o mínimo inválido.',
-                );
+                throw new ResponseContractError('El servidor devolvió una medida inválida.');
 
             return String(input);
         };
@@ -62,7 +67,6 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
             unitSymbol: readText(value.unitMeasure, 'symbol'),
             base: decimal(value.base),
             height: decimal(value.height),
-            minStock: decimal(value.minStock),
         };
     }
 
@@ -79,6 +83,14 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
 export const catalogService = {
     async list(catalog: CatalogName, query: CatalogQuery, signal?: AbortSignal) {
         const params = pageParams(query);
+
+        if (catalog === 'materials') {
+            for (const field of Object.keys(EMPTY_ARTICLE_FILTERS) as (keyof ArticleFilters)[]) {
+                const value = query[field];
+                if (value) params.set(field, value);
+            }
+        }
+
         const result = await requestPage(`${API_PATHS.catalogs}/${catalog}?${params}`, signal);
         return { ...result, data: result.data.map((value) => normalizeEntry(value, catalog)) };
     },
