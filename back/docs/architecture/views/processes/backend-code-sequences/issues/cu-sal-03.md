@@ -24,7 +24,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Inventory` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `DTO` | control | [`goodsIssueDTO.js`](../../../../../../src/dtos/goodsIssueDTO.js) |
 | `Header` | control | [`issueHeaderService.js`](../../../../../../src/services/warehouse/issues/issueHeaderService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`issueValidations.js`](../../../../../../src/validators/forms/issueValidations.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `FileMaterialGoodsIssueController` | control | [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js) |
@@ -125,7 +125,7 @@ sequenceDiagram
     participant Facade@{ "type": "control" } as materialGoodsIssueService.js
     participant Core@{ "type": "control" } as goodsIssueService.js
     participant DTO@{ "type": "control" } as DTO funcional<br/>goodsIssueDTO.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Note over Controller: Handler generado
     Controller->>DTO: createGoodsIssueHeaderDtoForEdit(req.body)

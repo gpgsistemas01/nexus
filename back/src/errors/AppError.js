@@ -2,6 +2,7 @@ export class AppError extends Error {
 
     constructor(message, code, statusCode) {
         super(message);
+        this.name = this.constructor.name;
         this.code = code;
         this.statusCode = statusCode;
         this.isOperational = true;

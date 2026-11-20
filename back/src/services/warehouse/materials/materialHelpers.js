@@ -1,6 +1,16 @@
-import { getPerPieceMeasureError, getUnitPresentationMeasurementsError, isFixedUnitPresentation, applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
-import { AppError, isAppError } from '../../../errors/AppError.js';
-import { ExcededMaxRetriesSkuError, MaterialAlreadyExists, MaterialNotFound, MaterialRollReferenceReadOnly } from "../../../errors/warehouse/materialError.js";
+import {
+    applyUnitPresentationMeasurements,
+    getPerPieceMeasureError,
+    getUnitPresentationMeasurementsError,
+    isFixedUnitPresentation
+} from '../../../shared/inventory/wasteMeasurements.js';
+import {
+    ExcededMaxRetriesSkuError,
+    MaterialAlreadyExists,
+    MaterialMeasurementsInvalid,
+    MaterialNotFound,
+    MaterialRollReferenceReadOnly
+} from "../../../errors/warehouse/materialError.js";
 import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
@@ -8,7 +18,7 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
-import { normalizeDatabaseError } from '../../../errors/databaseError.js';
+import { resolveServiceError } from '../../serviceErrorHandler.js';
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 
 
@@ -23,6 +33,11 @@ export const assertMaterialRollReference = ({ referenceConeWeightKg, referenceRo
     }
 };
 
+export const getMaterialMeasurementError = ({ material, presentation, unit, type }) =>
+    type === MATERIAL_TYPES.CONSUMABLE || isFixedUnitPresentation(presentation)
+        ? getUnitPresentationMeasurementsError(material, presentation)
+        : getPerPieceMeasureError(unit, material);
+
 export const prepareMaterialData = async ({ tx, materialDto, materialId = null, context = null, requireSupplier = true }) => {
 
     const { presentationId, unitMeasureId, supplierId, minStock, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...input } = materialDto;
@@ -31,9 +46,8 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null, 
     const unit = context?.units?.get(unitMeasureId) ?? await findUniqueUnitMeasure({ tx, id: unitMeasureId });
     const presentation = context?.presentations?.get(presentationId) ?? await findUniquePresentation({ tx, id: presentationId });
     const rest = applyUnitPresentationMeasurements(input, presentation);
-    const measureError = rest.type === 'CONSUMABLE' || isFixedUnitPresentation(presentation)
-        ? getUnitPresentationMeasurementsError(rest, presentation) : getPerPieceMeasureError(unit, rest);
-    if (measureError) throw new AppError(measureError, 'PER_PIECE_MEASURE_INVALID', 400);
+    const measureError = getMaterialMeasurementError({ material: rest, presentation, unit, type: rest.type });
+    if (measureError) throw new MaterialMeasurementsInvalid(measureError);
     const supplier = requireSupplier
         ? context?.suppliers?.get(supplierId) ?? await findUniqueSupplier({ tx, id: supplierId })
         : null;
@@ -112,10 +126,7 @@ export const throwMaterialWriteError = ({ err, fallbackError }) => {
         throw new MaterialAlreadyExists();
     }
 
-    const normalizedError = normalizeDatabaseError(err);
-    if (isAppError(normalizedError)) throw normalizedError;
-
-    throw fallbackError;
+    throw resolveServiceError(err, fallbackError);
 };
 
 export const buildMaterialData = ({ rest, relations }) => ({

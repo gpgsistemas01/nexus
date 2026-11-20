@@ -19,7 +19,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Domain` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Usage` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `DatabaseErrors` | control | [`databaseError.js`](../../../../../../src/errors/databaseError.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
@@ -56,7 +56,7 @@ sequenceDiagram
     participant Usage@{ "type": "control" } as supplierMaterialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant DatabaseErrors@{ "type": "control" } as databaseError.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 

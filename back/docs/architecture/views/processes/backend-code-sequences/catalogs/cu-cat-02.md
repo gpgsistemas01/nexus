@@ -24,7 +24,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`supplierController.js`](../../../../../../src/controllers/api/warehouse/supplierController.js) |
 | `SupplierDto` | control | [`supplierDTO.js`](../../../../../../src/dtos/supplierDTO.js) |
 | `Domain` | control | [`supplierService.js`](../../../../../../src/services/warehouse/supplierService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`supplierValidations.js`](../../../../../../src/validators/forms/supplierValidations.js) |
 
 ## Secuencia de implementación
@@ -40,7 +40,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as supplierController.js
     participant SupplierDto@{ "type": "control" } as DTO funcional<br/>supplierDTO.js
     participant Domain@{ "type": "control" } as supplierService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: POST /api/warehouse/suppliers
     Route->>Auth: verifyApiTokenRequired(req, res, next)

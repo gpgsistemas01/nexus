@@ -1,9 +1,7 @@
-import { handleServiceError } from '../serviceErrorHandler.js';
-import { normalizeDatabaseError } from '../../errors/databaseError.js';
+import { handleServiceError, resolveServiceError } from '../serviceErrorHandler.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
 import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from "../../repository/paginationRepository.js";
-import { isAppError } from "../../errors/AppError.js";
 import {
     SupplierCreateDatabaseError,
     SupplierNotFound,
@@ -168,9 +166,6 @@ export const updateSupplier = async (supplierDto, id) => {
         });
 
         if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new SupplierNotFound();
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-
-        throw new SupplierUpdateDatabaseError();
+        throw resolveServiceError(err, new SupplierUpdateDatabaseError());
     }
 };

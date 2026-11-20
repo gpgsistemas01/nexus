@@ -19,7 +19,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`catalogController.js`](../../../../../../src/controllers/api/admin/catalogController.js) |
 | `Domain` | control | [`catalogService.js`](../../../../../../src/services/admin/catalogService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`catalogValidations.js`](../../../../../../src/validators/forms/catalogValidations.js) |
 
 ## Secuencia de implementación
@@ -34,7 +34,7 @@ sequenceDiagram
     participant Validator@{ "type": "control" } as validatorMiddleware.js
     participant Controller@{ "type": "control" } as catalogController.js
     participant Domain@{ "type": "control" } as catalogService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: PUT /api/admin/catalogs/reasons/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)

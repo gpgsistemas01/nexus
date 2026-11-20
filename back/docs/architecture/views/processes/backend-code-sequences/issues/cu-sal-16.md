@@ -28,7 +28,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Helpers` | control | [`goodsIssueHelpers.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) |
 | `DTO` | control | [`goodsIssueDTO.js`](../../../../../../src/dtos/goodsIssueDTO.js) |
 | `Header` | control | [`issueHeaderService.js`](../../../../../../src/services/warehouse/issues/issueHeaderService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `Fulfillment` | control | [`fulfillmentStatusService.js`](../../../../../../src/services/warehouse/fulfillmentStatusService.js) |
 | `ValidationRules` | control | [`goodsIssueValidations.js`](../../../../../../src/validators/forms/goodsIssueValidations.js) |
@@ -126,7 +126,7 @@ sequenceDiagram
     participant Facade@{ "type": "control" } as consumableGoodsIssueService.js
     participant Core@{ "type": "control" } as goodsIssueService.js
     participant DTO@{ "type": "control" } as DTO funcional<br/>goodsIssueDTO.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Note over Controller: Handler generado
     Controller->>DTO: createGoodsIssueDtoForRegister(req.body)

@@ -17,7 +17,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Route` | boundary | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
 | `Controller` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
 | `Domain` | control | [`wasteIssueService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
@@ -52,7 +52,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as wasteIssueController.js
     participant Domain@{ "type": "control" } as wasteIssueService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 

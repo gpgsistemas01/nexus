@@ -1,7 +1,5 @@
-import { handleServiceError } from '../../serviceErrorHandler.js';
+import { handleServiceError, resolveServiceError } from '../../serviceErrorHandler.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
-import { normalizeDatabaseError } from '../../../errors/databaseError.js';
-import { isAppError } from '../../../errors/AppError.js';
 import { updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import {
@@ -176,8 +174,6 @@ export const updatePerson = async ({ personDto, id }) => {
 
         if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new PersonNotFound();
 
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-        throw new PersonUpdateDatabaseError();
+        throw resolveServiceError(err, new PersonUpdateDatabaseError());
     }
 }

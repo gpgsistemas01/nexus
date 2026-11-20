@@ -1,6 +1,6 @@
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { lockMaterialIdentity, lockSupplierMaterialForRemoval } from '../../../repository/warehouse/stockLockRepository.js';
-import { normalizeDatabaseError } from '../../../errors/databaseError.js';
+import { resolveServiceError } from '../../serviceErrorHandler.js';
 import {
     MaterialAlreadyExists,
     MaterialCreateDatabaseError,
@@ -30,7 +30,6 @@ import {
     prepareMaterialData,
     throwMaterialWriteError
 } from './materialHelpers.js';
-import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
@@ -330,10 +329,7 @@ export const updateMaterialStock = async ({
             throw new MaterialNotFound();
         }
 
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-
-        throw new MaterialStockAdjustmentDatabaseError();
+        throw resolveServiceError(err, new MaterialStockAdjustmentDatabaseError());
     }
 };
 
@@ -384,9 +380,6 @@ export const deleteMaterial = async (supplierMaterialId, { type = null } = {}) =
 
         if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new MaterialNotFound();
         if (err.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new MaterialDeleteRelationConflict();
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-
-        throw new MaterialDeleteDatabaseError();
+        throw resolveServiceError(err, new MaterialDeleteDatabaseError());
     }
 };

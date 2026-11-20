@@ -17,7 +17,7 @@ sequenceDiagram
     participant Materials@{ "type": "control" } as materialCatalogService.js
     participant Helpers@{ "type": "control" } as materialHelpers.js
     participant Db@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
     Client->>Route: POST /api/admin/catalogs/materials
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     Route->>Auth: authorizeUserApi(PERMISSIONS.MATERIAL_CATALOGS_MANAGE)(req, res, next)
@@ -61,4 +61,4 @@ sequenceDiagram
 | `Dto` | control | [catalogDTO.js](../../../../../../src/dtos/catalogDTO.js) |
 | `Materials` | control | [materialCatalogService.js](../../../../../../src/services/warehouse/materials/materialCatalogService.js) |
 | `Helpers` | control | [materialHelpers.js](../../../../../../src/services/warehouse/materials/materialHelpers.js) |
-| `ErrorHandler` | control | [app.js](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |

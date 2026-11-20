@@ -1,10 +1,11 @@
-import { getPerPieceMeasureError, getUnitPresentationMeasurementsError, isFixedUnitPresentation, applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
+import { applyUnitPresentationMeasurements } from '../../../shared/inventory/wasteMeasurements.js';
 import { randomUUID } from 'node:crypto';
 import { setImmediate } from 'node:timers/promises';
 import { validateInventoryImportRow } from '../../../validators/forms/inventoryImportValidations.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { assertWasteMaterialReference, prepareWasteMeasurements } from '../wastes/wasteHelpers.js';
+import { getMaterialMeasurementError } from '../materials/materialHelpers.js';
 import { createMaterialDtoForRegister, createMaterialDtoForEdit } from '../../../dtos/materialDTO.js';
 import { createWasteDtoForRegister, createWasteDtoForEdit } from '../../../dtos/wasteDTO.js';
 import { loadInventoryImportContext, importKey, importCatalogValue, materialImportIdentity, wasteImportIdentity } from './inventoryImportContext.js';
@@ -12,6 +13,7 @@ import { validateInventoryStockCountRows } from './inventoryStockCountValidation
 import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
 import { errorMap } from '../../../messages/codeMessages.js';
+import { isAppError } from '../../../errors/AppError.js';
 
 const snapshot = item => ({
     name: item.name, minStock: Number(item.minStock),
@@ -115,7 +117,9 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                     const presentation = context.presentations.get(dto.presentationId);
                     const unit = context.units.get(dto.unitMeasureId);
                     dto = applyUnitPresentationMeasurements(dto, presentation);
-                    const measureError = isFixedUnitPresentation(presentation) || config.type === 'CONSUMABLE' ? getUnitPresentationMeasurementsError(dto, presentation) : getPerPieceMeasureError(unit, dto);
+                    const measureError = getMaterialMeasurementError({
+                        material: dto, presentation, unit, type: config.type
+                    });
                     if (measureError) add('height', measureError);
                     if (!presentation || !context.units.has(dto.unitMeasureId)) add('presentationName', 'Presentación o unidad inexistente, inactiva o ambigua.');
                     else {
@@ -134,7 +138,7 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                     }
                 }
             } catch (error) {
-                if (!error.isOperational) throw error;
+                if (!isAppError(error)) throw error;
                 errors.push(issue(domainField, error.message, error.code));
             }
             if (identity && targets.has(identity)) add('name', `El registro está repetido: coincide con la fila ${targets.get(identity)} del archivo.`);

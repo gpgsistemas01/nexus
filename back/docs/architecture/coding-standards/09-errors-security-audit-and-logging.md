@@ -1,7 +1,10 @@
 # 9. Errores, seguridad, auditoría y logging
 
-- Se reutilizan `AppError` y los errores de dominio existentes. No se arrojan strings ni
-  se responde con una forma de error exclusiva de un endpoint.
+- Los servicios lanzan errores de dominio derivados de `AppError`. Reutilizan
+  `resolveServiceError` para conservar esos errores y traducir fallos de Prisma.
+- `errorMiddleware.handleError` publica el estado HTTP, `code`, `message` y `meta`
+  cuando corresponde. El cliente HTTP de Vue construye `ApiError` a partir de
+  esa respuesta.
 - Las reglas de `express-validator` entregan códigos declarados en `errorMap`; no
   incluyen mensajes visibles literales en `withMessage`. Todo código nuevo que deba
   mostrarse se registra también en `shared/messages/apiMessages.js` para conservar

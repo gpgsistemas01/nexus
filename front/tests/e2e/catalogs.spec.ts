@@ -377,6 +377,7 @@ for (const type of ['Material', 'Consumible']) {
         .getByRole('button', { name: 'Editar registro', exact: true })
         .click();
       const edit = page.getByRole('dialog', { name: 'Editar artículo', exact: true });
+      await expect(edit.getByText(/^Puede editar el nombre\./)).toBeVisible();
       for (const label of ['Tipo', 'Presentación', 'Unidad de medida'])
         await expect(edit.getByRole('combobox', { name: label, exact: true })).toBeDisabled();
       await expect(edit.getByLabel('Base', { exact: true })).toHaveAttribute('readonly', '');

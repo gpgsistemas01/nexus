@@ -1,10 +1,8 @@
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
-import { AppError } from '../../../errors/AppError.js';
+import { ForbiddenError } from '../../../errors/authError.js';
 import { INVENTORY_COLLECTIONS as resources, MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
-import { errorMap } from '../../../messages/codeMessages.js';
-import { errorMessages } from '../../../shared/messages/apiMessages.js';
 import { INVENTORY_SPREADSHEET_COLUMNS } from '../../../constants/inventorySpreadsheet.js';
 
 const weights = [
@@ -46,13 +44,11 @@ export const getImportConfig = (resource, mode = modes.CREATE) => {
 export const importUnitLabel = unit => `${unit.symbol} · ${unit.name}`;
 export const inventoryImportColumnLabel = (config, field) => config.columns.find(([, key]) => key === field)?.[0] ?? field;
 
-const forbidden = () => new AppError(errorMessages[errorMap.message.FORBIDDEN], errorMap.message.FORBIDDEN, 403);
-
 export const authorizeInventoryImport = (user, resource, mode = modes.CREATE) => {
     const config = getImportConfig(resource, mode);
     const required = mode === modes.ADJUST ? [config.read, config.adjust] : [config.read, config.write, PERMISSIONS.INVENTORY_COSTS_READ];
     if (!required.every(permission => user?.permissions?.includes(permission))) {
-        throw forbidden();
+        throw new ForbiddenError();
     }
     return config;
 };

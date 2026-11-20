@@ -22,6 +22,10 @@ arreglo de `src/validators/forms` seguido de
 `validatorMiddleware.validate(req, res, next)`; el controller recibe una entrada ya
 aceptada por esa frontera y el DTO la normaliza.
 
+`createApp` y las aplicaciones de prueba de controllers registran el mismo
+manejador final, `errorMiddleware.handleError`. El middleware devuelve los
+errores operativos con su código y usa `SERVER_ERROR` para fallos inesperados.
+
 Las comprobaciones del navegador son complementarias. Pueden detener el envío y
 mostrar errores de manera inmediata, pero no reemplazan ni condicionan la validación
 del servidor. Su colaboración se documenta en la secuencia frontend del caso cuando

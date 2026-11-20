@@ -84,7 +84,7 @@ describe('clientController database integration', () => {
     });
   });
 
-  it('conserva el tipo y el código del error específico producido por los servicios', async () => {
+  it('responde con el código y mensaje del error de dominio cuando el cliente no existe', async () => {
     const missingId = '00000000-0000-4000-8000-000000000000';
 
     const response = await request(app)
@@ -93,8 +93,7 @@ describe('clientController database integration', () => {
       .expect('Content-Type', /json/)
       .expect(404);
 
-    expect(response.body).toMatchObject({
-      type: 'ClientNotFound',
+    expect(response.body).toEqual({
       code: 'CLIENT_NOT_FOUND',
       message: 'Cliente no encontrado'
     });

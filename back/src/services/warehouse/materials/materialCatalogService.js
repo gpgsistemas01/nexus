@@ -1,6 +1,6 @@
 import { toNumber } from '../../../utils/formattersUtils.js';
-import { AppError } from '../../../errors/AppError.js';
-import { CatalogFilterInvalid } from '../../../errors/admin/catalogError.js';
+import { CatalogFilterInvalid, CatalogValidationError } from '../../../errors/admin/catalogError.js';
+import { PUBLIC_CATALOGS } from '../../../shared/constants/catalogs.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import {
     MaterialAlreadyExists,
@@ -115,7 +115,7 @@ export const updateMaterialCatalogEntry = async (id, input) => {
                 const capture = { ...current, base: toNumber(current.base),
                     height: toNumber(current.height), ...input };
                 if (Object.entries(materialCatalogValidation).some(([field, rule]) => rule(capture[field], capture))) {
-                    throw new AppError('Revise los datos del material.', 'CATALOG_VALIDATION_ERROR', 400);
+                    throw new CatalogValidationError(PUBLIC_CATALOGS.materials.label);
                 }
                 const { rest, relations } = await prepareMaterialData({ tx, requireSupplier: false,
                     materialDto: Object.fromEntries(Object.keys(materialCatalogValidation).map(field => [field, capture[field]])) });

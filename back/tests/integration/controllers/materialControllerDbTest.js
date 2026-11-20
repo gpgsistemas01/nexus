@@ -193,7 +193,11 @@ describe('registro de materiales con y sin medidas', () => {
     const data = { ...body(`unit-${unit}-${context}`), unitMeasureId: ids[unit], presentationId: presentation.id,
       base: 1, height: 1, newStock: 7.5, ...(context === 'goodsReceipt' ? { creationContext: context } : {}) };
     for (const invalid of [{ height: 2 }]) {
-      await request(app).post('/consumables').send({ ...data, ...invalid }).expect(400);
+      const rejected = await request(app).post('/consumables').send({ ...data, ...invalid }).expect(400);
+      expect(rejected.body).toEqual({
+        code: 'PER_PIECE_MEASURE_INVALID',
+        message: 'La presentación KILOGRAMOS o METRO LINEAL requiere medidas 1 × 1.'
+      });
       expect(await prisma.material.count({ where: { name: data.name } })).toBe(0);
     }
     await request(app).post('/consumables').send({ ...data, base: null, height: null }).expect(200);

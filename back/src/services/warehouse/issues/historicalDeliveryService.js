@@ -1,10 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { getDb } from '../../../repository/baseRepository.js';
-import { AppError } from '../../../errors/AppError.js';
+import { ForbiddenError } from '../../../errors/authError.js';
 import { HistoricalDeliveryError } from '../../../errors/warehouse/historicalDeliveryError.js';
 import { isDatabaseContentionError } from '../../../errors/databaseError.js';
-import { errorMap } from '../../../messages/codeMessages.js';
-import { errorMessages } from '../../../shared/messages/apiMessages.js';
 import { HISTORICAL_DELIVERY_LIMITS as limits, HISTORICAL_DELIVERY_REVISION_PATTERN } from '../../../shared/constants/historicalDelivery.js';
 import { INVENTORY_COLLECTIONS, MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { OperationKeyConflictError, RecordVersionConflictError } from '../../../errors/concurrencyError.js';
@@ -30,7 +28,7 @@ const model = (db, resource) => resource === INVENTORY_COLLECTIONS.WASTES ? db.w
 const authorize = (user, resource) => {
     if (!Object.values(INVENTORY_COLLECTIONS).includes(resource)) throw invalid('El módulo no es válido.');
     if (!user?.permissions?.includes(PERMISSIONS.ISSUES_RECONCILE)) {
-        throw new AppError(errorMessages[errorMap.message.FORBIDDEN], errorMap.message.FORBIDDEN, 403);
+        throw new ForbiddenError();
     }
 };
 const date = value => {

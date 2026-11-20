@@ -20,7 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`clientController.js`](../../../../../../src/controllers/api/sales/clientController.js) |
 | `ClientDto` | control | [`clientDTO.js`](../../../../../../src/dtos/clientDTO.js) |
 | `Domain` | control | [`clientService.js`](../../../../../../src/services/sales/clientService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`clientValidations.js`](../../../../../../src/validators/forms/clientValidations.js) |
 
 ## Secuencia de implementación
@@ -36,7 +36,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as clientController.js
     participant ClientDto@{ "type": "control" } as DTO funcional<br/>clientDTO.js
     participant Domain@{ "type": "control" } as clientService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: PUT /api/sales/clients/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)

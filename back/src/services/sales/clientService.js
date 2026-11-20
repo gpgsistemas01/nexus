@@ -1,7 +1,5 @@
-import { handleServiceError } from '../serviceErrorHandler.js';
-import { normalizeDatabaseError } from '../../errors/databaseError.js';
+import { handleServiceError, resolveServiceError } from '../serviceErrorHandler.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
-import { isAppError } from '../../errors/AppError.js';
 import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from "../../repository/paginationRepository.js";
 import { ClientCreateDatabaseError, ClientFindDatabaseError, ClientNotFound } from "../../errors/sales/clientError.js";
@@ -108,9 +106,9 @@ export const updateClient = async ({
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'sales.clientService' });
 
-        const normalizedError = normalizeDatabaseError(err);
-        if (isAppError(normalizedError)) throw normalizedError;
-        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new ClientNotFound();
-        throw new ClientFindDatabaseError();
+        const fallbackError = err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND
+            ? new ClientNotFound()
+            : new ClientFindDatabaseError();
+        throw resolveServiceError(err, fallbackError);
     }
 }

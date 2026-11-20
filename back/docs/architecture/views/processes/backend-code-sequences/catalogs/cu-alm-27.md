@@ -20,7 +20,7 @@ sequenceDiagram
     participant History@{ "type": "control" } as materialDocumentRepository.js
     participant Version@{ "type": "control" } as versionRepository.js
     participant Db@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
     Client->>Route: PUT /api/admin/catalogs/materials/:id con expectedVersion
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     Route->>Auth: authorizeUserApi(PERMISSIONS.MATERIAL_CATALOGS_MANAGE)(req, res, next)
@@ -74,4 +74,4 @@ sequenceDiagram
 | `Helpers` | control | [materialHelpers.js](../../../../../../src/services/warehouse/materials/materialHelpers.js) |
 | `History` | control | [materialDocumentRepository.js](../../../../../../src/repository/warehouse/materialDocumentRepository.js) |
 | `Version` | control | [versionRepository.js](../../../../../../src/repository/versionRepository.js) |
-| `ErrorHandler` | control | [app.js](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |

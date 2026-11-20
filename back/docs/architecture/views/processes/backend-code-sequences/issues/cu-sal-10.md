@@ -20,7 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
 | `IssueDto` | control | [`wasteIssueDTO.js`](../../../../../../src/dtos/wasteIssueDTO.js) |
 | `Domain` | control | [`wasteIssueService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueService.js) |
-| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ErrorHandler` | control | [`errorMiddleware.js`](../../../../../../src/middleware/errorMiddleware.js) |
 | `ValidationRules` | control | [`wasteIssueValidations.js`](../../../../../../src/validators/forms/wasteIssueValidations.js) |
 
 ## Secuencia de implementación
@@ -36,7 +36,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as wasteIssueController.js
     participant IssueDto@{ "type": "control" } as DTO funcional<br/>wasteIssueDTO.js
     participant Domain@{ "type": "control" } as wasteIssueService.js
-    participant ErrorHandler@{ "type": "control" } as app.js
+    participant ErrorHandler@{ "type": "control" } as errorMiddleware.js
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/header
     Route->>Auth: verifyApiTokenRequired(req, res, next)
