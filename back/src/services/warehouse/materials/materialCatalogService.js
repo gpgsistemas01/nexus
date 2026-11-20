@@ -93,19 +93,22 @@ export const createMaterialCatalogEntry = async data => {
     } catch (err) { throwMaterialWriteError({ err, fallbackError: new MaterialCreateDatabaseError() }); }
 };
 
-export const updateMaterialCatalogEntry = async (id, input) => {
+export const materialCatalogIdentityChanged = (current, input) =>
+    ['type', 'presentationId', 'unitMeasureId', 'base', 'height'].some(field =>
+        input[field] !== undefined && String(input[field] ?? '') !== String(current[field] ?? ''));
+
+export const updateMaterialCatalogEntry = async (id, input, { tx, context } = {}) => {
     try {
-        return await getDb().$transaction(async tx => {
+        const update = async db => {
             // Serializa la edición con los INSERT de relaciones que comprueban esta FK.
-            await lockMaterialIdentity({ tx, id, forEditing: true });
-            const current = await tx.material.findUnique({
+            await lockMaterialIdentity({ tx: db, id, forEditing: true });
+            const current = await db.material.findUnique({
                 where: { id },
                 select: { ...MATERIAL_CATALOG_SELECT, ...MATERIAL_SPECIFICATION_SELECT }
             });
             if (!current) throw new MaterialNotFound();
             assertRecordVersion(current, input.expectedVersion);
-            const identityChanged = ['type', 'presentationId', 'unitMeasureId', 'base', 'height'].some(field =>
-                input[field] !== undefined && String(input[field] ?? '') !== String(current[field] ?? ''));
+            const identityChanged = materialCatalogIdentityChanged(current, input);
             let data = { name: input.name };
             let identity = { rest: { ...current, name: input.name }, relations: current };
             if (identityChanged) {
@@ -117,23 +120,24 @@ export const updateMaterialCatalogEntry = async (id, input) => {
                 if (Object.entries(materialCatalogValidation).some(([field, rule]) => rule(capture[field], capture))) {
                     throw new CatalogValidationError(PUBLIC_CATALOGS.materials.label);
                 }
-                const { rest, relations } = await prepareMaterialData({ tx, requireSupplier: false,
+                const { rest, relations } = await prepareMaterialData({ tx: db, context, requireSupplier: false,
                     materialDto: Object.fromEntries(Object.keys(materialCatalogValidation).map(field => [field, capture[field]])) });
                 identity = { rest, relations };
                 data = buildMaterialData({ rest, relations });
             }
             if ((identityChanged || input.name !== current.name) &&
-                await findMaterialByIdentity({ tx, ...identity, excludeId: id })) {
+                await findMaterialByIdentity({ tx: db, ...identity, excludeId: id })) {
                 throw new MaterialAlreadyExists();
             }
             if (identityChanged) {
                 await preserveMaterialSpecifications({
-                    tx, materialId: id, type: current.type, specification: createMaterialSpecification(current)
+                    tx: db, materialId: id, type: current.type, specification: createMaterialSpecification(current)
                 });
             }
-            return updateVersionedRecord({ model: tx.material, where: { id }, expectedVersion: input.expectedVersion,
+            return updateVersionedRecord({ model: db.material, where: { id }, expectedVersion: input.expectedVersion,
                 data, select: MATERIAL_CATALOG_SELECT });
-        });
+        };
+        return await (tx ? update(tx) : getDb().$transaction(update));
     } catch (err) { throwMaterialWriteError({ err, fallbackError: new MaterialUpdateDatabaseError() }); }
 };
 

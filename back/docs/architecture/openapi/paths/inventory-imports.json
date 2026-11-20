@@ -6,7 +6,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Descargar plantilla de una operación con estructura de inventario",
-      "description": "Una operación para todo el archivo: create (Alta), update (Editar datos) o adjust (Ajustar existencias). Columnas iniciales y orden del reporte de inventario; después Activo, IDs/versiones y campos de captura. Ajuste omite costos. IDs/versiones incluidos automáticamente para toda cuenta con permiso operativo, sin exigir administrador. Alta genera IDs y captura Cantidad inicial; edición conserva stock; ajuste usa Stock contado final con motivo/observaciones, cero válido y vacío rechazado. Hasta 500 filas/2 MiB y catálogos de 500 opciones. Edición/ajuste incluyen todos los registros que coinciden con proveedor/nombre, sin paginación; una consulta mayor a 500 se rechaza. La plantilla identifica módulo y operación; se rechaza una selección incompatible. Merma usa referencia existente y proveedor filtrado.",
+      "description": "Una operación para todo el archivo: create (Alta), update (Editar datos) o adjust (Ajustar existencias). Columnas iniciales y orden del reporte de inventario; después Activo, IDs/versiones y campos de captura. Ajuste omite costos. IDs/versiones incluidos automáticamente para toda cuenta con permiso operativo, sin exigir administrador. Alta genera IDs y captura Cantidad inicial; edición conserva stock; ajuste usa Stock contado final con motivo/observaciones, cero válido y vacío rechazado. Hasta 500 filas/2 MiB y catálogos de 500 opciones. Edición/ajuste incluyen todos los registros que coinciden con proveedor/nombre, sin paginación; una consulta mayor a 500 se rechaza. La plantilla identifica módulo y operación; se rechaza una selección incompatible. Merma usa referencia existente y proveedor filtrado. Artículos (articles) admite alta y edición con permiso de administrar artículos. Contiene nombre, tipo, presentación, unidad y medidas. La edición conserva ID y versión. Con un proveedor vinculado sólo admite cambios de nombre. Este recurso no modifica ofertas ni existencias.",
       "security": [
         {
           "cookieAuth": []
@@ -22,7 +22,8 @@
             "enum": [
               "materials",
               "consumables",
-              "wastes"
+              "wastes",
+              "articles"
             ]
           }
         },
@@ -152,7 +153,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Validar archivo sin cambiar el inventario",
-      "description": "Autoriza la operación seleccionada para todo el archivo antes del multipart. Analiza un único XLSX con SheetKit en worker y comprueba formato V2, módulo, operación, encabezados, permisos, duplicados, versiones, identidad y conteo final. No deduce la operación por fila o por nombre. Un error bloquea todo el archivo sin modificar inventario. Hasta 500 filas/2 MiB.",
+      "description": "Autoriza la operación seleccionada para todo el archivo antes del multipart. Analiza un único XLSX con SheetKit en worker y comprueba formato V2, módulo, operación, encabezados, permisos, duplicados, versiones, identidad y conteo final. No deduce la operación por fila o por nombre. Un error bloquea todo el archivo sin modificar inventario. Hasta 500 filas/2 MiB. Artículos (articles) admite alta y edición con permiso de administrar artículos. Contiene nombre, tipo, presentación, unidad y medidas. La edición conserva ID y versión. Con un proveedor vinculado sólo admite cambios de nombre. Este recurso no modifica ofertas ni existencias.",
       "security": [
         {
           "cookieAuth": []
@@ -168,7 +169,8 @@
             "enum": [
               "materials",
               "consumables",
-              "wastes"
+              "wastes",
+              "articles"
             ]
           }
         },

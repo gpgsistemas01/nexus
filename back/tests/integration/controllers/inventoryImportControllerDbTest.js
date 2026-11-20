@@ -10,6 +10,7 @@ import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { getImportConfig } from '../../../src/services/warehouse/imports/inventoryImportConfig.js';
 import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
+import { ARTICLE_IMPORT_RESOURCE } from '../../../src/shared/constants/inventoryImport.js';
 
 let prisma, app, fixture, cookie, deniedCookie, previousSecret;
 const extraUnitIds = [];
@@ -74,6 +75,75 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         if (prisma) await prisma.unitMeasure.deleteMany({ where: { id: { in: extraUnitIds } } });
         if (previousSecret === undefined) delete process.env.JWT_SECRET_ACCESS;
         else process.env.JWT_SECRET_ACCESS = previousSecret;
+    });
+
+    it('importa y edita artículos desde sus plantillas sin crear una oferta ni un movimiento', async () => {
+        const resource = ARTICLE_IMPORT_RESOURCE;
+        const name = fixture.row('Catálogo desde Excel').name;
+        const requestTemplate = (mode, search) => request(app).get(`/${resource}/template`)
+            .query({ mode, search }).set('Cookie', cookie).buffer(true).parse((res, done) => {
+                const chunks = [];
+                res.on('data', chunk => chunks.push(chunk));
+                res.on('end', () => done(null, Buffer.concat(chunks)));
+            });
+        await request(app).get(`/${resource}/template`).set('Cookie', deniedCookie).expect(403);
+        await requestTemplate('adjust').expect(400);
+
+        const template = await requestTemplate('create').expect(200);
+        const { workbook, sheet: data } = await readExcelReport(template.body, 'Datos');
+        expect(data.getRow(1).values.slice(1)).toEqual(['Nombre', 'Tipo', 'Presentación', 'Unidad', 'Base (m)', 'Altura (m)']);
+        const row = fixture.row('Catálogo desde Excel');
+        data.getRow(2).values = [name, 'Consumible', row.presentationName, row.unitLabel, 2, 3];
+        const batch = (await request(app).post(`/${resource}/preview`).set('Cookie', cookie)
+            .attach('file', await writeInventoryWorkbook(workbook), 'articulos.xlsx').expect(200)).body.batch;
+        expect(batch.preview.summary).toMatchObject({ creates: 1, errors: 0 });
+        expect(await prisma.material.count({ where: { name } })).toBe(0);
+        const operationId = randomUUID();
+        const applied = (await confirm(batch, operationId).expect(200)).body.batch;
+        const id = applied.result.rows[0].id;
+        await confirm(batch, operationId).expect(200);
+        const article = await prisma.material.findUniqueOrThrow({ where: { id } });
+        expect(article).toMatchObject({ name, type: 'CONSUMABLE', version: 0 });
+        expect(await prisma.supplierMaterial.count({ where: { materialId: id } })).toBe(0);
+        expect(await prisma.movementDetail.count({ where: { materialId: id } })).toBe(0);
+
+        const exported = await requestTemplate('update', name).expect(200);
+        const { workbook: editBook, sheet: editSheet } = await readExcelReport(exported.body, 'Datos');
+        expect(editSheet.getRow(2).values.slice(1)).toEqual([name, 'Consumible', row.presentationName, row.unitLabel, 2, 3, id, 0]);
+        editSheet.getCell('B2').value = 'Material';
+        editSheet.getCell('F2').value = 4;
+        const edit = (await request(app).post(`/${resource}/preview?mode=update`).set('Cookie', cookie)
+            .attach('file', await writeInventoryWorkbook(editBook), 'articulos-edicion.xlsx').expect(200)).body.batch;
+        expect(edit.preview.summary).toMatchObject({ updates: 1, errors: 0 });
+        await confirm(edit).expect(200);
+        const saved = await prisma.material.findUniqueOrThrow({ where: { id } });
+        expect(saved).toMatchObject({ type: 'MATERIAL', version: 1 });
+        expect(Number(saved.height)).toBe(4);
+        const duplicate = await preview([{ ...row, type: 'Material', base: 2, height: 4 }], resource);
+        expect(duplicate.preview.summary.errors).toBe(1);
+        await confirm(duplicate).expect(400);
+    });
+
+    it('protege los artículos vinculados y rechaza todo el lote cuando una versión cambia', async () => {
+        const resource = ARTICLE_IMPORT_RESOURCE;
+        const [first, second] = await Promise.all(['Artículo vinculado', 'Artículo con versión'].map(seedOffer));
+        const edit = offer => ({ ...fixture.row(''), id: offer.materialId, expectedVersion: offer.material.version,
+            name: offer.material.name, type: 'Material', base: 2, height: 3 });
+        const forbidden = await preview([{ ...edit(first), height: 4 }], resource, 'update');
+        expect(forbidden.preview.rows[0].errors[0].code).toBe('MATERIAL_IDENTITY_LINKED');
+        await confirm(forbidden).expect(400);
+        const batch = await preview([first, second].map(offer => ({
+            ...edit(offer), name: `${offer.material.name} corregido`
+        })), resource, 'update');
+        expect(batch.preview.summary.updates).toBe(2);
+        await prisma.material.update({ where: { id: second.materialId }, data: { name: `${second.material.name} externo` } });
+        await confirm(batch).expect(409);
+        expect(await prisma.material.findUniqueOrThrow({ where: { id: first.materialId } })).toEqual(first.material);
+        const rename = await preview([{ ...edit(first), name: `${first.material.name} corregido` }], resource, 'update');
+        await confirm(rename).expect(200);
+        const saved = await prisma.supplierMaterial.findUniqueOrThrow({ where: { id: first.id }, include: { material: true } });
+        expect(saved.material.name).toBe(`${first.material.name} corregido`);
+        expect(Number(saved.currentStock)).toBe(Number(first.currentStock));
     });
 
     it('reemplaza el saldo por conteo cero o positivo, conserva datos, omite iguales y devuelve folios sin duplicar', async () => {

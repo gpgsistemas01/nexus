@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
 import { inventoryImportDraft } from '../fixtures/inventoryImport.js';
 import { ids, user } from '../fixtures/inventory.js';
+import { mockCatalogs } from './catalogFixtures.js';
 
 const selectOperation = async (page: Page, title: string) => {
   const select = page.getByRole('combobox', { name: 'Operación del archivo', exact: true });
@@ -10,6 +11,66 @@ const selectOperation = async (page: Page, title: string) => {
   await page.getByRole('option', { name: title, exact: true }).click();
   await expect(select).toHaveValue(title);
 };
+
+test('artículos: elige una operación y confirma una edición sin proveedor ni stock', async ({
+  page,
+}) => {
+  const { reads } = await mockCatalogs(page, ['material-catalogs:manage']);
+  const batch = inventoryImportDraft();
+  batch.resource = 'articles';
+  batch.mode = 'update';
+  batch.filename = 'articulos.xlsx';
+  batch.preview!.summary = { total: 1, creates: 0, updates: 1, unchanged: 0, errors: 0 };
+  batch.preview!.rows = [
+    {
+      row: 2,
+      id: ids.material,
+      name: 'Artículo corregido',
+      action: 'update',
+      before: { name: 'Artículo' },
+      after: { name: 'Artículo corregido' },
+      details: {},
+      errors: [],
+      warnings: [],
+    },
+  ];
+  await page.route('**/api/warehouse/inventory-imports/articles/preview?mode=update', (route) =>
+    route.fulfill({ json: { code: 'INVENTORY_IMPORT_PREVIEW', batch } }),
+  );
+  await page.route(`**/api/warehouse/inventory-imports/${batch.id}/confirm`, (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({ expectedVersion: batch.version });
+    return route.fulfill({
+      json: {
+        code: 'INVENTORY_IMPORT_COMPLETED',
+        batch: { ...batch, status: 'COMPLETED', preview: null, result: batch.preview },
+      },
+    });
+  });
+  await page.goto('/almacen/articulos');
+  await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Importar Excel de artículos', exact: true });
+  await selectOperation(page, 'Editar datos');
+  await expect(dialog.getByText(/Conserva las columnas grises de ID y versión/)).toBeVisible();
+  await expect(dialog.getByRole('textbox', { name: 'Filtrar artículos por nombre' })).toBeVisible();
+  await expect(dialog.getByRole('combobox', { name: /Proveedor/ })).toHaveCount(0);
+  const operation = dialog.getByRole('combobox', { name: 'Operación del archivo' });
+  await operation.press('Enter');
+  await expect(page.getByRole('option', { name: 'Ajustar existencias' })).toHaveCount(0);
+  await operation.press('Escape');
+  await dialog.locator('input[type=file]').setInputFiles({
+    name: 'articulos.xlsx',
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: Buffer.from('fixture: artículos'),
+  });
+  await dialog.getByRole('button', { name: 'Validar archivo', exact: true }).click();
+  await expect(dialog.getByText('Fila 2: Artículo corregido', { exact: true })).toBeVisible();
+  const before = reads.length;
+  await dialog.getByRole('button', { name: 'Confirmar importación', exact: true }).click();
+  await expect(
+    dialog.getByText('Importación confirmada. El catálogo de artículos se actualizó.'),
+  ).toBeVisible();
+  await expect.poll(() => reads.length).toBeGreaterThan(before);
+});
 
 test('un archivo de otra operación muestra el rechazo y permite elegir otra plantilla sin confirmar', async ({
   page,

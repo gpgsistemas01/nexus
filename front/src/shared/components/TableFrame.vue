@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, onUpdated, ref } from 'vue';
 import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 import { VBtn } from 'vuetify/components/VBtn';
 
@@ -18,17 +18,60 @@ withDefaults(
     },
 );
 const frame = ref<HTMLDivElement | null>(null);
+const canScrollLeft = ref(false);
+const canScrollRight = ref(false);
+const hasOverflow = computed(() => canScrollLeft.value || canScrollRight.value);
+let wrapper: HTMLElement | null = null;
+let table: HTMLTableElement | null = null;
+let observer: ResizeObserver | undefined;
+
+const updateScroll = () => {
+    const left = wrapper?.clientWidth ? wrapper.scrollLeft : 0;
+    const remaining = wrapper?.clientWidth ? wrapper.scrollWidth - wrapper.clientWidth - left : 0;
+    canScrollLeft.value = left > 1;
+    canScrollRight.value = remaining > 1;
+};
+
+const observeTable = () => {
+    const nextWrapper = frame.value?.querySelector<HTMLElement>('.v-table__wrapper') ?? null;
+    const nextTable = nextWrapper?.querySelector('table') ?? null;
+
+    if (nextWrapper !== wrapper || nextTable !== table) {
+        observer?.disconnect();
+        wrapper = nextWrapper;
+        table = nextTable;
+        if (wrapper) observer?.observe(wrapper);
+
+        if (table) observer?.observe(table);
+    }
+
+    updateScroll();
+};
+
+onMounted(() => {
+    if (typeof ResizeObserver !== 'undefined') observer = new ResizeObserver(updateScroll);
+
+    observeTable();
+});
+onUpdated(observeTable);
+onBeforeUnmount(() => observer?.disconnect());
 
 const scrollTable = (direction: -1 | 1) => {
-    const wrapper = frame.value?.querySelector<HTMLElement>('.v-table__wrapper');
     if (!wrapper) return;
 
     wrapper.scrollBy({
-        left: direction * Math.max(wrapper.clientWidth * 0.75, 180),
+        left: direction * Math.max(wrapper.clientWidth * 0.5, 120),
         behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
             ? 'instant'
             : 'smooth',
     });
+};
+
+const scrollWithKeyboard = (event: KeyboardEvent) => {
+    if (!hasOverflow.value || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+
+    event.preventDefault();
+    scrollTable(event.key === 'ArrowLeft' ? -1 : 1);
 };
 </script>
 
@@ -40,11 +83,17 @@ const scrollTable = (direction: -1 | 1) => {
             'table-frame--fit-columns': fitColumns,
             'table-frame--mobile-cards': mobileCards,
             'table-frame--details': details,
+            'table-frame--scrollable': hasOverflow,
         }"
         :aria-busy="isLoading"
+        :tabindex="fitColumns && hasOverflow ? 0 : undefined"
+        :role="fitColumns && hasOverflow ? 'region' : undefined"
+        :aria-label="fitColumns && hasOverflow ? 'Tabla con desplazamiento horizontal' : undefined"
+        @scroll.capture="updateScroll"
+        @keydown.self="scrollWithKeyboard"
     >
         <div
-            v-if="fitColumns"
+            v-if="fitColumns && hasOverflow"
             class="table-frame__scroll-controls"
             role="group"
             aria-label="Desplazamiento horizontal de la tabla"
@@ -55,6 +104,7 @@ const scrollTable = (direction: -1 | 1) => {
                 variant="outlined"
                 :icon="`svg:${mdiChevronLeft}`"
                 aria-label="Desplazar tabla a la izquierda"
+                :disabled="!canScrollLeft"
                 @click="scrollTable(-1)"
             />
             <VBtn
@@ -62,6 +112,7 @@ const scrollTable = (direction: -1 | 1) => {
                 variant="outlined"
                 :icon="`svg:${mdiChevronRight}`"
                 aria-label="Desplazar tabla a la derecha"
+                :disabled="!canScrollRight"
                 @click="scrollTable(1)"
             />
         </div>
@@ -78,7 +129,7 @@ const scrollTable = (direction: -1 | 1) => {
     overflow: hidden;
 }
 .table-frame__scroll-controls {
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 0.5rem;
@@ -160,158 +211,59 @@ const scrollTable = (direction: -1 | 1) => {
     opacity: 0.4;
     box-shadow: none;
 }
-@media (max-width: 1599px) {
-    .table-frame--fit-columns :deep(.v-table__wrapper) {
-        overflow-x: hidden;
-        container-type: inline-size;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper > table) {
-        width: calc(100% - 1px) !important;
-        min-width: 0 !important;
-        table-layout: fixed;
-        box-sizing: border-box;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper th),
-    .table-frame--fit-columns :deep(.v-table__wrapper td) {
-        min-width: 0 !important;
-        white-space: normal !important;
-        text-wrap: wrap !important;
-        text-overflow: clip !important;
-        overflow: visible !important;
-        overflow-wrap: anywhere;
-        padding: 0.35rem 0.25rem;
-        font-size: clamp(0.62rem, calc(0.62rem + 0.25cqi), 0.8rem);
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper th) {
-        line-height: 1.2;
-    }
-    .table-frame--fit-columns :deep(.v-data-table-header__content) {
-        display: flex !important;
-        min-width: 0;
-        white-space: normal;
-        text-wrap: wrap;
-        overflow-wrap: anywhere;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper td > *) {
-        min-width: 0;
-        max-width: 100%;
-        white-space: normal !important;
-        text-wrap: wrap !important;
-        overflow-wrap: anywhere;
-    }
-    .table-frame--fit-columns :deep(.v-data-table-column--fixed),
-    .table-frame--fit-columns :deep(.v-data-table-column--fixed-end) {
-        position: static !important;
-        inset-inline: auto !important;
-    }
-    .table-frame--fit-columns :deep(.v-input),
-    .table-frame--fit-columns :deep(.v-field),
-    .table-frame--fit-columns :deep(.inventory-actions) {
-        min-width: 0;
-        max-width: 100%;
-    }
-    .table-frame--fit-columns :deep(th:last-child),
-    .table-frame--fit-columns :deep(td:last-child) {
-        width: 3rem;
-    }
+.table-frame:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-primary));
+    outline-offset: -2px;
+}
+.table-frame--fit-columns :deep(.v-table__wrapper) {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-color: rgb(var(--v-theme-primary)) rgb(var(--v-theme-table-alt));
+}
+.table-frame--fit-columns :deep(.v-table__wrapper > table) {
+    width: max-content;
+    min-width: 100%;
+}
+.table-frame--fit-columns :deep(.v-table__wrapper td),
+.table-frame--fit-columns :deep(.v-table__wrapper th) {
+    max-width: 18rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    white-space: normal;
+}
+.table-frame--fit-columns :deep(.v-table__wrapper td) {
+    overflow-wrap: anywhere;
+}
+.table-frame--fit-columns :deep(td.v-data-table-column--align-end) {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.table-frame--fit-columns :deep(.v-data-table-header__content) {
+    white-space: normal;
+}
+.table-frame--fit-columns:not(.table-frame--scrollable) :deep(.v-data-table-column--fixed),
+.table-frame--fit-columns:not(.table-frame--scrollable) :deep(.v-data-table-column--fixed-end) {
+    position: static;
+}
+.table-frame--fit-columns.table-frame--scrollable :deep(.v-data-table-column--fixed),
+.table-frame--fit-columns.table-frame--scrollable :deep(.v-data-table-column--fixed-end) {
+    position: sticky;
+    z-index: 2;
+}
+.table-frame--fit-columns.table-frame--scrollable :deep(.v-data-table-column--fixed) {
+    inset-inline-start: 0;
+}
+.table-frame--fit-columns.table-frame--scrollable :deep(.v-data-table-column--fixed-end) {
+    inset-inline-end: 0;
+}
+.table-frame--fit-columns.table-frame--scrollable :deep(thead .v-data-table-column--fixed),
+.table-frame--fit-columns.table-frame--scrollable :deep(thead .v-data-table-column--fixed-end) {
+    z-index: 4;
 }
 @media (max-width: 599px) {
     .table-frame--mobile-cards :deep(.v-table__wrapper) {
         display: none;
-    }
-}
-@media (min-width: 600px) and (max-width: 899px) {
-    .table-frame__scroll-controls {
-        display: flex;
-    }
-    .table-frame--fit-columns .table-frame__scroll-controls {
-        display: flex;
-    }
-    .table-frame:not(.table-frame--fit-columns) .table-frame__scroll-controls {
-        display: none;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper) {
-        overflow-x: auto !important;
-        overscroll-behavior-x: contain;
-        scrollbar-color: rgb(var(--v-theme-primary)) rgb(var(--v-theme-table-alt));
-        scrollbar-width: auto;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper > table) {
-        width: max-content !important;
-        min-width: 100% !important;
-        table-layout: auto;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper th),
-    .table-frame--fit-columns :deep(.v-table__wrapper td) {
-        min-width: 7rem !important;
-        max-width: 16rem;
-        padding: 0.5rem 0.65rem;
-        font-size: 0.8rem;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper th:first-child),
-    .table-frame--fit-columns :deep(.v-table__wrapper td:first-child) {
-        min-width: 10rem !important;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper th:last-child),
-    .table-frame--fit-columns :deep(.v-table__wrapper td:last-child) {
-        min-width: 4rem !important;
-    }
-    .table-frame--fit-columns :deep(.v-data-table-column--fixed),
-    .table-frame--fit-columns :deep(.v-data-table-column--fixed-end) {
-        position: sticky !important;
-    }
-    .table-frame--fit-columns :deep(.v-data-table-column--fixed) {
-        inset-inline-start: 0 !important;
-        z-index: 2;
-        background: rgb(var(--v-theme-surface));
-    }
-    .table-frame--fit-columns :deep(.v-data-table-column--fixed-end) {
-        inset-inline-end: 0 !important;
-        z-index: 2;
-        background: rgb(var(--v-theme-surface));
-    }
-    .table-frame--fit-columns :deep(thead .v-data-table-column--fixed),
-    .table-frame--fit-columns :deep(thead .v-data-table-column--fixed-end) {
-        z-index: 4;
-    }
-    .table-frame--fit-columns
-        :deep(.v-table__wrapper th:first-child:not(.v-data-table-column--fixed)),
-    .table-frame--fit-columns
-        :deep(.v-table__wrapper td:first-child:not(.v-data-table-column--fixed)) {
-        position: sticky;
-        left: 0;
-        z-index: 2;
-        background: rgb(var(--v-theme-surface));
-    }
-    .table-frame--fit-columns :deep(thead th:first-child:not(.v-data-table-column--fixed)) {
-        z-index: 4;
-        background: rgb(var(--v-theme-table-header)) !important;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper::-webkit-scrollbar) {
-        height: 0.85rem;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper::-webkit-scrollbar-thumb) {
-        border: 2px solid rgb(var(--v-theme-table-alt));
-        border-radius: 1rem;
-        background: rgb(var(--v-theme-primary));
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper::-webkit-scrollbar-track) {
-        background: rgb(var(--v-theme-table-alt));
-    }
-}
-@media (max-width: 599px) {
-    .table-frame__scroll-controls {
-        display: none;
-    }
-    .table-frame--fit-columns :deep(.v-table__wrapper th),
-    .table-frame--fit-columns :deep(.v-table__wrapper td) {
-        padding: 0.25rem 0.15rem;
-        font-size: clamp(0.62rem, calc(0.62rem + 0.25cqi), 0.8rem);
-    }
-    .table-frame--fit-columns :deep(button.table-action) {
-        width: 2.75rem !important;
-        min-width: 2.75rem !important;
-        height: 2.75rem !important;
     }
 }
 /* Las partidas conservan anchos legibles; el desplazamiento queda dentro del marco. */

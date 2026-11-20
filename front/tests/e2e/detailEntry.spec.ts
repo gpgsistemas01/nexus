@@ -13,6 +13,15 @@ test(
     await page.goto('/compras/materiales');
     await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
+    const observations = dialog.getByRole('textbox', { name: 'Observaciones', exact: true });
+    const initialHeight = await observations.evaluate((field) => field.clientHeight);
+    const note = Array.from({ length: 8 }, (_, index) => `Observación ${index + 1}`).join('\n');
+    await observations.fill(note);
+    await expect
+      .poll(() => observations.evaluate((field) => field.clientHeight))
+      .toBeGreaterThan(initialHeight);
+    await expect(observations).toHaveCSS('resize', 'vertical');
+    await observations.clear();
     await chooseOption(page, 'Proveedor', 'Proveedor Central', dialog);
     await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO', dialog);
     await dialog.getByLabel('Cantidad', { exact: true }).fill('1.5');
@@ -45,6 +54,17 @@ test(
     await expect(dialog.getByLabel('Cantidad', { exact: true })).toHaveValue('1.5');
     await expect(dialog.getByLabel('Costo por presentación', { exact: true })).toHaveValue('12');
     await page.screenshot({ path: info.outputPath('compra-desktop.png') });
+    await observations.scrollIntoViewIfNeeded();
+    const box = (await observations.boundingBox())!;
+    const handleX = box.x + box.width - 4;
+    const handleY = box.y + box.height - 4;
+    await page.mouse.move(handleX, handleY);
+    await page.mouse.down();
+    await page.mouse.move(handleX, handleY + 64, { steps: 5 });
+    await page.mouse.up();
+    await expect
+      .poll(() => observations.evaluate((field) => field.getBoundingClientRect().height))
+      .toBeGreaterThan(box.height);
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(dialog.getByRole('combobox', { name: 'Material', exact: true })).toHaveValue(
       'Lona · 2 × 50 · ROLLO',

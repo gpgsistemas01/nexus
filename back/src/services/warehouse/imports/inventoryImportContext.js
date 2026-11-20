@@ -25,6 +25,37 @@ const bounded = rows => {
     return rows;
 };
 
+export const loadMaterialImportCatalogs = async ({ db, values }) => {
+    const names = unique(values.map(row => importText(row.presentationName)));
+    const presentationIds = ids(values.map(row => row.presentationId));
+    const unitIds = ids(values.map(row => row.unitMeasureId));
+    const unitNames = unique(values.map(row => {
+        const label = importText(row.unitLabel);
+        const separator = label.indexOf(' · ');
+        return separator < 0 ? label : label.slice(separator + 3);
+    }));
+    const presentations = bounded(await db.presentation.findMany({ take: catalogLimit + 1, where: { isActive: true, OR: [
+        { id: { in: presentationIds } }, { name: { in: names, mode: 'insensitive' } }
+    ] } }));
+    const units = bounded(await db.unitMeasure.findMany({ take: catalogLimit + 1, where: { isActive: true, OR: [
+        { id: { in: unitIds } }, { name: { in: unitNames, mode: 'insensitive' } }
+    ] } }));
+    const byLabel = (rows, label) => {
+        const map = new Map();
+        for (const row of rows) {
+            const key = importKey(label(row));
+            map.set(key, map.has(key) ? null : row);
+        }
+        return map;
+    };
+    return {
+        presentations: new Map(presentations.map(row => [row.id, row])),
+        units: new Map(units.map(row => [row.id, row])),
+        presentationNames: byLabel(presentations, row => row.name),
+        unitLabels: byLabel(units, importUnitLabel)
+    };
+};
+
 export const loadInventoryImportContext = async ({ db, config, rows }) => {
     const values = rows.map(row => row.values);
     const supplierCodes = unique(values.map(row => importCatalogValue(row.supplierCode)).filter(Boolean));
@@ -43,32 +74,7 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
         context.supplierCodes.set(key, context.supplierCodes.has(key) ? null : row);
     }
     if (config.mode === modes.CREATE && config.resource !== 'wastes') {
-        const names = unique(values.map(row => importText(row.presentationName)).filter(Boolean));
-        const presentationIds = ids(values.map(row => row.presentationId));
-        const presentations = bounded(await db.presentation.findMany({ take: catalogLimit + 1, where: { isActive: true, OR: [
-            { id: { in: presentationIds } }, { name: { in: names, mode: 'insensitive' } }
-        ] } }));
-        const unitIds = ids(values.map(row => row.unitMeasureId));
-        const unitNames = unique(values.map(row => {
-            const label = importText(row.unitLabel);
-            const separator = label.indexOf(' · ');
-            return separator < 0 ? label : label.slice(separator + 3);
-        }).filter(Boolean));
-        const units = bounded(await db.unitMeasure.findMany({ take: catalogLimit + 1, where: { isActive: true, OR: [
-            { id: { in: unitIds } }, { name: { in: unitNames, mode: 'insensitive' } }
-        ] } }));
-        context.presentations = new Map(presentations.map(row => [row.id, row]));
-        context.units = new Map(units.map(row => [row.id, row]));
-        context.presentationNames = new Map();
-        context.unitLabels = new Map();
-        for (const row of presentations) {
-            const key = importKey(row.name);
-            context.presentationNames.set(key, context.presentationNames.has(key) ? null : row);
-        }
-        for (const row of units) {
-            const key = importKey(importUnitLabel(row));
-            context.unitLabels.set(key, context.unitLabels.has(key) ? null : row);
-        }
+        Object.assign(context, await loadMaterialImportCatalogs({ db, values }));
         const identities = values.flatMap(row => {
             const presentationId = row.presentationId || context.presentationNames.get(importKey(row.presentationName))?.id;
             const unitMeasureId = row.unitMeasureId || context.unitLabels.get(importKey(row.unitLabel))?.id;

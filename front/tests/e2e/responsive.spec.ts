@@ -9,6 +9,7 @@ import { mockCatalogs } from './catalogFixtures.js';
 
 const permissions = Object.values(PERMISSIONS);
 const views = [
+  ['/almacen/articulos', 'Nuevo artículo', mockCatalogs],
   ['/almacen/materiales', 'Nueva existencia', mockWarehouse],
   ['/almacen/consumibles', 'Nueva existencia', mockWarehouse],
   ['/almacen/mermas', 'Nueva merma', mockWarehouse],
@@ -37,6 +38,7 @@ for (const width of [320, 390, 599, 600, 768, 880, 900, 1024, 1440, 1920]) {
       await prepare(page, permissions);
       await page.goto(route);
       await expect(page.locator('main h1'), route).toBeVisible({ timeout: 30_000 });
+      await expect(page.locator('.v-data-table__progress .v-progress-linear')).toHaveCount(0);
       const cards = page.locator('.responsive-table-cards').first();
       const tableWrapper = page.locator('.table-frame--fit-columns .v-table__wrapper').first();
       if (width < 600) {
@@ -46,16 +48,14 @@ for (const width of [320, 390, 599, 600, 768, 880, 900, 1024, 1440, 1920]) {
         await expect(page.getByRole('table').first()).toBeVisible();
         await expect(cards).toBeHidden();
         await expect(tableWrapper).toBeVisible();
-        if (width >= 600 && width < 900) {
-          await expect(tableWrapper).toHaveCSS('overflow-x', 'auto');
-          await expect(
-            page.getByRole('button', { name: 'Desplazar tabla a la derecha' }).first(),
-          ).toBeVisible();
-        } else if (width < 1600) {
-          await expect(tableWrapper).toHaveCSS('overflow-x', 'hidden');
-        }
+        await expect(tableWrapper).toHaveCSS('overflow-x', 'auto');
+        const needsScroll = await tableWrapper.evaluate(
+          (wrapper) => wrapper.scrollWidth - wrapper.clientWidth > 1,
+        );
+        const right = page.getByRole('button', { name: 'Desplazar tabla a la derecha' });
+        if (needsScroll) await expect(right).toBeEnabled();
+        else await expect(right).toHaveCount(0);
       }
-      await expect(page.locator('.v-data-table__progress .v-progress-linear')).toHaveCount(0);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth),
         route,
@@ -75,9 +75,7 @@ for (const width of [320, 390, 599, 600, 768, 880, 900, 1024, 1440, 1920]) {
   });
 }
 
-test('inventario entre 600 y 899 px desplaza la tabla dentro de su contenedor', async ({
-  page,
-}) => {
+test('inventario en tableta desplaza la tabla dentro de su contenedor', async ({ page }) => {
   await page.setViewportSize({ width: 768, height: 844 });
   await mockWarehouse(page, permissions);
   await page.goto('/almacen/materiales');
@@ -100,10 +98,10 @@ test('inventario entre 600 y 899 px desplaza la tabla dentro de su contenedor', 
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(768);
 });
 
-test('inventario desde 900 px muestra todas las columnas sin desplazamiento horizontal', async ({
+test('inventario con ancho suficiente muestra todas las columnas y oculta las flechas', async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 900, height: 844 });
+  await page.setViewportSize({ width: 1920, height: 844 });
   await mockWarehouse(page, permissions);
   await page.goto('/almacen/materiales');
 
@@ -130,7 +128,8 @@ test('inventario desde 900 px muestra todas las columnas sin desplazamiento hori
   expect(await wrapper.evaluate((element) => element.scrollWidth)).toBeLessThanOrEqual(
     await wrapper.evaluate((element) => element.clientWidth),
   );
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(900);
+  await expect(page.getByRole('button', { name: 'Desplazar tabla a la derecha' })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1920);
 });
 
 test('mantiene la agrupación y el estilo de subcolumnas en tabla y fichas', async ({ page }) => {

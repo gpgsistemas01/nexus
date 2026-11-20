@@ -22,6 +22,11 @@
     opacity: 1;
 }
 
+.warehouse-control.v-textarea
+    textarea.v-field__input:not(.v-textarea__sizer, [readonly], [disabled]) {
+    resize: vertical;
+}
+
 .warehouse-control .v-label {
     font-weight: 600;
     opacity: 1;

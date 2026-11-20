@@ -38,6 +38,16 @@ Almacén y Sistemas acceden a esta sección según su rol. El proveedor se vincu
 
 ![Formulario de alta de un artículo.](images/12a-article-form.png)
 
+## Importar artículos desde Excel
+
+1. Pulse **Importar Excel** y elija **Alta** o **Editar datos**. Descargue la plantilla de esa operación.
+2. En **Datos**, capture nombre, tipo, presentación, unidad y, si aplican, base y altura. Use los valores de **Catalogos** y conserve los encabezados.
+3. Para editar, puede filtrar por nombre al descargar. Conserve el **ID artículo** y la **Versión**. Si tiene un proveedor vinculado, cambie sólo el nombre.
+4. Cargue el archivo con la misma operación y pulse **Validar archivo**. Revise la vista previa y corrija las filas señaladas antes de confirmar.
+5. Pulse **Confirmar importación**. El lote admite hasta 500 filas y 2 MiB. Trabaja sólo con el catálogo de artículos.
+
+![Selección de operación y plantilla para importar artículos.](images/12b-article-import.png)
+
 Para registrar existencias, vincular proveedores, definir su mínimo o ajustar stock, utilice
 **Existencias de materiales** o **Existencias de consumibles**. Proveedores continúa
 en **Directorio comercial** y las clasificaciones auxiliares en **Catálogos**.

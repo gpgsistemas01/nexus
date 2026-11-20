@@ -2,7 +2,7 @@ import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { ForbiddenError } from '../../../errors/authError.js';
 import { INVENTORY_COLLECTIONS as resources, MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
-import { INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
+import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
 import { INVENTORY_SPREADSHEET_COLUMNS } from '../../../constants/inventorySpreadsheet.js';
 
 const weights = [
@@ -15,7 +15,16 @@ const configs = {
     [resources.WASTES]: { read: PERMISSIONS.WASTES_READ, write: PERMISSIONS.WASTES_WRITE, adjust: PERMISSIONS.WASTES_ADJUST_STOCK }
 };
 
+const articleColumns = [
+    ['Nombre', 'name'], ['Tipo', 'type'], ['Presentación', 'presentationName'],
+    ['Unidad', 'unitLabel'], ['Base (m)', 'base'], ['Altura (m)', 'height']
+];
+
 export const getImportConfig = (resource, mode = modes.CREATE) => {
+    if (resource === ARTICLE_IMPORT_RESOURCE && [modes.CREATE, modes.UPDATE].includes(mode)) {
+        const identity = mode === modes.UPDATE ? [['ID artículo', 'id'], ['Versión', 'expectedVersion']] : [];
+        return { resource, mode, columns: [...articleColumns, ...identity], readonlyFields: identity.map(([, key]) => key) };
+    }
     if (!Object.hasOwn(configs, resource) || !Object.values(modes).includes(mode)) throw new InventoryImportError();
     const identity = resource === resources.WASTES ? [['ID merma', 'id'], ['Versión', 'expectedVersion']]
         : [['ID material', 'id'], ['ID proveedor', 'supplierId'], ['Versión proveedor', 'expectedVersion'], ['Versión material', 'expectedMaterialVersion']];
@@ -46,6 +55,11 @@ export const inventoryImportColumnLabel = (config, field) => config.columns.find
 
 export const authorizeInventoryImport = (user, resource, mode = modes.CREATE) => {
     const config = getImportConfig(resource, mode);
+    if (resource === ARTICLE_IMPORT_RESOURCE) {
+        if (![PERMISSIONS.MATERIAL_CATALOGS_MANAGE, PERMISSIONS.CATALOGS_MANAGE]
+            .some(permission => user?.permissions?.includes(permission))) throw new ForbiddenError();
+        return config;
+    }
     const required = mode === modes.ADJUST ? [config.read, config.adjust] : [config.read, config.write, PERMISSIONS.INVENTORY_COSTS_READ];
     if (!required.every(permission => user?.permissions?.includes(permission))) {
         throw new ForbiddenError();

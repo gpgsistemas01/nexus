@@ -1,6 +1,7 @@
 import { ResponseContractError } from '../../../shared/clientError.js';
 import { successCodeMessages } from '@nexus/api-success-codes';
 import {
+    ARTICLE_IMPORT_RESOURCE,
     INVENTORY_IMPORT_LIMITS,
     INVENTORY_IMPORT_STATUSES,
     INVENTORY_IMPORT_ROW_ACTIONS,
@@ -12,10 +13,10 @@ import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { confirmMutation, readRecord } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { isInventoryImportMode } from '../inventoryImport.js';
-import type { InventoryResource } from '../inventory.js';
 import type {
     InventoryImportBatch,
     InventoryImportMode,
+    InventoryImportResource,
     PendingInventoryImport,
 } from '../inventoryImport.js';
 
@@ -35,7 +36,7 @@ const scalarRecord = (value: unknown) =>
 
 const readBatch = (
     value: unknown,
-    expected: { id?: string; resource?: InventoryResource; mode?: InventoryImportMode } = {},
+    expected: { id?: string; resource?: InventoryImportResource; mode?: InventoryImportMode } = {},
 ): InventoryImportBatch => {
     if (!isRecord(value)) throw invalid();
 
@@ -45,7 +46,9 @@ const readBatch = (
         (expected.id !== undefined && batch.id !== expected.id) ||
         (expected.resource !== undefined && batch.resource !== expected.resource) ||
         (expected.mode !== undefined && batch.mode !== expected.mode) ||
-        !['materials', 'consumables', 'wastes'].includes(String(batch.resource)) ||
+        !['materials', 'consumables', 'wastes', ARTICLE_IMPORT_RESOURCE].includes(
+            String(batch.resource),
+        ) ||
         !isInventoryImportMode(batch.mode) ||
         !Object.values(INVENTORY_IMPORT_STATUSES).some((status) => status === batch.status) ||
         typeof batch.filename !== 'string' ||
@@ -109,7 +112,7 @@ const readBatch = (
 
 export const inventoryImportService = {
     template(
-        resource: InventoryResource,
+        resource: InventoryImportResource,
         mode: InventoryImportMode,
         query: { supplierId: string; search: string },
         signal: AbortSignal,
@@ -123,7 +126,7 @@ export const inventoryImportService = {
         return requestExcel(`${base}/${resource}/template?${params}`, signal);
     },
     async preview(
-        resource: InventoryResource,
+        resource: InventoryImportResource,
         mode: InventoryImportMode,
         file: File,
         signal: AbortSignal,

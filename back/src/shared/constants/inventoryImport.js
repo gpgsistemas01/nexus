@@ -1,3 +1,5 @@
+export const ARTICLE_IMPORT_RESOURCE = 'articles';
+
 export const INVENTORY_IMPORT_LIMITS = Object.freeze({
     maxBytes: 2 * 1024 * 1024,
     maxRows: 500,

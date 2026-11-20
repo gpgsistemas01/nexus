@@ -76,6 +76,7 @@ model InventoryImport {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   version     Int       @default(0)
   userId      String?   @db.Uuid
+  /// Artículos admite alta y edición de catálogo. Los recursos de existencias también admiten ajuste.
   resource    String    @db.VarChar(16)
   /// Una operación para todo el archivo: create, update o adjust.
   mode        String    @db.VarChar(8)

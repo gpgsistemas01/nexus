@@ -211,9 +211,15 @@ export const captureRecipe = async (
             .evaluate((element) => element.scrollIntoView({ block: 'start' }));
       }
     }
-  } else if (filename === '11a-articles-list.png' || filename === '12a-article-form.png') {
+  } else if (
+    ['11a-articles-list.png', '12a-article-form.png', '12b-article-import.png'].includes(filename)
+  ) {
     await go(page, '/almacen/articulos');
     if (filename === '12a-article-form.png') await openAction(page, 'Nuevo artículo');
+    if (filename === '12b-article-import.png') {
+      await openAction(page, 'Importar Excel');
+      await expect(page.getByRole('dialog', { name: 'Importar Excel de artículos' })).toBeVisible();
+    }
   } else if (number <= 12) {
     await go(page, '/catalogos/unit-measures');
     if (number === 12) await openAction(page, 'Nueva unidad de medida');

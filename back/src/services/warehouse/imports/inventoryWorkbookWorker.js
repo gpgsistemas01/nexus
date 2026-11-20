@@ -5,7 +5,7 @@ import { createSpreadsheet, spreadsheetColumn } from '../../../utils/spreadsheet
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { errorMap } from '../../../messages/codeMessages.js';
 import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
-import { INVENTORY_IMPORT_LIMITS as limits,
+import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_LIMITS as limits,
     INVENTORY_IMPORT_MODE_LABELS } from '../../../shared/constants/inventoryImport.js';
 
 const fail = kind => { throw new InventoryImportError(kind); };
@@ -96,8 +96,15 @@ const template = async ({ config, rows = [], catalogs }) => {
     workbook.setColWidth('Instrucciones', 'A', 32);
     workbook.setColWidth('Instrucciones', 'B', 110);
     const isWaste = config.resource === 'wastes';
+    const isArticle = config.resource === ARTICLE_IMPORT_RESOURCE;
     const applicableCatalogs = [];
-    if (config.mode === 'create') {
+    if (isArticle) {
+        applicableCatalogs.push(
+            { key: 'type', header: 'Tipo', values: ['Material', 'Consumible'] },
+            { key: 'presentationName', header: 'Presentación', values: (catalogs.presentations ?? []).map(item => item.name) },
+            { key: 'unitLabel', header: 'Unidad', values: catalogs.units ?? [] }
+        );
+    } else if (config.mode === 'create') {
         applicableCatalogs.push({
             key: 'supplierCode',
             header: 'Proveedor (código | nombre)',
@@ -114,7 +121,11 @@ const template = async ({ config, rows = [], catalogs }) => {
     } else if (config.mode === 'adjust') {
         applicableCatalogs.push({ key: 'reasonId', header: 'Motivo', values: catalogs.reasons ?? [] });
     }
-    const operationDescription = config.mode === 'create'
+    const operationDescription = isArticle
+        ? (config.mode === 'create'
+            ? 'Registra artículos en el catálogo sin vincular proveedores ni crear existencias.'
+            : 'Edita los datos del catálogo. Si el artículo tiene un proveedor vinculado, sólo puedes cambiar el nombre.')
+        : config.mode === 'create'
         ? `Alta crea registros nuevos. ${isWaste
             ? 'Completa proveedor, material de referencia, mínimo, costo, activo, cantidad inicial y observaciones; captura medidas o pesos según la presentación.'
             : 'Completa proveedor, material, presentación, unidad, mínimo, costo, activo, cantidad inicial y observaciones.'}`
@@ -125,11 +136,14 @@ const template = async ({ config, rows = [], catalogs }) => {
             : 'Ajustar existencias reemplaza el saldo con el conteo físico final. Captura stock contado, motivo activo y observaciones en cada fila.';
     const limitDescription = config.mode === 'create'
         ? `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. Conserva hojas y encabezados; retira filas vacías que no quieras importar.`
-        : `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. La plantilla incluye registros coincidentes; si hay más, filtra por proveedor o nombre y procesa grupos de hasta ${limits.maxRows}. Conserva hojas y encabezados.`;
+        : `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. La plantilla incluye registros coincidentes; si hay más, filtra por ${isArticle ? 'nombre' : 'proveedor o nombre'} y procesa grupos de hasta ${limits.maxRows}. Conserva hojas y encabezados.`;
     const referenceDescription = config.mode === 'create'
-        ? 'Las columnas grises son datos de consulta, como stock actual y conversión. No las edites; captura sólo en las columnas blancas.'
+        ? (isArticle ? 'Captura los datos del artículo en las columnas blancas.'
+            : 'Las columnas grises son datos de consulta, como stock actual y conversión. No las edites; captura sólo en las columnas blancas.')
         : 'Las columnas grises son datos de consulta e identificadores/versiones del destino. No las edites: consérvalos para identificar el registro y sus datos actuales.';
-    const captureDescription = config.mode === 'adjust'
+    const captureDescription = isArticle
+        ? 'Una fila por artículo. Elige Tipo, Presentación y Unidad de Catalogos. Captura Base y Altura juntas cuando correspondan, sin fórmulas.'
+        : config.mode === 'adjust'
         ? 'Una fila por registro. Captura el saldo como número; no uses fórmulas.'
         : 'Una fila por registro. Usa números sin signo de moneda. Activo: SI o NO. No uses fórmulas.';
     const catalogCaptureInstructions = [
@@ -155,13 +169,13 @@ const template = async ({ config, rows = [], catalogs }) => {
         ['Captura', captureDescription],
         ...(applicableCatalogs.length ? [['Catálogos', `Catalogos incluye sólo: ${applicableCatalogs.map(({ header }) => header).join(', ')}. ${catalogCaptureInstructions.join(' ')} No son registros de inventario para importar.`]] : []),
         ['Duplicados', 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
-        ...(config.mode === 'create' ? [['Cantidad inicial', 'Es cantidad por presentación, no área ni peso. Pieza exige enteros.']] : []),
+        ...(config.mode === 'create' && !isArticle ? [['Cantidad inicial', 'Es cantidad por presentación, no área ni peso. Pieza exige enteros.']] : []),
         ...(config.mode === 'adjust' ? [
             ['Conteo físico', 'Stock contado es el saldo final en la unidad del registro; cero es válido y vacío se rechaza. Stock actual y Conversión son referencias y no se suman.'],
             ['Corte del conteo', 'Usa un conteo físico actual y evita movimientos mientras capturas. Si cambió una versión, descarga una plantilla nueva y vuelve a verificar el conteo.']
         ] : []),
         ...(config.mode === 'create' && isWaste ? [['Medidas', 'Base y altura en metros. En Rollo deja ambas vacías: el servidor las calcula con los tres pesos en kg.']] : []),
-        ...(config.mode === 'update' ? [['Actualización', isWaste
+        ...(config.mode === 'update' && !isArticle ? [['Actualización', isWaste
             ? 'Material, mínimo, costo y activo corresponden a la merma. Un vacío no borra datos.'
             : 'El mínimo, costo y estado corresponden a cada combinación de artículo y proveedor. Usa 0 para desactivar su alerta de stock bajo.']] : []),
         ['Confirmación', 'Validar sólo genera una vista previa. Confirmar aplica todas las filas válidas juntas; si alguna falla, no se aplica ninguna.'],

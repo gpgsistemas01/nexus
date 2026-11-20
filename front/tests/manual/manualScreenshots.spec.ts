@@ -208,7 +208,11 @@ test('artículos: listado y formulario sin registrar existencias', async ({ page
   const permissions = Object.values(PERMISSIONS);
   await mockCatalogs(page, permissions);
   await readOnly(page);
-  for (const filename of ['11a-articles-list.png', '12a-article-form.png'])
+  for (const filename of [
+    '11a-articles-list.png',
+    '12a-article-form.png',
+    '12b-article-import.png',
+  ])
     await captureRecipe(page, filename, path.resolve('docs/user-manual'), { ...user, permissions });
 });
 
