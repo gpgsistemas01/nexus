@@ -45,6 +45,7 @@ export interface Entry {
   version: number;
 }
 export const entryId = '11111111-1111-4111-8111-111111111111';
+export const createdEntryId = '99999999-9999-4999-8999-999999999999';
 export const mockCatalogs = async (page: Page, permissions = user.permissions) => {
   await mockWarehouse(page, permissions);
   const store = new Map<string, Entry[]>(
@@ -112,7 +113,7 @@ export const mockCatalogs = async (page: Page, permissions = user.permissions) =
     const saved: Entry =
       name === 'materials'
         ? {
-            id: method === 'POST' ? '22222222-2222-4222-8222-222222222222' : entryId,
+            id: method === 'POST' ? createdEntryId : entryId,
             name: String(body.name),
             version: method === 'POST' ? 0 : 8,
             _count: method === 'POST' ? { supplierMaterials: 0 } : previous?._count,
@@ -130,7 +131,7 @@ export const mockCatalogs = async (page: Page, permissions = user.permissions) =
             height: Object.hasOwn(body, 'height') ? body.height : previous?.height,
           }
         : {
-            id: method === 'POST' ? '22222222-2222-4222-8222-222222222222' : entryId,
+            id: method === 'POST' ? createdEntryId : entryId,
             name: body.name,
             ...(name === 'unit-measures' ? { symbol: body.symbol } : {}),
             isActive: body.isActive,

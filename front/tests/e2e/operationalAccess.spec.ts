@@ -13,7 +13,9 @@ for (const profileId of ['impresion-coordinador', 'instalaciones-instalador']) {
   ] as const) {
     test(
       `${profileId}/${resource}: sólo consulta de Almacén y solicitudes, sin altas comerciales ni entregas`,
-      { tag: resource === 'materials' ? '@essential' : [] },
+      {
+        tag: profileId === 'impresion-coordinador' && resource === 'materials' ? '@essential' : [],
+      },
       async ({ page }) => {
         test.setTimeout(60_000);
         const profile = DEMO_PROFILES.find(({ id }) => id === profileId)!;

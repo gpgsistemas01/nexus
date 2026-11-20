@@ -102,7 +102,7 @@ for (const [path, resource, title] of [
 
   test(
     `select compras ${resource}: crea proveedor y artículo desde el desplegable con contexto de compra`,
-    { tag: '@essential' },
+    { tag: resource === 'materials' ? '@essential' : [] },
     async ({ page }) => {
       const { writes } = await mockPurchases(page);
       const term = `Proveedor compra ${resource}`;
@@ -314,36 +314,32 @@ test('select: coincidencias existentes, filtros y catálogos sólo consultables 
   await expect(page.getByRole('button', { name: /Registrar proveedor «/ })).toHaveCount(0);
 });
 
-test(
-  'select: conserva el texto y consulta una vez después de la pausa de escritura',
-  { tag: '@essential' },
-  async ({ page }) => {
-    await mockWarehouse(page);
-    const searches: string[] = [];
-    await page.route('**/api/warehouse/suppliers?**', (route) => {
-      const search = new URL(route.request().url()).searchParams.get('search') ?? '';
-      searches.push(search);
-      return route.fulfill({
-        json: pageOf(search ? [] : [{ id: ids.supplier, tradeName: 'Proveedor Central' }]),
-      });
+test('select: conserva el texto y consulta una vez después de la pausa de escritura', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const searches: string[] = [];
+  await page.route('**/api/warehouse/suppliers?**', (route) => {
+    const search = new URL(route.request().url()).searchParams.get('search') ?? '';
+    searches.push(search);
+    return route.fulfill({
+      json: pageOf(search ? [] : [{ id: ids.supplier, tradeName: 'Proveedor Central' }]),
     });
-    await page.goto('/almacen/materiales');
-    await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
-    const dialog = page.getByRole('dialog', {
-      name: 'Registrar existencia de material',
-      exact: true,
-    });
-    const field = dialog.getByRole('combobox', { name: 'Proveedor', exact: true });
-    await field.click();
-    await expect(
-      page.getByRole('option', { name: 'Proveedor Central', exact: true }),
-    ).toBeVisible();
-    await field.pressSequentially('Alambre', { delay: 300 });
-    await expect.poll(() => searches.filter(Boolean)).toEqual(['Alambre']);
-    await expect(field).toHaveValue('Alambre');
-    await field.fill('Alambre a');
-    await field.fill('Alambre azul');
-    await expect.poll(() => searches.filter(Boolean)).toEqual(['Alambre', 'Alambre azul']);
-    await expect(field).toHaveValue('Alambre azul');
-  },
-);
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+  const dialog = page.getByRole('dialog', {
+    name: 'Registrar existencia de material',
+    exact: true,
+  });
+  const field = dialog.getByRole('combobox', { name: 'Proveedor', exact: true });
+  await field.click();
+  await expect(page.getByRole('option', { name: 'Proveedor Central', exact: true })).toBeVisible();
+  await field.pressSequentially('Alambre', { delay: 300 });
+  await expect.poll(() => searches.filter(Boolean)).toEqual(['Alambre']);
+  await expect(field).toHaveValue('Alambre');
+  await field.fill('Alambre a');
+  await field.fill('Alambre azul');
+  await expect.poll(() => searches.filter(Boolean)).toEqual(['Alambre', 'Alambre azul']);
+  await expect(field).toHaveValue('Alambre azul');
+});

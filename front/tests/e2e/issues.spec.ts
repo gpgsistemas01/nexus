@@ -334,7 +334,7 @@ for (const [path, label] of [
 ] as const) {
   test(
     `salidas ${path}: entregas parciales conservan proyecto y diferencia negativa`,
-    { tag: path === 'mermas' ? [] : '@essential' },
+    { tag: path === 'consumibles' ? '@essential' : [] },
     async ({ page }) => {
       const { writes } = await mockIssues(page);
       await page.setViewportSize({ width: 1920, height: 1080 });
@@ -434,7 +434,7 @@ for (const [path, label, name] of [
 ] as const) {
   test(
     `salidas ${path}: edición pendiente, surtido y devolución`,
-    { tag: path === 'mermas' ? [] : '@essential' },
+    { tag: path === 'materiales' ? '@essential' : [] },
     async ({ page }) => {
       const { writes } = await mockIssues(page);
       await page.setViewportSize({ width: 900, height: 844 });
