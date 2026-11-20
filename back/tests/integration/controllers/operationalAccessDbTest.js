@@ -26,6 +26,11 @@ const detail = resource => resource === 'wastes'
     ? { wasteId: ids.waste, quantity: 2 }
     : { materialId: ids[resource], supplierId: ids.supplier, quantity: 2 };
 const issuePath = resource => resource === 'wastes' ? '/api/warehouse/waste-issues' : `/api/warehouse/goods-issues/${resource}`;
+const readIssue = (response, resource) => response.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'];
+const expectNoIssueCost = detail => {
+    expect(detail).not.toHaveProperty('maxUnitCost');
+    if (detail.waste) expect(detail.waste).not.toHaveProperty('maxUnitCost');
+};
 const stockSnapshot = () => Promise.all([
     prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } }),
     prisma.waste.findUnique({ where: { id: ids.waste } }),
@@ -146,12 +151,16 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             const payload = { ...header(departmentId), details: [detail(resource)] };
             const path = issuePath(resource);
             const created = await request(app).post(path).set('Cookie', cookie).send(payload).expect(resource === 'wastes' ? 201 : 200);
-            const issue = created.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'];
+            const issue = readIssue(created, resource);
+            expectNoIssueCost(issue.details[0]);
             const edited = await request(app).patch(`${path}/${issue.id}`).set('Cookie', cookie)
                 .send({ ...payload, projectNumber: 'ACC-101', details: [{ ...detail(resource), quantity: 3 }] }).expect(200);
-            expect(edited.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'].details[0].quantity).toBe('3');
-            await request(app).patch(`${path}/${issue.id}/header`).set('Cookie', cookie)
+            const editedDetail = readIssue(edited, resource).details[0];
+            expect(editedDetail.quantity).toBe('3');
+            expectNoIssueCost(editedDetail);
+            const headerUpdate = await request(app).patch(`${path}/${issue.id}/header`).set('Cookie', cookie)
                 .send({ ...header(departmentId), observations: 'Encabezado revisado' }).expect(200);
+            expectNoIssueCost(readIssue(headerUpdate, resource).details[0]);
             const model = resource === 'wastes' ? prisma.wasteIssue : prisma.goodsIssue;
             const saved = await model.findUnique({ where: { id: issue.id }, include: { details: true, fulfillmentStatus: true } });
             expect(saved).toMatchObject({ observations: 'Encabezado revisado', departmentId, fulfillmentStatus: { name: 'Pendiente' } });
@@ -161,7 +170,9 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             expect(listed.body.data.map(row => row.id)).toContain(issue.id);
             expect(listed.body.data.find(row => row.id === issue.id)).not.toHaveProperty('details');
             const retrieved = await request(app).get(`${path}/${issue.id}`).set('Cookie', cookie).expect(200);
-            expect(retrieved.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'].details[0].id).toBe(saved.details[0].id);
+            const retrievedDetail = readIssue(retrieved, resource).details[0];
+            expect(retrievedDetail.id).toBe(saved.details[0].id);
+            expectNoIssueCost(retrievedDetail);
             expect((await stockSnapshot()).slice(0, 2)).toEqual(before.slice(0, 2));
         }
     });
@@ -234,10 +245,13 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
                 .query({ clientId: ids.client, length: '100' }).expect(200);
             expect(new Set(result.body.data.map(row => row.departmentId))).toEqual(new Set(areas.map(area => sessions[area].departmentId)));
             const row = result.body.data.find(row => row.departmentId === departmentId);
-            await request(app).get(`${path}/${row.id}`).set('Cookie', cookie).expect(200);
+            const read = await request(app).get(`${path}/${row.id}`).set('Cookie', cookie).expect(200);
+            expect(readIssue(read, resource).details[0].maxUnitCost).toBe('25');
             const created = await request(app).post(path).set('Cookie', cookie)
                 .send({ ...header(departmentId), details: [detail(resource)] }).expect(resource === 'wastes' ? 201 : 200);
-            expect(created.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'].departmentId).toBe(departmentId);
+            expect(readIssue(created, resource)).toMatchObject({
+                departmentId, details: [expect.objectContaining({ maxUnitCost: '25' })]
+            });
         }
         expect((await stockSnapshot()).slice(0, 2)).toEqual(before.slice(0, 2));
     });

@@ -540,7 +540,7 @@
           "string",
           "null"
         ],
-        "description": "Decimal persistido; puede recibirse como texto JSON."
+        "description": "Costo por unidad de conversión. Sólo se incluye con inventory:costs-read. Materiales y consumibles usan el costo guardado en el detalle; mermas usan el costo vigente. Un costo histórico sin verificar se devuelve como null."
       },
       "materialName": {
         "type": "string",
@@ -567,7 +567,7 @@
       },
       "waste": {
         "type": "object",
-        "description": "Merma con presentation y unitMeasure.",
+        "description": "Merma con presentation y unitMeasure. maxUnitCost se omite sin inventory:costs-read o si corresponde a una regularización histórica sin costo verificado.",
         "additionalProperties": true
       },
       "materialSpecification": {

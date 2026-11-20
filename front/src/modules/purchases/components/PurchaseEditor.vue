@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VRow, VCol } from 'vuetify/components/VGrid';
-import { VTextField } from 'vuetify/components/VTextField';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import DateField from '../../../shared/components/DateField.vue';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VRadioGroup } from 'vuetify/components/VRadioGroup';
@@ -97,7 +97,7 @@ const emit = defineEmits<{
                     cols="12"
                     md="6"
                 >
-                    <VTextField
+                    <WrappingTextField
                         label="Número de Factura"
                         :model-value="values.invoice"
                         :maxlength="FORM_FIELD_LIMITS.INVOICE"
@@ -114,7 +114,7 @@ const emit = defineEmits<{
                     cols="12"
                     md="6"
                 >
-                    <VTextField
+                    <WrappingTextField
                         v-if="isEditing || isReadOnly"
                         label="Proveedor"
                         :model-value="supplier?.title ?? ''"

@@ -7,6 +7,7 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { DECIMAL_INPUT_FORMAT } from '@nexus/input-validation';
 import { isPiecePresentation } from '@nexus/piece-quantity';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
 defineProps<{
@@ -88,7 +89,7 @@ const emit = defineEmits<{
             />
         </template>
         <template #presentation>
-            <VTextField
+            <WrappingTextField
                 label="Presentación"
                 :model-value="presentation"
                 readonly

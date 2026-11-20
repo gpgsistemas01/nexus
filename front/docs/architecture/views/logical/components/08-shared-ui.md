@@ -78,6 +78,8 @@ definen campos modificables, props, eventos y callbacks.
 
 `RemoteSelect` presenta opciones, búsqueda y carga. En detalles, `selectedTitle`
 muestra el nombre seleccionado mientras las opciones conservan su descripción completa.
+Las selecciones largas ocupan varias líneas. `WrappingTextField` ajusta la altura
+de los campos de texto largos y mantiene el valor en una sola línea en el formulario.
 La búsqueda permanece en el campo y se consulta tras 500 ms sin escribir. Sus
 [eventos](../../../contracts/form-and-event-contracts.md#eventos-de-interacción) permiten
 consultar o solicitar un alta. La [creación
@@ -95,8 +97,9 @@ Los demás diálogos conservan la retención de foco habitual. Las reglas de tec
 foco se consultan en el [estándar de interfaz](../../../interface-standards.md#teclado-y-distribución).
 
 Las columnas de detalle siguen identificación → captura → resultados → acciones.
-Compras agrupa costo unitario con Conversión e importes con IVA/sin IVA; Salidas
-selecciona seguimiento y saldos según consulta, surtido o devolución.
+Compras muestra el costo por presentación y agrupa la cantidad convertida con su unidad.
+Salidas selecciona seguimiento y saldos según consulta, surtido o devolución.
+`RecordTotals` presenta los totales de ambos módulos con el mismo formato.
 `DetailEntryRow` recibe las columnas aplanadas de la misma tabla, y las fichas
 reciben sus encabezados: reordenar conserva la correspondencia de campo y dato.
 

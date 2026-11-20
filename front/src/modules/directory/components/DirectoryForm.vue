@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VTextField } from 'vuetify/components/VTextField';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import type { DirectoryValues, DirectoryField, DirectoryResource } from '../directory.js';
@@ -35,7 +35,7 @@ const emit = defineEmits<{
         @submit="emit('submit')"
         @reload="emit('reload')"
     >
-        <VTextField
+        <WrappingTextField
             v-if="resource === 'clients'"
             label="Nombre"
             name="name"
@@ -46,7 +46,7 @@ const emit = defineEmits<{
             @blur="emit('blur', 'name')"
         />
         <template v-else>
-            <VTextField
+            <WrappingTextField
                 label="Razón social"
                 name="legalName"
                 :model-value="values.legalName"
@@ -55,7 +55,7 @@ const emit = defineEmits<{
                 @update:model-value="emit('update', 'legalName', $event ?? '')"
                 @blur="emit('blur', 'legalName')"
             />
-            <VTextField
+            <WrappingTextField
                 label="Nombre comercial"
                 name="tradeName"
                 :model-value="values.tradeName"

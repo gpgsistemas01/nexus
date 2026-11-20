@@ -107,7 +107,7 @@ keyof CatalogValues
 
 ## CatalogForm.defineProps
 
-**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 11, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 12, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -141,7 +141,7 @@ keyof CatalogValues
 
 ## CatalogForm.defineEmits
 
-**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 31, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/catalogs/components/CatalogForm.vue](../../../../../src/modules/catalogs/components/CatalogForm.vue) · línea 32, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

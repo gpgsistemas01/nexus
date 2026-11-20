@@ -9,7 +9,7 @@ flowchart TB
     R["routes/api<br/>wasteIssueApiRoute.js"]
     C["controllers/api<br/>wasteIssueController.js"]
     S["services<br/>wasteIssueService.js<br/>detailReturns/"]
-    D["DTO<br/>wasteIssueDTO.js"]
+    D["DTO<br/>wasteIssueDTO.js<br/>issueDTO.js"]
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>stockHelpers.js<br/>y colaboradores"]
     V["Validadores<br/>issueReturnValidations.js<br/>wasteIssueValidations.js"]
     P["baseRepository.js<br/>getDb(tx)"]
@@ -27,7 +27,7 @@ flowchart TB
 | routes/api · wasteIssueApiRoute.js | `src/routes/api/warehouse/`<br/>`wasteIssueApiRoute.js` |
 | controllers/api · wasteIssueController.js | `src/controllers/api/warehouse/`<br/>`wasteIssueController.js` |
 | services · wasteIssueReturnService.js · wasteIssueFulfillmentService.js · y colaboradores | `src/services/warehouse/wasteIssues/`<br/>`detailReturns/wasteIssueReturnService.js`<br/>`src/services/warehouse/wasteIssues/`<br/>`wasteIssueFulfillmentService.js`<br/>`src/services/warehouse/wasteIssues/`<br/>`wasteIssueDetailService.js`<br/>`src/services/warehouse/wasteIssues/`<br/>`wasteIssueService.js` |
-| DTO · wasteIssueDTO.js | `src/dtos/wasteIssueDTO.js` |
+| DTO · wasteIssueDTO.js · issueDTO.js | `src/dtos/wasteIssueDTO.js`, `src/dtos/issueDTO.js` |
 | Colaboradores de dominio · referenceNumberService.js · stockHelpers.js · y colaboradores | `src/services/document/`<br/>`referenceNumberService.js`<br/>`src/services/inventory/stockHelpers.js`<br/>`src/services/warehouse/`<br/>`fulfillmentStatusService.js`<br/>`src/services/warehouse/issues/`<br/>`issueFulfillmentRules.js`<br/>`src/services/warehouse/issues/`<br/>`issueHeaderService.js`<br/>`src/services/warehouse/wastes/`<br/>`wasteMovementService.js` |
 | Validadores · issueReturnValidations.js · wasteIssueValidations.js | `src/validators/forms/`<br/>`issueReturnValidations.js`<br/>`src/validators/forms/`<br/>`wasteIssueValidations.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
@@ -41,6 +41,10 @@ los detalles solicitados en una actualización parametrizada por lote, compartid
 materiales. `wasteIssueHelpers.js` conserva la preparación de detalles, la selección
 de relaciones y la adaptación de respuesta compartidas con el CRUD. Las operaciones
 de edición, surtido y devolución conservan el bloqueo de la salida durante su `tx`.
+
+`issueDTO.js` expone el costo vigente sólo con `inventory:costs-read`. También
+filtra el costo de la relación `waste` cuando la sesión carece del permiso o la
+regularización histórica tiene costo sin verificar.
 
 Los conflictos de estado, merma duplicada y merma no disponible se distinguen mediante
 códigos de `errorMap.wasteIssue`, traducidos en `apiMessages.js`. La ausencia de estados

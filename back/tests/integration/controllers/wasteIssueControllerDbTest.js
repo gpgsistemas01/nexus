@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
+import { getGrantedPermissions } from '../../../src/constants/permissions.js';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 
@@ -43,7 +44,11 @@ describe('waste issue controller database integration', () => {
     prisma = prismaModule.prisma;
     app = createControllerTestApp({
       registerRoutes: router => {
-        router.use((req, _res, next) => { req.user = { id: ids.user, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS }] }; next(); });
+        router.use((req, _res, next) => {
+          const accesses = [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS }];
+          req.user = { id: ids.user, accesses, permissions: getGrantedPermissions(accesses) };
+          next();
+        });
         router.get('/waste-issues/:id', controller.getWasteIssue);
         router.get('/waste-issues', controller.getAllWasteIssues);
         router.get('/waste-movements', movementController.getAllWasteMovements);

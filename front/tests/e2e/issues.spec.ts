@@ -466,6 +466,7 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Importes',
               'Surtido registrado',
               'Captura de surtido',
               'Surtir',
@@ -473,7 +474,9 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
-              'Costo unitario de Conversión',
+              'Costo unitario',
+              'Monto solicitado',
+              'Monto entregado neto',
               'Cantidad surtida',
               'Pendiente de surtir',
               'Cantidad a surtir',
@@ -486,9 +489,9 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Importes',
               'Cantidad surtida',
               'Pendiente de surtir',
-              'Costo unitario de Conversión',
               'Cantidad a surtir',
               'Cantidad de proyecto',
               'Diferencia',
@@ -497,6 +500,9 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
+              'Costo unitario',
+              'Monto solicitado',
+              'Monto entregado neto',
             ],
       );
       await expect(dialog.locator('.table-frame--fit-columns .v-table__wrapper')).toHaveCSS(
@@ -551,6 +557,7 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Importes',
               'Cantidad surtida',
               'Devolución',
               'Acciones',
@@ -558,6 +565,9 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
+              'Costo unitario',
+              'Monto solicitado',
+              'Monto entregado neto',
               'Cantidad devuelta',
               'Saldo entregado',
             ]
@@ -567,6 +577,7 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Importes',
               'Cantidad surtida',
               'Cantidad devuelta',
               'Saldo entregado',
@@ -575,6 +586,9 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
+              'Costo unitario',
+              'Monto solicitado',
+              'Monto entregado neto',
             ],
       );
       await page.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
@@ -591,6 +605,9 @@ for (const [path, label, name] of [
       await expect(returning).toBeHidden();
       expect(writes[2]!.url.pathname).toMatch(/\/returns$/);
       expect(writes[2]!.data).toEqual({ returnQuantity: 1, observations: '' });
+      const totals = page.getByRole('dialog').getByLabel('Totales de salida');
+      await expect(totals).toContainText('Total solicitado$20,000.00');
+      await expect(totals).toContainText('Total entregado neto$10,000.00');
     },
   );
 }
@@ -599,7 +616,9 @@ test(
   'salidas: sin permiso de surtido oculta controles; acceso directo sin permiso se rechaza',
   { tag: '@essential' },
   async ({ page }) => {
-    const permissions = issuePermissions.filter((p) => p !== 'goods:issue-details-manage');
+    const permissions = issuePermissions.filter(
+      (p) => !['goods:issue-details-manage', 'inventory:costs-read'].includes(p),
+    );
     const { writes } = await mockIssues(page, permissions);
     await page.route('**/api/auth/me', (route) =>
       route.fulfill({
@@ -625,6 +644,12 @@ test(
       createDialog.getByRole('checkbox', { name: 'Surtir al guardar', exact: true }),
     ).toHaveCount(0);
     await createDialog.getByRole('button', { name: 'Regresar', exact: true }).click();
+    await page.getByRole('button', { name: 'Consultar salida', exact: true }).click();
+    const view = page.getByRole('dialog');
+    await expect(view.getByRole('columnheader', { name: 'Pendiente de surtir' })).toBeVisible();
+    await expect(view.getByRole('columnheader', { name: 'Costo unitario' })).toHaveCount(0);
+    await expect(view.getByLabel('Totales de salida')).toHaveCount(0);
+    await view.getByRole('button', { name: 'Regresar', exact: true }).click();
     expect(writes).toHaveLength(0);
     await mockIssues(page, ['materials:read']);
     await page.goto('/salidas/materiales');

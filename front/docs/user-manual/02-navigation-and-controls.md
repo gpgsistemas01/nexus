@@ -72,9 +72,9 @@ Al final de las fichas o la tabla se indica cuántos registros contiene la pági
 selector **Registros por página** permite cambiar ese límite.
 Las fichas de todas las tablas conservan sus acciones e inputs, incluidos los detalles
 de compras y salidas y las asignaciones de personas.
-Los formularios distribuyen los campos según el ancho disponible. Las opciones
-seleccionadas con nombres largos pueden ocupar varias líneas. **Observaciones**
-crece al escribir. Con ratón, arrastre su esquina inferior para ajustar la altura.
+Los nombres y otros datos largos ocupan varias líneas en los campos de texto y en
+las opciones seleccionadas. **Observaciones** crece al escribir. Con ratón, arrastre
+su esquina inferior para ajustar la altura.
 
 En los desplegables, la opción seleccionada se distingue por el fondo y una
 marca de verificación. Al salir de un campo de fecha, se muestra **día/mes/año**

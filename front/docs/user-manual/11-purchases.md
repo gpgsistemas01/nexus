@@ -36,7 +36,8 @@ Abra **Compras → Consumibles**. Busque por folio, factura, proveedor, persona 
 
 El nombre, las medidas, la presentación y la unidad de los artículos se muestran desde el catálogo de Materiales. Los importes conservan los valores de la compra.
 
-La tabla coloca **Presentación** antes de **Compra**; el costo capturado y su alcance preceden a **Conversión** e **Importes**. **Conversión** reúne cantidad, unidad y costo unitario; **Importes**, montos sin IVA y con IVA.
+La tabla muestra **Costo por presentación** y el alcance del importe capturado.
+**Conversión** reúne la cantidad convertida y su unidad. **Importes** muestra los montos sin IVA y con IVA.
 
 Todos los detalles pertenecen al **Proveedor** del encabezado; no se repite en el nombre de cada artículo. En móvil la captura se apila y conserva los mismos valores.
 

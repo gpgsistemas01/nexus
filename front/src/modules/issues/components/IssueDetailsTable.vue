@@ -6,6 +6,7 @@ import type { DataTableHeader, DataTableSortItem } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
 import ResponsiveTableCards from '../../../shared/components/ResponsiveTableCards.vue';
+import RecordTotals from '../../../shared/components/RecordTotals.vue';
 import IssueSupplyField from './IssueSupplyField.vue';
 import {
     numberText,
@@ -13,6 +14,7 @@ import {
     convertedQuantityText,
 } from '../../../shared/utils/formatNumbers.js';
 import { getIssueReturnableQuantity, getIssuePendingQuantity } from '../issueRules.js';
+import { getIssueDetailAmounts, getIssueTotals } from '../issueDetails.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
 import type { IssueDetail, IssueMode, IssueResource, IssueSupplyChanges } from '../issue.js';
 
@@ -21,6 +23,7 @@ const props = defineProps<{
     mode: IssueMode;
     resource: IssueResource;
     isDisabled: boolean;
+    canReadCosts: boolean;
 }>();
 const emit = defineEmits<{
     remove: [id: string];
@@ -33,15 +36,33 @@ const groupWasteColumns = (title: string, columns: DataTableHeader<IssueDetail>[
         ? [{ title, align: 'center' as const, children: columns }]
         : columns;
 
-const conversionCost: DataTableHeader<IssueDetail> = {
-    title: 'Costo unitario de Conversión',
-    key: 'maxUnitCost',
-    align: 'end',
-};
+const amountColumns = [
+    {
+        title: 'Monto solicitado',
+        key: 'requested',
+        align: 'end',
+        value: (item) => getIssueDetailAmounts(item).requested,
+    },
+    {
+        title: 'Monto entregado neto',
+        key: 'delivered',
+        align: 'end',
+        value: (item) => getIssueDetailAmounts(item).delivered,
+    },
+] satisfies DataTableHeader<IssueDetail>[];
+
+const totals = computed(() => {
+    if (!props.canReadCosts) return [];
+
+    const { requested, delivered } = getIssueTotals(props.rows);
+    return [
+        { label: 'Total solicitado', value: currencyText(requested) },
+        { label: 'Total entregado neto', value: currencyText(delivered) },
+    ];
+});
 
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
-    const { mode, resource } = props;
-    const isWaste = resource === 'wastes';
+    const { mode, resource, canReadCosts } = props;
 
     return [
         {
@@ -65,9 +86,12 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
             children: [
                 { title: 'Cantidad', key: 'convertedQuantity', align: 'end' },
                 { title: 'Unidad', key: 'unitMeasure', align: 'start' },
-                ...(isWaste && mode === 'supply' ? [conversionCost] : []),
+                ...(canReadCosts
+                    ? [{ title: 'Costo unitario', key: 'maxUnitCost', align: 'end' as const }]
+                    : []),
             ],
         },
+        ...(canReadCosts ? [{ title: 'Importes', children: [...amountColumns] }] : []),
         ...groupWasteColumns('Surtido registrado', [
             ...(['supply', 'return', 'view'].includes(mode)
                 ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity', align: 'end' as const }]
@@ -87,7 +111,6 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
             : []),
         ...(mode === 'supply'
             ? [
-                  ...(!isWaste ? [conversionCost] : []),
                   ...groupWasteColumns('Captura de surtido', [
                       {
                           title: 'Cantidad a surtir',
@@ -143,8 +166,10 @@ const cardValue = (item: IssueDetail, key: string) => {
     if (key === 'convertedQuantity')
         return convertedQuantityText(item.convertedQuantity, item.unitMeasure);
 
-    if (key === 'maxUnitCost')
-        return item.maxUnitCost == null ? '—' : currencyText(item.maxUnitCost);
+    if (key === 'maxUnitCost') return currencyText(item.maxUnitCost);
+
+    if (key === 'requested' || key === 'delivered')
+        return currencyText(getIssueDetailAmounts(item)[key]);
 
     if (key === 'pendingQuantity') return numberText(getIssuePendingQuantity(item));
 
@@ -167,6 +192,8 @@ const cardValue = (item: IssueDetail, key: string) => {
 };
 
 const sortValue = (item: IssueDetail, key: string): unknown => {
+    if (key === 'requested' || key === 'delivered') return getIssueDetailAmounts(item)[key];
+
     if (key === 'pendingQuantity') return getIssuePendingQuantity(item);
 
     if (key === 'deliveredQuantity') return getIssueReturnableQuantity(item);
@@ -236,7 +263,14 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                 {{ numberText(getIssueReturnableQuantity(item)) }}
             </template>
             <template #[`item.maxUnitCost`]="{ item }">
-                {{ item.maxUnitCost == null ? '—' : currencyText(item.maxUnitCost) }}
+                {{ currencyText(item.maxUnitCost) }}
+            </template>
+            <template
+                v-for="{ key } in amountColumns"
+                :key="key"
+                #[`item.${key}`]="{ value }"
+            >
+                {{ currencyText(value) }}
             </template>
             <template #[`item.quantityToSupply`]="{ item }">
                 <IssueSupplyField
@@ -364,6 +398,18 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
             </template>
         </ResponsiveTableCards>
     </TableFrame>
+    <RecordTotals
+        v-if="canReadCosts"
+        class="issue-totals"
+        label="Totales de salida"
+        :fields="totals"
+    />
+    <p
+        v-if="canReadCosts && resource === 'wastes' && rows.some((row) => row.maxUnitCost != null)"
+        class="text-caption mt-2"
+    >
+        Importes de referencia con el costo vigente de la merma.
+    </p>
 </template>
 
 <style scoped>
@@ -371,5 +417,8 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
     display: block;
     color: rgb(var(--v-theme-muted));
     font-size: 0.8rem;
+}
+.issue-totals {
+    margin-block-start: 1rem;
 }
 </style>

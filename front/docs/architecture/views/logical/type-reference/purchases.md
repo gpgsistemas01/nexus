@@ -165,7 +165,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 12, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 13, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -189,7 +189,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 26, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 27, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -235,7 +235,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseTotals.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseTotals.vue](../../../../../src/modules/purchases/components/PurchaseTotals.vue) · línea 5, columna 17. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseTotals.vue](../../../../../src/modules/purchases/components/PurchaseTotals.vue) · línea 6, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

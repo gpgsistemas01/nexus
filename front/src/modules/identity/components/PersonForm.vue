@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { VTextField } from 'vuetify/components/VTextField';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VTable } from 'vuetify/components/VTable';
 import { VAlert } from 'vuetify/components/VAlert';
@@ -63,7 +63,7 @@ const accessHeaders: DataTableHeader<PersonAccessRow>[] = [
         @submit="emit('submit')"
         @reload="emit('reload')"
     >
-        <VTextField
+        <WrappingTextField
             label="Nombre completo"
             name="fullName"
             :model-value="values.fullName"

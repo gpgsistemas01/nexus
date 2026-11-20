@@ -114,6 +114,12 @@ a Almacén y administración.
 - **CA-RF-ISS-003-1:** la nueva devolución no supera cantidad suministrada menos
   devoluciones anteriores. Una devolución parcial conserva `Surtido`; devolver el saldo
   completo cancela el detalle. Cancelar todos los detalles cancela la salida.
+- **CA-RF-ISS-001-2:** con `inventory:costs-read`, la salida muestra costo por unidad
+  de conversión, importes por partida y totales solicitado y entregado neto, sin IVA.
+  El entregado resta las devoluciones y excluye partidas canceladas. Vue deriva los
+  importes del costo de la partida en materiales y consumibles y del costo vigente en
+  mermas. Las regularizaciones con costo sin verificar quedan sin valoración.
+  La API omite costos para las demás áreas.
 - **CA-RF-WST-003-1:** se aplican las mismas condiciones de cantidad parcial y saldo
   a merma; la existencia y sus movimientos permanecen independientes.
 - **CA-RF-WST-006-1:** se aplican las mismas condiciones de saldo y cancelación derivada

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VRow, VCol } from 'vuetify/components/VGrid';
-import { VTextField } from 'vuetify/components/VTextField';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import DateField from '../../../shared/components/DateField.vue';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
@@ -34,6 +34,7 @@ defineProps<{
     resource: IssueResource;
     selects: IssueHeaderSelect[];
     canCreateClient: boolean;
+    canReadCosts: boolean;
     canSupplyOnCreate: boolean;
     supplyImmediately: boolean;
 }>();
@@ -123,7 +124,7 @@ const emit = defineEmits<{
                 cols="12"
                 md="6"
             >
-                <VTextField
+                <WrappingTextField
                     label="Número de proyecto"
                     :maxlength="FORM_FIELD_LIMITS.PROJECT_NUMBER"
                     :model-value="values.projectNumber"
@@ -184,6 +185,7 @@ const emit = defineEmits<{
             :rows="values.details"
             :mode="mode"
             :resource="resource"
+            :can-read-costs="canReadCosts"
             :is-disabled="isSubmitting"
             @remove="emit('remove', $event)"
             @supply="(id, changes) => emit('supply', id, changes)"

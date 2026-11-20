@@ -144,6 +144,8 @@ const loadWhenVisible = (isVisible: boolean) => {
 
 <template>
     <VAutocomplete
+        class="remote-select"
+        :class="{ 'remote-select--selected': currentItem && search === currentItem.title }"
         :menu="isMenuOpen"
         :search="search"
         :label="label"
@@ -176,10 +178,7 @@ const loadWhenVisible = (isVisible: boolean) => {
             v-if="selectedTitle"
             #selection
         >
-            <span
-                class="selected-option"
-                :title="selectedTitle"
-            >
+            <span class="selected-option">
                 {{ selectedTitle }}
             </span>
         </template>
@@ -244,10 +243,24 @@ const loadWhenVisible = (isVisible: boolean) => {
 </template>
 
 <style scoped>
-.selected-option {
+.remote-select :deep(.v-autocomplete__selection) {
+    height: auto;
+    min-width: 0;
+}
+.selected-option,
+.remote-select :deep(.v-autocomplete__selection-text) {
     min-width: 0;
     white-space: normal;
     overflow-wrap: anywhere;
+    overflow: visible;
+}
+.remote-select--selected:not(.v-autocomplete--selection-slot)
+    :deep(.v-field--focused .v-autocomplete__selection) {
+    opacity: 1;
+}
+.remote-select--selected:not(.v-autocomplete--selection-slot) :deep(.v-field--focused input) {
+    color: transparent;
+    caret-color: rgb(var(--v-theme-on-surface));
 }
 .catalog-status {
     display: flex;
