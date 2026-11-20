@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue';
 import { PERMISSIONS } from '@nexus/permissions';
+import { ARTICLE_IMPORT_RESOURCE } from '@nexus/inventory-imports';
 import { VBtn } from 'vuetify/components/VBtn';
 import { usePageAccess } from '../../../app/composables/usePageAccess.js';
 import { useListEditor } from '../../../shared/composables/useListEditor.js';
@@ -17,7 +18,11 @@ import { ApiError } from '../../../shared/http/apiError.js';
 import type { ArticleFilters, CatalogEntry, CatalogName, CatalogTarget } from '../catalog.js';
 
 const props = defineProps<{ catalog: CatalogName }>();
-const { has, onDenied } = usePageAccess();
+const { session, has, onDenied } = usePageAccess();
+const InventoryImportPage = defineAsyncComponent(
+    () => import('../../warehouse/pages/InventoryImportPage.vue'),
+);
+const isImportOpen = ref(false);
 const canManage = computed(
     () =>
         has(PERMISSIONS.CATALOGS_MANAGE) ||
@@ -118,6 +123,13 @@ onMounted(() => {
         </template>
         <template #actions>
             <VBtn
+                v-if="isArticleCatalog && canManage"
+                variant="outlined"
+                @click="isImportOpen = true"
+            >
+                Importar Excel
+            </VBtn>
+            <VBtn
                 v-if="canManage"
                 color="primary"
                 variant="flat"
@@ -139,6 +151,19 @@ onMounted(() => {
             @remove="removeArticle"
         />
     </RecordListPanel>
+    <InventoryImportPage
+        v-if="isImportOpen && session.user.value"
+        :resource="ARTICLE_IMPORT_RESOURCE"
+        :user-id="session.user.value.id"
+        :can-read-suppliers="false"
+        :can-edit-data="canManage"
+        :can-adjust="false"
+        initial-supplier-id=""
+        :initial-search="query.search"
+        @close="isImportOpen = false"
+        @saved="list.load()"
+        @unauthorized="onDenied(401)"
+    />
     <CatalogEditorPage
         v-if="editor"
         :catalog="catalog"

@@ -1,12 +1,22 @@
 import { getDb } from '../../../repository/baseRepository.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
-import { INVENTORY_IMPORT_LIMITS as limits, INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
+import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_LIMITS as limits, INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
 import { INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { findWasteMaterialTemplates } from '../wastes/wasteMaterialService.js';
 import { authorizeInventoryImport, importUnitLabel } from './inventoryImportConfig.js';
 import { processInventoryWorkbook } from './inventoryWorkbookService.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
+import { articleImportSnapshot } from './articleImportService.js';
+
+const loadMaterialCatalogs = async db => ({
+    presentations: await db.presentation.findMany({
+        where: { isActive: true }, orderBy: { name: 'asc' }, take: processing.maxCatalogRows, select: { name: true }
+    }),
+    units: (await db.unitMeasure.findMany({
+        where: { isActive: true }, orderBy: { name: 'asc' }, take: processing.maxCatalogRows, select: { name: true, symbol: true }
+    })).map(importUnitLabel)
+});
 
 export const createInventoryImportTemplate = async ({ user, resource, mode, query = {}, signal }) => {
     const config = authorizeInventoryImport(user, resource, mode);
@@ -15,6 +25,26 @@ export const createInventoryImportTemplate = async ({ user, resource, mode, quer
     if ((supplierId && (typeof supplierId !== 'string' || !UUID_V4_PATTERN.test(supplierId)))
         || typeof search !== 'string' || search.length > limits.maxSearchLength) throw new InventoryImportError();
     const db = getDb();
+    if (resource === ARTICLE_IMPORT_RESOURCE) {
+        let rows = [];
+        if (config.mode === modes.UPDATE) {
+            const articles = await db.material.findMany({
+                where: search ? { name: { contains: search, mode: 'insensitive' } } : {},
+                take: limits.maxRows + 1, orderBy: [{ name: 'asc' }, { id: 'asc' }],
+                select: { id: true, version: true, name: true, type: true, base: true, height: true,
+                    presentation: { select: { name: true } }, unitMeasure: { select: { name: true, symbol: true } } }
+            });
+            if (articles.length > limits.maxRows) throw new InventoryImportError('LIMIT');
+            if (!articles.length) throw new InventoryImportError('VALIDATION', { hint: 'No hay artículos en la consulta.' });
+            rows = articles.map(item => {
+                const { presentation, unit, ...snapshot } = articleImportSnapshot(item);
+                return { ...snapshot, id: item.id, expectedVersion: item.version,
+                    presentationName: presentation, unitLabel: unit };
+            });
+        }
+        const catalogs = await loadMaterialCatalogs(db);
+        return processInventoryWorkbook({ action: 'template', config, rows, catalogs }, signal);
+    }
     const catalogs = { suppliers: [], presentations: [], units: [], materials: [], reasons: [] };
     let rows = [];
     if (config.mode !== modes.CREATE) {
@@ -66,8 +96,7 @@ export const createInventoryImportTemplate = async ({ user, resource, mode, quer
                 catalogs.materials = references.data.map(material => `${material.id} | ${material.name} | ${material.base ?? ''} × ${material.height ?? ''} | ${material.presentation.name}`);
             }
         } else {
-            catalogs.presentations = await db.presentation.findMany({ where: { isActive: true }, orderBy: { name: 'asc' }, take: processing.maxCatalogRows, select: { name: true } });
-            catalogs.units = (await db.unitMeasure.findMany({ where: { isActive: true }, orderBy: { name: 'asc' }, take: processing.maxCatalogRows, select: { name: true, symbol: true } })).map(importUnitLabel);
+            Object.assign(catalogs, await loadMaterialCatalogs(db));
         }
     }
     return processInventoryWorkbook({ action: 'template', config, rows, catalogs }, signal);

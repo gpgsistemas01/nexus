@@ -20,6 +20,7 @@ export const controlDefaults = {
         rounded: 'lg',
         color: 'primary',
         hideDetails: 'auto',
+        autoGrow: true,
     },
     VAutocomplete: {
         autocomplete: 'suppress',

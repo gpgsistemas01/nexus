@@ -6,7 +6,8 @@ import { registerWasteStockEntriesBatch } from '../wastes/wasteStockEntryService
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { materialImportIdentity } from './inventoryImportContext.js';
 import { lockInventoryImportReferences, lockInventoryStockCount, updateImportedSupplierMaterials, updateImportedWastes } from '../../../repository/warehouse/inventoryImportWriteRepository.js';
-import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
+import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
+import { writeArticleImport } from './articleImportService.js';
 
 const createMaterials = async ({ tx, config, rows, context, userId }) => {
     const identities = new Map(context.identities);
@@ -61,6 +62,9 @@ const createWastes = async ({ tx, rows, context, userId }) => {
 // Las reglas y conversiones son las de los formularios; el lote agrupa las escrituras dentro de su única tx.
 export const writeInventoryImport = async ({ tx, config, rows, context, userId }) => {
     const changed = rows.filter(row => row.action !== actions.UNCHANGED);
+    if (config.resource === ARTICLE_IMPORT_RESOURCE) {
+        return changed.length ? writeArticleImport({ tx, config, rows: changed, context }) : new Map();
+    }
     if (config.mode === modes.ADJUST) {
         await lockInventoryStockCount({ tx, context });
         const references = config.type

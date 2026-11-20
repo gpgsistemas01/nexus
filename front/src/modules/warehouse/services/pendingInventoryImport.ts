@@ -1,12 +1,11 @@
 import { ClientError } from '../../../shared/clientError.js';
 import { UUID_V4_PATTERN } from '@nexus/input-validation';
 import { isRecord } from '../../../shared/utils/isRecord.js';
-import type { InventoryResource } from '../inventory.js';
-import type { PendingInventoryImport } from '../inventoryImport.js';
+import type { InventoryImportResource, PendingInventoryImport } from '../inventoryImport.js';
 
 export const pendingInventoryImport = (
     userId: string,
-    resource: InventoryResource,
+    resource: InventoryImportResource,
     storage: Storage = localStorage,
 ) => {
     const key = `nexus:inventory-import:${userId}:${resource}`;

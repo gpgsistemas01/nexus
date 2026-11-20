@@ -10,10 +10,11 @@ import { createMaterialDtoForRegister, createMaterialDtoForEdit } from '../../..
 import { createWasteDtoForRegister, createWasteDtoForEdit } from '../../../dtos/wasteDTO.js';
 import { loadInventoryImportContext, importKey, importCatalogValue, materialImportIdentity, wasteImportIdentity } from './inventoryImportContext.js';
 import { validateInventoryStockCountRows } from './inventoryStockCountValidationService.js';
-import { INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
+import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
 import { errorMap } from '../../../messages/codeMessages.js';
 import { isAppError } from '../../../errors/AppError.js';
+import { validateArticleImportRows } from './articleImportService.js';
 
 const snapshot = item => ({
     name: item.name, minStock: Number(item.minStock),
@@ -24,8 +25,18 @@ const offerSnapshot = item => ({ minStock: Number(item.minStock), maxUnitCost: i
 const offerEditable = dto => ({ minStock: dto.minStock, maxUnitCost: dto.maxUnitCost, isActive: dto.isActive });
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const issue = (field, message, code = errorMap.inventoryImport.VALIDATION) => ({ field, message, code });
+const summarize = rows => ({
+    total: rows.length, creates: rows.filter(row => row.action === actions.CREATE).length,
+    updates: rows.filter(row => row.action === actions.UPDATE).length,
+    unchanged: rows.filter(row => row.action === actions.UNCHANGED).length,
+    errors: rows.filter(row => row.action === actions.ERROR).length
+});
 
 export const validateInventoryImportRows = async ({ db, config, rows }) => {
+    if (config.resource === ARTICLE_IMPORT_RESOURCE) {
+        const articles = await validateArticleImportRows({ db, config, rows });
+        return { ...articles, summary: summarize(articles.rows) };
+    }
     // Las columnas de consulta no se convierten en captura.
     const captureRows = config.mode === modes.CREATE ? rows.map(input => ({ ...input,
         values: Object.fromEntries(Object.entries(input.values).filter(([key]) => !config.readonlyFields.includes(key)))
@@ -199,10 +210,5 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
             proposed.set(identity, row.id);
         }
     }
-    return { context, rows: results, summary: {
-        total: results.length, creates: results.filter(row => row.action === actions.CREATE).length,
-        updates: results.filter(row => row.action === actions.UPDATE).length,
-        unchanged: results.filter(row => row.action === actions.UNCHANGED).length,
-        errors: results.filter(row => row.action === actions.ERROR).length
-    } };
+    return { context, rows: results, summary: summarize(results) };
 };

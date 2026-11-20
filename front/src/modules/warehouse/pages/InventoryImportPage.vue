@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import type { InventoryImportResource } from '../inventoryImport.js';
 import { computed, ref } from 'vue';
 import { INVENTORY_IMPORT_MODES as modes } from '@nexus/inventory-imports';
 import InventoryImportDialog from '../components/InventoryImportDialog.vue';
 import { useInventoryImport } from '../composables/useInventoryImport.js';
 import { useRemoteOptions } from '../composables/useRemoteOptions.js';
-import type { InventoryResource } from '../inventory.js';
 
 const props = defineProps<{
-    resource: InventoryResource;
+    resource: InventoryImportResource;
     userId: string;
     canReadSuppliers: boolean;
     canEditData: boolean;

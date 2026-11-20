@@ -1,9 +1,12 @@
 import type { InventoryResource } from './inventory.js';
 import {
+    ARTICLE_IMPORT_RESOURCE,
     INVENTORY_IMPORT_MODES,
     INVENTORY_IMPORT_STATUSES,
     INVENTORY_IMPORT_ROW_ACTIONS,
 } from '@nexus/inventory-imports';
+
+export type InventoryImportResource = InventoryResource | typeof ARTICLE_IMPORT_RESOURCE;
 
 export type InventoryImportMode =
     (typeof INVENTORY_IMPORT_MODES)[keyof typeof INVENTORY_IMPORT_MODES];
@@ -30,7 +33,7 @@ export interface InventoryImportPreview {
 export interface InventoryImportBatch {
     id: string;
     version: number;
-    resource: InventoryResource;
+    resource: InventoryImportResource;
     mode: InventoryImportMode;
     status: (typeof INVENTORY_IMPORT_STATUSES)[keyof typeof INVENTORY_IMPORT_STATUSES];
     filename: string;
@@ -47,6 +50,7 @@ export interface PendingInventoryImport {
 export const IMPORT_FIELD_LABELS: Record<string, string> = {
     sourceMaterial: 'Material de referencia',
     name: 'Nombre',
+    type: 'Tipo',
     minStock: 'Stock mínimo',
     maxUnitCost: 'Costo máximo unitario',
     isActive: 'Activo',

@@ -169,8 +169,9 @@ permisos, importación y regularización con recuperación, compras y salidas co
 cambios de saldo, existencias y conflictos de versión. Conserva recorridos
 representativos de Artículos, Movimientos, alta desde selector y captura adaptable.
 El alta de existencia verifica que el stock mínimo se envíe en el vínculo con el
-proveedor. Una clave común por SHA cancela la ejecución duplicada cuando el mismo
-commit activa push y pull request.
+proveedor. La concurrencia agrupa por evento, referencia, SHA y suite. El push
+comprueba el commit de la rama y el pull request comprueba su combinación con la
+rama base. Una ejecución repetida sólo reemplaza a otra del mismo grupo.
 
 Las variantes de anchura, recurso y error, el CRUD del directorio comercial y de
 identidad, y las comprobaciones específicas de reportes y selectores permanecen en

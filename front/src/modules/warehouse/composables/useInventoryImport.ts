@@ -11,15 +11,15 @@ import { useFileExport } from '../../../shared/composables/useFileExport.js';
 import { inventoryImportService } from '../services/inventoryImportService.js';
 import { pendingInventoryImport } from '../services/pendingInventoryImport.js';
 import { isInventoryImportMode } from '../inventoryImport.js';
-import type { InventoryResource } from '../inventory.js';
 import type {
     InventoryImportBatch,
     InventoryImportMode,
+    InventoryImportResource,
     PendingInventoryImport,
 } from '../inventoryImport.js';
 
 export const useInventoryImport = (options: {
-    resource: InventoryResource;
+    resource: InventoryImportResource;
     userId: string;
     initialMode?: InventoryImportMode;
     availableModes?: () => readonly InventoryImportMode[];

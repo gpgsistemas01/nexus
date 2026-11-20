@@ -153,7 +153,6 @@ const emit = defineEmits<{
                 <VTextarea
                     label="Observaciones"
                     rows="4"
-                    auto-grow
                     :maxlength="FORM_FIELD_LIMITS.OBSERVATIONS"
                     :model-value="values.observations"
                     :error-messages="errors.observations"

@@ -63,7 +63,6 @@ const update = (value: string | boolean) => {
         :disabled="isDisabled"
         :error-messages="error"
         rows="2"
-        auto-grow
         @update:model-value="update($event ?? '')"
         @blur="emit('blur')"
     />
@@ -74,6 +73,7 @@ const update = (value: string | boolean) => {
         :name="field.name"
         :type="field.type === 'number' ? 'number' : 'text'"
         :model-value="field.displayValue ?? String(value)"
+        :title="!field.type ? (field.displayValue ?? String(value)) : undefined"
         :readonly="field.isReadOnly"
         :class="{ 'consultation-field': field.isReadOnly }"
         :disabled="isDisabled"

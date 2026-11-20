@@ -176,7 +176,12 @@ const loadWhenVisible = (isVisible: boolean) => {
             v-if="selectedTitle"
             #selection
         >
-            {{ selectedTitle }}
+            <span
+                class="selected-option"
+                :title="selectedTitle"
+            >
+                {{ selectedTitle }}
+            </span>
         </template>
         <template #no-data>
             <div
@@ -239,6 +244,11 @@ const loadWhenVisible = (isVisible: boolean) => {
 </template>
 
 <style scoped>
+.selected-option {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
 .catalog-status {
     display: flex;
     justify-content: center;

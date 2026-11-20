@@ -63,16 +63,18 @@ todas sus asignaciones activas.
 
 Pulse un encabezado habilitado para ordenar y cambie el tamaño de página para ver
 más registros. En teléfonos (hasta 599 px), cada registro se presenta como ficha con
-sus campos identificados. Desde 600 px se muestra la tabla. Entre 600 y 899 px, si no
-caben todas las columnas, desplázate dentro de la tabla con la barra inferior o los
-controles de flecha superiores; la columna identificadora permanece fija y la página
-no se desplaza horizontalmente. Desde 900 px las columnas vuelven a ajustarse para
-aprovechar el espacio disponible. Use los encabezados o el selector para ordenar.
+sus campos identificados. Desde 600 px se muestra la tabla. Cuando no caben todas
+las columnas, use la barra inferior, los botones de flecha o el teclado al enfocar
+la tabla. El desplazamiento ocurre dentro de la tabla y mantiene el tamaño de
+letra. La columna de identificación y las acciones permanecen visibles cuando
+la tabla las tiene fijas. Use los encabezados o el selector para ordenar.
 Al final de las fichas o la tabla se indica cuántos registros contiene la página actual; el
 selector **Registros por página** permite cambiar ese límite.
 Las fichas de todas las tablas conservan sus acciones e inputs, incluidos los detalles
 de compras y salidas y las asignaciones de personas.
-Los formularios distribuyen los campos según el ancho disponible.
+Los formularios distribuyen los campos según el ancho disponible. Las opciones
+seleccionadas con nombres largos pueden ocupar varias líneas. **Observaciones**
+crece al escribir. Con ratón, arrastre su esquina inferior para ajustar la altura.
 
 En los desplegables, la opción seleccionada se distingue por el fondo y una
 marca de verificación. Al salir de un campo de fecha, se muestra **día/mes/año**

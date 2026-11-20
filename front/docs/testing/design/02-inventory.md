@@ -8,6 +8,11 @@
 
 ## Pruebas de Almacén
 
+`RF-CAT-032` se comprueba con dos recorridos. La integración HTTP prueba
+plantillas de alta y edición reales, control de versión, protección con proveedor
+y ausencia de ofertas y movimientos. La prueba de navegador comprueba la
+selección de operación, la confirmación y la recarga de Artículos.
+
 `DP-VUE-IMP-001` incluye el aviso explícito de que validar no guarda filas y un
 duplicado bloquea todo el lote. Chromium verifica el número de fila coincidente,
 la descarga del informe y la ausencia del botón de confirmación. Si la confirmación

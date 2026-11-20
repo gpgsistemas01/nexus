@@ -7,6 +7,7 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VPagination } from 'vuetify/components/VPagination';
 import { VSelect } from 'vuetify/components/VSelect';
 import {
+    ARTICLE_IMPORT_RESOURCE,
     INVENTORY_IMPORT_MODES as modes,
     INVENTORY_IMPORT_MODE_LABELS,
     INVENTORY_IMPORT_LIMITS as limits,
@@ -14,12 +15,16 @@ import {
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import { IMPORT_FIELD_LABELS, isInventoryImportMode } from '../inventoryImport.js';
-import type { ImportValue, InventoryImportBatch, InventoryImportMode } from '../inventoryImport.js';
-import type { InventoryResource } from '../inventory.js';
+import type {
+    ImportValue,
+    InventoryImportBatch,
+    InventoryImportMode,
+    InventoryImportResource,
+} from '../inventoryImport.js';
 import type { LookupState } from '../../../shared/lookup.js';
 
 const props = defineProps<{
-    resource: InventoryResource;
+    resource: InventoryImportResource;
     mode: InventoryImportMode;
     availableModes: readonly InventoryImportMode[];
     batch: InventoryImportBatch | null;
@@ -66,6 +71,23 @@ const modeOptions = computed(() =>
     })),
 );
 const modeLabel = computed(() => INVENTORY_IMPORT_MODE_LABELS[props.mode]);
+const isArticle = computed(() => props.resource === ARTICLE_IMPORT_RESOURCE);
+const operationHint = computed(() => {
+    if (isArticle.value)
+        return props.mode === modes.CREATE
+            ? 'Registra materiales y consumibles en el catálogo sin crear existencias.'
+            : 'Descarga los artículos con sus IDs y versiones. Si tienen proveedor vinculado, edita sólo el nombre.';
+
+    if (props.mode === modes.CREATE)
+        return 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.';
+
+    if (props.mode === modes.ADJUST)
+        return 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.';
+
+    return props.resource === 'wastes'
+        ? 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y conserva las columnas grises.'
+        : 'Descarga los registros con sus IDs y versiones. Edita el mínimo, costo o estado por proveedor y conserva las columnas grises.';
+});
 const supplierLabel = computed(() =>
     props.mode === modes.CREATE
         ? 'Limitar proveedores disponibles'
@@ -79,20 +101,27 @@ const supplierHint = computed(() =>
         : 'La plantilla incluirá sólo los registros asociados a este proveedor. Déjalo vacío para incluir todos.',
 );
 const showSearch = computed(() => props.mode !== modes.CREATE || props.resource === 'wastes');
+const names = {
+    materials: 'materiales',
+    consumables: 'consumibles',
+    wastes: 'mermas',
+    [ARTICLE_IMPORT_RESOURCE]: 'artículos',
+};
 const searchLabel = computed(() =>
     props.mode === modes.CREATE
         ? 'Buscar material de referencia por nombre'
-        : `Filtrar ${props.resource === 'wastes' ? 'mermas' : props.resource === 'materials' ? 'materiales' : 'consumibles'} por nombre`,
+        : `Filtrar ${names[props.resource]} por nombre`,
 );
 const searchHint = computed(() =>
-    props.mode === modes.CREATE
-        ? 'Reduce las opciones de Material de referencia en Catalogos para el proveedor elegido; no filtra filas de merma.'
-        : 'Incluye sólo registros cuyo nombre contenga este texto. Déjalo vacío para incluir todos; combinado con proveedor ayuda a acotar plantillas de más de 500 filas.',
+    isArticle.value
+        ? 'Incluye artículos cuyo nombre contenga este texto.'
+        : props.mode === modes.CREATE
+          ? 'Reduce las opciones de Material de referencia en Catalogos para el proveedor elegido; no filtra filas de merma.'
+          : 'Incluye sólo registros cuyo nombre contenga este texto. Déjalo vacío para incluir todos; combinado con proveedor ayuda a acotar plantillas de más de 500 filas.',
 );
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
 );
-const names = { materials: 'materiales', consumables: 'consumibles', wastes: 'mermas' };
 const actions = {
     create: 'Nuevo',
     update: 'Actualizar',
@@ -167,17 +196,7 @@ const selectMode = (value: unknown) => {
                 class="mb-4"
                 @update:model-value="selectMode"
             />
-            <p class="mb-4">
-                {{
-                    mode === modes.CREATE
-                        ? 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.'
-                        : mode === modes.ADJUST
-                          ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
-                          : resource === 'wastes'
-                            ? 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y conserva las columnas grises.'
-                            : 'Descarga los registros con sus IDs y versiones. Edita el mínimo, costo o estado por proveedor y conserva las columnas grises.'
-                }}
-            </p>
+            <p class="mb-4">{{ operationHint }}</p>
             <p class="mb-4">
                 Todas las filas realizan la operación seleccionada. Descarga su plantilla y
                 selecciona esa misma operación al cargarla. Un duplicado o error bloquea todo el
@@ -188,15 +207,28 @@ const selectMode = (value: unknown) => {
                 variant="tonal"
                 class="mb-4"
             >
-                Las columnas grises son referencias que debes conservar sin editar; las blancas son
-                los campos que puedes capturar para esta operación. La hoja
-                <strong>Catalogos</strong>
-                contiene opciones para las listas desplegables, no registros de inventario. Elige la
-                opción completa tal como aparece; si incluye un ID, no lo escribas por separado.
-                <template v-if="mode === modes.CREATE">
-                    En Alta de Materiales/Consumibles, Proveedor sólo limita las opciones de esa
-                    lista y no las filas nuevas. En Alta de Mermas, es obligatorio y determina los
-                    materiales disponibles como referencia.
+                <template v-if="isArticle">
+                    En
+                    <strong>Datos</strong>
+                    , usa las opciones de
+                    <strong>Catalogos</strong>
+                    . Captura base y altura juntas cuando correspondan.
+                    <template v-if="mode === modes.UPDATE">
+                        Conserva las columnas grises de ID y versión.
+                    </template>
+                </template>
+                <template v-else>
+                    Las columnas grises son referencias que debes conservar sin editar; las blancas
+                    son los campos que puedes capturar para esta operación. La hoja
+                    <strong>Catalogos</strong>
+                    contiene opciones para las listas desplegables, no registros de inventario.
+                    Elige la opción completa tal como aparece; si incluye un ID, no lo escribas por
+                    separado.
+                    <template v-if="mode === modes.CREATE">
+                        En Alta de Materiales/Consumibles, Proveedor sólo limita las opciones de esa
+                        lista y no las filas nuevas. En Alta de Mermas, es obligatorio y determina
+                        los materiales disponibles como referencia.
+                    </template>
                 </template>
             </VAlert>
             <VAlert
@@ -205,11 +237,16 @@ const selectMode = (value: unknown) => {
                 variant="tonal"
                 class="mb-4"
             >
-                En edición y ajuste, Proveedor y Nombre determinan qué registros entran en la
-                plantilla; no cambian los datos. Déjalos vacíos para incluir todos. Se incluyen
-                hasta {{ limits.maxRows }} filas; si hay más, acota con esos filtros y descarga
-                grupos separados. No se entrega una plantilla parcial. Cada archivo también debe
-                pesar como máximo {{ limits.maxBytes / (1024 * 1024) }} MiB.
+                <template v-if="isArticle">
+                    Filtra por nombre para incluir sólo los artículos que vas a editar.
+                </template>
+                <template v-else>
+                    En edición y ajuste, Proveedor y Nombre determinan qué registros entran en la
+                    plantilla. Déjalos vacíos para incluir todos.
+                </template>
+                Se incluyen hasta {{ limits.maxRows }} filas; si hay más, acota con esos filtros y
+                descarga grupos separados. No se entrega una plantilla parcial. Cada archivo también
+                debe pesar como máximo {{ limits.maxBytes / (1024 * 1024) }} MiB.
             </VAlert>
             <div class="template-controls">
                 <div class="template-fields">
@@ -277,7 +314,11 @@ const selectMode = (value: unknown) => {
                 variant="tonal"
                 class="mb-4"
             >
-                Importación confirmada. El inventario se actualizó.
+                {{
+                    isArticle
+                        ? 'Importación confirmada. El catálogo de artículos se actualizó.'
+                        : 'Importación confirmada. El inventario se actualizó.'
+                }}
             </VAlert>
             <VAlert
                 v-else-if="['CANCELED', 'EXPIRED'].includes(batch.status)"
@@ -309,7 +350,7 @@ const selectMode = (value: unknown) => {
                     errores.
                 </p>
                 <VAlert
-                    v-if="mode === 'update' && resource !== 'wastes'"
+                    v-if="mode === modes.UPDATE && !isArticle && resource !== 'wastes'"
                     type="info"
                     variant="tonal"
                     class="mb-4"

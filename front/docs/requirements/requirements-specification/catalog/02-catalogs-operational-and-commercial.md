@@ -39,6 +39,7 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 
 | RF-CAT-030 | Nexus debe permitir al Personal de almacén y al Administrador con material-catalogs:manage consultar, buscar y paginar la tabla Material desde Almacén → Artículos, con filtros combinables por tipo, presentación y unidad de medida, incluyendo ambos tipos sin ofertas duplicadas; crear identidades sin proveedor, costo ni stock, y editar todos sus datos con expectedVersion mientras no tengan proveedores vinculados. Con proveedor vinculado, sólo el nombre es editable. Las compras y salidas conservan los nombres y las especificaciones de sus partidas. Puede eliminar el artículo si no tiene proveedores vinculados ni referencias de inventario. | Implementado |
 | RF-CAT-031 | El alta en Almacén debe seleccionar artículo y proveedor por ID y capturar stock mínimo, costo máximo, disponibilidad, cantidad inicial y observaciones. La identidad procede del catálogo; el modal auxiliar usa el catálogo de materiales para registrar el artículo faltante, sin requerir proveedor previo ni crear existencias o vínculo hasta confirmar el formulario principal. | Implementado |
+| RF-CAT-032 | Nexus debe permitir a quien administre Artículos importar un XLSX de alta o edición de catálogo. La edición conserva ID y versión y, con proveedor vinculado, sólo permite cambiar el nombre. Se valida todo el lote antes de confirmar. Un error impide aplicar cualquier fila. La importación opera sobre la tabla Material. | Implementado |
 
 ## Criterios de alta de artículos
 

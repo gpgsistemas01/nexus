@@ -18,7 +18,7 @@ on:
           - essential
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.event_name == 'workflow_dispatch' && inputs.browser_suite || 'automatic' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}-${{ github.sha }}-${{ inputs.browser_suite || 'automatic' }}
   cancel-in-progress: true
 
 jobs:

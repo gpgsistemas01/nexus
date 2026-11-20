@@ -185,7 +185,6 @@ const emit = defineEmits<{
                         :disabled="isSubmitting"
                         :error-messages="errors.observations"
                         rows="4"
-                        auto-grow
                         @update:model-value="emit('update', 'observations', $event ?? '')"
                         @blur="emit('blur', 'observations')"
                     />

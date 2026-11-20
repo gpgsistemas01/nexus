@@ -188,7 +188,8 @@
         "enum": [
           "materials",
           "consumables",
-          "wastes"
+          "wastes",
+          "articles"
         ]
       },
       "mode": {
