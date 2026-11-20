@@ -2,8 +2,61 @@ import { expect, test } from '@playwright/test';
 import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { mockPurchases } from './purchaseFixtures.js';
 import { ids, pageOf } from '../fixtures/inventory.js';
-import { personData } from '../fixtures/records.js';
+import { personData, supplierData } from '../fixtures/records.js';
 import { purchaseItem } from '../fixtures/purchases.js';
+
+test('compras: muestra el nombre completo del proveedor en alta y consulta', async ({ page }) => {
+  const { document } = await mockPurchases(page);
+  const name = 'Comercializadora de Materiales y Suministros Industriales del Centro de México';
+  document.supplierName = name;
+  await page.route('**/api/warehouse/suppliers?**', (route) =>
+    route.fulfill({ json: pageOf([{ ...supplierData, tradeName: name }]) }),
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/compras/materiales');
+  await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
+  const editor = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
+  const supplier = editor.getByRole('combobox', { name: 'Proveedor', exact: true });
+  await supplier.click();
+  await page.getByRole('option', { name, exact: true }).click();
+
+  const selection = editor.locator('.v-autocomplete__selection').filter({ hasText: name });
+  await expect(selection).toHaveCSS('opacity', '1');
+  const geometry = await selection.evaluate((element) => {
+    const range = element.ownerDocument.createRange();
+    range.selectNodeContents(element.querySelector('.v-autocomplete__selection-text')!);
+    const text = range.getBoundingClientRect();
+    const field = element.closest('.v-field')!.getBoundingClientRect();
+    return {
+      lines: range.getClientRects().length,
+      fits: text.bottom <= field.bottom && text.right <= field.right,
+    };
+  });
+  expect(geometry.lines).toBeGreaterThan(1);
+  expect(geometry.fits).toBe(true);
+  await supplier.fill('Suministros');
+  await expect(supplier).toHaveValue('Suministros');
+  await editor.getByRole('button', { name: 'Regresar', exact: true }).click();
+
+  await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+  const detail = page.getByRole('dialog', { name: 'Ver compra - Folio COM-001', exact: true });
+  const field = detail.getByRole('textbox', { name: 'Proveedor', exact: true });
+  await expect(field).toHaveValue(name);
+  await expect(field).toHaveAttribute('readonly');
+  expect(
+    await field.evaluate((element) => {
+      const fieldStyle = getComputedStyle(element);
+      return (
+        element.clientHeight >
+          parseFloat(fieldStyle.lineHeight) +
+            parseFloat(fieldStyle.paddingTop) +
+            parseFloat(fieldStyle.paddingBottom) &&
+        element.scrollHeight <= element.clientHeight + 1 &&
+        element.scrollWidth <= element.clientWidth
+      );
+    }),
+  ).toBe(true);
+});
 
 test('compras: usa fichas en móvil y tabla desplazable desde 600 px', async ({ page }) => {
   await mockPurchases(page);
@@ -172,7 +225,6 @@ for (const [path, title, item] of [
         'Altura',
         'Cantidad',
         'Unidad',
-        'Costo unitario',
         'Monto s/ IVA',
         'Monto c/ IVA',
       ]);
@@ -181,7 +233,7 @@ for (const [path, title, item] of [
       ).toHaveAttribute('colspan', '2');
       await expect(
         dialog.getByRole('columnheader', { name: 'Conversión', exact: true }),
-      ).toHaveAttribute('colspan', '3');
+      ).toHaveAttribute('colspan', '2');
       await expect(dialog.getByLabel('Totales de compra')).toContainText('$232');
       expect(writes).toHaveLength(0);
       await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -596,7 +648,7 @@ for (const [path, label] of [
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
       const row = dialog.locator('tbody tr').first();
       await expect(row).toContainText('Total del detalle');
-      await expect(row).toContainText('$200');
+      await expect(row.getByRole('cell', { name: '$150.00', exact: true })).toHaveCount(2);
       await expect(dialog.getByLabel('Totales de compra')).toContainText('$174');
       await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
       await expect(dialog).toBeHidden();

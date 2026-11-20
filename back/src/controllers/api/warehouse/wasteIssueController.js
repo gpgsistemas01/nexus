@@ -6,6 +6,7 @@ import {
     createWasteIssueHeaderDtoForEdit,
     createWasteIssueDtoForReturn
 } from '../../../dtos/wasteIssueDTO.js';
+import { presentIssueDocument, presentIssueReturn } from '../../../dtos/issueDTO.js';
 import {
     createWasteIssue,
     findAllWasteIssues,
@@ -21,7 +22,9 @@ import { getIssueDataTableQuery } from '../../../utils/issueQueryUtils.js';
 import { buildDocumentReadHandler } from './documentReadHandler.js';
 import { WasteIssueNotFound } from '../../../errors/warehouse/wasteIssueError.js';
 
-export const getWasteIssue = buildDocumentReadHandler({ findDocuments: findAllWasteIssues, dataKey: 'wasteIssue', NotFound: WasteIssueNotFound });
+export const getWasteIssue = buildDocumentReadHandler({
+    findDocuments: findAllWasteIssues, dataKey: 'wasteIssue', NotFound: WasteIssueNotFound, present: presentIssueDocument
+});
 
 const DATATABLE_COLUMNS = [
     'referenceNumber',
@@ -59,7 +62,7 @@ export const registerWasteIssue = async (req, res) => {
     if (sanitizedWasteIssueDto.supplyImmediately) emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' });
 
     return res.status(201).json({
-        wasteIssue,
+        wasteIssue: presentIssueDocument(wasteIssue, req.user),
         code: successCodeMessages.CREATED_WASTE_ISSUE
     });
 };
@@ -76,7 +79,7 @@ export const editWasteIssue = async (req, res) => {
     });
 
     return res.status(200).json({
-        wasteIssue,
+        wasteIssue: presentIssueDocument(wasteIssue, req.user),
         code: successCodeMessages.UPDATED_WASTE_ISSUE
     });
 };
@@ -93,7 +96,7 @@ export const editWasteIssueHeader = async (req, res) => {
     });
 
     return res.status(200).json({
-        wasteIssue,
+        wasteIssue: presentIssueDocument(wasteIssue, req.user),
         code: successCodeMessages.UPDATED_WASTE_ISSUE
     });
 };
@@ -111,7 +114,7 @@ export const editWasteIssueDetails = async (req, res) => {
     emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' });
 
     return res.status(200).json({
-        wasteIssue,
+        wasteIssue: presentIssueDocument(wasteIssue, req.user),
         code: successCodeMessages.UPDATED_WASTE_ISSUE
     });
 };
@@ -129,7 +132,7 @@ export const registerWasteIssueDetailReturn = async (req, res) => {
     emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' });
 
     return res.status(200).json({
-        wasteIssueReturn,
+        wasteIssueReturn: presentIssueReturn(wasteIssueReturn, req.user),
         code: successCodeMessages.UPDATED_WASTE_ISSUE
     });
 };

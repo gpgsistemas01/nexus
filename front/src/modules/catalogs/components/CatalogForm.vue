@@ -3,6 +3,7 @@ import { VSelect } from 'vuetify/components/VSelect';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { LookupState, LookupItem } from '../../../shared/lookup.js';
 import { VTextField } from 'vuetify/components/VTextField';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import { ARTICLE_TYPE_OPTIONS } from '../catalog.js';
@@ -63,7 +64,7 @@ const emit = defineEmits<{
         @submit="emit('submit')"
         @reload="emit('reload')"
     >
-        <VTextField
+        <WrappingTextField
             label="Nombre"
             name="name"
             :model-value="values.name"

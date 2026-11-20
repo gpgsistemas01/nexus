@@ -22,7 +22,7 @@
     opacity: 1;
 }
 
-.warehouse-control.v-textarea
+.warehouse-control.v-textarea:not(.wrapping-text-field)
     textarea.v-field__input:not(.v-textarea__sizer, [readonly], [disabled]) {
     resize: vertical;
 }

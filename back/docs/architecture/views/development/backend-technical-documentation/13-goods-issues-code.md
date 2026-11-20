@@ -11,7 +11,7 @@ flowchart TB
     H["Handlers compartidos<br/>goodsIssueHandlers.js"]
     A["Adaptadores por tipo<br/>material / consumable"]
     S["services<br/>goodsIssueService.js<br/>detailReturns/"]
-    D["DTO<br/>goodsIssueDTO.js"]
+    D["DTO<br/>goodsIssueDTO.js<br/>issueDTO.js"]
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>movementService.js<br/>y colaboradores"]
     P["baseRepository.js<br/>getDb(tx)"]
     A --> S
@@ -31,7 +31,7 @@ flowchart TB
 | Handlers compartidos · goodsIssueHandlers.js | `src/controllers/api/warehouse/goodsIssues/`<br/>`shared/goodsIssueHandlers.js` |
 | Adaptadores por tipo · material / consumable | `src/services/warehouse/goodsIssues/`<br/>`consumables/consumableGoodsIssueService.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`materials/materialGoodsIssueService.js` |
 | services · goodsIssueReturnService.js · goodsIssueDetailSelect.js · y colaboradores | `src/services/warehouse/goodsIssues/`<br/>`detailReturns/goodsIssueReturnService.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueDetailSelect.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueFulfillmentRules.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueHelpers.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueService.js` |
-| DTO · goodsIssueDTO.js | `src/dtos/goodsIssueDTO.js` |
+| DTO · goodsIssueDTO.js · issueDTO.js | `src/dtos/goodsIssueDTO.js`, `src/dtos/issueDTO.js` |
 | Colaboradores de dominio · referenceNumberService.js · movementService.js · y colaboradores | `src/services/document/`<br/>`referenceNumberService.js`<br/>`src/services/inventory/movementService.js`<br/>`src/services/inventory/stockHelpers.js`<br/>`src/services/warehouse/`<br/>`fulfillmentStatusService.js`<br/>`src/services/warehouse/issues/`<br/>`issueFulfillmentRules.js`<br/>`src/services/warehouse/issues/`<br/>`issueHeaderService.js`<br/>`src/services/warehouse/materials/`<br/>`supplierMaterialService.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
 
@@ -45,6 +45,10 @@ por ID usan el mismo filtro. En ediciones se comprueba el área original al leer
 bloqueo y el destino antes de modificar el encabezado o los detalles. Auxiliar y
 Coordinador de Almacén, y Administrador del sistema, tienen alcance de todas las
 áreas; los demás accesos autorizados se limitan a sus áreas asignadas.
+
+`issueDTO.js` incluye `maxUnitCost` en los detalles sólo con `inventory:costs-read`.
+El dato proviene del detalle persistido. Una regularización histórica devuelve
+`null` cuando el costo está sin verificar.
 
 El surtido reside en `goodsIssueDetailService.js`; los adaptadores de materiales
 y consumibles lo importan directamente. `goodsIssueService.js` conserva consultas,

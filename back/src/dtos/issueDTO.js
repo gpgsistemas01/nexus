@@ -1,3 +1,32 @@
+import { PERMISSIONS } from '../shared/constants/permissions.js';
+
+const canReadCosts = user => user?.permissions?.includes(PERMISSIONS.INVENTORY_COSTS_READ);
+
+const omitCost = ({ maxUnitCost, ...fields }) => fields;
+
+const omitDetailCosts = detail => ({
+    ...omitCost(detail),
+    ...(detail.waste && { waste: omitCost(detail.waste) })
+});
+
+export const presentIssueDocument = (issue, user) => {
+    const showCosts = canReadCosts(user);
+
+    if (!issue?.details || (showCosts && !issue.historicalDeliveryBatchId)) return issue;
+
+    return {
+        ...issue,
+        details: issue.details.map(detail => ({
+            ...omitDetailCosts(detail),
+            ...(showCosts && { maxUnitCost: null })
+        }))
+    };
+};
+
+export const presentIssueReturn = (result, user) => !result?.detail || canReadCosts(user)
+    ? result
+    : { ...result, detail: omitDetailCosts(result.detail) };
+
 export const createIssueHeaderDto = (body = {}) => ({
     requesterId: body.requesterId.trim(),
     advisorId: body.advisorId.trim(),

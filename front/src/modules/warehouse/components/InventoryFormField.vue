@@ -3,6 +3,7 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import type { InventoryFieldSpec } from '../inventoryFormTypes.js';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
@@ -66,14 +67,14 @@ const update = (value: string | boolean) => {
         @update:model-value="update($event ?? '')"
         @blur="emit('blur')"
     />
-    <VTextField
+    <component
+        :is="field.type === 'number' ? VTextField : WrappingTextField"
         v-else
         :label="field.label"
         :aria-label="field.label"
         :name="field.name"
-        :type="field.type === 'number' ? 'number' : 'text'"
+        :type="field.type === 'number' ? 'number' : undefined"
         :model-value="field.displayValue ?? String(value)"
-        :title="!field.type ? (field.displayValue ?? String(value)) : undefined"
         :readonly="field.isReadOnly"
         :class="{ 'consultation-field': field.isReadOnly }"
         :disabled="isDisabled"

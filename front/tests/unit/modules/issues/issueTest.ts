@@ -19,6 +19,8 @@ import { mapIssueFormToRequest } from '../../../../src/modules/issues/mappers/is
 import {
   createIssueDetailDraft,
   addIssueDetail,
+  getIssueDetailAmounts,
+  getIssueTotals,
 } from '../../../../src/modules/issues/issueDetails.js';
 import {
   resolveIssueEditMode,
@@ -393,6 +395,7 @@ describe('salidas Vue: contratos y modos', () => {
       name: 'Lona',
       itemId: ids.material,
       convertedQuantity: 200,
+      maxUnitCost: 100,
     });
     const merged = addIssueDetail([line], { ...line, quantity: 3, convertedQuantity: 300 });
     expect(merged[0]).toMatchObject({ quantity: 5, convertedQuantity: 500 });
@@ -401,6 +404,26 @@ describe('salidas Vue: contratos y modos', () => {
       addIssueDetail([{ ...line, quantity: 2.1 }], { ...line, quantity: 2.2 })[0]!.quantity,
     ).toBe(4.3);
     expect(addIssueDetail([line], { ...line, supplierId: 'another' })).toHaveLength(2);
+  });
+  it('valora la cantidad convertida y el surtido neto, y excluye partidas canceladas', () => {
+    const line = document().details[0]!;
+    const partial = { ...line, suppliedQuantity: 1.25, returnedQuantity: 0.5 };
+    const fractional = {
+      ...line,
+      quantity: 0.75,
+      convertedQuantity: 0.75,
+      suppliedQuantity: 0.5,
+      maxUnitCost: 25,
+    };
+    expect(getIssueDetailAmounts(partial)).toEqual({ requested: 20000, delivered: 7500 });
+    expect(getIssueTotals([partial, fractional, { ...line, isCanceled: true }])).toEqual({
+      requested: 20018.75,
+      delivered: 7512.5,
+    });
+    expect(getIssueTotals([{ ...partial, maxUnitCost: null }])).toEqual({
+      requested: null,
+      delivered: null,
+    });
   });
   it.each(['materials', 'consumables'] as const)(
     'opciones de %s admiten inventario sin type y rechazan contradicciones explícitas',

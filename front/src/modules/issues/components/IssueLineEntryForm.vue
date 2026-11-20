@@ -6,6 +6,7 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VBtn } from 'vuetify/components/VBtn';
 import { isPiecePresentation } from '@nexus/piece-quantity';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
+import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
 const props = defineProps<{
@@ -75,7 +76,7 @@ const supplierName = computed(() => {
             />
         </template>
         <template #presentation>
-            <VTextField
+            <WrappingTextField
                 label="Presentación"
                 :model-value="presentation"
                 readonly

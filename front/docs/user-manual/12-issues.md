@@ -116,6 +116,13 @@ si cambia un dato del encabezado.
 **Consultar salida** muestra estado, cantidades surtidas y devueltas, pendiente
 de surtir y saldo entregado de cada partida. **Regresar** cierra sin cambios.
 
+<!-- manual:any inventory:costs-read -->
+En Sistemas y Almacén, cada partida muestra **Costo unitario**, **Monto solicitado**
+y **Monto entregado neto**. Este último descuenta las devoluciones. **Totales de salida**
+suma los importes de las partidas activas. Para Mermas, los montos son de referencia
+y usan el costo vigente. El guion indica que el costo o importe no está disponible.
+<!-- manual:end -->
+
 | Cumplimiento | Qué significa |
 | --- | --- |
 | Pendiente | No hay entregas. |

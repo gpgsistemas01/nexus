@@ -241,6 +241,15 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `clear` | `clear: [];` |
 | `refresh` | `refresh: []` |
 
+## RecordTotals.defineProps
+
+**Fuente:** [src/shared/components/RecordTotals.vue](../../../../../src/shared/components/RecordTotals.vue) · línea 2, columna 13. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `label` | `label: string;` |
+| `fields` | `fields: { label: string; value: string }[];` |
+
 ## RemoteSelect.defineProps
 
 **Fuente:** [src/shared/components/RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue) · línea 11, columna 17. **Declaración:** SFC contract.

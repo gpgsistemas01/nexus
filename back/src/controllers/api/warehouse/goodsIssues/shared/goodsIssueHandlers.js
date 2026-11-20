@@ -5,6 +5,7 @@ import {
     createGoodsIssueDtoForReturn,
     createGoodsIssueHeaderDtoForEdit
 } from "../../../../../dtos/goodsIssueDTO.js";
+import { presentIssueDocument, presentIssueReturn } from '../../../../../dtos/issueDTO.js';
 import { successCodeMessages } from "../../../../../shared/constants/apiSuccessCodes.js";
 import { sanitizeEmptyStrings } from '../../../../../utils/formattersUtils.js';
 import { emitInventoryUpdated } from "../../../../../utils/socketUtils.js";
@@ -13,7 +14,9 @@ import { getIssueDataTableQuery } from '../../../../../utils/issueQueryUtils.js'
 import { buildDocumentReadHandler } from '../../documentReadHandler.js';
 import { GoodsIssueNotFound } from '../../../../../errors/warehouse/goodsIssueError.js';
 
-export const buildReadHandler = findDocuments => buildDocumentReadHandler({ findDocuments, dataKey: 'goodsIssue', NotFound: GoodsIssueNotFound });
+export const buildReadHandler = findDocuments => buildDocumentReadHandler({
+    findDocuments, dataKey: 'goodsIssue', NotFound: GoodsIssueNotFound, present: presentIssueDocument
+});
 
 const DATATABLE_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
 
@@ -45,7 +48,7 @@ export const buildRegisterHandler = (createGoodsIssue, inventoryContext) => asyn
     if (sanitizedGoodsIssueDto.supplyImmediately) emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-supplied' });
 
     return res.status(200).json({
-        goodsIssue,
+        goodsIssue: presentIssueDocument(goodsIssue, req.user),
         code: successCodeMessages.CREATED_GOODS_ISSUE
     });
 };
@@ -62,7 +65,7 @@ export const buildEditHandler = updateGoodsIssue => async (req, res) => {
     });
 
     return res.status(200).json({
-        goodsIssue,
+        goodsIssue: presentIssueDocument(goodsIssue, req.user),
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };
@@ -79,7 +82,7 @@ export const buildHeaderHandler = updateGoodsIssueHeader => async (req, res) => 
     });
 
     return res.status(200).json({
-        goodsIssue,
+        goodsIssue: presentIssueDocument(goodsIssue, req.user),
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };
@@ -97,7 +100,7 @@ export const buildDetailsHandler = ({ updateGoodsIssueDetails, inventoryContext 
     emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-supplied' });
 
     return res.status(200).json({
-        goodsIssue,
+        goodsIssue: presentIssueDocument(goodsIssue, req.user),
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };
@@ -117,7 +120,7 @@ export const buildReturnHandler = ({ returnGoodsIssueDetail, inventoryContext })
     emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-return-created' });
 
     return res.status(200).json({
-        goodsIssueReturn,
+        goodsIssueReturn: presentIssueReturn(goodsIssueReturn, req.user),
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };

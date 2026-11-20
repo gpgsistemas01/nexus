@@ -26,12 +26,7 @@ const emit = defineEmits<{
     cancel: [row: PurchaseDetail];
 }>();
 const numeric = ['base', 'height', 'quantity'] as const;
-const money = [
-    'conversionUnitCost',
-    'costPerUnitType',
-    'netPurchaseAmount',
-    'grossPurchaseAmount',
-] as const;
+const money = ['costPerUnitType', 'netPurchaseAmount', 'grossPurchaseAmount'] as const;
 const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
     { title: 'Material', key: 'name', align: 'start' as const, nowrap: true, fixed: 'start' },
     {
@@ -59,7 +54,6 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
         children: [
             { title: 'Cantidad', key: 'convertedQuantity', align: 'end' as const },
             { title: 'Unidad', key: 'unitMeasure', align: 'start' as const },
-            { title: 'Costo unitario', key: 'conversionUnitCost', align: 'end' as const },
         ],
     },
     {
@@ -90,23 +84,8 @@ const cardValue = (item: PurchaseDetail, key: string) => {
     if (key === 'convertedQuantity')
         return convertedQuantityText(item.convertedQuantity, item.unitMeasure);
 
-    if (
-        [
-            'conversionUnitCost',
-            'costPerUnitType',
-            'netPurchaseAmount',
-            'grossPurchaseAmount',
-        ].includes(key)
-    )
-        return currencyText(
-            item[
-                key as
-                    | 'conversionUnitCost'
-                    | 'costPerUnitType'
-                    | 'netPurchaseAmount'
-                    | 'grossPurchaseAmount'
-            ],
-        );
+    const moneyKey = money.find((column) => column === key);
+    if (moneyKey) return currencyText(item[moneyKey]);
 
     if (key === 'costScope') return item.costIsTotal ? 'Total del detalle' : 'Por presentación';
 

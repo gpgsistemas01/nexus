@@ -118,6 +118,7 @@ const openReturnDialog = (line: IssueDetail) => {
         :resource="resource"
         :selects="selects"
         :can-create-client="canCreateClient"
+        :can-read-costs="has(PERMISSIONS.INVENTORY_COSTS_READ)"
         :can-supply-on-create="editor.canSupplyOnCreate.value"
         :supply-immediately="editor.supplyImmediately.value"
         @update:supply-immediately="editor.supplyImmediately.value = $event"

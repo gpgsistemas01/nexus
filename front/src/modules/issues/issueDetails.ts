@@ -1,6 +1,7 @@
 import { roundTo } from '@nexus/numbers';
 import { isRecord } from '../../shared/utils/isRecord.js';
 import { createUuid } from '../../shared/utils/createUuid.js';
+import { getIssueReturnableQuantity } from './issueRules.js';
 import type { LookupItem } from '../../shared/lookup.js';
 import type { IssueDetail, IssueResource, IssueSupplyChanges } from './issue.js';
 
@@ -25,6 +26,41 @@ export const getIssueDetailsToSupply = (details: IssueDetail[]) =>
     details.filter(
         (detail) => detail.isSupplied && !detail.isOriginallySupplied && !detail.isCanceled,
     );
+
+export const getIssueDetailAmounts = (detail: IssueDetail) => {
+    if (detail.isCanceled) return { requested: null, delivered: null };
+
+    const cost = detail.maxUnitCost;
+    const delivered = getIssueReturnableQuantity(detail);
+    const requestedAmount = cost == null || cost <= 0 ? null : detail.convertedQuantity * cost;
+
+    return {
+        requested: requestedAmount == null ? null : roundTo(requestedAmount, 2),
+        delivered:
+            delivered <= 0
+                ? 0
+                : requestedAmount == null
+                  ? null
+                  : roundTo((requestedAmount * delivered) / detail.quantity, 2),
+    };
+};
+
+export const getIssueTotals = (details: IssueDetail[]) => {
+    let requested: number | null = 0;
+    let delivered: number | null = 0;
+
+    for (const detail of details) {
+        if (detail.isCanceled) continue;
+
+        const amounts = getIssueDetailAmounts(detail);
+        requested =
+            requested == null || amounts.requested == null ? null : requested + amounts.requested;
+        delivered =
+            delivered == null || amounts.delivered == null ? null : delivered + amounts.delivered;
+    }
+
+    return { requested, delivered };
+};
 
 export const updateIssueDetailSupply = (
     details: IssueDetail[],
@@ -54,6 +90,7 @@ export const createIssueDetailDraft = (
     const unit = isRecord(item.unitMeasure) ? item.unitMeasure : {};
     const base = item.base == null ? null : Number(item.base);
     const height = item.height == null ? null : Number(item.height);
+    const cost = Number(data.maxUnitCost);
     return {
         id: createUuid(),
         itemId: String(item.id),
@@ -74,7 +111,7 @@ export const createIssueDetailDraft = (
         suppliedQuantity: 0,
         quantityToSupply: '',
         returnedQuantity: 0,
-        maxUnitCost: null,
+        maxUnitCost: Number.isFinite(cost) && cost > 0 ? cost : null,
         projectConvertedQuantity: '',
         isSupplied: false,
         isOriginallySupplied: false,
