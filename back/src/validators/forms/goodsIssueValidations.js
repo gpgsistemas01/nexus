@@ -3,7 +3,6 @@ import {
     validateIssueProjectQuantityDetailsEdition
 } from "../fields/fieldsValidator.js";
 import { issueHeaderValidation, issueImmediateSupplyValidation } from './issueValidations.js';
-export { issueReturnValidation as goodsIssueReturnValidation } from './issueReturnValidations.js';
 
 export const goodsIssueValidation = [
     issueImmediateSupplyValidation,
@@ -19,5 +18,3 @@ export const goodsIssueUpdateValidation = [
 export const goodsIssueDetailsValidation = [
     validateIssueProjectQuantityDetailsEdition
 ];
-
-export const goodsIssueHeaderValidation = [...issueHeaderValidation];

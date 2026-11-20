@@ -99,7 +99,10 @@ export const verifyInventoryAccess = async (page: Page, user: SessionUser) => {
     await expect(page.getByRole('columnheader', { name: /Costo/ })).toHaveCount(0);
   if (!user.permissions.includes(P.MATERIALS_WRITE))
     await expect(
-      page.getByRole('button', { name: /Nueva existencia|Editar|Eliminar/, exact: true }),
+      page.getByRole('button', {
+        name: /Nueva existencia|Editar existencia|Eliminar/,
+        exact: true,
+      }),
     ).toHaveCount(0);
   if (!user.permissions.includes(P.MATERIALS_ADJUST_STOCK))
     await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toHaveCount(0);

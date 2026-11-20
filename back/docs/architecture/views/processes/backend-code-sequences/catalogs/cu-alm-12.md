@@ -23,6 +23,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Adjustment` | control | [`wasteStockAdjustmentService.js`](../../../../../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `Stock` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `StockQuantity` | control | [`stockQuantity.js`](../../../../../../src/shared/inventory/stockQuantity.js) |
 | `Movement` | control | [`wasteMovementService.js`](../../../../../../src/services/warehouse/wastes/wasteMovementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
@@ -98,6 +99,7 @@ sequenceDiagram
     participant Adjustment@{ "type": "control" } as wasteStockAdjustmentService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
     participant Stock@{ "type": "control" } as stockHelpers.js
+    participant StockQuantity@{ "type": "control" } as stockQuantity.js
     participant Movement@{ "type": "control" } as wasteMovementService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket@{ "type": "control" } as socketUtils.js
@@ -115,7 +117,7 @@ sequenceDiagram
     Service->>Prisma: tx.waste.findUnique({ where: { id } })
     Service->>Adjustment: registerWasteStockAdjustment({ tx, waste, ...stockAdjustmentDto, userId, include })
     Adjustment->>Adjustment: calculateWasteStockAdjustmentValues({ waste, newStock })
-    Adjustment->>Stock: calculateConvertedQuantity({ currentStock: newStock, base: waste.base, height: waste.height })
+    Adjustment->>StockQuantity: calculateConvertedQuantity({ currentStock: newStock, base: waste.base, height: waste.height })
     Adjustment->>Stock: assertSufficientStock({ material: waste, newStock, newConvertedQuantity })
     Adjustment->>Reference: generateYearlyReferenceNumber({ type, tx })
     Adjustment->>Prisma: tx.wasteStockAdjustment.create({ data })

@@ -1,7 +1,9 @@
 import { getLookupArticle } from '../../shared/utils/articleOptions.js';
 import { inventoryLabels } from './inventoryDisplay.js';
 import { isRollPresentation } from '@nexus/waste-measurements';
-import { isPiecePresentation } from '@nexus/piece-quantity';
+import { getPieceQuantityError, isPiecePresentation } from '@nexus/piece-quantity';
+import { materialOfferCreateValidation } from '@nexus/form-validation';
+import { calculateConvertedQuantity } from '@nexus/stock-quantity';
 import { isRecord } from '../../shared/utils/isRecord.js';
 import { numberText, convertedQuantityText } from '../../shared/utils/formatNumbers.js';
 import type { EditorTarget, InventoryField, InventoryResource } from './inventory.js';
@@ -59,6 +61,7 @@ export const inventorySections = (
     options: {
         template?: LookupItem;
         article?: LookupItem;
+        initialStock?: string;
         presentationName?: string;
         usesMeasurements: boolean;
         isPerPiece?: boolean;
@@ -112,9 +115,17 @@ export const inventorySections = (
         const base = row?.base ?? (article?.base == null ? null : Number(article.base));
         const height = row?.height ?? (article?.height == null ? null : Number(article.height));
         const unitName = row?.unitMeasure ?? String(unit.symbol || unit.name || '—');
+        const initialStock = options.initialStock ?? '0';
+        const initialConvertedQuantity =
+            isCreating &&
+            article &&
+            !materialOfferCreateValidation.newStock(initialStock) &&
+            !getPieceQuantityError(initialStock, options.presentationName)
+                ? calculateConvertedQuantity({ quantity: Number(initialStock), base, height })
+                : null;
 
         sections.identity = {
-            title: 'Artículo y proveedor',
+            title: `${labels.name} y proveedor`,
             fields: isCreating
                 ? [
                       { name: 'materialId', label: labels.name, type: 'lookup', isWide: true },
@@ -126,7 +137,7 @@ export const inventorySections = (
                   ],
         };
         sections.reference = {
-            title: 'Datos del artículo',
+            title: resource === 'consumables' ? 'Datos del consumible' : 'Datos del material',
             fields: [
                 readOnlyField(
                     'presentationId',
@@ -146,64 +157,54 @@ export const inventorySections = (
             ],
         };
         sections.inventory = {
-            title: 'Datos de la existencia',
-            summary:
-                !isCreating && !isStock && row
-                    ? [
-                          { label: labels.currentStock, value: numberText(row.currentStock) },
-                          {
-                              label: 'Cantidad convertida',
-                              value: convertedQuantityText(row.convertedQuantity, unitName),
-                          },
-                      ]
-                    : undefined,
+            title: 'Existencias',
+            summary: isCreating
+                ? [
+                      {
+                          label: 'Cantidad convertida inicial',
+                          value: convertedQuantityText(initialConvertedQuantity, unitName),
+                      },
+                      { label: 'Motivo del movimiento', value: 'Stock inicial' },
+                  ]
+                : [
+                      { label: labels.currentStock, value: numberText(row?.currentStock) },
+                      {
+                          label: 'Cantidad convertida actual',
+                          value: convertedQuantityText(row?.convertedQuantity, unitName),
+                      },
+                  ],
             fields: [
-                { ...costField, isReadOnly: isStock },
+                ...(isCreating || isStock
+                    ? [
+                          {
+                              name: action === 'add-stock' ? 'quantity' : 'newStock',
+                              label:
+                                  action === 'add-stock'
+                                      ? 'Cantidad a agregar'
+                                      : isCreating
+                                        ? 'Cantidad inicial'
+                                        : 'Nuevo stock',
+                              type: 'number',
+                              step: quantityStep,
+                          } satisfies InventoryFieldSpec,
+                      ]
+                    : []),
+                ...(!isStock || row?.maxUnitCost !== undefined
+                    ? [{ ...costField, isReadOnly: isStock }]
+                    : []),
                 { ...stateField, isReadOnly: isStock },
+                ...(action === 'stock'
+                    ? [
+                          {
+                              name: 'reasonId',
+                              label: 'Motivo del ajuste',
+                              type: 'lookup',
+                          } satisfies InventoryFieldSpec,
+                      ]
+                    : []),
+                ...(isCreating || isStock ? [notesField] : []),
             ],
         };
-
-        if (isCreating || isStock) {
-            sections.stock = {
-                title: 'Existencias',
-                summary: isCreating
-                    ? undefined
-                    : [
-                          { label: labels.currentStock, value: numberText(row?.currentStock) },
-                          {
-                              label: 'Cantidad convertida actual',
-                              value: convertedQuantityText(
-                                  row?.convertedQuantity,
-                                  row?.unitMeasure ?? '',
-                              ),
-                          },
-                      ],
-                fields: [
-                    ...(action === 'stock'
-                        ? [
-                              {
-                                  name: 'reasonId' as const,
-                                  label: 'Motivo del ajuste',
-                                  type: 'lookup' as const,
-                              },
-                          ]
-                        : []),
-                    {
-                        name: action === 'add-stock' ? 'quantity' : 'newStock',
-                        label:
-                            action === 'add-stock'
-                                ? 'Cantidad a agregar'
-                                : isCreating
-                                  ? 'Cantidad inicial'
-                                  : 'Nuevo stock',
-                        type: 'number',
-                        step: quantityStep,
-                        hint: isCreating ? `Se registra en ${labels.currentStock}.` : undefined,
-                    },
-                ],
-            };
-            sections.notes = { title: 'Notas del movimiento', fields: [notesField] };
-        }
 
         return SECTION_ORDER.flatMap((id) => {
             const section = sections[id];

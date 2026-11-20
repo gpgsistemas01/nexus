@@ -1,17 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  assertSufficientStock,
-  calculateConvertedQuantity,
-  hasDimensions
-} from '../../../src/services/inventory/stockHelpers.js';
+import { assertSufficientStock } from '../../../src/services/inventory/stockHelpers.js';
+import { calculateConvertedQuantity } from '../../../src/shared/inventory/stockQuantity.js';
 import { GoodsIssueInsufficientStock } from '../../../src/errors/inventory/stockError.js';
 
 describe('stockHelpers', () => {
-  it('detecta dimensiones válidas solo cuando base y altura son mayores a cero', () => {
-    expect(hasDimensions({ base: '2', height: '3' })).toBe(true);
-    expect(hasDimensions({ base: '0', height: '3' })).toBe(false);
-    expect(hasDimensions({ base: null, height: '3' })).toBe(false);
+  it('convierte la cantidad solo cuando ambas dimensiones son mayores a cero', () => {
+    expect(calculateConvertedQuantity({ quantity: 2, base: '2', height: '3' })).toBe(12);
+    expect(calculateConvertedQuantity({ quantity: 2, base: '0', height: '3' })).toBe(2);
+    expect(calculateConvertedQuantity({ quantity: 2, base: null, height: '3' })).toBe(2);
   });
 
   it('calcula cantidad convertida con dimensiones y redondeo normalizado', () => {

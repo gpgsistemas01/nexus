@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
+import { issueHeaderValidation } from '../../../../../../src/validators/forms/issueValidations.js';
+import { issueReturnValidation } from '../../../../../../src/validators/forms/issueReturnValidations.js';
 
 const get = vi.fn();
 const post = vi.fn();
@@ -30,9 +32,9 @@ describe('rutas de salida separadas por contexto', () => {
         expect(post).toHaveBeenCalledWith('/', verifyApiTokenRequired, validators.goodsIssueValidation, validate, manage, handlers[`register${label}GoodsIssue`]);
         for (const [suffix, validation, permission, handler] of [
             ['', validators.goodsIssueUpdateValidation, manage, `edit${label}GoodsIssue`],
-            ['/header', validators.goodsIssueHeaderValidation, manage, `edit${label}GoodsIssueHeader`],
+            ['/header', issueHeaderValidation, manage, `edit${label}GoodsIssueHeader`],
             ['/details', validators.goodsIssueDetailsValidation, supply, `edit${label}GoodsIssueDetails`],
-            ['/details/:detailId/returns', validators.goodsIssueReturnValidation, supply, `register${label}GoodsIssueDetailReturn`]
+            ['/details/:detailId/returns', issueReturnValidation, supply, `register${label}GoodsIssueDetailReturn`]
         ]) {
             expect(patch).toHaveBeenCalledWith(`/:id${suffix}`, verifyApiTokenRequired, validation, validate, permission, handlers[handler]);
         }

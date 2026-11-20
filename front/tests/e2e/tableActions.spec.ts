@@ -8,7 +8,7 @@ for (const width of [390, 960]) {
     await page.setViewportSize({ width, height: 900 });
     await mockWarehouse(page);
     await page.goto('/almacen/materiales');
-    const action = page.getByRole('button', { name: 'Editar', exact: true });
+    const action = page.getByRole('button', { name: 'Editar existencia', exact: true });
     await expect(action).toBeVisible();
     await expect(action).toHaveClass(/bg-filter-action/);
     const deleteAction = page.getByRole('button', { name: 'Eliminar', exact: true });
@@ -25,7 +25,7 @@ for (const width of [390, 960]) {
         expect(buttonBounds?.width).toBeGreaterThanOrEqual(44);
         expect(buttonBounds?.height).toBeGreaterThanOrEqual(44);
       }
-      await actions.getByRole('button', { name: 'Editar', exact: true }).click();
+      await actions.getByRole('button', { name: 'Editar existencia', exact: true }).click();
     } else {
       const table = page.locator('.table-frame--fit-columns .v-table__wrapper').first();
       await expect(table).toBeVisible();

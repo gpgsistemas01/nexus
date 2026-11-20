@@ -114,8 +114,8 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 ## Registrar un material
 
 1. Pulse **Nueva existencia** para abrir **Registrar existencia de material**.
-2. Elija **Proveedor** y **Material**. La búsqueda incluye todo el catálogo, aunque el artículo todavía no tenga proveedor.
-3. Complete **Cantidad inicial**, **Costo máximo unitario**, **Activo** y **Observaciones**.
+2. Elija **Material** y **Proveedor**. La búsqueda incluye todo el catálogo, aunque el artículo todavía no tenga proveedor.
+3. En **Existencias**, capture **Cantidad inicial** y revise **Cantidad convertida inicial**. Complete **Costo máximo unitario**, **Activo** y **Observaciones**. El motivo se asigna como **Stock inicial**.
 4. Pulse **Guardar**. Se vincula el artículo al proveedor y se registra el stock inicial en una sola operación.
 
 Nombre, presentación, unidad, medidas y mínimo pertenecen al catálogo; no se vuelven a capturar aquí. PIEZA exige cantidades enteras; KILOGRAMOS y METRO LINEAL admiten decimales y conservan `1 × 1`.
@@ -139,16 +139,15 @@ sin IVA de las partidas nuevas supera el valor guardado. No duplique la entrada.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
-## Editar una oferta
+## Editar una existencia
 
-1. Localice el registro y pulse **Editar oferta**.
-2. Cambie **Costo máximo unitario** o **Activo**.
+1. Localice el registro y pulse **Editar existencia**.
+2. En **Existencias**, consulte el saldo actual y cambie **Costo máximo unitario** o **Activo**.
 3. Pulse **Guardar** y compruebe el registro actualizado.
 
-El artículo, el proveedor y el saldo se muestran como referencia. Para cambiar
-nombre o stock mínimo, abra **Almacén → Artículos**. Los datos comerciales del proveedor
-se editan en **Directorio comercial → Proveedores**. Los accesos directos aparecen
-si la cuenta puede editar en el módulo correspondiente.
+Use **Editar artículo** para cambiar el nombre o stock mínimo y **Editar proveedor**
+para cambiar sus datos comerciales. Cada botón abre su formulario en un modal
+cuando la cuenta tiene el permiso correspondiente.
 
 ![Edición de oferta con los datos del artículo y el proveedor como referencia.](images/05a-material-offer-edit.png)
 <!-- manual:end -->
@@ -160,7 +159,7 @@ si la cuenta puede editar en el módulo correspondiente.
 motivo; las recepciones se registran en Compras.
 
 1. Pulse **Ajustar stock** en el registro correcto.
-2. Compruebe **Stock actual** y **Cantidad convertida actual**.
+2. En **Existencias**, compruebe **Stock actual** y **Cantidad convertida actual**.
 3. Seleccione **Motivo del ajuste**.
 4. En **Nuevo stock**, escriba el saldo final que debe quedar y capture las
    **Observaciones** que explican la corrección.
@@ -179,7 +178,7 @@ Compruebe el historial en **Movimientos → Materiales**. Ante un conflicto, sig
 **Eliminar** está disponible cuando la oferta tiene stock cero y carece de compras,
 salidas y otros registros de inventario. Revise el proveedor antes de confirmar. El
 artículo se conserva en **Artículos**. Para dejar de usar una oferta con historial en
-operaciones nuevas, desmarque **Activo** en **Editar oferta**.
+operaciones nuevas, desmarque **Activo** en **Editar existencia**.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->
@@ -190,7 +189,7 @@ resultados de la consulta.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
-Al seleccionar el artículo, **Datos del artículo** muestra Base, Altura,
+Al seleccionar el artículo, **Datos del material** muestra Base, Altura,
 Presentación, Unidad de medida y Stock mínimo con los valores de Artículos.
 Son campos de sólo lectura en el alta y la edición. La cantidad inicial se
 registra en **Stock actual**; **Costo máximo unitario** y **Activo** corresponden

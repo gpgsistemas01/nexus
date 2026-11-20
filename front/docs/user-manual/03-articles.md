@@ -3,6 +3,10 @@
 Abra **Almacén → Artículos**. La **Tabla de Artículos** reúne materiales y consumibles
 sin duplicarlos por proveedor. Use la búsqueda, la paginación y el contador para localizar un artículo.
 
+La **existencia** reúne el saldo, el costo y el estado de un material o consumible con
+un proveedor específico. Una merma tiene su propio saldo. Al registrarla, seleccione
+el material de origen.
+
 ![Listado de artículos sin proveedor ni existencia.](images/11a-articles-list.png)
 
 ## Registrar y editar artículos
@@ -19,7 +23,7 @@ La tabla incluye materiales y consumibles una vez por identidad, con tipo, prese
 
 Una compra o salida registrada impide retirar el vínculo de esa oferta, aunque el saldo
 llegue a cero o el documento se cancele. Para dejar de usarla en operaciones nuevas,
-desmarque **Activo** desde **Editar oferta** en Existencias. Las partidas históricas
+desmarque **Activo** desde **Editar existencia** en Existencias. Las partidas históricas
 conservan su artículo, proveedor y especificaciones.
 
 Si necesita cambiar la presentación, unidad o medidas de un artículo con proveedor vinculado, registre otro artículo con los datos correctos. En Catálogos, una presentación o unidad vinculada conserva su nombre y, cuando aplica, su símbolo. Se puede cambiar su estado.

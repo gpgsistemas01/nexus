@@ -22,7 +22,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Service` | control | [`consumableService.js`](../../../../../../src/services/warehouse/consumables/consumableService.js) |
 | `Adjustment` | control | [`adjustmentService.js`](../../../../../../src/services/warehouse/adjustmentService.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
-| `Stock` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `Stock` | control | [`stockQuantity.js`](../../../../../../src/shared/inventory/stockQuantity.js) |
 | `Movement` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Offers` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `SupplierMaterial` | control | [`supplierMaterialStockService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialStockService.js) |
@@ -101,7 +101,7 @@ sequenceDiagram
     participant Service@{ "type": "control" } as consumableService.js
     participant Adjustment@{ "type": "control" } as adjustmentService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
-    participant Stock@{ "type": "control" } as stockHelpers.js
+    participant Stock@{ "type": "control" } as stockQuantity.js
     participant Movement@{ "type": "control" } as movementService.js
     participant SupplierMaterial@{ "type": "control" } as supplierMaterialStockService.js
     participant MaterialService@{ "type": "control" } as materialService.js

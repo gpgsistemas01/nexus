@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { VCol } from 'vuetify/components/VGrid';
 import { VSelect } from 'vuetify/components/VSelect';
-import { VTextField } from 'vuetify/components/VTextField';
+import DateField from '../../../shared/components/DateField.vue';
 import { VAlert } from 'vuetify/components/VAlert';
 import ListFilters from '../../../shared/components/ListFilters.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
@@ -99,7 +99,7 @@ const search = defineModel<string>('search', { required: true });
             cols="12"
             md="6"
         >
-            <VTextField
+            <DateField
                 label="Fecha de inicio"
                 type="date"
                 :model-value="values.startDate"
@@ -111,7 +111,7 @@ const search = defineModel<string>('search', { required: true });
             cols="12"
             md="6"
         >
-            <VTextField
+            <DateField
                 label="Fecha de fin"
                 type="date"
                 :model-value="values.endDate"

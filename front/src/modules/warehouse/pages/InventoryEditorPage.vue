@@ -52,6 +52,7 @@ const sections = computed(() =>
     inventorySections(props.resource, props.target, preview.value, {
         template: editor.selectedTemplate.value,
         article: editor.selectedArticle.value,
+        initialStock: values.newStock,
         presentationName: editor.presentationName.value,
         usesMeasurements: editor.usesMeasurements.value,
         isPerPiece: editor.isPerPiece.value,
@@ -65,7 +66,7 @@ const title = computed(() =>
 );
 const isEditingOffer = props.target.action === 'edit' && props.resource !== 'wastes';
 const context =
-    props.target.row && !isEditingOffer
+    props.target.row && props.resource === 'wastes'
         ? `${props.target.row.name} · ${props.target.row.supplierName} · Stock actual: ${props.target.row.currentStock}`
         : '';
 

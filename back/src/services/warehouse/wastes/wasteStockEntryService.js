@@ -6,7 +6,8 @@ import {
     reserveYearlyReferenceNumbers,
     throwIfReferenceNumberAlreadyExists
 } from '../../document/referenceNumberService.js';
-import { assertPieceQuantity, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { calculateConvertedQuantity } from '../../../shared/inventory/stockQuantity.js';
+import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { applyWasteMovement } from './wasteMovementService.js';
 import { applyWasteStockChanges } from './wasteInventoryService.js';
 

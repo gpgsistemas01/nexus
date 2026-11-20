@@ -7,7 +7,8 @@ import {
 } from "../document/referenceNumberService.js";
 import { toNumber } from '../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
-import { assertPieceQuantity, assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
+import { calculateConvertedQuantity } from '../../shared/inventory/stockQuantity.js';
+import { assertPieceQuantity, assertSufficientStock } from "../inventory/stockHelpers.js";
 import { findSupplierMaterialByIds } from "./materials/supplierMaterialService.js";
 import { adjustSupplierMaterialStock } from "./materials/supplierMaterialStockService.js";
 import { lockSupplierMaterialStock } from "../../repository/warehouse/stockLockRepository.js";
@@ -276,5 +277,3 @@ export const createMaterialStockAdjustmentsBatch = async ({ tx, entries, userId,
     if (balances.length !== entries.length) throw new RecordVersionConflictError();
     return references;
 };
-
-export const createInitialMaterialStockBatch = createMaterialStockAdjustmentsBatch;

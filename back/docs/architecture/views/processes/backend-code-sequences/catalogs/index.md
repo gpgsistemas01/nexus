@@ -7,7 +7,7 @@ Este capítulo forma parte del [catálogo de secuencias del código backend](../
 
 - [`CU-ALM-01` — Consultar materiales](cu-alm-01.md)
 - [`CU-ALM-02` — Crear existencia de material](cu-alm-02.md)
-- [`CU-ALM-03` — Editar oferta de material](cu-alm-03.md)
+- [`CU-ALM-03` — Editar existencia de material](cu-alm-03.md)
 - [`CU-ALM-04` — Retirar oferta de material](cu-alm-04.md)
 - [`CU-ALM-05` — Ajustar existencia de material](cu-alm-05.md)
 - [`CU-ALM-06` — Generar reporte de inventario de materiales](cu-alm-06.md)
@@ -31,7 +31,7 @@ Este capítulo forma parte del [catálogo de secuencias del código backend](../
 - [`CU-ALM-16` — Generar reporte de movimientos de mermas](cu-alm-16.md)
 - [`CU-ALM-17` — Consultar consumibles](cu-alm-17.md)
 - [`CU-ALM-18` — Crear existencia de consumible](cu-alm-18.md)
-- [`CU-ALM-19` — Editar oferta de consumible](cu-alm-19.md)
+- [`CU-ALM-19` — Editar existencia de consumible](cu-alm-19.md)
 - [`CU-ALM-20` — Retirar oferta de consumible](cu-alm-20.md)
 - [`CU-ALM-21` — Ajustar existencia de consumible](cu-alm-21.md)
 - [`CU-ALM-22` — Generar reporte de inventario de consumibles](cu-alm-22.md)

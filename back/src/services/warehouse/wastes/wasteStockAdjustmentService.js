@@ -14,7 +14,8 @@ import {
 } from '../../document/referenceNumberService.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
-import { assertPieceQuantity, assertSufficientStock, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { calculateConvertedQuantity } from '../../../shared/inventory/stockQuantity.js';
+import { assertPieceQuantity, assertSufficientStock } from '../../inventory/stockHelpers.js';
 import { createWasteMovement } from './wasteMovementService.js';
 
 export const calculateWasteStockAdjustmentValues = ({

@@ -42,7 +42,7 @@ for (const profileId of ['impresion-coordinador', 'instalaciones-instalador']) {
         await expect(page.getByRole('columnheader', { name: /Costo/ })).toHaveCount(0);
         await expect(
           page.getByRole('button', {
-            name: /^(Nueva existencia|Nueva existencia|Nueva merma|Editar|Eliminar|Ajustar stock|Agregar stock|Importar Excel|Exportar Excel|Detalles de peso)$/,
+            name: /^(Nueva existencia|Nueva merma|Editar(?: existencia| merma)?|Eliminar|Ajustar stock|Agregar stock|Importar Excel|Exportar Excel|Detalles de peso)$/,
           }),
         ).toHaveCount(0);
         const supplierLookup = page.waitForResponse((response) => {

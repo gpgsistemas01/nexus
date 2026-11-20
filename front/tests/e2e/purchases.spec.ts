@@ -252,6 +252,7 @@ test('compras: edición de encabezado conserva proveedor, observaciones y detall
   await expect(dialog.getByLabel('Fecha y hora de recepción:', { exact: true })).toHaveValue(
     '2026-10-22T12:30',
   );
+  await expect(dialog.getByText('22/10/2026 12:30', { exact: true })).toBeVisible();
   await dialog.getByLabel('Observaciones', { exact: true }).fill('Encabezado actualizado');
   await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
   await expect(dialog).toBeHidden();
@@ -359,6 +360,7 @@ test('compras: filtros aplicados, paginación y reporte filtrado sin límites', 
     .fill('aplicado');
   await page.getByLabel('Fecha de inicio', { exact: true }).fill('2026-10-01');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await expect(page.getByText('01/10/2026', { exact: true })).toBeVisible();
   await expect.poll(() => reads.at(-1)?.searchParams.get('search')).toBe('aplicado');
   await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
   await expect(page.getByRole('cell', { name: 'COM-011', exact: true })).toBeVisible();
@@ -409,6 +411,7 @@ test(
     await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
     await acknowledgeFormError(page, 'No se pudo completar');
     await expect(report.getByLabel('Mes del reporte', { exact: true })).toHaveValue('2026-10');
+    await expect(report.getByText('10/2026', { exact: true })).toBeVisible();
     expect(attempts).toBe(3);
     available = true;
     const download = page.waitForEvent('download');

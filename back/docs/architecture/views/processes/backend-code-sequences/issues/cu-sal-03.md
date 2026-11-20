@@ -25,7 +25,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `DTO` | control | [`goodsIssueDTO.js`](../../../../../../src/dtos/goodsIssueDTO.js) |
 | `Header` | control | [`issueHeaderService.js`](../../../../../../src/services/warehouse/issues/issueHeaderService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
-| `ValidationRules` | control | [`goodsIssueValidations.js`](../../../../../../src/validators/forms/goodsIssueValidations.js) |
+| `ValidationRules` | control | [`issueValidations.js`](../../../../../../src/validators/forms/issueValidations.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `FileMaterialGoodsIssueController` | control | [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
@@ -87,7 +87,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as materialGoodsIssueApiRoute.js
     participant Auth@{ "type": "control" } as authMiddleware.js
-    participant ValidationRules@{ "type": "control" } as goodsIssueValidations.js
+    participant ValidationRules@{ "type": "control" } as issueValidations.js
     participant Validator@{ "type": "control" } as validatorMiddleware.js
     participant Controller@{ "type": "control" } as goodsIssueHandlers.js
 
@@ -97,7 +97,7 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>ValidationRules: goodsIssueHeaderValidation[] — cadena ejecutada por Express
+    Route->>ValidationRules: issueHeaderValidation[] — cadena ejecutada por Express
     Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }

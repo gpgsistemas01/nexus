@@ -23,7 +23,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Operation` | control | [`serviceErrorHandler.js`](../../../../../../src/services/serviceErrorHandler.js) |
 | `Fulfillment` | control | [`wasteIssueFulfillmentService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js) |
 | `Header` | control | [`issueHeaderService.js`](../../../../../../src/services/warehouse/issues/issueHeaderService.js) |
-| `Stock` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `Stock` | control | [`stockQuantity.js`](../../../../../../src/shared/inventory/stockQuantity.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`wasteIssueValidations.js`](../../../../../../src/validators/forms/wasteIssueValidations.js) |
@@ -99,7 +99,7 @@ sequenceDiagram
     participant Operation@{ "type": "control" } as serviceErrorHandler.js
     participant Fulfillment@{ "type": "control" } as wasteIssueFulfillmentService.js
     participant Header@{ "type": "control" } as issueHeaderService.js
-    participant Stock@{ "type": "control" } as stockHelpers.js
+    participant Stock@{ "type": "control" } as stockQuantity.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler@{ "type": "control" } as app.js

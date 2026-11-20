@@ -248,8 +248,6 @@ export const issueReturnValidation = {
     observations: (value) => validateTextOptional(value, FORM_FIELD_LIMITS.OBSERVATIONS, 'Las observaciones')
 };
 
-export const goodsIssueReturnValidation = issueReturnValidation;
-
 export const clientValidation = {
     name: (value) => validateText({
         name: value,

@@ -32,8 +32,8 @@ deben ser 1. Conserve los IDs/versiones incluidos para editar o ajustar.
 ## Registrar un consumible
 
 1. Pulse **Nueva existencia**.
-2. Elija **Proveedor** y **Consumible** del catálogo completo.
-3. Complete **Cantidad inicial**, **Costo máximo unitario**, **Activo** y **Observaciones**.
+2. Elija **Consumible** y **Proveedor** del catálogo completo.
+3. En **Existencias**, capture **Cantidad inicial** y revise **Cantidad convertida inicial**. Complete **Costo máximo unitario**, **Activo** y **Observaciones**. El motivo se asigna como **Stock inicial**.
 4. Pulse **Guardar** y compruebe el saldo. Se crea la relación con el proveedor sin duplicar el artículo.
 
 Presentación, unidad, medidas y mínimo provienen del catálogo. PIEZA exige enteros; KILOGRAMOS y METRO LINEAL admiten decimales y representan una unidad `1 × 1`.
@@ -58,12 +58,13 @@ partidas nuevas supera el valor guardado.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
-## Editar una oferta
+## Editar una existencia
 
-Pulse **Editar oferta**, cambie **Costo máximo unitario** o **Activo** y pulse
-**Guardar**. El artículo, el proveedor y el saldo se muestran como referencia.
-Para cambiar nombre o stock mínimo, abra **Almacén → Artículos**. Los datos comerciales se editan en
-**Directorio comercial → Proveedores**.
+Pulse **Editar existencia**. En **Existencias**, consulte el saldo actual, cambie
+**Costo máximo unitario** o **Activo** y pulse **Guardar**.
+Use **Editar artículo** para cambiar el nombre o stock mínimo y **Editar proveedor**
+para cambiar sus datos comerciales. Cada botón abre su formulario en un modal
+cuando la cuenta tiene el permiso correspondiente.
 
 ![Edición de oferta con datos de referencia y campos editables.](images/07a-consumable-offer-edit.png)
 <!-- manual:end -->
@@ -74,7 +75,7 @@ Para cambiar nombre o stock mínimo, abra **Almacén → Artículos**. Los datos
 Para corregir un conteo:
 
 1. Pulse **Ajustar stock** en el consumible correcto.
-2. Revise el saldo actual y seleccione **Motivo del ajuste**.
+2. En **Existencias**, revise el saldo actual y seleccione **Motivo del ajuste**.
 3. Escriba el saldo final en **Nuevo stock**, no la diferencia.
 4. Explique la corrección en **Observaciones** y pulse **Guardar**.
 5. Compruebe el saldo actualizado y, cuando corresponda, su movimiento.
@@ -89,7 +90,7 @@ para entregas. Los ajustes corrigen el saldo; no sustituyen esos documentos.
 **Eliminar** está disponible cuando la oferta tiene stock cero y carece de compras,
 salidas y otros registros de inventario. Revise el proveedor antes de confirmar. El
 artículo se conserva en **Artículos**. Para dejar de usar una oferta con historial en
-operaciones nuevas, desmarque **Activo** en **Editar oferta**.
+operaciones nuevas, desmarque **Activo** en **Editar existencia**.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->

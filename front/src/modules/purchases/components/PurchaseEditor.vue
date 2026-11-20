@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
+import DateField from '../../../shared/components/DateField.vue';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VRadioGroup } from 'vuetify/components/VRadioGroup';
 import { VRadio } from 'vuetify/components/VRadio';
@@ -162,7 +163,7 @@ const emit = defineEmits<{
                     cols="12"
                     md="6"
                 >
-                    <VTextField
+                    <DateField
                         label="Fecha y hora de recepción:"
                         type="datetime-local"
                         hint="Hora de Ciudad de México."

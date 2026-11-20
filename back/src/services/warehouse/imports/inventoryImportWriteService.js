@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { prepareMaterialData } from '../materials/materialHelpers.js';
-import { createInitialMaterialStockBatch, createMaterialStockAdjustmentsBatch } from '../adjustmentService.js';
+import { createMaterialStockAdjustmentsBatch } from '../adjustmentService.js';
 import { registerWasteStockAdjustmentsBatch } from '../wastes/wasteStockAdjustmentService.js';
 import { registerWasteStockEntriesBatch } from '../wastes/wasteStockEntryService.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
@@ -35,7 +35,7 @@ const createMaterials = async ({ tx, config, rows, context, userId }) => {
     }
     if (materials.length) await tx.material.createMany({ data: materials });
     await tx.supplierMaterial.createMany({ data: offers });
-    await createInitialMaterialStockBatch({ tx, entries: initialStock, userId, reasonId: context.initialStockReason.id });
+    await createMaterialStockAdjustmentsBatch({ tx, entries: initialStock, userId, reasonId: context.initialStockReason.id });
     return saved;
 };
 
