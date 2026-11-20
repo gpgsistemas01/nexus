@@ -1,7 +1,7 @@
 import { computed, watch } from 'vue';
 import { materialCatalogValidation, materialCatalogEditValidation } from '@nexus/form-validation';
 import { isFixedUnitPresentation } from '@nexus/waste-measurements';
-import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
+import { useCatalogMeasurementLookups } from './useCatalogMeasurementLookups.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import { useForm } from 'vee-validate';
 import { createCatalogValidation } from '@nexus/form-validation';
@@ -49,7 +49,6 @@ export const useCatalogEditor = (options: {
             unitMeasureId: row?.unitMeasureId ?? '',
             base: row?.base ?? '',
             height: row?.height ?? '',
-            minStock: row?.minStock ?? '',
         },
         validationSchema: Object.fromEntries(
             Object.entries(rules).map(([field, rule]) => [
@@ -69,34 +68,9 @@ export const useCatalogEditor = (options: {
         form.defineField(field, { validateOnModelUpdate: false });
     }
 
-    const lookup = (name: 'presentations' | 'unit-measures') =>
-        useRemoteLookup(
-            async (search, page, signal) => {
-                const result = await catalogService.list(
-                    name,
-                    { search, page, length: 20 },
-                    signal,
-                );
-                return {
-                    ...result,
-                    data: result.data.map((entry) => ({
-                        id: entry.id,
-                        title:
-                            name === 'unit-measures'
-                                ? `${entry.name} (${entry.symbol})`
-                                : entry.name,
-                        isDisabled: entry.isActive === false,
-                        data: { ...entry },
-                    })),
-                };
-            },
-            computed(() => catalog === 'materials' && canEditIdentity),
-        );
-
-    const lookups = {
-        presentationId: lookup('presentations'),
-        unitMeasureId: lookup('unit-measures'),
-    };
+    const lookups = useCatalogMeasurementLookups(
+        computed(() => catalog === 'materials' && canEditIdentity),
+    );
     const selectedPresentation = useSelectedOption(
         lookups.presentationId.items,
         () => form.values.presentationId ?? '',

@@ -1033,7 +1033,8 @@ it.each(DEMO_PROFILES)(
     expect(materials).not.toContain('## Compras');
     expect(materials).not.toContain('## Salidas');
     expect(consumables).toContain('| Consumible |');
-    expect(consumables).not.toContain('Base y Altura');
+    expect(consumables).toContain('KILOGRAMOS y METRO LINEAL usan `1 × 1`');
+    expect(consumables).not.toContain('| Base y Altura |');
     expect(wastes).toContain('| Merma |');
     expect(wastes).not.toContain('| Material |');
     expect(wastes).not.toContain('## Compras');

@@ -35,7 +35,7 @@ export const getImportConfig = (resource, mode = modes.CREATE) => {
     const editable = mode === modes.ADJUST ? ['newStock', 'reasonId', 'observations']
         : mode === modes.UPDATE ? resource === resources.WASTES
             ? ['name', 'minStock', 'maxUnitCost', 'isActive']
-            : ['maxUnitCost', 'isActive']
+            : ['minStock', 'maxUnitCost', 'isActive']
             : ['supplierCode', 'name', 'minStock', 'maxUnitCost', 'isActive', 'observations', 'newStock', 'initialQuantity',
                 ...(resource === resources.WASTES ? ['materialId', 'base', 'height', ...weights.map(([, key]) => key)]
                     : ['presentationName', 'unitLabel', 'base', 'height'])];

@@ -7,13 +7,14 @@ import { useListEditor } from '../../../shared/composables/useListEditor.js';
 import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import CatalogTable from '../components/CatalogTable.vue';
+import ArticleCatalogFilters from '../components/ArticleCatalogFilters.vue';
 import CatalogEditorPage from './CatalogEditorPage.vue';
-import { catalogDefinition } from '../catalog.js';
+import { catalogDefinition, EMPTY_ARTICLE_FILTERS } from '../catalog.js';
 import { useCatalogList } from '../composables/useCatalogList.js';
 import { catalogService } from '../services/catalogService.js';
 import { confirmAction } from '../../../shared/ui/feedback.js';
 import { ApiError } from '../../../shared/http/apiError.js';
-import type { CatalogEntry, CatalogName, CatalogTarget } from '../catalog.js';
+import type { ArticleFilters, CatalogEntry, CatalogName, CatalogTarget } from '../catalog.js';
 
 const props = defineProps<{ catalog: CatalogName }>();
 const { has, onDenied } = usePageAccess();
@@ -29,7 +30,17 @@ const canManage = computed(
 const definition = catalogDefinition(props.catalog);
 const list = useCatalogList(props.catalog, onDenied);
 const { query, rows, total, isLoading, error } = list;
-const { search, applySearch, clearSearch } = useListSearch(list);
+const isArticleCatalog = props.catalog === 'materials';
+const filters = ref<ArticleFilters>({ ...EMPTY_ARTICLE_FILTERS });
+const { search, applySearch, clearSearch } = useListSearch(list, () =>
+    isArticleCatalog ? filters.value : {},
+);
+
+const clearFilters = () => {
+    filters.value = { ...EMPTY_ARTICLE_FILTERS };
+    clearSearch(isArticleCatalog ? filters.value : {});
+};
+
 const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor<CatalogTarget>({
     canOpen: () => canManage.value,
     reload: list.load,
@@ -94,10 +105,17 @@ onMounted(() => {
         :is-loading="isLoading"
         :error="error"
         :loading-label="catalog === 'materials' ? 'Cargando artículos…' : 'Cargando catálogo…'"
+        :has-active-filters="isArticleCatalog && Object.values(filters).some(Boolean)"
         @search="applySearch"
-        @clear="clearSearch"
+        @clear="clearFilters"
         @refresh="list.load"
     >
+        <template
+            v-if="isArticleCatalog"
+            #filters
+        >
+            <ArticleCatalogFilters v-model="filters" />
+        </template>
         <template #actions>
             <VBtn
                 v-if="canManage"
@@ -115,7 +133,7 @@ onMounted(() => {
             :query="query"
             :is-loading="isLoading"
             :has-symbol="definition.fields.includes('symbol')"
-            :is-material="catalog === 'materials'"
+            :is-material="isArticleCatalog"
             @query="list.applyQuery"
             @edit="openEditor({ action: 'edit', row: $event })"
             @remove="removeArticle"

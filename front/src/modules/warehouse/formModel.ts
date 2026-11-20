@@ -33,7 +33,7 @@ export const initialInventoryValues = (target: EditorTarget): InventoryValues =>
         materialId: '',
         base: String(row?.base ?? ''),
         height: String(row?.height ?? ''),
-        minStock: String(row?.minStock ?? ''),
+        minStock: String(row?.minStock ?? (target.action === 'create' ? '0' : '')),
         maxUnitCost: String(row ? (row.maxUnitCost ?? '') : '0'),
         isActive: row?.isActive ?? true,
         newStock: String(row?.currentStock ?? '0'),
@@ -115,6 +115,7 @@ export const inventoryRules = (
         : action === 'edit'
           ? {
                 supplierId: materialEditValidation.supplierId,
+                minStock: materialEditValidation.minStock,
                 maxUnitCost: materialEditValidation.maxUnitCost,
                 isActive: materialEditValidation.isActive,
             }
@@ -138,7 +139,6 @@ export const buildInventoryPayload = (
             unitMeasureId: String(values.unitMeasureId),
             base: values.base === '' ? null : Number(values.base),
             height: values.height === '' ? null : Number(values.height),
-            ...(values.minStock === '' ? {} : { minStock: Number(values.minStock) }),
             isActive: true,
         };
 
@@ -160,6 +160,7 @@ export const buildInventoryPayload = (
         return {
             supplierId: row!.supplierId,
             expectedVersion: row!.version,
+            minStock: Number(values.minStock),
             isActive: Boolean(values.isActive),
             maxUnitCost: Number(values.maxUnitCost),
         };
@@ -197,6 +198,7 @@ export const buildInventoryPayload = (
     return {
         materialId: String(values.materialId),
         supplierId: String(values.supplierId),
+        minStock: Number(values.minStock),
         isActive: Boolean(values.isActive),
         maxUnitCost: Number(values.maxUnitCost),
         newStock: Number(values.newStock),

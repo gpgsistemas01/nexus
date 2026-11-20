@@ -3,7 +3,7 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
-import type { InventoryFieldSpec } from '../formFields.js';
+import type { InventoryFieldSpec } from '../inventoryFormTypes.js';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
 const props = defineProps<{

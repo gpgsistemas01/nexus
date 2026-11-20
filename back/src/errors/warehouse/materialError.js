@@ -109,7 +109,7 @@ export class MaterialCatalogDeleteConflict extends AppError {
 
 export class MaterialFieldsManagedInCatalog extends AppError {
     constructor() {
-        super('El nombre y el stock mínimo se editan en Almacén → Artículos.', 'MATERIAL_FIELDS_MANAGED_IN_CATALOG', 409);
+        super('El nombre del artículo se edita en Almacén → Artículos.', 'MATERIAL_FIELDS_MANAGED_IN_CATALOG', 409);
     }
 }
 

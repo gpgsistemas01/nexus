@@ -14,6 +14,7 @@ import type {
     IssueValues,
     IssueField,
     IssueMode,
+    IssueResource,
     IssueDetail,
     IssueSupplyChanges,
     IssueHeaderSelect,
@@ -30,7 +31,7 @@ defineProps<{
     canEditHeader: boolean;
     canEditDetails: boolean;
     mode: IssueMode;
-    itemLabel: string;
+    resource: IssueResource;
     selects: IssueHeaderSelect[];
     canCreateClient: boolean;
     canSupplyOnCreate: boolean;
@@ -183,7 +184,7 @@ const emit = defineEmits<{
         <IssueDetailsTable
             :rows="values.details"
             :mode="mode"
-            :item-label="itemLabel"
+            :resource="resource"
             :is-disabled="isSubmitting"
             @remove="emit('remove', $event)"
             @supply="(id, changes) => emit('supply', id, changes)"

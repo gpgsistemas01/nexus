@@ -62,8 +62,8 @@ describe('exportación paginada de inventario', () => {
       const type = index % 2 ? 'CONSUMABLE' : 'MATERIAL';
       offers.push({ id: randomUUID(), materialId: id, supplierId: ids.supplier,
         currentStock: index >= materialCount - 2 ? 0 : index + 1, convertedQuantity: index + 0.5,
-        maxUnitCost: 1.234567, isActive: index < materialCount - 4, type, base: index + 0.25 });
-      return { id, name: `IT STREAM ${suffix}`, base: index + 0.25, height: 2, minStock: 3,
+        minStock: 3, maxUnitCost: 1.234567, isActive: index < materialCount - 4, type, base: index + 0.25 });
+      return { id, name: `IT STREAM ${suffix}`, base: index + 0.25, height: 2,
         presentationId: ids.presentation, unitMeasureId: ids.unit, type };
     });
     await prisma.material.createMany({ data: materials });

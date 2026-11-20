@@ -33,10 +33,10 @@ deben ser 1. Conserve los IDs/versiones incluidos para editar o ajustar.
 
 1. Pulse **Nueva existencia**.
 2. Elija **Consumible** y **Proveedor** del catálogo completo.
-3. En **Existencias**, capture **Cantidad inicial** y revise **Cantidad convertida inicial**. Complete **Costo máximo unitario**, **Activo** y **Observaciones**. El motivo se asigna como **Stock inicial**.
+3. En **Existencias**, capture **Cantidad inicial** y revise **Cantidad convertida inicial**. Complete **Stock mínimo**, **Costo máximo unitario**, **Activo** y **Observaciones**. El motivo se asigna como **Stock inicial**.
 4. Pulse **Guardar** y compruebe el saldo. Se crea la relación con el proveedor sin duplicar el artículo.
 
-Presentación, unidad, medidas y mínimo provienen del catálogo. PIEZA exige enteros; KILOGRAMOS y METRO LINEAL admiten decimales y representan una unidad `1 × 1`.
+Presentación, unidad y medidas provienen del catálogo. Cada proveedor tiene su propio mínimo. Use **0** para desactivar su alerta de stock bajo. PIEZA exige enteros; KILOGRAMOS y METRO LINEAL admiten decimales y representan una unidad `1 × 1`.
 
 Si falta el consumible, **escriba el nombre en Consumible** y pulse **Registrar consumible «texto escrito»** o presione **Enter** en el selector después de la búsqueda. Complete el modal; el tipo Consumible está definido por el módulo y no necesita elegir antes un proveedor. Al guardar queda seleccionado sin registrar todavía stock ni proveedor. Guarde el formulario principal para completar el vínculo y la existencia. Corrija artículos existentes desde **Almacén → Artículos**.
 
@@ -52,7 +52,7 @@ guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
 ![Alta de existencia con los datos del consumible seleccionado como referencia.](images/07-consumable-create.png)
 
 Compruebe presentación y unidad antes de guardar. Desde una compra, la existencia
-se recibe al guardar la compra; no la duplique como cantidad inicial. La recepción
+se recibe al guardar la compra. Una oferta nueva inicia con mínimo **0**. La recepción
 eleva el costo máximo de la oferta sólo si el mayor costo unitario sin IVA de las
 partidas nuevas supera el valor guardado.
 <!-- manual:end -->
@@ -61,8 +61,8 @@ partidas nuevas supera el valor guardado.
 ## Editar una existencia
 
 Pulse **Editar existencia**. En **Existencias**, consulte el saldo actual, cambie
-**Costo máximo unitario** o **Activo** y pulse **Guardar**.
-Use **Editar artículo** para cambiar el nombre o stock mínimo y **Editar proveedor**
+**Stock mínimo**, **Costo máximo unitario** o **Activo** y pulse **Guardar**.
+Use **Editar artículo** para cambiar el nombre y **Editar proveedor**
 para cambiar sus datos comerciales. Cada botón abre su formulario en un modal
 cuando la cuenta tiene el permiso correspondiente.
 
@@ -105,15 +105,13 @@ El [capítulo de reportes](14-reports.md) explica su alcance.
 Seleccione la presentación **KILOGRAMOS** o **METRO LINEAL**: esa elección fija
 ambas medidas en **1 × 1**, independientemente de la unidad de medida seleccionada.
 Estos campos se ocultan durante el alta porque se completan automáticamente.
-La cantidad comprada expresa kg o metros, respectivamente: 4 kilos a $20 por kilo
-suman $80 antes de IVA. Las medidas representan la unidad y no multiplican el precio.
+La cantidad comprada expresa kg o metros. Si compra 4 kg a $20 por kg, capture 4
+y el costo total de $80 antes de IVA. Nexus calcula el costo unitario de $20.
 Esta regla también aplica al alta desde Compras y Excel. En Excel, Base y Altura
 vacías se completan en 1; los valores distintos de 1 se rechazan.
 
 <!-- manual:any materials:write -->
-El formulario conserva los nombres de las columnas: Consumible, Presentación,
-Unidad de medida, Stock mínimo, Costo máximo unitario y Activo. Los datos
-heredados de Artículos se muestran como referencia; Cantidad inicial se registra
-en **Existencia**.
+**Datos del consumible** muestra la presentación, unidad y medidas
+de Artículos como referencia. Capture el saldo inicial en **Cantidad inicial**.
 
 <!-- manual:end -->

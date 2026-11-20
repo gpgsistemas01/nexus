@@ -34,14 +34,14 @@ describe('validadores del CRUD de materiales', () => {
     expect(materialStockValidation.supplierId('11111111-1111-4111-8111-111111111111')).toBeNull();
   });
 
-  it.each([
-    ['alta normal', materialCreateValidation, '', expect.any(String)],
-    ['alta desde entrada', goodsReceiptMaterialCreateValidation, '', null],
-    ['alta desde entrada con costo', goodsReceiptMaterialCreateValidation, '12.50', null],
-    ['alta desde entrada con costo cero', goodsReceiptMaterialCreateValidation, 0, null],
-    ['alta desde entrada con tipo inválido', goodsReceiptMaterialCreateValidation, false, expect.any(String)],
-    ['alta desde entrada con array', goodsReceiptMaterialCreateValidation, [2], expect.any(String)]
-  ])('%s decide si el costo máximo es obligatorio', (_, validation, value, expected) => {
-    expect(validation.maxUnitCost(value)).toEqual(expected);
+  it('el alta desde una compra valida sólo los datos de identidad y proveedor', () => {
+    expect(goodsReceiptMaterialCreateValidation).toMatchObject({
+      name: materialValidation.name,
+      supplierId: materialValidation.supplierId,
+      base: materialValidation.base,
+      height: materialValidation.height
+    });
+    expect(goodsReceiptMaterialCreateValidation).not.toHaveProperty('minStock');
+    expect(goodsReceiptMaterialCreateValidation).not.toHaveProperty('maxUnitCost');
   });
 });

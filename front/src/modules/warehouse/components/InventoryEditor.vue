@@ -4,7 +4,7 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import InventoryFormField from './InventoryFormField.vue';
-import type { InventoryFormSection } from '../formFields.js';
+import type { InventoryFormSection } from '../inventoryFormTypes.js';
 import type { InventoryField, InventoryValues } from '../inventory.js';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
@@ -74,8 +74,8 @@ const emit = defineEmits<{
                 variant="tonal"
                 class="mb-4"
             >
-                Los datos de artículo y proveedor se abren en sus formularios desde aquí. Para
-                corregir el saldo, usa Ajustar stock.
+                Edita el mínimo, costo o estado de esta existencia. Para corregir el saldo, usa
+                Ajustar stock.
                 <div
                     v-if="canEditArticle || canEditSupplier"
                     class="d-flex flex-wrap ga-2 mt-3"

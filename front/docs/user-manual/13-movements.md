@@ -23,7 +23,9 @@ Abra **Movimientos → Consumibles**. El historial explica los cambios de existe
 
 <!-- module:any movimientos-mermas -->
 
-Abra **Movimientos → Mermas**. El historial explica los cambios de existencia. Esta tabla es de consulta.
+Abra **Movimientos → Mermas**. La fecha, el tipo y el folio identifican el
+movimiento. Después aparecen la merma, su proveedor y sus medidas. **Cambio de
+existencia** muestra el stock anterior, la cantidad del movimiento y el nuevo saldo.
 
 <!-- module:end -->
 

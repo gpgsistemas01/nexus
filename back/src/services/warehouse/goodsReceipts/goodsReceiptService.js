@@ -1,4 +1,4 @@
-import { MATERIAL_DOCUMENT_DISPLAY_SELECT } from '../materials/materialService.js';
+import { MATERIAL_DOCUMENT_DISPLAY_SELECT } from '../materials/materialDocumentSnapshot.js';
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import { createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptTotalsService.js";

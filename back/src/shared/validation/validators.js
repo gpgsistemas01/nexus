@@ -87,13 +87,11 @@ export const materialCatalogValidation = {
     presentationId: materialValidation.presentationId,
     unitMeasureId: materialValidation.unitMeasureId,
     base: materialValidation.base,
-    height: materialValidation.height,
-    minStock: value => validateNumberOptional(value, 'El stock mínimo', { format: MIN_STOCK_INPUT_FORMAT })
+    height: materialValidation.height
 };
 
 export const materialCatalogEditValidation = {
-    name: materialCatalogValidation.name,
-    minStock: materialCatalogValidation.minStock
+    name: materialCatalogValidation.name
 };
 
 export const materialStockValidation = {
@@ -114,15 +112,20 @@ export const materialOfferCreateValidation = {
     materialId: value => validateUUID(value, 'El artículo'),
     supplierId: materialValidation.supplierId,
     maxUnitCost: materialValidation.maxUnitCost,
+    minStock: materialValidation.minStock,
     isActive: materialValidation.isActive,
     newStock: materialStockValidation.newStock,
     observations: materialStockValidation.observations
 };
 
 export const goodsReceiptMaterialCreateValidation = {
-    ...materialValidation,
-    maxUnitCost: value => validateNumberOptional(value, 'El costo máximo', { format: MONEY_INPUT_FORMAT })
-}
+    name: materialValidation.name,
+    supplierId: materialValidation.supplierId,
+    presentationId: materialValidation.presentationId,
+    unitMeasureId: materialValidation.unitMeasureId,
+    base: materialValidation.base,
+    height: materialValidation.height
+};
 
 const wasteSecondaryDataValidation = {
     ...inventoryStateValidation,

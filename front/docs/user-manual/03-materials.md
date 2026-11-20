@@ -20,8 +20,8 @@ para su cuenta; no se elige una operación diferente en cada fila.
 y observaciones. El sistema genera los IDs nuevos; Stock actual y Conversión
 son referencias.
 
-**Editar datos:** cambie **Costo máximo unitario** o **Activo** de la oferta.
-Nombre y Stock mínimo son referencias de **Artículos**; los datos del proveedor se editan
+**Editar datos:** cambie **Stock mínimo**, **Costo máximo unitario** o **Activo**
+de cada oferta. El nombre viene de **Artículos**; los datos del proveedor se editan
 en **Proveedores**. Se conservan IDs/versiones, presentación, unidad, medidas y existencias.
 <!-- manual:end -->
 
@@ -53,7 +53,9 @@ IDs/versiones y campos de captura. El ajuste omite el costo. El Excel obtenido c
 **Exportar Excel** es un reporte: para importar descargue la plantilla de la operación.
 <!-- module:any reference consumables -->
 
-Los consumibles mantienen Base y Altura como referencias vacías; no capture dimensiones.
+Para altas de consumibles con presentación **KILOGRAMOS** o **METRO LINEAL**,
+puede dejar **Base** y **Altura** vacías: se guardan como `1 × 1`. En otras
+presentaciones, capture las medidas cuando correspondan al artículo.
 
 <!-- module:end -->
 
@@ -71,8 +73,8 @@ incluido el código o ID cuando forme parte de la opción. Retire de **Datos** l
 que no quiera procesar, sin borrar ni renombrar encabezados.
 
 <!-- manual:all materials:write inventory:costs-read -->
-Las altas llevan **Cantidad inicial**. Nombre y mínimo se comparten entre proveedores;
-costo y Activo corresponden a la relación con el proveedor. Pieza exige enteros.
+Las altas llevan **Cantidad inicial**. El mínimo, el costo y Activo corresponden a
+cada proveedor. Use **0** como mínimo si no necesita la alerta. PIEZA exige enteros.
 Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo.
 <!-- manual:end -->
 
@@ -115,12 +117,12 @@ archivo ni cree otra alta mientras el resultado sea incierto.
 
 1. Pulse **Nueva existencia** para abrir **Registrar existencia de material**.
 2. Elija **Material** y **Proveedor**. La búsqueda incluye todo el catálogo, aunque el artículo todavía no tenga proveedor.
-3. En **Existencias**, capture **Cantidad inicial** y revise **Cantidad convertida inicial**. Complete **Costo máximo unitario**, **Activo** y **Observaciones**. El motivo se asigna como **Stock inicial**.
+3. En **Existencias**, capture **Cantidad inicial** y revise **Cantidad convertida inicial**. Complete **Stock mínimo**, **Costo máximo unitario**, **Activo** y **Observaciones**. El motivo se asigna como **Stock inicial**.
 4. Pulse **Guardar**. Se vincula el artículo al proveedor y se registra el stock inicial en una sola operación.
 
-Nombre, presentación, unidad, medidas y mínimo pertenecen al catálogo; no se vuelven a capturar aquí. PIEZA exige cantidades enteras; KILOGRAMOS y METRO LINEAL admiten decimales y conservan `1 × 1`.
+Nombre, presentación, unidad y medidas pertenecen al catálogo; no se vuelven a capturar aquí. PIEZA exige cantidades enteras; KILOGRAMOS y METRO LINEAL admiten decimales y conservan `1 × 1`.
 
-Si falta el artículo, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar material «texto escrito»** o presione **Enter** en el selector. Complete **Presentación**, **Unidad de medida** y mínimo; capture medidas sólo cuando la presentación las requiera. KILOGRAMOS y METRO LINEAL fijan `1 × 1` y ocultan esos campos. No necesita elegir antes un proveedor. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Almacén → Artículos**.
+Si falta el artículo, **escriba el nombre en Material** y espere la búsqueda. Pulse **Registrar material «texto escrito»** o presione **Enter** en el selector. Complete **Presentación**, **Unidad de medida**; capture medidas sólo cuando la presentación las requiera. KILOGRAMOS y METRO LINEAL fijan `1 × 1` y ocultan esos campos. No necesita elegir antes un proveedor. El artículo queda seleccionado; todavía debe guardar el formulario principal para vincularlo y registrar existencias. Cancelar el modal conserva la captura principal. Para corregir un artículo existente, use **Almacén → Artículos**.
 
 <!-- manual:all suppliers:manage suppliers:read -->
 Si falta el proveedor, **escriba su nombre comercial completo dentro de Proveedor**
@@ -133,7 +135,7 @@ guarde y compruebe que el proveedor nuevo queda seleccionado en esta captura.
 
 ![Formulario para crear un material.](images/04-material-create.png)
 
-Desde una compra se omiten cantidad inicial y costo máximo. La recepción registra
+Si una compra crea una oferta, su mínimo empieza en **0**. La recepción registra
 la existencia y eleva el costo máximo de la oferta sólo si el mayor costo unitario
 sin IVA de las partidas nuevas supera el valor guardado. No duplique la entrada.
 <!-- manual:end -->
@@ -142,10 +144,10 @@ sin IVA de las partidas nuevas supera el valor guardado. No duplique la entrada.
 ## Editar una existencia
 
 1. Localice el registro y pulse **Editar existencia**.
-2. En **Existencias**, consulte el saldo actual y cambie **Costo máximo unitario** o **Activo**.
+2. En **Existencias**, consulte el saldo actual y cambie **Stock mínimo**, **Costo máximo unitario** o **Activo**.
 3. Pulse **Guardar** y compruebe el registro actualizado.
 
-Use **Editar artículo** para cambiar el nombre o stock mínimo y **Editar proveedor**
+Use **Editar artículo** para cambiar el nombre y **Editar proveedor**
 para cambiar sus datos comerciales. Cada botón abre su formulario en un modal
 cuando la cuenta tiene el permiso correspondiente.
 
@@ -190,9 +192,9 @@ resultados de la consulta.
 
 <!-- manual:any materials:write -->
 Al seleccionar el artículo, **Datos del material** muestra Base, Altura,
-Presentación, Unidad de medida y Stock mínimo con los valores de Artículos.
+Presentación y Unidad de medida con los valores de Artículos.
 Son campos de sólo lectura en el alta y la edición. La cantidad inicial se
-registra en **Stock actual**; **Costo máximo unitario** y **Activo** corresponden
+registra en **Cantidad inicial**; **Costo máximo unitario** y **Activo** corresponden
 a las columnas del mismo nombre.
 <!-- manual:end -->
 

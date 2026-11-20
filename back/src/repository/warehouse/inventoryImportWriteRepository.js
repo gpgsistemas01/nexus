@@ -63,15 +63,15 @@ export const lockInventoryImportReferences = async ({ tx, context }) => {
 
 export const updateImportedSupplierMaterials = async ({ tx, offers }) => {
     if (!offers.length) return;
-    const suppliers = offers.map(row => Prisma.sql`(${row.materialId}::uuid, ${row.supplierId}::uuid, ${row.version}::int, ${row.maxUnitCost}::numeric, ${row.isActive}::boolean)`);
+    const suppliers = offers.map(row => Prisma.sql`(${row.materialId}::uuid, ${row.supplierId}::uuid, ${row.version}::int, ${row.minStock}::numeric, ${row.maxUnitCost}::numeric, ${row.isActive}::boolean)`);
     const updated = await tx.$queryRaw(Prisma.sql`
-        WITH source(material_id, supplier_id, version, cost, active) AS (VALUES ${Prisma.join(suppliers)}),
+        WITH source(material_id, supplier_id, version, minimum, cost, active) AS (VALUES ${Prisma.join(suppliers)}),
         locked AS MATERIALIZED (
             SELECT item."id" FROM "SupplierMaterial" item JOIN source
                 ON item."materialId" = source.material_id AND item."supplierId" = source.supplier_id
             ORDER BY item."materialId", item."supplierId" FOR UPDATE OF item
         )
-        UPDATE "SupplierMaterial" item SET "maxUnitCost" = source.cost, "isActive" = source.active
+        UPDATE "SupplierMaterial" item SET "minStock" = source.minimum, "maxUnitCost" = source.cost, "isActive" = source.active
         FROM source, locked WHERE item."id" = locked."id" AND item."materialId" = source.material_id
             AND item."supplierId" = source.supplier_id AND item."version" = source.version
         RETURNING item."id"

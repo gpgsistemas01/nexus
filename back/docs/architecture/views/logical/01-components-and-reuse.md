@@ -103,7 +103,7 @@ Las factories y consumidores de servicios se detallan en los
 Las [colaboraciones por dominio](../development/code-structure/03-backend-domains-and-dependencies.md)
 amplían las dependencias y [OpenAPI](../../openapi/openapi.json) define los contratos HTTP.
 
-La edición de nombre y mínimo no vuelve a resolver presentación ni unidad si
+La edición del nombre no vuelve a resolver presentación ni unidad si
 la identidad se conserva. Al vincular por ID se reutiliza la presentación activa
 leída en la transacción; una opción inactiva se rechaza.
 

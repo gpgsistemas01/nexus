@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { catalogs, entryId, mockCatalogs } from './catalogFixtures.js';
+import { chooseOption } from './warehouseFixtures.js';
 import { acknowledgeFormError } from '../helpers/formFeedback.js';
 
 test('catálogos: los nombres recibidos se muestran como texto sin crear HTML', async ({ page }) => {
@@ -380,12 +381,11 @@ for (const type of ['Material', 'Consumible']) {
         await expect(edit.getByRole('combobox', { name: label, exact: true })).toBeDisabled();
       await expect(edit.getByLabel('Base', { exact: true })).toHaveAttribute('readonly', '');
       await edit.getByLabel('Nombre', { exact: true }).fill('Material editado');
-      await edit.getByLabel('Stock mínimo', { exact: true }).fill('5');
+      await expect(edit.getByLabel('Stock mínimo', { exact: true })).toHaveCount(0);
       await edit.getByRole('button', { name: 'Actualizar', exact: true }).click();
       await expect(edit).toBeHidden();
       expect(writes[1]?.data).toEqual({
         name: 'Material editado',
-        minStock: 5,
         expectedVersion: 7,
       });
       await expect(page.getByRole('cell', { name: 'Material editado', exact: true })).toBeVisible();
@@ -441,3 +441,56 @@ test(
     ).toBeVisible();
   },
 );
+
+test('Artículos combina filtros en servidor, reinicia la página y limpia la búsqueda', async ({
+  page,
+}) => {
+  const { store, reads } = await mockCatalogs(page, ['material-catalogs:manage']);
+  store.set('presentations', [{ id: entryId, name: 'PIEZA', version: 0, isActive: false }]);
+  store.set('unit-measures', [
+    { id: entryId, name: 'PIEZA', symbol: 'PZA.', version: 0, isActive: true },
+  ]);
+  store.set(
+    'materials',
+    Array.from({ length: 12 }, (_, index) => ({
+      id: `article-${index}`,
+      name: `Artículo ${index + 1}`,
+      version: 0,
+      type: index === 0 ? 'CONSUMABLE' : 'MATERIAL',
+      presentationId: entryId,
+      presentation: { name: 'PIEZA' },
+      unitMeasureId: entryId,
+      unitMeasure: { name: 'PIEZA', symbol: 'PZA.' },
+      _count: { supplierMaterials: index === 0 ? 0 : 1 },
+      base: null,
+      height: null,
+    })),
+  );
+  const lastArticles = () =>
+    reads.filter(({ pathname }) => pathname.endsWith('/materials')).at(-1)?.searchParams;
+  await page.goto('/almacen/articulos');
+  await expect(page.getByText('Registros encontrados: 12', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+  await expect(page.getByText('Registros 11–12 de 12', { exact: true })).toBeVisible();
+
+  await page.getByRole('combobox', { name: 'Filtrar por tipo', exact: true }).press('ArrowDown');
+  await page.getByRole('option', { name: 'Consumible', exact: true }).click();
+  await chooseOption(page, 'Filtrar por presentación', 'PIEZA');
+  await chooseOption(page, 'Filtrar por unidad de medida', 'PIEZA (PZA.)');
+  await page.getByRole('textbox', { name: 'Buscar por nombre', exact: true }).fill('Artículo');
+  expect(lastArticles()?.get('start')).toBe('10');
+
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await expect(page.getByText('Registros encontrados: 1', { exact: true })).toBeVisible();
+  expect(Object.fromEntries(lastArticles()!)).toMatchObject({
+    start: '0',
+    search: 'Artículo',
+    type: 'CONSUMABLE',
+    presentationId: entryId,
+    unitMeasureId: entryId,
+  });
+
+  await page.getByRole('button', { name: 'Limpiar filtros', exact: true }).click();
+  await expect(page.getByText('Registros encontrados: 12', { exact: true })).toBeVisible();
+  expect(Object.fromEntries(lastArticles()!)).toEqual({ start: '0', search: '', length: '10' });
+});

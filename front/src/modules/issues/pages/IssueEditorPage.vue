@@ -115,7 +115,7 @@ const openReturnDialog = (line: IssueDetail) => {
         :can-edit-header="editor.canEditHeader"
         :can-edit-details="editor.canEditDetails"
         :mode="mode"
-        :item-label="ISSUE_CONFIG[resource].item"
+        :resource="resource"
         :selects="selects"
         :can-create-client="canCreateClient"
         :can-supply-on-create="editor.canSupplyOnCreate.value"

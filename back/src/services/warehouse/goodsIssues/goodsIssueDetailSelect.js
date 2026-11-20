@@ -1,4 +1,4 @@
-import { MATERIAL_DOCUMENT_DISPLAY_SELECT } from '../materials/materialService.js';
+import { MATERIAL_DOCUMENT_DISPLAY_SELECT } from '../materials/materialDocumentSnapshot.js';
 
 export const GOODS_ISSUE_DETAIL_SELECT = {
     id: true,

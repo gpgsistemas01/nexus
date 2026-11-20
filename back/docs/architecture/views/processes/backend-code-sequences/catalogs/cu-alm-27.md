@@ -14,7 +14,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as catalogController.js
     participant Domain@{ "type": "control" } as catalogService.js
     participant Dto@{ "type": "control" } as DTO funcional<br/>catalogDTO.js
-    participant Materials@{ "type": "control" } as materialService.js
+    participant Materials@{ "type": "control" } as materialCatalogService.js
     participant Lock@{ "type": "control" } as stockLockRepository.js
     participant Helpers@{ "type": "control" } as materialHelpers.js
     participant History@{ "type": "control" } as materialDocumentRepository.js
@@ -69,7 +69,7 @@ sequenceDiagram
 | `Controller` | control | [catalogController.js](../../../../../../src/controllers/api/admin/catalogController.js) |
 | `Domain` | control | [catalogService.js](../../../../../../src/services/admin/catalogService.js) |
 | `Dto` | control | [catalogDTO.js](../../../../../../src/dtos/catalogDTO.js) |
-| `Materials` | control | [materialService.js](../../../../../../src/services/warehouse/materials/materialService.js) |
+| `Materials` | control | [materialCatalogService.js](../../../../../../src/services/warehouse/materials/materialCatalogService.js) |
 | `Lock` | control | [stockLockRepository.js](../../../../../../src/repository/warehouse/stockLockRepository.js) |
 | `Helpers` | control | [materialHelpers.js](../../../../../../src/services/warehouse/materials/materialHelpers.js) |
 | `History` | control | [materialDocumentRepository.js](../../../../../../src/repository/warehouse/materialDocumentRepository.js) |

@@ -24,7 +24,7 @@ flowchart TB
     validators --> registry["constants/catalogs.js<br/>MANAGED_CATALOGS · NAMES"]
     service --> registry
     service --> db["baseRepository.js<br/>getDb()[catalog.model]"]
-    service --> material["warehouse/materials/materialService.js<br/>Artículos"]
+    service --> material["warehouse/materials/materialCatalogService.js<br/>Artículos"]
 ```
 
 | Responsabilidad | Archivos bajo `src/` |
@@ -55,7 +55,9 @@ Estos seis registros admiten `isActive` booleano, además de los campos indicado
 
 La clave `materials` también usa `MANAGED_CATALOGS`. Su etiqueta visible es **Artículos**;
 el registro almacena `name`, `type`, `presentationId`, `unitMeasureId`, `base`, `height`
-y `minStock`. La validación se delega a `materialCatalogValidation` y
+del artículo. `materialCatalogService.js` combina nombre, tipo, presentación y
+unidad de medida en la consulta paginada.
+La validación de escritura se delega a `materialCatalogValidation` y
 `materialCatalogEditValidation`, y las operaciones al servicio de materiales. No usa
 `isActive` ni la validación CRUD genérica de los catálogos auxiliares.
 
@@ -103,7 +105,7 @@ implica que toda consulta interna filtre activos.
 | Unidades | `/warehouse/unit-measures` | `warehouse/unitMeasureService.js` |
 | Motivos | `/warehouse/reasons` | `warehouse/reasonService.js` |
 | Cumplimiento | `/warehouse/fulfillment-statuses` | `warehouse/fulfillmentStatusService.js` |
-| Artículos | `/warehouse/materials` | `warehouse/materials/materialService.js` |
+| Artículos | `/warehouse/materials` | `warehouse/materials/materialCatalogService.js` |
 
 El [mapa de lecturas operativas](03-shared-code-and-coverage.md#lecturas-operativas-y-reportes)
 posee sus imports. El [patrón del registro](../design-and-construction-patterns/08-catalog-registry-and-allowlist.md)

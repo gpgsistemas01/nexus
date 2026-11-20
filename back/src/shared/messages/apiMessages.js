@@ -154,6 +154,7 @@ export const errorMessages = {
     DEPARTMENTS_INVALID_FORMAT: 'Los departamentos seleccionados no son válidos.',
     CATALOG_NOT_FOUND: meta => `El catálogo ${ meta.catalogName || 'solicitado' } no está disponible.`,
     CATALOG_ENTRY_NOT_FOUND: meta => `El registro de ${ meta.catalogLabel || 'Catálogos' } no está disponible.`,
+    CATALOG_FILTER_INVALID: 'Selecciona un tipo, presentación o unidad de medida válida para filtrar artículos.',
     CATALOG_VALIDATION_ERROR: meta => `Revise los campos obligatorios de ${ meta.catalogLabel || 'Catálogos' }.`,
     CATALOG_MEASUREMENT_IN_USE: 'La presentación o unidad está vinculada a artículos o mermas. Sólo puede cambiar su estado.',
     PERSON_ACCESSES_INVALID_FORMAT: 'Cada acceso debe contener un área y un rol válidos.',

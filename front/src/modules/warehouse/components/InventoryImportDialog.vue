@@ -173,7 +173,9 @@ const selectMode = (value: unknown) => {
                         ? 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.'
                         : mode === modes.ADJUST
                           ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
-                          : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
+                          : resource === 'wastes'
+                            ? 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y conserva las columnas grises.'
+                            : 'Descarga los registros con sus IDs y versiones. Edita el mínimo, costo o estado por proveedor y conserva las columnas grises.'
                 }}
             </p>
             <p class="mb-4">
@@ -312,8 +314,7 @@ const selectMode = (value: unknown) => {
                     variant="tonal"
                     class="mb-4"
                 >
-                    Nombre y mínimo se comparten entre los proveedores del mismo artículo. Revisa
-                    todas sus filas.
+                    El mínimo, costo y estado corresponden al proveedor de cada fila.
                 </VAlert>
                 <VBtn
                     v-if="preview.summary.errors && batch.status === 'DRAFT'"

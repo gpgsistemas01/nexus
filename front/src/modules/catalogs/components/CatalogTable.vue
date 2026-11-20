@@ -28,7 +28,6 @@ const headers = computed(() => [
               { title: 'Unidad de medida', key: 'unitSymbol', sortable: false },
               { title: 'Base', key: 'base', sortable: false },
               { title: 'Altura', key: 'height', sortable: false },
-              { title: 'Stock mínimo', key: 'minStock', sortable: false },
           ]
         : [{ title: 'Activo', key: 'isActive', sortable: false }]),
     { title: 'Acciones', key: 'actions', sortable: false },

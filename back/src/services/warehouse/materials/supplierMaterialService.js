@@ -128,13 +128,13 @@ export const findAllSupplierMaterials = async ({
                 referenceRollTotalWeightKg: true,
                 ...(canReadCosts && { maxUnitCost: true }),
                 currentStock: true,
+                minStock: true,
                 convertedQuantity: true,
                 material: {
                     select: {
                         id: true,
                         version: true,
                         name: true,
-                        minStock: true,
                         base: true,
                         height: true,
                         presentation: true,
@@ -149,19 +149,15 @@ export const findAllSupplierMaterials = async ({
                     }
                 }
             },
-            orderBy: {
-                material: {
-                    [orderBy]: orderDir
-                }
-            }
+            orderBy: orderBy === 'minStock' ? { minStock: orderDir } : { material: { [orderBy]: orderDir } }
         }
     });
     const supplierMaterials = page.data;
 
     const sorted = supplierMaterials.sort((a, b) => {
 
-        const isLowStockA = Number(a.currentStock) < Number(a.material.minStock);
-        const isLowStockB = Number(b.currentStock) < Number(b.material.minStock);
+        const isLowStockA = Number(a.currentStock) < Number(a.minStock);
+        const isLowStockB = Number(b.currentStock) < Number(b.minStock);
 
         if (isLowStockA !== isLowStockB) return isLowStockB - isLowStockA;
 
@@ -185,6 +181,7 @@ export const SUPPLIER_MATERIAL_DETAIL_SELECT = {
     version: true,
     isActive: true,
     currentStock: true,
+    minStock: true,
     convertedQuantity: true,
     maxUnitCost: true,
     referenceConeWeightKg: true,
@@ -195,7 +192,6 @@ export const SUPPLIER_MATERIAL_DETAIL_SELECT = {
             version: true,
             type: true,
             name: true,
-            minStock: true,
             base: true,
             height: true,
             presentation: true,
@@ -249,6 +245,7 @@ export const findSupplierMaterialById = async ({
             version: true,
             isActive: true,
             currentStock: true,
+            minStock: true,
             convertedQuantity: true,
             maxUnitCost: true,
             referenceConeWeightKg: true,
@@ -258,7 +255,6 @@ export const findSupplierMaterialById = async ({
                     id: true,
                     version: true,
                     name: true,
-                    minStock: true,
                     base: true,
                     height: true,
                     presentation: true,
@@ -300,6 +296,7 @@ export const createSupplierMaterial = async ({
     tx,
     supplierId,
     materialId,
+    minStock,
     maxUnitCost,
     isActive
 }) => {
@@ -309,6 +306,7 @@ export const createSupplierMaterial = async ({
     const data = {
         supplierId,
         materialId,
+        ...(minStock !== undefined && { minStock }),
         maxUnitCost,
         ...(isActive !== undefined && { isActive })
     };

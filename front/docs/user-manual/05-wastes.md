@@ -84,8 +84,10 @@ hasta comprobar el resultado y siga el [manejo de archivos locales](02-navigatio
 
 ## Consultar una merma
 
-Abra **Almacén → Mermas**. Busque por nombre y proveedor y revise medidas, cantidad y
-conversión. Los pesos de cono, total y neto se consultan directamente en la tabla.
+Abra **Almacén → Mermas**. Identifique la merma por su nombre y proveedor.
+Después aparecen **Medidas**, **Presentación** y **Pesos por unidad (kg)**.
+**Existencias** reúne el stock actual y el mínimo. **Conversión** muestra la
+cantidad y su unidad. El costo, estado y acciones aparecen al final según su permiso.
 
 <!-- manual:any wastes:write wastes:adjust-stock wastes:add-stock -->
 **Detalles de peso** muestra las referencias guardadas cuando están disponibles;

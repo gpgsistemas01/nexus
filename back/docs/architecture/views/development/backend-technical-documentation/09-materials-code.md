@@ -45,10 +45,17 @@ el API rechaza su captura o modificación con el código de campo de `errorMap`.
 La nueva muestra se registra exclusivamente desde merma.
 
 Las validaciones de alta permiten omitir ambas medidas; si se informa una, exigen la
-pareja positiva y responden con los códigos de campo de `errorMap`. Para consumibles y
-presentaciones KILOGRAMOS o METRO LINEAL, el backend exige medidas `1 × 1`. El DTO
-normaliza medidas omitidas como `null`; la conversión sin dimensiones conserva la
-cantidad. Vue muestra los campos según el artículo y la presentación seleccionados.
+pareja positiva y responden con los códigos de campo de `errorMap`. Las presentaciones
+KILOGRAMOS y METRO LINEAL requieren `1 × 1`, también en consumibles; el servicio
+completa esos valores cuando se omiten y rechaza otros factores. Los demás consumibles
+no requieren dimensiones. El DTO representa medidas omitidas como `null`, y la
+conversión sin dimensiones conserva la cantidad. Vue muestra los campos de captura
+según el artículo y la presentación seleccionados.
+
+`materialCatalogService.js` consulta y administra la identidad del artículo.
+`materialService.js` coordina el vínculo, la edición, el ajuste y el retiro de
+existencias. Ambos reutilizan la preparación y la búsqueda por identidad de
+`materialHelpers.js`.
 
 ### Datos, resultados y efectos del módulo
 

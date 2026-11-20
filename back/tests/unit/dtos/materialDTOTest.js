@@ -12,7 +12,7 @@ const materialBody = {
 };
 
 describe('materialDTO', () => {
-  it('descarta costo máximo y stock inicial al crear el material desde una compra', () => {
+  it('descarta costo máximo, mínimo y stock inicial al crear el material desde una compra', () => {
     const dto = createMaterialDtoForRegister({
       ...materialBody,
       creationContext: 'goodsReceipt',
@@ -29,7 +29,6 @@ describe('materialDTO', () => {
       unitMeasureId: 'unit-1',
       base: null,
       height: null,
-      minStock: 2,
       isActive: true
     });
   });

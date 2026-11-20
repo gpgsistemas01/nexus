@@ -11,11 +11,11 @@ import { QUERY_BATCH_SIZES } from '../../constants/pagination.js';
 const INVENTORY_REPORT_MATERIAL_SELECT = {
     maxUnitCost: true,
     currentStock: true,
+    minStock: true,
     convertedQuantity: true,
     material: {
         select: {
             name: true,
-            minStock: true,
             base: true,
             height: true,
             presentation: { select: { name: true } },
@@ -47,7 +47,7 @@ const mapMaterialRows = (materials = []) => materials.map((item) => ({
     base: toNumber(item.material.base),
     height: toNumber(item.material.height),
     currentStock: toNumber(item.currentStock),
-    minStock: toNumber(item.material.minStock),
+    minStock: toNumber(item.minStock),
     presentation: item.material.presentation?.name,
     convertedQuantity: toNumber(item.convertedQuantity),
     unitMeasure: item.material.unitMeasure?.name,
@@ -152,7 +152,7 @@ export const findWarehouseReportRows = async function* ({
         query: {
             where,
             select: { id: true, ...INVENTORY_REPORT_MATERIAL_SELECT },
-            orderBy: [{ material: { [orderBy]: orderDir } }, { id: 'asc' }]
+            orderBy: [orderBy === 'minStock' ? { minStock: orderDir } : { material: { [orderBy]: orderDir } }, { id: 'asc' }]
         }
     })) {
         yield* mapMaterialRows(materials);

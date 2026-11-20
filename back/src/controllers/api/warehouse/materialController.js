@@ -1,3 +1,4 @@
+import { findMaterialCatalog } from '../../../services/warehouse/materials/materialCatalogService.js';
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import {
     createMaterialDtoForEdit,
@@ -7,7 +8,6 @@ import {
 import { successCodeMessages } from "../../../shared/constants/apiSuccessCodes.js";
 import {
     findAllMaterials,
-    findMaterialCatalog,
     createMaterial,
     updateMaterial,
     updateMaterialStock,

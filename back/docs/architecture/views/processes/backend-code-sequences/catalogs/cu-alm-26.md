@@ -14,7 +14,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as catalogController.js
     participant Domain@{ "type": "control" } as catalogService.js
     participant Dto@{ "type": "control" } as DTO funcional<br/>catalogDTO.js
-    participant Materials@{ "type": "control" } as materialService.js
+    participant Materials@{ "type": "control" } as materialCatalogService.js
     participant Helpers@{ "type": "control" } as materialHelpers.js
     participant Db@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler@{ "type": "control" } as app.js
@@ -59,6 +59,6 @@ sequenceDiagram
 | `Controller` | control | [catalogController.js](../../../../../../src/controllers/api/admin/catalogController.js) |
 | `Domain` | control | [catalogService.js](../../../../../../src/services/admin/catalogService.js) |
 | `Dto` | control | [catalogDTO.js](../../../../../../src/dtos/catalogDTO.js) |
-| `Materials` | control | [materialService.js](../../../../../../src/services/warehouse/materials/materialService.js) |
+| `Materials` | control | [materialCatalogService.js](../../../../../../src/services/warehouse/materials/materialCatalogService.js) |
 | `Helpers` | control | [materialHelpers.js](../../../../../../src/services/warehouse/materials/materialHelpers.js) |
 | `ErrorHandler` | control | [app.js](../../../../../../src/app.js) |

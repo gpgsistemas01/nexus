@@ -119,7 +119,9 @@ const template = async ({ config, rows = [], catalogs }) => {
             ? 'Completa proveedor, material de referencia, mínimo, costo, activo, cantidad inicial y observaciones; captura medidas o pesos según la presentación.'
             : 'Completa proveedor, material, presentación, unidad, mínimo, costo, activo, cantidad inicial y observaciones.'}`
         : config.mode === 'update'
-            ? 'Editar datos modifica nombre, mínimo, costo y activo. No modifica las existencias; conserva el proveedor y los demás datos del registro.'
+            ? isWaste
+                ? 'Editar datos modifica nombre, mínimo, costo y activo de la merma. El saldo se conserva.'
+                : 'Editar datos modifica el mínimo, costo y estado de la oferta de ese proveedor. El saldo y el artículo se conservan.'
             : 'Ajustar existencias reemplaza el saldo con el conteo físico final. Captura stock contado, motivo activo y observaciones en cada fila.';
     const limitDescription = config.mode === 'create'
         ? `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. Conserva hojas y encabezados; retira filas vacías que no quieras importar.`
@@ -161,7 +163,7 @@ const template = async ({ config, rows = [], catalogs }) => {
         ...(config.mode === 'create' && isWaste ? [['Medidas', 'Base y altura en metros. En Rollo deja ambas vacías: el servidor las calcula con los tres pesos en kg.']] : []),
         ...(config.mode === 'update' ? [['Actualización', isWaste
             ? 'Material, mínimo, costo y activo corresponden a la merma. Un vacío no borra datos.'
-            : 'Nombre y mínimo se comparten entre proveedores. Costo y activo corresponden a cada proveedor. Un vacío no borra datos.']] : []),
+            : 'El mínimo, costo y estado corresponden a cada combinación de artículo y proveedor. Usa 0 para desactivar su alerta de stock bajo.']] : []),
         ['Confirmación', 'Validar sólo genera una vista previa. Confirmar aplica todas las filas válidas juntas; si alguna falla, no se aplica ninguna.'],
         ['Archivos', 'El servidor descarta el XLSX después del análisis. El original de tu equipo permanece bajo tu control.']
     ];

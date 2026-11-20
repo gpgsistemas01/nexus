@@ -132,17 +132,16 @@ protegen captura y solicitudes.
 
 ```mermaid
 flowchart TB
-    context[/Recurso, operación y referencias/] --> mode{Alta directa de existencia}
-    mode -->|sí| offer[Artículo y proveedor, referencias y existencia]
-    mode -->|no| registry[Construir cada sección por su clave tipada]
-    registry --> order[Seleccionar secciones en SECTION_ORDER]
-    offer --> schema[/InventoryFormSection array/]
-    order --> schema
-    schema --> view[InventoryEditor presenta campos y referencias]
+    context[/Recurso y operación/] --> schema[formFields]
+    schema -->|Existencias| offer[inventoryOfferSections]
+    schema -->|Alta desde Compras| purchase[purchaseArticleSections]
+    schema -->|Merma| waste[wasteFormSections]
+    offer --> sections[/InventoryFormSection array/]
+    purchase --> sections
+    waste --> sections
+    sections --> view[InventoryEditor]
 ```
 
-La fábrica es pura. Comparte las especificaciones de costo, estado y observaciones;
-el registro tipado impide introducir una sección fuera del orden definido.
-`inventoryLabels` proporciona los nombres comunes con la tabla e
-`inventoryActionTitle` los títulos del editor y la eliminación. Validación,
-transporte y persistencia conservan sus propietarios.
+Las tres fábricas devuelven campos y referencias en el orden de su formulario.
+`inventoryFormTypes` define el contrato que consume `InventoryEditor`.
+`inventoryLabels` comparte los nombres de los campos con la tabla.

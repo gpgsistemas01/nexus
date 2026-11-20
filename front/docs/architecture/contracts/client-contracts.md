@@ -50,7 +50,7 @@ estado. Un `200` incompleto no confirma la operación. La
 | Usuarios | `GET/POST /api/admin/users`; edición `PATCH /:id`; contraseña `PATCH /:id/password`. Alta incluye contraseña; editar datos no la reenvía; ambos modos de edición conservan versión. |
 | Clientes | `GET/POST /api/sales/clients`, edición `PUT /:id`. Nombre/Activo y versión al editar. |
 | Proveedores | `GET/POST /api/warehouse/suppliers`, edición `PUT /:id`. Razón social, nombre comercial, Activo y versión al editar. |
-| Inventario | Base `/api/warehouse/materials`, `/consumables` o `/wastes`: GET lista, POST alta, PATCH `/:id` actualiza costo/estado de la oferta (nombre y stock mínimo se editan por Artículos), PATCH `/:id/stock` ajusta el saldo. POST `/:id/stock-additions` es entrada de merma; DELETE retira una oferta con stock cero y sin compras, salidas ni otros registros de inventario de esa oferta, y conserva el artículo. |
+| Inventario | Base `/api/warehouse/materials`, `/consumables` o `/wastes`: GET lista, POST alta, PATCH `/:id` actualiza stock mínimo, costo y estado de la oferta (el nombre se edita en Artículos), PATCH `/:id/stock` ajusta el saldo. POST `/:id/stock-additions` es entrada de merma; DELETE retira una oferta con stock cero y sin compras, salidas ni otros registros de inventario de esa oferta, y conserva el artículo. |
 | Compras | Base `/api/warehouse/goods-receipts/materials` o `/consumables`: listado, lectura por ID, alta y edición a través de `purchaseService`; corrección/cancelación de detalle conserva su operación y confirmación propias. |
 | Salidas | Base `/api/warehouse/goods-issues/materials`, `/consumables` o `/api/warehouse/waste-issues`: GET listado/ID, POST alta, PATCH edición; `/:id/header` para encabezado y `/:id/details` para surtido. Devolución: PATCH `/:id/details/:detailId/returns`. |
 | Reportes | Todas las páginas usan `useReportScope` y `ReportScopeDialog`; `useFileExport` comparte permiso, bloqueo, cancelación, nombre fechado y descarga. Los servicios configuran la ruta y usan `requestExcel`; `reportParams` comparte periodos, filtros, orden y eliminación de paginación. |
@@ -72,7 +72,7 @@ Al consultar con `catalog=true`, Prisma devuelve los artículos directamente y e
 selector los adapta a `LookupItem`.
 
 `DELETE /api/admin/catalogs/materials/:id` elimina un artículo sin proveedores ni
-historial. En Existencias, la edición envía proveedor, costo, estado y versión de la oferta.
+historial. En Existencias, la edición envía proveedor, mínimo, costo, estado y versión de la oferta.
 
 `loginRequest` exige el código `SUCCESS_LOGIN`; otro resultado no confirma el acceso.
 La preferencia local del nombre tiene su propietario y vida útil en el

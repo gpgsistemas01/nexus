@@ -182,7 +182,6 @@ export const useInventorySelection = (options: {
             'unitMeasureId',
             'base',
             'height',
-            'minStock',
         ] as const) {
             options.setValue(field, String(data[field] ?? ''));
         }

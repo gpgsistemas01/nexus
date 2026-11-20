@@ -24,13 +24,13 @@ const confirm = (batch, operationId = randomUUID()) => request(app).post(`/${bat
 const savedOffer = name => prisma.supplierMaterial.findFirst({ where: { material: { name } }, include: { material: true } });
 const seedOffer = async name => {
     const material = await prisma.material.create({ data: { name: fixture.row(name).name,
-        presentationId: fixture.presentation.id, unitMeasureId: fixture.unit.id, base: 2, height: 3, minStock: 1 } });
+        presentationId: fixture.presentation.id, unitMeasureId: fixture.unit.id, base: 2, height: 3 } });
     return prisma.supplierMaterial.create({ data: { materialId: material.id, supplierId: fixture.suppliers[0].id,
-        maxUnitCost: 10, currentStock: 2, convertedQuantity: 12 }, include: { material: true } });
+        minStock: 1, maxUnitCost: 10, currentStock: 2, convertedQuantity: 12 }, include: { material: true } });
 };
 const updateRow = offer => ({ id: offer.materialId, supplierId: offer.supplierId,
     expectedVersion: offer.version, expectedMaterialVersion: offer.material.version,
-    name: offer.material.name, minStock: Number(offer.material.minStock), maxUnitCost: Number(offer.maxUnitCost), isActive: 'SI' });
+    name: offer.material.name, minStock: Number(offer.minStock), maxUnitCost: Number(offer.maxUnitCost), isActive: 'SI' });
 
 const newRow = async (resource, name) => {
     if (resource !== 'wastes') return fixture.row(name);
@@ -230,7 +230,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
 
     it('crea dos proveedores de un material, stock, conversiones e historia; el reintento no duplica', async () => {
         const row = fixture.row('Compartido');
-        const batch = await preview([row, { ...row, supplierCode: fixture.suppliers[1].code, newStock: 3 }]);
+        const batch = await preview([row, { ...row, supplierCode: fixture.suppliers[1].code, newStock: 3, minStock: 4.5 }]);
         expect(batch.preview.summary).toMatchObject({ creates: 2, errors: 0 });
         const operationId = randomUUID();
         const completed = await confirm(batch, operationId).expect(200);
@@ -240,6 +240,8 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(offers).toHaveLength(2);
         expect(new Set(offers.map(item => item.materialId)).size).toBe(1);
         expect(offers.map(item => Number(item.currentStock)).sort()).toEqual([2, 3]);
+        expect(new Map(offers.map(item => [item.supplierId, Number(item.minStock)]))).toEqual(
+            new Map([[fixture.suppliers[0].id, 1], [fixture.suppliers[1].id, 4.5]]));
         expect(offers.map(item => Number(item.convertedQuantity)).sort((a,b) => a-b)).toEqual([12, 18]);
         expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: offers[0].materialId } })).toBe(2);
         expect(await prisma.movementDetail.count({ where: { materialId: offers[0].materialId } })).toBe(2);
@@ -252,7 +254,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         await prisma.supplierMaterial.create({ data: { materialId: offer.materialId, supplierId: fixture.suppliers[1].id,
             maxUnitCost: 10, currentStock: 3, convertedQuantity: 18 } });
         const offers = await prisma.supplierMaterial.findMany({ where: { materialId: offer.materialId }, include: { material: true } });
-        const rows = offers.map(item => ({ ...updateRow(item), maxUnitCost: 22 }));
+        const rows = offers.map(item => ({ ...updateRow(item), minStock: item.supplierId === offer.supplierId ? 5 : 0, maxUnitCost: 22 }));
         const invalid = await preview(rows.map(row => ({ ...row, name: fixture.row('Renombrado').name })), 'materials', 'update');
         expect(invalid.preview.summary).toMatchObject({ updates: 0, errors: 2 });
         await confirm(invalid).expect(400);
@@ -262,6 +264,8 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const saved = await prisma.supplierMaterial.findMany({ where: { materialId: offer.materialId }, include: { material: true } });
         expect(saved.every(item => Number(item.maxUnitCost) === 22 && item.material.version === offer.material.version)).toBe(true);
         expect(saved.map(item => Number(item.currentStock)).sort()).toEqual([2, 3]);
+        expect(new Map(saved.map(item => [item.supplierId, Number(item.minStock)]))).toEqual(
+            new Map([[fixture.suppliers[0].id, 5], [fixture.suppliers[1].id, 0]]));
         expect(await prisma.stockAdjustmentDetail.count({ where: { materialId: offer.materialId } })).toBe(0);
         const unchanged = await preview(saved.map(updateRow), 'materials', 'update');
         expect(unchanged.preview.summary.unchanged).toBe(2);

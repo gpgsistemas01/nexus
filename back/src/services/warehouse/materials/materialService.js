@@ -1,11 +1,8 @@
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { lockMaterialIdentity, lockSupplierMaterialForRemoval } from '../../../repository/warehouse/stockLockRepository.js';
-import { AppError } from '../../../errors/AppError.js';
-import { materialCatalogValidation } from '../../../shared/validation/validators.js';
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import {
     MaterialAlreadyExists,
-    MaterialIdentityLinkedConflict,
     MaterialCreateDatabaseError,
     MaterialInitialStockReasonNotFound,
     MaterialNotFound,
@@ -15,20 +12,24 @@ import {
     MaterialDeleteRelationConflict,
     MaterialDeleteStockConflict,
     MaterialDeleteHistoryConflict,
-    MaterialCatalogDeleteConflict,
     MaterialFieldsManagedInCatalog
 } from "../../../errors/warehouse/materialError.js";
-import { findPage } from '../../../repository/paginationRepository.js';
 import { getDb } from "../../../repository/baseRepository.js";
 import {
-    findMaterialsWithUsage,
     existsDeletableSupplierMaterial,
     findAllSupplierMaterials,
     findSupplierMaterialByIds,
     createSupplierMaterial,
     SUPPLIER_MATERIAL_DETAIL_SELECT
 } from "./supplierMaterialService.js";
-import { assertMaterialRollReference, prepareMaterialData } from "./materialHelpers.js";
+import {
+    assertMaterialRollReference,
+    buildMaterialData,
+    DEFAULT_MATERIAL_SNAPSHOT_SELECT,
+    findMaterialByIdentity,
+    prepareMaterialData,
+    throwMaterialWriteError
+} from './materialHelpers.js';
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
@@ -38,48 +39,8 @@ import { MATERIAL_TYPES, MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../.
 
 import { assertRecordVersion, updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
-import { createMaterialSpecification, MATERIAL_SPECIFICATION_SELECT } from './materialDocumentSnapshot.js';
-import { preserveMaterialSpecifications } from '../../../repository/warehouse/materialDocumentRepository.js';
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
-
-const throwMaterialWriteError = ({ err, fallbackError }) => {
-    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
-        throw new MaterialNotFound();
-    }
-
-    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) {
-        throw new MaterialAlreadyExists();
-    }
-
-    const normalizedError = normalizeDatabaseError(err);
-    if (isAppError(normalizedError)) throw normalizedError;
-
-    throw fallbackError;
-};
-
-const buildMaterialData = ({ rest, relations }) => ({
-    ...rest,
-    presentation: {
-        connect: { id: relations.presentationId }
-    },
-    unitMeasure: {
-        connect: { id: relations.unitMeasureId }
-    }
-});
-
-const findMaterialByIdentity = ({ tx, rest, relations, excludeId }) => tx.material.findFirst({
-    where: {
-        ...(excludeId && { id: { not: excludeId } }),
-        name: { equals: rest.name, mode: 'insensitive' },
-        presentationId: relations.presentationId,
-        unitMeasureId: relations.unitMeasureId,
-        base: rest.base ?? null,
-        height: rest.height ?? null,
-        type: rest.type ?? MATERIAL_TYPES.MATERIAL
-    },
-    select: { id: true }
-});
 
 export const findAllMaterials = async ({
     skip = 0,
@@ -103,129 +64,6 @@ export const findAllMaterials = async ({
         canReadCosts,
         canRemoveOffers
     });
-};
-
-const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
-    id: true,
-    type: true,
-    name: true,
-    minStock: true,
-    presentation: { select: { name: true } },
-    base: true,
-    height: true
-};
-
-export const MATERIAL_CATALOG_SELECT = Object.freeze({
-    ...DEFAULT_MATERIAL_SNAPSHOT_SELECT,
-    version: true,
-    presentationId: true,
-    _count: { select: { supplierMaterials: true } },
-    unitMeasureId: true,
-    unitMeasure: { select: { name: true, symbol: true } }
-});
-
-export const MATERIAL_DOCUMENT_DISPLAY_SELECT = Object.freeze({
-    type: true,
-    base: true,
-    height: true,
-    presentation: { select: { name: true } },
-    unitMeasure: { select: { name: true, symbol: true } }
-});
-
-export const findMaterialCatalogEntries = async ({ skip = 0, take = 10, search = '', type = null, includeSupplierCount = true } = {}) => {
-    const page = await findPage({
-        model: getDb().material,
-        totalWhere: type ? { type } : {},
-        hasFilters: Boolean(search),
-        query: {
-            skip, take,
-            where: { ...(type && { type }), ...(search && { name: { contains: search, mode: 'insensitive' } }) },
-            select: { ...MATERIAL_CATALOG_SELECT, ...(!includeSupplierCount && { _count: false }) },
-            orderBy: [{ name: 'asc' }, { id: 'asc' }]
-        }
-    });
-    if (!includeSupplierCount) return page;
-
-    // Un proveedor vinculado ya protege la identidad. Sólo consultamos historial para los demás.
-    const withoutOffers = new Map();
-    for (const article of page.data) {
-        if (article._count.supplierMaterials === 0) withoutOffers.set(article.id, article);
-    }
-    if (withoutOffers.size) {
-        const used = await findMaterialsWithUsage([...withoutOffers.keys()]);
-        for (const { id } of used) withoutOffers.get(id).hasHistory = true;
-    }
-    return page;
-};
-
-export const createMaterialCatalogEntry = async data => {
-    try {
-        return await getDb().$transaction(async tx => {
-            const { rest, relations } = await prepareMaterialData({ tx, materialDto: data, requireSupplier: false });
-            if (await findMaterialByIdentity({ tx, rest, relations })) throw new MaterialAlreadyExists();
-            return tx.material.create({ data: buildMaterialData({ rest, relations }), select: MATERIAL_CATALOG_SELECT });
-        });
-    } catch (err) { throwMaterialWriteError({ err, fallbackError: new MaterialCreateDatabaseError() }); }
-};
-
-export const updateMaterialCatalogEntry = async (id, input) => {
-    try {
-        return await getDb().$transaction(async tx => {
-            // Serializa la edición con los INSERT de relaciones que comprueban esta FK.
-            await lockMaterialIdentity({ tx, id, forEditing: true });
-            const current = await tx.material.findUnique({
-                where: { id },
-                select: { ...MATERIAL_CATALOG_SELECT, ...MATERIAL_SPECIFICATION_SELECT }
-            });
-            if (!current) throw new MaterialNotFound();
-            assertRecordVersion(current, input.expectedVersion);
-            const identityChanged = ['type', 'presentationId', 'unitMeasureId', 'base', 'height'].some(field =>
-                input[field] !== undefined && String(input[field] ?? '') !== String(current[field] ?? ''));
-            let data = { name: input.name, ...(input.minStock !== undefined && { minStock: input.minStock }) };
-            let identity = { rest: { ...current, name: input.name }, relations: current };
-            if (identityChanged) {
-                if (current._count.supplierMaterials > 0) {
-                    throw new MaterialIdentityLinkedConflict();
-                }
-                const capture = { ...current, base: toNumber(current.base),
-                    height: toNumber(current.height), minStock: Number(current.minStock), ...input };
-                if (Object.entries(materialCatalogValidation).some(([field, rule]) => rule(capture[field], capture))) {
-                    throw new AppError('Revise los datos del material.', 'CATALOG_VALIDATION_ERROR', 400);
-                }
-                const { rest, relations } = await prepareMaterialData({ tx, requireSupplier: false,
-                    materialDto: Object.fromEntries(Object.keys(materialCatalogValidation).map(field => [field, capture[field]])) });
-                identity = { rest, relations };
-                data = buildMaterialData({ rest, relations });
-            } else {
-                assertPieceQuantity({ quantity: input.minStock, item: current });
-            }
-            if ((identityChanged || input.name !== current.name) &&
-                await findMaterialByIdentity({ tx, ...identity, excludeId: id })) {
-                throw new MaterialAlreadyExists();
-            }
-            if (identityChanged) {
-                await preserveMaterialSpecifications({
-                    tx, materialId: id, type: current.type, specification: createMaterialSpecification(current)
-                });
-            }
-            return updateVersionedRecord({ model: tx.material, where: { id }, expectedVersion: input.expectedVersion,
-                data, select: MATERIAL_CATALOG_SELECT });
-        });
-    } catch (err) { throwMaterialWriteError({ err, fallbackError: new MaterialUpdateDatabaseError() }); }
-};
-
-export const findMaterialCatalog = ({ skip = 0, take = 10, search = '', type = MATERIAL_TYPES.MATERIAL }) =>
-    findMaterialCatalogEntries({ skip, take, search, type, includeSupplierCount: false });
-
-export const deleteMaterialCatalogEntry = async id => {
-    try {
-        // PostgreSQL comprueba los vínculos y elimina el registro en la misma operación.
-        return await getDb().material.delete({ where: { id }, select: { id: true } });
-    } catch (error) {
-        if (error.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new MaterialNotFound();
-        if (error.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new MaterialCatalogDeleteConflict();
-        throw error;
-    }
 };
 
 export const findMaterialsSnapshot = async ({
@@ -300,7 +138,7 @@ export const createMaterial = async ({
                 }
                 // La identidad proviene del catálogo, nunca de campos adicionales del cliente.
                 Object.assign(materialData, { name: selected.name, presentationId: selected.presentationId,
-                    unitMeasureId: selected.unitMeasureId, base: toNumber(selected.base), height: toNumber(selected.height), minStock: Number(selected.minStock) });
+                    unitMeasureId: selected.unitMeasureId, base: toNumber(selected.base), height: toNumber(selected.height) });
             }
             const catalogOnly = creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
             const { rest, relations } = await prepareMaterialData({
@@ -344,6 +182,7 @@ export const createMaterial = async ({
                 tx,
                 supplierId: relations.supplierId,
                 materialId,
+                minStock: relations.minStock,
                 maxUnitCost: relations.maxUnitCost,
                 isActive: relations.isActive
             });
@@ -397,7 +236,7 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
 
         const material = await getDb().$transaction(async (tx) => {
 
-            const { supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, expectedVersion, expectedMaterialVersion, ...materialData } = materialDto;
+            const { supplierId, minStock, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, expectedVersion, expectedMaterialVersion, name } = materialDto;
 
             assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 
@@ -407,31 +246,28 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
             };
 
             // Las capturas que ya enviaban datos del artículo aún validan su versión y sus valores.
-            if (expectedMaterialVersion !== undefined || materialData.name !== undefined || materialData.minStock !== undefined) {
+            if (expectedMaterialVersion !== undefined || name !== undefined || minStock !== undefined) {
                 const currentOffer = await tx.supplierMaterial.findUnique({
                     where,
-                    select: { version: true }
+                    select: { version: true, material: { select: { version: true, name: true,
+                        presentation: { select: { name: true } } } } }
                 });
                 if (!currentOffer) throw new MaterialNotFound();
                 assertRecordVersion(currentOffer, expectedVersion);
 
-                const currentMaterial = await tx.material.findUnique({
-                    where: { id, ...(type && { type }) },
-                    select: { version: true, name: true, minStock: true }
-                });
-                if (!currentMaterial) throw new MaterialNotFound();
-                assertRecordVersion(currentMaterial, expectedMaterialVersion);
-                if ((materialData.name !== undefined && materialData.name !== currentMaterial.name) ||
-                    (materialData.minStock !== undefined && Number(materialData.minStock) !== Number(currentMaterial.minStock))) {
+                const { material: currentMaterial } = currentOffer;
+                if (expectedMaterialVersion !== undefined || name !== undefined)
+                    assertRecordVersion(currentMaterial, expectedMaterialVersion);
+                if (name !== undefined && name !== currentMaterial.name)
                     throw new MaterialFieldsManagedInCatalog();
-                }
+                assertPieceQuantity({ quantity: minStock, item: currentMaterial });
             }
 
             return updateVersionedRecord({
                 model: tx.supplierMaterial,
                 expectedVersion,
                 where,
-                data: { maxUnitCost, isActive },
+                data: { minStock, maxUnitCost, isActive },
                 select: SUPPLIER_MATERIAL_DETAIL_SELECT
             });
         });

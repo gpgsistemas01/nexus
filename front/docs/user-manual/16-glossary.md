@@ -54,7 +54,6 @@
 | Presentación | Forma comercial o física del artículo. |
 | Unidad de medida | Unidad utilizada para controlar cantidades. |
 | Base y Altura | Medidas físicas; no representan existencias. |
-| Stock mínimo | Umbral utilizado para detectar existencias bajas. |
 
 <!-- module:end -->
 <!-- manual:end -->
@@ -90,7 +89,7 @@
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Consumible | Artículo con presentación y unidad, sin dimensiones. |
+| Consumible | Artículo con presentación y unidad. Base y Altura se registran cuando aplican. KILOGRAMOS y METRO LINEAL usan `1 × 1`. |
 
 <!-- module:end -->
 
@@ -112,7 +111,7 @@
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Stock mínimo | Referencia para identificar existencias bajas; cambiarla conserva el saldo. |
+| Stock mínimo | Umbral de cada vínculo artículo–proveedor o merma. Cero desactiva la alerta. |
 | Activo / Inactivo | Disponibilidad para nuevas operaciones; desactivar conserva historia y stock. |
 
 <!-- manual:any materials:adjust-stock wastes:adjust-stock -->
@@ -323,6 +322,6 @@ Si entregó 10 y ya regresaron 4, puede recibir hasta 6 más en devolución.
 
 <!-- module:any reference catalog-materials -->
 
-**Material:** identidad del artículo, clasificada como Material o Consumible. **Presentación:** forma de manejo. **Unidad:** nombre y símbolo de control. **Base y altura:** dimensiones por presentación; ambas vacías cuando no aplican. **Stock mínimo:** umbral de alerta compartido; `0` indica que no se definió un umbral. **Oferta:** vínculo del artículo con un proveedor, con su existencia y costo propios.
+**Material:** identidad del artículo, clasificada como Material o Consumible. **Presentación:** forma de manejo. **Unidad:** nombre y símbolo de control. **Base y altura:** dimensiones por presentación; quedan vacías cuando no aplican. KILOGRAMOS y METRO LINEAL usan `1 × 1`. **Oferta:** vínculo del artículo con un proveedor, con su existencia, mínimo y costo propios.
 
 <!-- module:end -->

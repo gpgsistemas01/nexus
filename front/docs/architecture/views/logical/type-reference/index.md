@@ -2,13 +2,13 @@
 
 Generado desde `src/` con `npm run docs:generate`. No editar manualmente.
 
-Se inspeccionan 201 archivos TS/SFC y se describen 263 contratos declarados.
+Se inspeccionan 207 archivos TS/SFC y se describen 264 contratos declarados.
 
 | Ámbito | Contratos | Miembros directos |
 | --- | --- | --- |
 | [app](app.md) | 11 | 25 |
 | [auth](auth.md) | 11 | 21 |
-| [catalogs](catalogs.md) | 14 | 62 |
+| [catalogs](catalogs.md) | 15 | 64 |
 | [directory](directory.md) | 12 | 35 |
 | [identity](identity.md) | 21 | 82 |
 | [issues](issues.md) | 50 | 237 |

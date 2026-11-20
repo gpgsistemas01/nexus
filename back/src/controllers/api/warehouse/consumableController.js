@@ -1,4 +1,4 @@
-import { findMaterialCatalog } from '../../../services/warehouse/materials/materialService.js';
+import { findMaterialCatalog } from '../../../services/warehouse/materials/materialCatalogService.js';
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import {

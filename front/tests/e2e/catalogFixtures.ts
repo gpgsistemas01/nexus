@@ -42,7 +42,6 @@ export interface Entry {
   unitMeasure?: { name: string; symbol: string };
   base?: string | number | null;
   height?: string | number | null;
-  minStock?: string | number;
   version: number;
 }
 export const entryId = '11111111-1111-4111-8111-111111111111';
@@ -75,7 +74,6 @@ export const mockCatalogs = async (page: Page, permissions = user.permissions) =
       unitMeasure: { name: 'PIEZA', symbol: 'PZA.' },
       base: null,
       height: null,
-      minStock: '0',
     },
   ]);
   const writes: { method: string; catalog: string; data: Record<string, unknown> }[] = [];
@@ -87,8 +85,16 @@ export const mockCatalogs = async (page: Page, permissions = user.permissions) =
     const method = route.request().method();
     if (method === 'GET') {
       reads.push(url);
-      const filtered = rows.filter((row) =>
-        row.name.toLowerCase().includes((url.searchParams.get('search') ?? '').toLowerCase()),
+      const search = (url.searchParams.get('search') ?? '').toLowerCase();
+      const type = url.searchParams.get('type');
+      const presentation = url.searchParams.get('presentationId');
+      const unit = url.searchParams.get('unitMeasureId');
+      const filtered = rows.filter(
+        (row) =>
+          row.name.toLowerCase().includes(search) &&
+          (!type || row.type === type) &&
+          (!presentation || row.presentationId === presentation) &&
+          (!unit || row.unitMeasureId === unit),
       );
       const start = Number(url.searchParams.get('start') ?? 0);
       const length = Number(url.searchParams.get('length') ?? 10);
@@ -122,7 +128,6 @@ export const mockCatalogs = async (page: Page, permissions = user.permissions) =
             },
             base: Object.hasOwn(body, 'base') ? body.base : previous?.base,
             height: Object.hasOwn(body, 'height') ? body.height : previous?.height,
-            minStock: body.minStock ?? previous?.minStock ?? 0,
           }
         : {
             id: method === 'POST' ? '22222222-2222-4222-8222-222222222222' : entryId,

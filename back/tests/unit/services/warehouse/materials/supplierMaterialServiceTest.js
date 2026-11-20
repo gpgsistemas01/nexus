@@ -32,7 +32,8 @@ describe('listado del CRUD de materiales', () => {
       id: 'offer-1',
       currentStock: 4,
       convertedQuantity: 4,
-      material: { id: 'material-1', name: 'Lona', minStock: 1 },
+      minStock: 1,
+      material: { id: 'material-1', name: 'Lona' },
       supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
     }]);
     supplierMaterialCount.mockResolvedValue(1);
@@ -47,7 +48,7 @@ describe('listado del CRUD de materiales', () => {
   });
 
   it('comprueba la baja en bloque y sólo para el proveedor de cada oferta sin saldo', async () => {
-    const row = { id: 'offer-1', currentStock: 0, material: { minStock: 1 }, supplier: { id: 'supplier-1' } };
+    const row = { id: 'offer-1', currentStock: 0, minStock: 1, material: { id: 'material-1' }, supplier: { id: 'supplier-1' } };
     supplierMaterialFindMany.mockResolvedValueOnce([row]).mockResolvedValueOnce([{ id: row.id }]);
 
     const result = await findAllSupplierMaterials({ canRemoveOffers: true });
@@ -66,6 +67,18 @@ describe('listado del CRUD de materiales', () => {
       select: { id: true }
     });
     expect(result.data[0]).toEqual({ ...row, canDelete: true });
+  });
+
+  it('prioriza stock bajo por oferta y ordena el mínimo en la relación', async () => {
+    const material = { id: 'material-1', name: 'Lona' };
+    const withinMinimum = { id: 'offer-1', currentStock: 4, minStock: 3, material };
+    const belowMinimum = { id: 'offer-2', currentStock: 8, minStock: 10, material };
+    supplierMaterialFindMany.mockResolvedValueOnce([withinMinimum, belowMinimum]);
+
+    const result = await findAllSupplierMaterials({ orderBy: 'minStock' });
+
+    expect(result.data).toEqual([belowMinimum, withinMinimum]);
+    expect(supplierMaterialFindMany).toHaveBeenCalledWith(expect.objectContaining({ orderBy: { minStock: 'asc' } }));
   });
 
   it('filtra los consumibles mediante su clasificación explícita', async () => {
@@ -107,10 +120,10 @@ describe('listado del CRUD de materiales', () => {
       id: 'offer-1',
       currentStock: 0,
       convertedQuantity: 0,
+      minStock: 1,
       material: {
         id: 'material-1',
         name: 'Lona',
-        minStock: 1,
         presentation: { id: 'presentation-1', name: 'ROLLO' },
         unitMeasure: { id: 'unit-1', symbol: 'm²' }
       },

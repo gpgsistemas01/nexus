@@ -48,7 +48,8 @@ export const material = {
   currentStock: '10',
   convertedQuantity: '1000',
   maxUnitCost: '100',
-  material: { ...template, version: 7, minStock: '5' },
+  minStock: '5',
+  material: { ...template, version: 7 },
   supplier: { id: ids.supplier, tradeName: 'Proveedor Central' },
 };
 export const consumableMaterial = {
@@ -62,7 +63,6 @@ export const consumableMaterial = {
     height: null,
     presentation: { id: ids.presentation, name: 'PIEZA' },
     unitMeasure: { id: ids.unit, name: 'Pieza', symbol: 'PZA' },
-    minStock: '0',
   },
 };
 export const waste = {
