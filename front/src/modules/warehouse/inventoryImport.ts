@@ -1,4 +1,5 @@
 import type { InventoryResource } from './inventory.js';
+import { MAX_UNIT_COST_LABEL } from '../../shared/ui/inventoryLabels.js';
 import {
     ARTICLE_IMPORT_RESOURCE,
     INVENTORY_IMPORT_MODES,
@@ -52,7 +53,7 @@ export const IMPORT_FIELD_LABELS: Record<string, string> = {
     name: 'Nombre',
     type: 'Tipo',
     minStock: 'Stock mínimo',
-    maxUnitCost: 'Costo máximo unitario',
+    maxUnitCost: MAX_UNIT_COST_LABEL,
     isActive: 'Activo',
     supplier: 'Proveedor',
     supplierCode: 'Código del proveedor',

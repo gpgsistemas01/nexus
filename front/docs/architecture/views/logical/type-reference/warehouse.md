@@ -508,7 +508,7 @@ Record<string, string | number | boolean | null>
 
 ## InventoryImportResource
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 9, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 10, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -522,7 +522,7 @@ InventoryResource | typeof ARTICLE_IMPORT_RESOURCE
 
 ## InventoryImportMode
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 11, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 12, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -532,7 +532,7 @@ InventoryResource | typeof ARTICLE_IMPORT_RESOURCE
 
 ## ImportValue
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 17, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 18, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -542,7 +542,7 @@ string | number | boolean | null
 
 ## InventoryImportRow
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 18, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 19, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -564,7 +564,7 @@ string | number | boolean | null
 
 ## InventoryImportPreview
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 29, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 30, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -577,7 +577,7 @@ string | number | boolean | null
 
 ## InventoryImportBatch
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 33, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 34, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -600,7 +600,7 @@ string | number | boolean | null
 
 ## PendingInventoryImport
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 44, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 45, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

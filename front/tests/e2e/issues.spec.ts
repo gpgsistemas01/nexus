@@ -22,6 +22,9 @@ test('salidas: muestra fichas en móvil y tabla desplazable desde 600 px', async
   const detailCards = dialog.locator('.responsive-table-cards');
   await expect(detailCards).toBeVisible();
   await expect(detailCards.locator('dt', { hasText: 'Salida' })).toBeVisible();
+  await expect(
+    detailCards.getByRole('term').filter({ hasText: 'Costo máximo unitario' }),
+  ).toHaveText('Costo máximo unitario');
   await expect(detailCards.getByText('Lona', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 
@@ -35,6 +38,9 @@ test('salidas: muestra fichas en móvil y tabla desplazable desde 600 px', async
   await expect(details).toBeVisible();
   await expect(detailCards).toBeHidden();
   await expect(dialog.getByRole('table')).toBeVisible();
+  await expect(
+    dialog.getByRole('columnheader', { name: 'Conversión', exact: true }),
+  ).toHaveAttribute('colspan', '2');
   await expect(details).toHaveCSS('overflow-x', 'auto');
   await expect(dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(600);
@@ -225,11 +231,15 @@ for (const [path, resource, title, label] of [
       'Presentación',
       'Salida',
       'Conversión',
+      'Costo máximo unitario',
+      'Importes',
       'Acciones',
       'Base',
       'Altura',
       'Cantidad',
       'Unidad',
+      'Monto solicitado',
+      'Monto entregado neto',
     ]);
     expect(writes).toHaveLength(0);
     await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -287,7 +297,7 @@ for (const [path, resource, title, label] of [
     await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
     const dialog = page.getByRole('dialog');
     const canceled = dialog.getByRole('row').filter({
-      has: page.getByRole('cell', { name: 'Detalle cancelado', exact: true }),
+      has: page.getByRole('cell', { name: /^Detalle cancelado\b/ }),
     });
     await expect(canceled).toBeVisible();
     await expect(canceled.getByRole('button')).toHaveCount(0);
@@ -466,6 +476,7 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Costo máximo unitario',
               'Importes',
               'Surtido registrado',
               'Captura de surtido',
@@ -474,7 +485,6 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
-              'Costo unitario',
               'Monto solicitado',
               'Monto entregado neto',
               'Cantidad surtida',
@@ -489,6 +499,7 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Costo máximo unitario',
               'Importes',
               'Cantidad surtida',
               'Pendiente de surtir',
@@ -500,7 +511,6 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
-              'Costo unitario',
               'Monto solicitado',
               'Monto entregado neto',
             ],
@@ -557,6 +567,7 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Costo máximo unitario',
               'Importes',
               'Cantidad surtida',
               'Devolución',
@@ -565,7 +576,6 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
-              'Costo unitario',
               'Monto solicitado',
               'Monto entregado neto',
               'Cantidad devuelta',
@@ -577,6 +587,7 @@ for (const [path, label, name] of [
               'Presentación',
               'Salida',
               'Conversión',
+              'Costo máximo unitario',
               'Importes',
               'Cantidad surtida',
               'Cantidad devuelta',
@@ -586,7 +597,6 @@ for (const [path, label, name] of [
               'Altura',
               'Cantidad',
               'Unidad',
-              'Costo unitario',
               'Monto solicitado',
               'Monto entregado neto',
             ],
@@ -647,7 +657,7 @@ test(
     await page.getByRole('button', { name: 'Consultar salida', exact: true }).click();
     const view = page.getByRole('dialog');
     await expect(view.getByRole('columnheader', { name: 'Pendiente de surtir' })).toBeVisible();
-    await expect(view.getByRole('columnheader', { name: 'Costo unitario' })).toHaveCount(0);
+    await expect(view.getByRole('columnheader', { name: 'Costo máximo unitario' })).toHaveCount(0);
     await expect(view.getByLabel('Totales de salida')).toHaveCount(0);
     await view.getByRole('button', { name: 'Regresar', exact: true }).click();
     expect(writes).toHaveLength(0);

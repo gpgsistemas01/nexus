@@ -98,7 +98,8 @@ foco se consultan en el [estándar de interfaz](../../../interface-standards.md#
 
 Las columnas de detalle siguen identificación → captura → resultados → acciones.
 Compras muestra el costo por presentación y agrupa la cantidad convertida con su unidad.
-Salidas selecciona seguimiento y saldos según consulta, surtido o devolución.
+Salidas ubica **Costo máximo unitario** después de **Conversión**, como en Existencias,
+y selecciona seguimiento y saldos según consulta, surtido o devolución.
 `RecordTotals` presenta los totales de ambos módulos con el mismo formato.
 `DetailEntryRow` recibe las columnas aplanadas de la misma tabla, y las fichas
 reciben sus encabezados: reordenar conserva la correspondencia de campo y dato.
