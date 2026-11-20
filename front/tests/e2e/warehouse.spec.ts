@@ -1,4 +1,4 @@
-import { mockCatalogs } from './catalogFixtures.js';
+import { createdEntryId, mockCatalogs } from './catalogFixtures.js';
 import { user } from '../fixtures/inventory.js';
 import { expect, test } from '@playwright/test';
 import { acknowledgeFormError } from '../helpers/formFeedback.js';
@@ -257,44 +257,40 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await expect(page).toHaveURL(/inicio-sesion\?returnTo=/);
 });
 
-test(
-  'consumibles: alta con artículo del catálogo y datos de inventario',
-  { tag: '@essential' },
-  async ({ page }) => {
-    await mockWarehouse(page);
-    const writes: unknown[] = [];
-    await page.route('**/api/warehouse/consumables', async (route) => {
-      writes.push(route.request().postDataJSON());
-      await route.fulfill({ json: { code: 'CREATED_MATERIAL' } });
-    });
-    await page.goto('/almacen/consumibles');
-    await page.getByRole('button', { name: 'Nueva existencia' }).click();
-    const dialog = page.getByRole('dialog', {
-      name: 'Registrar existencia de consumible',
-      exact: true,
-    });
-    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-    expect(writes).toEqual([]);
-    await chooseOption(page, 'Proveedor', 'Proveedor Central');
-    await chooseOption(page, 'Consumible', 'Lona · 2 × 50 · ROLLO');
-    await dialog.getByRole('spinbutton', { name: 'Costo máximo unitario' }).fill('12.5');
-    await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('4');
-    await expect(dialog.getByRole('spinbutton', { name: 'Base' })).toHaveCount(0);
-    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-    await expect(dialog).toBeHidden();
-    expect(writes).toEqual([
-      {
-        materialId: ids.material,
-        supplierId: ids.supplier,
-        maxUnitCost: 12.5,
-        newStock: 4,
-        minStock: 0,
-        isActive: true,
-        observations: '',
-      },
-    ]);
-  },
-);
+test('consumibles: alta con artículo del catálogo y datos de inventario', async ({ page }) => {
+  await mockWarehouse(page);
+  const writes: unknown[] = [];
+  await page.route('**/api/warehouse/consumables', async (route) => {
+    writes.push(route.request().postDataJSON());
+    await route.fulfill({ json: { code: 'CREATED_MATERIAL' } });
+  });
+  await page.goto('/almacen/consumibles');
+  await page.getByRole('button', { name: 'Nueva existencia' }).click();
+  const dialog = page.getByRole('dialog', {
+    name: 'Registrar existencia de consumible',
+    exact: true,
+  });
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  expect(writes).toEqual([]);
+  await chooseOption(page, 'Proveedor', 'Proveedor Central');
+  await chooseOption(page, 'Consumible', 'Lona · 2 × 50 · ROLLO');
+  await dialog.getByRole('spinbutton', { name: 'Costo máximo unitario' }).fill('12.5');
+  await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('4');
+  await expect(dialog.getByRole('spinbutton', { name: 'Base' })).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes).toEqual([
+    {
+      materialId: ids.material,
+      supplierId: ids.supplier,
+      maxUnitCost: 12.5,
+      newStock: 4,
+      minStock: 0,
+      isActive: true,
+      observations: '',
+    },
+  ]);
+});
 
 test(
   'materiales: conflicto de stock exige actualizar y no pierde la versión original',
@@ -724,61 +720,57 @@ test(
   },
 );
 
-test(
-  'selectores: carga automática al final, reintento y selección conservada',
-  { tag: '@essential' },
-  async ({ page }) => {
-    await mockWarehouse(page);
-    const starts: number[] = [];
-    let isAvailable = false;
-    const suppliers = Array.from({ length: 45 }, (_, index) => ({
-      id: `99999999-9999-4999-8999-${String(index + 1).padStart(12, '0')}`,
-      tradeName: `Proveedor ${String(index + 1).padStart(3, '0')}`,
-    }));
-    await page.route('**/api/warehouse/suppliers?**', async (route) => {
-      const query = new URL(route.request().url()).searchParams;
-      const start = Number(query.get('start'));
-      starts.push(start);
-      if (start === 20 && !isAvailable) {
-        return route.fulfill({ status: 503, json: {} });
-      }
-      return route.fulfill({
-        json: { data: suppliers.slice(start, start + 20), recordsFiltered: 45, recordsTotal: 45 },
-      });
+test('selectores: carga automática al final, reintento y selección conservada', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const starts: number[] = [];
+  let isAvailable = false;
+  const suppliers = Array.from({ length: 45 }, (_, index) => ({
+    id: `99999999-9999-4999-8999-${String(index + 1).padStart(12, '0')}`,
+    tradeName: `Proveedor ${String(index + 1).padStart(3, '0')}`,
+  }));
+  await page.route('**/api/warehouse/suppliers?**', async (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    const start = Number(query.get('start'));
+    starts.push(start);
+    if (start === 20 && !isAvailable) {
+      return route.fulfill({ status: 503, json: {} });
+    }
+    return route.fulfill({
+      json: { data: suppliers.slice(start, start + 20), recordsFiltered: 45, recordsTotal: 45 },
     });
-    await page.goto('/almacen/materiales');
-    await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
-    const field = page.getByRole('combobox', { name: 'Proveedor', exact: true });
-    await field.click();
-    const list = page.getByRole('listbox');
-    await list.hover();
-    await page.mouse.wheel(0, 1500);
-    await expect(
-      page.getByRole('button', { name: 'Reintentar catálogo', exact: true }),
-    ).toBeVisible();
-    expect(starts.filter((start) => start === 20)).toHaveLength(3);
-    isAvailable = true;
-    await page.getByRole('button', { name: 'Reintentar catálogo', exact: true }).click();
-    await expect.poll(() => starts.filter((start) => start === 20).length).toBe(4);
-    await list.hover();
-    await page.mouse.wheel(0, 1800);
-    await expect.poll(() => starts.includes(40)).toBe(true);
-    await expect(
-      page.getByText('Desplázate para cargar más opciones', { exact: true }),
-    ).toBeHidden();
-    await list.hover();
-    await page.mouse.wheel(0, 800);
-    await page.getByRole('option', { name: 'Proveedor 045', exact: true }).click();
-    await expect(field).toHaveValue('Proveedor 045');
-    expect(starts.filter((start) => start === 40)).toHaveLength(1);
-    await field.click();
-    const selected = list.getByRole('option', { name: 'Proveedor 045', selected: true });
-    await expect(selected).toBeVisible();
-    expect(
-      await selected.evaluate((option) => getComputedStyle(option, '::after').content),
-    ).not.toBe('none');
-  },
-);
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Nueva existencia', exact: true }).click();
+  const field = page.getByRole('combobox', { name: 'Proveedor', exact: true });
+  await field.click();
+  const list = page.getByRole('listbox');
+  await list.hover();
+  await page.mouse.wheel(0, 1500);
+  await expect(
+    page.getByRole('button', { name: 'Reintentar catálogo', exact: true }),
+  ).toBeVisible();
+  expect(starts.filter((start) => start === 20)).toHaveLength(3);
+  isAvailable = true;
+  await page.getByRole('button', { name: 'Reintentar catálogo', exact: true }).click();
+  await expect.poll(() => starts.filter((start) => start === 20).length).toBe(4);
+  await list.hover();
+  await page.mouse.wheel(0, 1800);
+  await expect.poll(() => starts.includes(40)).toBe(true);
+  await expect(page.getByText('Desplázate para cargar más opciones', { exact: true })).toBeHidden();
+  await list.hover();
+  await page.mouse.wheel(0, 800);
+  await page.getByRole('option', { name: 'Proveedor 045', exact: true }).click();
+  await expect(field).toHaveValue('Proveedor 045');
+  expect(starts.filter((start) => start === 40)).toHaveLength(1);
+  await field.click();
+  const selected = list.getByRole('option', { name: 'Proveedor 045', selected: true });
+  await expect(selected).toBeVisible();
+  expect(await selected.evaluate((option) => getComputedStyle(option, '::after').content)).not.toBe(
+    'none',
+  );
+});
 
 test('selectores: páginas repetidas y conteo desactualizado no duplican opciones ni prolongan las consultas', async ({
   page,
@@ -972,6 +964,8 @@ for (const [path, resource, label, type] of [
         exact: true,
       });
       await main.getByLabel('Cantidad inicial', { exact: true }).fill('4');
+      const minimum = main.getByRole('spinbutton', { name: 'Stock mínimo', exact: true });
+      await minimum.fill('2');
       const term = `Artículo nuevo ${resource}`;
       const picker = main.getByRole('combobox', { name: label, exact: true });
       await picker.fill(term);
@@ -993,6 +987,7 @@ for (const [path, resource, label, type] of [
       await auxiliary.getByRole('button', { name: 'Cerrar', exact: true }).click();
       expect(catalogWrites).toEqual([]);
       await expect(main.getByLabel('Cantidad inicial', { exact: true })).toHaveValue('4');
+      await expect(minimum).toHaveValue('2');
       await main.getByRole('combobox', { name: label, exact: true }).fill(term);
       await page
         .getByRole('button', { name: `Registrar ${label.toLowerCase()} «${term}»`, exact: true })
@@ -1018,10 +1013,11 @@ for (const [path, resource, label, type] of [
       await main.getByRole('button', { name: 'Guardar', exact: true }).click();
       await expect(main).toBeHidden();
       expect(stockWrites[0]).toEqual({
-        materialId: '22222222-2222-4222-8222-222222222222',
+        materialId: createdEntryId,
         supplierId: ids.supplier,
         maxUnitCost: 0,
         newStock: 4,
+        minStock: 2,
         isActive: true,
         observations: '',
       });

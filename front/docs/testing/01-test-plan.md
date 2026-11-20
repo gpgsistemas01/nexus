@@ -164,12 +164,16 @@ No se deduce cobertura total de conteos aprobados ni rendimiento de producción 
 
 Cada push y pull request ejecuta las suites unitarias e integración del backend y
 las comprobaciones de Vue (lint, formato, documentación, unitarias y build). El
-navegador simulado ejecuta sólo los casos `@essential`, seleccionados por riesgo:
-sesión, permisos, importación, operaciones de compra y salida, existencias,
-selectores y flujos representativos por tipo. Una clave común por SHA cancela la
-ejecución duplicada cuando el mismo commit activa push y pull request.
+navegador simulado ejecuta los 25 casos `@essential`. La selección cubre sesión y
+permisos, importación y regularización con recuperación, compras y salidas con
+cambios de saldo, existencias y conflictos de versión. Conserva recorridos
+representativos de Artículos, Movimientos, alta desde selector y captura adaptable.
+El alta de existencia verifica que el stock mínimo se envíe en el vínculo con el
+proveedor. Una clave común por SHA cancela la ejecución duplicada cuando el mismo
+commit activa push y pull request.
 
-Las variantes de anchura, recurso y error que no son esenciales permanecen en
+Las variantes de anchura, recurso y error, el CRUD del directorio comercial y de
+identidad, y las comprobaciones específicas de reportes y selectores permanecen en
 `npm run test:e2e`. La regresión completa y la prueba de sistema con Express y
 PostgreSQL aislado se ejecutan juntas desde GitHub Actions con **Run workflow →
 browser_suite: full**, antes de publicar y al cambiar componentes compartidos,

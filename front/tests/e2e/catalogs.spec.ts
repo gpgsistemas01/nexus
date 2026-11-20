@@ -313,7 +313,7 @@ for (const status of [401, 403])
 for (const type of ['Material', 'Consumible']) {
   test(
     `catálogos: Material consulta, crea ${type} sin proveedor y edita sólo datos habilitados`,
-    { tag: '@essential' },
+    { tag: type === 'Material' ? '@essential' : [] },
     async ({ page }) => {
       const { store, writes } = await mockCatalogs(page, [
         'catalogs:manage',

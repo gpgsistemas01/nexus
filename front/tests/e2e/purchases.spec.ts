@@ -87,7 +87,7 @@ for (const [path, title, item] of [
 ]) {
   test(
     `compras ${path}: alta con detalles, validación diferida y payload sin totales`,
-    { tag: '@essential' },
+    { tag: path === 'materiales' ? '@essential' : [] },
     async ({ page }) => {
       await page.setViewportSize({ width: 1920, height: 1080 });
       await page.addInitScript(() => {
@@ -381,46 +381,44 @@ test('compras: filtros aplicados, paginación y reporte filtrado sin límites', 
   expect(reports[0]!.searchParams.has('start')).toBe(false);
 });
 
-test(
-  'compras: el reporte valida el mes en el campo y conserva el alcance tras un error',
-  { tag: '@essential' },
-  async ({ page }) => {
-    await mockPurchases(page);
-    let available = false;
-    let attempts = 0;
-    await page.route('**/api/warehouse/reports/goods-receipts/**', (route) => {
-      attempts++;
-      return available
-        ? route.fallback()
-        : route.fulfill({ status: 503, json: { code: 'SERVER_ERROR' } });
-    });
-    await page.goto('/compras/materiales');
-    await page.getByRole('button', { name: 'Exportar Excel', exact: true }).click();
-    const report = page.getByRole('dialog', { name: 'Exportar reporte', exact: true });
-    await report
-      .getByRole('combobox', { name: 'Alcance del reporte', exact: true })
-      .press('ArrowDown');
-    await page.getByRole('option', { name: 'Mes específico', exact: true }).click();
-    await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
-    await expect(
-      report.getByText('Selecciona un mes válido para el reporte.', { exact: true }),
-    ).toBeVisible();
-    await expect(page.getByRole('alertdialog')).toHaveCount(0);
-    expect(attempts).toBe(0);
-    await report.getByLabel('Mes del reporte', { exact: true }).fill('2026-10');
-    await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
-    await acknowledgeFormError(page, 'No se pudo completar');
-    await expect(report.getByLabel('Mes del reporte', { exact: true })).toHaveValue('2026-10');
-    await expect(report.getByText('10/2026', { exact: true })).toBeVisible();
-    expect(attempts).toBe(3);
-    available = true;
-    const download = page.waitForEvent('download');
-    await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
-    await download;
-    await expect(report).toBeHidden();
-    expect(attempts).toBe(4);
-  },
-);
+test('compras: el reporte valida el mes en el campo y conserva el alcance tras un error', async ({
+  page,
+}) => {
+  await mockPurchases(page);
+  let available = false;
+  let attempts = 0;
+  await page.route('**/api/warehouse/reports/goods-receipts/**', (route) => {
+    attempts++;
+    return available
+      ? route.fallback()
+      : route.fulfill({ status: 503, json: { code: 'SERVER_ERROR' } });
+  });
+  await page.goto('/compras/materiales');
+  await page.getByRole('button', { name: 'Exportar Excel', exact: true }).click();
+  const report = page.getByRole('dialog', { name: 'Exportar reporte', exact: true });
+  await report
+    .getByRole('combobox', { name: 'Alcance del reporte', exact: true })
+    .press('ArrowDown');
+  await page.getByRole('option', { name: 'Mes específico', exact: true }).click();
+  await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+  await expect(
+    report.getByText('Selecciona un mes válido para el reporte.', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  expect(attempts).toBe(0);
+  await report.getByLabel('Mes del reporte', { exact: true }).fill('2026-10');
+  await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+  await acknowledgeFormError(page, 'No se pudo completar');
+  await expect(report.getByLabel('Mes del reporte', { exact: true })).toHaveValue('2026-10');
+  await expect(report.getByText('10/2026', { exact: true })).toBeVisible();
+  expect(attempts).toBe(3);
+  available = true;
+  const download = page.waitForEvent('download');
+  await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+  await download;
+  await expect(report).toBeHidden();
+  expect(attempts).toBe(4);
+});
 
 test('compras: altas rápidas reutilizan editores y seleccionan registros fuera de la página actual', async ({
   page,
@@ -549,7 +547,7 @@ for (const [path, label] of [
 ]) {
   test(
     `compras ${path}: costo total reparte el importe por cantidad y agrega IVA`,
-    { tag: '@essential' },
+    { tag: path === 'consumibles' ? '@essential' : [] },
     async ({ page }) => {
       const { writes } = await mockPurchases(page);
       const automatic = path === 'consumibles';

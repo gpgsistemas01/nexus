@@ -55,48 +55,46 @@ test(
   },
 );
 
-test(
-  'detalles: salidas distingue proveedores del mismo material en tabla y fichas',
-  { tag: '@essential' },
-  async ({ page }, info) => {
-    await mockIssues(page);
-    const otherSupplier = '99999999-9999-4999-8999-999999999998';
-    await page.route('**/api/warehouse/materials?**', (route) =>
-      route.fulfill({
-        json: pageOf([
-          material,
-          {
-            ...material,
-            id: '99999999-9999-4999-8999-999999999997',
-            supplier: { id: otherSupplier, tradeName: 'Proveedor Alterno' },
-          },
-        ]),
-      }),
-    );
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/salidas/materiales');
-    await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
-    const dialog = page.getByRole('dialog');
-    await expect(
-      dialog.getByText('Proveedor Central', { exact: true }).filter({ visible: true }),
-    ).toBeVisible();
-    await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO · Proveedor Alterno', dialog);
-    await dialog.getByLabel('Cantidad', { exact: true }).fill('0.75');
-    await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
-    await expect(
-      dialog.getByText('Proveedor Alterno', { exact: true }).filter({ visible: true }),
-    ).toBeVisible();
-    await page.screenshot({ path: info.outputPath('salida-desktop.png') });
-    await page.setViewportSize({ width: 390, height: 844 });
-    await expect(
-      dialog.getByText('Proveedor Central', { exact: true }).filter({ visible: true }),
-    ).toBeVisible();
-    await expect(
-      dialog.getByText('Proveedor Alterno', { exact: true }).filter({ visible: true }),
-    ).toBeVisible();
-    expect(
-      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-    ).toBe(true);
-    await page.screenshot({ path: info.outputPath('salida-mobile.png') });
-  },
-);
+test('detalles: salidas distingue proveedores del mismo material en tabla y fichas', async ({
+  page,
+}, info) => {
+  await mockIssues(page);
+  const otherSupplier = '99999999-9999-4999-8999-999999999998';
+  await page.route('**/api/warehouse/materials?**', (route) =>
+    route.fulfill({
+      json: pageOf([
+        material,
+        {
+          ...material,
+          id: '99999999-9999-4999-8999-999999999997',
+          supplier: { id: otherSupplier, tradeName: 'Proveedor Alterno' },
+        },
+      ]),
+    }),
+  );
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(
+    dialog.getByText('Proveedor Central', { exact: true }).filter({ visible: true }),
+  ).toBeVisible();
+  await chooseOption(page, 'Material', 'Lona · 2 × 50 · ROLLO · Proveedor Alterno', dialog);
+  await dialog.getByLabel('Cantidad', { exact: true }).fill('0.75');
+  await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
+  await expect(
+    dialog.getByText('Proveedor Alterno', { exact: true }).filter({ visible: true }),
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('salida-desktop.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(
+    dialog.getByText('Proveedor Central', { exact: true }).filter({ visible: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByText('Proveedor Alterno', { exact: true }).filter({ visible: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+  await page.screenshot({ path: info.outputPath('salida-mobile.png') });
+});
