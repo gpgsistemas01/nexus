@@ -1,4 +1,5 @@
 import { INVENTORY_CONFIG } from './inventory.js';
+import { MAX_UNIT_COST_LABEL } from '../../shared/ui/inventoryLabels.js';
 import type { InventoryResource, InventoryAction } from './inventory.js';
 
 // Nombres compartidos por la tabla y los formularios de existencias.
@@ -10,7 +11,7 @@ export const inventoryLabels = (resource: InventoryResource) => ({
     unitMeasure: 'Unidad de medida',
     currentStock: resource === 'consumables' ? 'Existencia' : 'Stock actual',
     minStock: 'Stock mínimo',
-    maxUnitCost: 'Costo máximo unitario',
+    maxUnitCost: MAX_UNIT_COST_LABEL,
     isActive: 'Activo',
 });
 

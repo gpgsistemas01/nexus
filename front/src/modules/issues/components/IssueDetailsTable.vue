@@ -7,6 +7,7 @@ import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
 import ResponsiveTableCards from '../../../shared/components/ResponsiveTableCards.vue';
 import RecordTotals from '../../../shared/components/RecordTotals.vue';
+import { MAX_UNIT_COST_LABEL } from '../../../shared/ui/inventoryLabels.js';
 import IssueSupplyField from './IssueSupplyField.vue';
 import {
     numberText,
@@ -86,12 +87,14 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
             children: [
                 { title: 'Cantidad', key: 'convertedQuantity', align: 'end' },
                 { title: 'Unidad', key: 'unitMeasure', align: 'start' },
-                ...(canReadCosts
-                    ? [{ title: 'Costo unitario', key: 'maxUnitCost', align: 'end' as const }]
-                    : []),
             ],
         },
-        ...(canReadCosts ? [{ title: 'Importes', children: [...amountColumns] }] : []),
+        ...(canReadCosts
+            ? [
+                  { title: MAX_UNIT_COST_LABEL, key: 'maxUnitCost', align: 'end' as const },
+                  { title: 'Importes', children: [...amountColumns] },
+              ]
+            : []),
         ...groupWasteColumns('Surtido registrado', [
             ...(['supply', 'return', 'view'].includes(mode)
                 ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity', align: 'end' as const }]
