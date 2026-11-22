@@ -77,19 +77,35 @@ const emit = defineEmits<{
             class="mb-4"
         >
             <strong>Regularizada por entrega histórica</strong>
-            . Recibo: {{ historicalDelivery.id }}. Motivo: {{ historicalDelivery.reason }}.
-            Registró: {{ historicalDelivery.user?.name ?? 'Usuario no disponible' }}. Corte:
-            {{
-                new Date(historicalDelivery.cutoffDate).toLocaleString('es-MX', {
-                    timeZone: 'America/Mexico_City',
-                })
-            }}. Registro:
-            {{
-                new Date(historicalDelivery.createdAt).toLocaleString('es-MX', {
-                    timeZone: 'America/Mexico_City',
-                })
-            }}. Costos y cantidades de proyecto históricos sin verificar. Las devoluciones deben
-            representar entradas físicas actuales.
+            <p class="mt-2">Recibo {{ historicalDelivery.id }}.</p>
+            <p>
+                <strong>Motivo</strong>
+                {{ historicalDelivery.reason }}
+            </p>
+            <p>
+                <strong>Registró</strong>
+                {{ historicalDelivery.user?.name ?? 'Usuario no disponible' }}
+            </p>
+            <p>
+                <strong>Fecha de corte</strong>
+                {{
+                    new Date(historicalDelivery.cutoffDate).toLocaleString('es-MX', {
+                        timeZone: 'America/Mexico_City',
+                    })
+                }}
+            </p>
+            <p>
+                <strong>Fecha de regularización</strong>
+                {{
+                    new Date(historicalDelivery.createdAt).toLocaleString('es-MX', {
+                        timeZone: 'America/Mexico_City',
+                    })
+                }}
+            </p>
+            <p class="mt-2">
+                Los costos y las cantidades de proyecto históricos quedan sin verificar. Registra
+                una devolución sólo cuando el material entre físicamente a Almacén.
+            </p>
         </VAlert>
         <h3>Datos de la salida</h3>
         <VRow>

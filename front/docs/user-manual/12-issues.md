@@ -241,23 +241,18 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 <!-- manual:any issues:reconcile -->
 ## Registrar entregas históricas ya realizadas
 
-1. Conciliar primero el inventario mediante un conteo físico actual en Almacén.
-2. Pulsar **Registrar entregas históricas** en el inventario de salidas correspondiente.
-3. La tabla carga automáticamente las salidas pendientes y parcialmente surtidas, usando
-   la hora actual como corte; no se necesita capturar una fecha.
-4. Revisar la tabla de salidas pendientes y parcialmente surtidas, con cantidades ya
-   registradas/devueltas. La tabla usa el mismo diseño que los listados del sistema, con
-   **100 registros por página**, rango visible y total de salidas elegibles. La última página
-   puede contener menos registros. El contador de seleccionadas es independiente del total.
-   **Seleccionar todo** carga y marca los resultados de todas las páginas; la selección se
-   conserva al navegar. Use la casilla del encabezado para seleccionar o deseleccionar todo;
-   también puede marcar filas individuales. Seleccione sólo documentos entregados completamente.
-   Cada lote admite
-   hasta 100 salidas; si hay más, seleccione manualmente hasta 100 por lote.
-5. Capturar motivo/evidencia. No capturar una fecha real común: cada salida puede haberse
-   entregado en un momento distinto; el sistema guarda la fecha de regularización.
-6. Declarar que todas las partidas pendientes seleccionadas se entregaron antes del corte.
-7. Pulsar **Registrar entregas seleccionadas** y conservar el recibo.
+1. Pulse **Registrar entregas históricas** en Salidas de Materiales, Consumibles o Mermas.
+   La fecha y hora de apertura del diálogo fijan el corte. La tabla muestra el rango y el total
+   con 100 registros por página.
+2. Seleccione sólo salidas entregadas por completo. Use **Seleccionar todo** si verificó todas
+   las salidas elegibles y son hasta 100. Para más de 100, confirme lotes de hasta 100 por módulo.
+3. Escriba el **Motivo de la regularización**. Si tiene un comprobante, incluya su referencia.
+   Confirme la entrega física completa antes del corte y pulse
+   **Registrar entregas seleccionadas**. Conserve el recibo de cada lote y vuelva a abrir el
+   diálogo para cargar las salidas restantes.
+4. Si Almacén sigue desactualizado, aplique el conteo físico como saldo final con una cuenta
+   autorizada para ajustar existencias. En Excel, use **Ajustar existencias** y capture el
+   **Stock contado**. Incluya los movimientos reales ocurridos entre el conteo y el ajuste.
 
 <!-- manual:any goods:issues-page-view -->
 <!-- module:any reference salidas-materiales -->
@@ -286,8 +281,8 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 Completa sólo lo que faltaba registrar. Conserva devoluciones y no vuelve a descontar
 stock ni genera movimientos. Consulta y Excel identifican la procedencia histórica;
 costos y datos de proyecto históricos quedan sin verificar.
-Si cambia un documento, volver a buscar/revisar. Si se pierde la respuesta, reabrir
-y pulsar **Revisar y reintentar registro**; conserva captura y clave originales.
+Si cambia un documento, vuelva a abrir el diálogo y revise los folios. Si la confirmación queda
+pendiente, pulse **Revisar y reintentar registro** para retomar el mismo lote.
 
 Una devolución posterior exige confirmar que el material está entrando físicamente
 al almacén ahora. No registrar como devolución material que ya se incluyó en el conteo.

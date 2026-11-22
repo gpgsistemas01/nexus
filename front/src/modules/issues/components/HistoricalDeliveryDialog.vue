@@ -56,22 +56,27 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
         :is-submit-disabled="!canConfirm"
         submit-label="Registrar entregas seleccionadas"
         :message="error"
-        note="Hasta 100 salidas por lote. Conserva el recibo de regularización."
+        :note="
+            !receipt && !recoveryRequired ? `Hasta ${limits.maxDocuments} salidas por lote.` : ''
+        "
         @close="emit('close')"
         @submit="emit('confirm')"
     >
         <VAlert
+            v-if="!receipt && !recoveryRequired"
             type="info"
             variant="tonal"
             class="mb-4"
         >
-            La tabla muestra automáticamente salidas pendientes y parcialmente surtidas hasta la
-            hora actual. Usa este registro sólo para entregas físicas ya realizadas. Primero
-            concilia el inventario con un conteo físico actual. Esta operación completa el registro
-            pendiente sin descontar stock. Los costos y cantidades de proyecto históricos permanecen
-            sin verificar. No se captura una fecha real única porque las salidas pueden haberse
-            entregado en momentos distintos; el sistema registra cuándo se realiza esta
-            regularización.
+            <p>
+                Selecciona sólo salidas que ya se entregaron por completo. Si aún queda mercancía
+                por entregar, deja la salida pendiente o parcial.
+            </p>
+            <p class="mt-2">
+                La regularización completa el registro de la entrega sin descontar existencias.
+                Puedes realizarla antes de ajustar el inventario con el conteo físico. Los costos y
+                las cantidades de proyecto históricos quedan sin verificar.
+            </p>
         </VAlert>
         <VAlert
             v-if="recoveryRequired"
@@ -79,8 +84,7 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
             variant="tonal"
             class="mb-4"
         >
-            Hay una confirmación pendiente. El reintento conserva la captura y su clave para evitar
-            duplicados.
+            Hay un lote pendiente de confirmación. Retoma el mismo lote para evitar duplicados.
             <VBtn
                 variant="outlined"
                 :disabled="isWorking"
@@ -96,8 +100,14 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
             variant="tonal"
             class="mb-4"
         >
-            Se registraron {{ receipt.documents.length }} entregas. Recibo: {{ receipt.id }}. El
-            inventario conserva sus existencias.
+            <p role="status">
+                {{
+                    receipt.documents.length === 1
+                        ? 'Se regularizó 1 salida.'
+                        : `Se regularizaron ${receipt.documents.length} salidas.`
+                }}
+                Las existencias siguen sin cambios.
+            </p>
             <ul>
                 <li
                     v-for="item in receipt.documents"
@@ -106,6 +116,7 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                     {{ item.referenceNumber }}
                 </li>
             </ul>
+            <p class="mt-2">Conserva el recibo {{ receipt.id }}.</p>
         </VAlert>
         <template v-if="!receipt && !recoveryRequired">
             <p
@@ -116,21 +127,20 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
             </p>
             <template v-if="preview">
                 <p>
-                    Revisa las partidas pendientes y selecciona sólo las salidas entregadas por
-                    completo. La selección se conserva al cambiar de página.
+                    El corte es la fecha y hora en que abriste el diálogo. La selección se conserva
+                    al cambiar de página.
                 </p>
                 <p
                     v-if="preview.total === 0"
                     role="status"
                 >
-                    No hay salidas pendientes ni parcialmente surtidas para este corte.
+                    No hay salidas con cantidades pendientes de registrar para este corte.
                 </p>
                 <p
                     v-else-if="!preview.documents.length"
                     role="status"
                 >
-                    No hay salidas pendientes ni parcialmente surtidas en esta página. Puedes
-                    avanzar o seleccionar los resultados de todas las páginas.
+                    Esta página está vacía. Cambia de página para consultar los resultados.
                 </p>
                 <template v-if="preview.documents.length || preview.hasMore">
                     <div class="my-4">
@@ -141,7 +151,7 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                                     ? 'salida seleccionada'
                                     : 'salidas seleccionadas'
                             }}
-                            en todas las páginas (máximo {{ limits.maxDocuments }} por lote).
+                            en todas las páginas.
                         </span>
                     </div>
                 </template>
@@ -192,9 +202,10 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                                 v-for="detail in item.details"
                                 :key="detail.id"
                             >
-                                {{ detail.name }}: {{ numberText(detail.pendingQuantity) }} por
-                                registrar; {{ numberText(detail.suppliedQuantity) }} ya registradas
-                                y {{ numberText(detail.returnedQuantity) }} devueltas.
+                                <strong>{{ detail.name }}</strong>
+                                · Por registrar {{ numberText(detail.pendingQuantity) }} ·
+                                Registradas {{ numberText(detail.suppliedQuantity) }} · Devueltas
+                                {{ numberText(detail.returnedQuantity) }}
                             </li>
                         </ul>
                     </template>
@@ -211,14 +222,15 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                 <div class="historical-fields">
                     <VTextarea
                         :model-value="values.reason"
-                        label="Motivo y evidencia de la entrega histórica"
+                        label="Motivo de la regularización"
+                        hint="Si tienes un comprobante, incluye su referencia."
                         :maxlength="limits.maxReasonLength"
                         :disabled="isWorking"
                         @update:model-value="emit('update', 'reason', $event ?? '')"
                     />
                     <VCheckbox
                         :model-value="values.declaredDelivered"
-                        label="Confirmo que todas las partidas pendientes seleccionadas ya se entregaron físicamente antes del corte."
+                        label="Confirmo que las salidas seleccionadas se entregaron físicamente por completo antes del corte."
                         :disabled="isWorking"
                         @update:model-value="emit('declare', $event === true)"
                     />

@@ -152,7 +152,7 @@ export const useHistoricalDelivery = (options: {
                     const candidate = candidates.value.get(id);
                     if (!candidate)
                         throw new ClientError(
-                            'No se encontró una salida seleccionada. Vuelve a buscar antes de confirmar.',
+                            'Una salida seleccionada ya no está disponible. Vuelve a abrir el diálogo y revisa los folios.',
                         );
 
                     return { id: candidate.id, revision: candidate.revision };
@@ -181,7 +181,7 @@ export const useHistoricalDelivery = (options: {
         if (!candidate) return;
 
         if (selected.value.length >= limits.maxDocuments) {
-            error.value = `Puedes seleccionar hasta ${limits.maxDocuments} salidas por lote. Desmarca alguna o selecciona otro lote.`;
+            error.value = `Este lote ya tiene ${limits.maxDocuments} salidas. Confírmalo o desmarca una salida para cambiar la selección.`;
             return;
         }
 
@@ -227,7 +227,7 @@ export const useHistoricalDelivery = (options: {
                         allCandidates.set(candidate.id, candidate);
                         if (allCandidates.size > limits.maxDocuments)
                             throw new ClientError(
-                                `Hay más de ${limits.maxDocuments} salidas para este corte. Selecciona manualmente hasta ${limits.maxDocuments} por lote.`,
+                                `Hay más de ${limits.maxDocuments} salidas para este corte. Marca hasta ${limits.maxDocuments} por lote.`,
                             );
                     }
 
@@ -239,7 +239,7 @@ export const useHistoricalDelivery = (options: {
 
                 if (!complete)
                     throw new ClientError(
-                        'Hay demasiadas páginas para seleccionar todos los resultados de una vez. Selecciona manualmente hasta 100 salidas por lote.',
+                        `Hay más resultados de los que puedes seleccionar de una vez. Marca hasta ${limits.maxDocuments} salidas por lote.`,
                     );
 
                 candidates.value = allCandidates;
