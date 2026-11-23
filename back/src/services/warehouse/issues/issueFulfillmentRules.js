@@ -1,4 +1,5 @@
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
+import { HistoricalDeliveryError } from '../../../errors/warehouse/historicalDeliveryError.js';
 import { IssueCanceledConflict } from '../../../errors/inventory/issueError.js';
 
 const FLOAT_EPSILON = 0.000001;
@@ -7,6 +8,12 @@ export const assertIssueNotCanceled = issue => {
     if (issue.status?.name === GOODS_ISSUE_STATUS_NAMES.CANCELED
         || issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED) {
         throw new IssueCanceledConflict();
+    }
+};
+
+export const assertIssueNotHistorical = issue => {
+    if (issue.historicalDeliveryBatchId) {
+        throw new HistoricalDeliveryError('CONFLICT', 'Las salidas regularizadas por entrega histórica se conservan para consulta y devolución física.');
     }
 };
 

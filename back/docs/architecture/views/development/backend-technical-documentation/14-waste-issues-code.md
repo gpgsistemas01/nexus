@@ -46,9 +46,10 @@ de edición, surtido y devolución conservan el bloqueo de la salida durante su 
 de surtido y en las de Sistemas con `supplyImmediately: true`. La entrega y el alta
 comparten la transacción.
 
-`issueDTO.js` expone el costo vigente sólo con `inventory:costs-read`. También
-filtra el costo de la relación `waste` cuando la sesión carece del permiso o la
-regularización histórica tiene costo sin verificar.
+`WasteIssueDetail.maxUnitCost` conserva el costo al crear la partida. Las partidas
+anteriores a la migración conservan `null`. `issueDTO.js` expone los costos sólo
+con `inventory:costs-read`. Las salidas regularizadas admiten consulta y devolución
+física.
 
 Los conflictos de estado, merma duplicada y merma no disponible se distinguen mediante
 códigos de `errorMap.wasteIssue`, traducidos en `apiMessages.js`. La ausencia de estados

@@ -2,9 +2,11 @@ import { roundTo } from '@nexus/numbers';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '@nexus/issue-statuses';
 import type { IssueRow, IssueDetail, IssueTarget, IssueWriteTarget } from './issue.js';
 
-export const canEditIssue = (row: IssueRow) =>
+const isActiveIssue = (row: IssueRow) =>
     row.status === GOODS_ISSUE_STATUS_NAMES.APPROVED &&
     row.fulfillmentStatus !== FULFILLMENT_STATUS_NAMES.CANCELED;
+
+export const canEditIssue = (row: IssueRow) => isActiveIssue(row) && !row.historicalDelivery;
 
 export const resolveIssueEditMode = (row: IssueRow): 'view' | 'edit' | 'header' =>
     !canEditIssue(row)
@@ -19,7 +21,7 @@ export const canSupplyIssue = (row: IssueRow) =>
         row.fulfillmentStatus === FULFILLMENT_STATUS_NAMES.PARTIAL);
 
 export const canReturnIssue = (row: IssueRow) =>
-    canEditIssue(row) && row.fulfillmentStatus === FULFILLMENT_STATUS_NAMES.COMPLETE;
+    isActiveIssue(row) && row.fulfillmentStatus === FULFILLMENT_STATUS_NAMES.COMPLETE;
 
 export const getIssueReturnableQuantity = (row: IssueDetail) =>
     roundTo(row.suppliedQuantity - row.returnedQuantity);

@@ -143,9 +143,9 @@ export const captureRecipe = async (
     await go(page, `/salidas/${resource}`);
     await openAction(page, 'Registrar entregas históricas');
     const dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
-    await expect(
-      dialog.getByRole('status').filter({ hasText: /registros? en esta página/ }),
-    ).toBeVisible({ timeout: 30_000 });
+    await expect(dialog.getByText(/Registros \d+–\d+ de \d+/, { exact: true })).toBeVisible({
+      timeout: 30_000,
+    });
     await expect(
       dialog.getByRole('combobox', { name: 'Registros por página:', exact: true }),
     ).toHaveValue('100');

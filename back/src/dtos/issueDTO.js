@@ -9,19 +9,9 @@ const omitDetailCosts = detail => ({
     ...(detail.waste && { waste: omitCost(detail.waste) })
 });
 
-export const presentIssueDocument = (issue, user) => {
-    const showCosts = canReadCosts(user);
-
-    if (!issue?.details || (showCosts && !issue.historicalDeliveryBatchId)) return issue;
-
-    return {
-        ...issue,
-        details: issue.details.map(detail => ({
-            ...omitDetailCosts(detail),
-            ...(showCosts && { maxUnitCost: null })
-        }))
-    };
-};
+export const presentIssueDocument = (issue, user) => !issue?.details || canReadCosts(user)
+    ? issue
+    : { ...issue, details: issue.details.map(omitDetailCosts) };
 
 export const presentIssueReturn = (result, user) => !result?.detail || canReadCosts(user)
     ? result

@@ -32,8 +32,7 @@ const emit = defineEmits<{
     update: [field: 'reason', value: string];
     declare: [value: boolean];
     select: [id: string];
-    selectPage: [];
-    clearSelection: [];
+    selectPage: [selected: boolean];
     load: [page?: number];
     confirm: [];
     recover: [];
@@ -41,13 +40,21 @@ const emit = defineEmits<{
 }>();
 
 const selectedIds = computed(() => new Set(props.selected));
+const selectedOnPage = computed(
+    () => props.preview?.documents.filter(({ id }) => selectedIds.value.has(id)).length ?? 0,
+);
+const allOnPageSelected = computed(
+    () => selectedOnPage.value > 0 && selectedOnPage.value === props.preview?.documents.length,
+);
+const hasBatchSpace = computed(() => props.selected.length < limits.maxDocuments);
+const willSelectPage = computed(() => !allOnPageSelected.value && hasBatchSpace.value);
 
 const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
-    { title: 'Folio', key: 'referenceNumber', sortable: false },
-    { title: 'Área', key: 'departmentName', sortable: false },
-    { title: 'Proyecto', key: 'projectNumber', sortable: false },
-    { title: 'Partidas pendientes', key: 'details', sortable: false },
-    { title: 'Acciones', key: 'actions', sortable: false },
+    { title: 'Folio', key: 'referenceNumber', align: 'center', sortable: false },
+    { title: 'Área', key: 'departmentName', align: 'center', sortable: false },
+    { title: 'Proyecto', key: 'projectNumber', align: 'center', sortable: false },
+    { title: 'Partidas pendientes', key: 'details', align: 'center', sortable: false },
+    { title: 'Acciones', key: 'actions', align: 'center', sortable: false },
 ];
 </script>
 
@@ -77,8 +84,8 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
             </p>
             <p class="mt-2">
                 La regularización completa el registro de la entrega sin descontar existencias.
-                Puedes realizarla antes de ajustar el inventario con el conteo físico. Los costos y
-                las cantidades de proyecto históricos quedan sin verificar.
+                Puedes realizarla antes de ajustar el inventario con el conteo físico. El monto
+                entregado y las cantidades de proyecto quedan sin verificar.
             </p>
         </VAlert>
         <VAlert
@@ -155,33 +162,37 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                             Lote completo. Confirma el registro o desmarca una salida.
                         </template>
                     </p>
-                    <div class="d-flex flex-wrap ga-2 mt-2">
-                        <VBtn
-                            variant="outlined"
-                            :disabled="
-                                isWorking ||
-                                selected.length >= limits.maxDocuments ||
-                                preview.documents.every(({ id }) => selectedIds.has(id))
-                            "
-                            @click="emit('selectPage')"
-                        >
-                            Seleccionar de esta página
-                        </VBtn>
-                        <VBtn
-                            variant="text"
-                            :disabled="isWorking || !selected.length"
-                            @click="emit('clearSelection')"
-                        >
-                            Limpiar selección
-                        </VBtn>
-                    </div>
                     <p class="mt-2">
-                        La selección de página agrega salidas en el orden de la tabla hasta
-                        completar el lote.
+                        La casilla de la página agrega salidas en el orden de la tabla hasta
+                        completar el lote. Al desmarcarla, se quita sólo la selección de esta
+                        página.
                     </p>
                 </div>
+                <fieldset
+                    v-if="preview.total || selected.length"
+                    class="historical-fields"
+                >
+                    <VTextarea
+                        :model-value="values.reason"
+                        label="Motivo de la regularización"
+                        hint="Si tienes un comprobante, incluye su referencia."
+                        :maxlength="limits.maxReasonLength"
+                        :rows="2"
+                        :disabled="isWorking"
+                        @update:model-value="emit('update', 'reason', $event ?? '')"
+                    />
+                    <VCheckbox
+                        :model-value="values.declaredDelivered"
+                        label="Confirmo que las salidas seleccionadas se entregaron físicamente por completo antes del corte."
+                        :disabled="isWorking"
+                        hide-details
+                        @update:model-value="emit('declare', $event === true)"
+                    />
+                </fieldset>
                 <ServerTable
                     :headers="deliveryHeaders"
+                    class="historical-table"
+                    hide-page-count
                     :rows="preview.documents"
                     :total="preview.total"
                     :page="preview.page"
@@ -196,6 +207,28 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                         emit('load', $event.page)
                     "
                 >
+                    <template #[`header.actions`]>
+                        <VCheckbox
+                            v-if="preview.documents.length"
+                            :model-value="allOnPageSelected"
+                            :indeterminate="selectedOnPage > 0 && !allOnPageSelected"
+                            :aria-checked="
+                                selectedOnPage > 0 && !allOnPageSelected ? 'mixed' : undefined
+                            "
+                            :aria-label="
+                                !selectedOnPage || willSelectPage
+                                    ? 'Seleccionar salidas de esta página'
+                                    : 'Desmarcar salidas de esta página'
+                            "
+                            :disabled="isWorking || (!hasBatchSpace && selectedOnPage === 0)"
+                            hide-details
+                            @update:model-value="emit('selectPage', willSelectPage)"
+                        >
+                            <template #label>
+                                <span class="d-sm-none">Selección de esta página</span>
+                            </template>
+                        </VCheckbox>
+                    </template>
                     <template #[`item.details`]="{ item }">
                         <ul class="historical-details">
                             <li
@@ -223,22 +256,6 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                         />
                     </template>
                 </ServerTable>
-                <div class="historical-fields">
-                    <VTextarea
-                        :model-value="values.reason"
-                        label="Motivo de la regularización"
-                        hint="Si tienes un comprobante, incluye su referencia."
-                        :maxlength="limits.maxReasonLength"
-                        :disabled="isWorking"
-                        @update:model-value="emit('update', 'reason', $event ?? '')"
-                    />
-                    <VCheckbox
-                        :model-value="values.declaredDelivered"
-                        label="Confirmo que las salidas seleccionadas se entregaron físicamente por completo antes del corte."
-                        :disabled="isWorking"
-                        @update:model-value="emit('declare', $event === true)"
-                    />
-                </div>
             </template>
         </template>
     </EditorDialog>
@@ -247,11 +264,32 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
 <style scoped>
 .historical-fields {
     display: grid;
-    gap: 1rem;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    margin-block: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid rgb(var(--v-theme-table-border));
+    border-radius: 0.65rem;
+    background: rgb(var(--v-theme-surface));
 }
 .historical-details {
     min-width: 16rem;
-    padding-inline-start: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.historical-details li + li {
+    margin-block-start: 0.25rem;
+}
+.historical-table :deep(.v-table__wrapper th),
+.historical-table :deep(.v-table__wrapper td) {
+    padding: 0.35rem 0.5rem;
+}
+.historical-table :deep(.v-table__wrapper tbody td:first-child) {
+    text-align: start;
+}
+.historical-table :deep(.v-table__wrapper .v-selection-control) {
+    justify-content: center;
 }
 @media (max-width: 599px) {
     .historical-details {

@@ -111,6 +111,7 @@ const cellText = (row: Row, key: string) => {
 
 <template>
     <div class="responsive-table-cards">
+        <slot name="header.actions" />
         <div
             v-if="sortableColumns.length"
             class="responsive-table-cards__sorting"

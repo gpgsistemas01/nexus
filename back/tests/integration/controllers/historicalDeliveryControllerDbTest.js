@@ -34,7 +34,7 @@ const seedIssue = async (resource, overrides = {}) => {
     returnedQuantity: overrides.returned ?? 0, isSupplied: false, projectConvertedQuantity: null, convertedQuantityDifference: null,
     fulfillmentStatusId: statuses[name] };
   return isWaste ? prisma.wasteIssue.create({ data: { ...header, createdById: fixture.user.id,
-    details: { create: { ...detail, wasteId: ids.waste } } }, include: { details: true } })
+    details: { create: { ...detail, wasteId: ids.waste, maxUnitCost: overrides.cost ?? null } } }, include: { details: true } })
     : prisma.goodsIssue.create({ data: { ...header, type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
       details: { create: { ...detail, materialId: ids[resource], supplierId: fixture.suppliers[0].id, maxUnitCost: overrides.cost ?? 0 } } }, include: { details: true } });
 };
@@ -85,7 +85,7 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
   });
 
   it.each(['materials', 'consumables', 'wastes'])('reconoce pendientes y parciales de %s con stock cero; conserva devoluciones y valores desconocidos', async resource => {
-    const issues = [await seedIssue(resource), await seedIssue(resource, { supplied: 2, returned: 1 })];
+    const issues = [await seedIssue(resource), await seedIssue(resource, { supplied: 2, returned: 1, cost: 10 })];
     const read = await preview(resource);
     const candidates = read.documents.filter(item => issues.some(issue => issue.id === item.id));
     expect(candidates.map(item => item.details[0].suppliedQuantity)).toEqual(expect.arrayContaining([0, 2]));
@@ -102,7 +102,8 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
       expect(Number(saved.details[0].returnedQuantity)).toBe(index);
       expect(saved.details[0].projectConvertedQuantity).toBeNull();
       expect(saved.details[0].convertedQuantityDifference).toBeNull();
-      if (resource !== 'wastes') expect(Number(saved.details[0].maxUnitCost)).toBe(0);
+      expect(saved.details[0].maxUnitCost === null ? null : Number(saved.details[0].maxUnitCost))
+        .toBe(index === 1 ? 10 : resource === 'wastes' ? null : 0);
     }
     const repeated = await confirm(resource, command).expect(200);
     expect(repeated.body.receipt).toEqual(response.body.receipt);
@@ -140,9 +141,21 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
   });
 
   it.each(['materials', 'wastes'])('una devolución histórica de %s exige entrada física actual y conserva datos sin verificar', async resource => {
-    const issue = await seedIssue(resource);
+    const issue = await seedIssue(resource, { cost: 10 });
     const candidate = (await preview(resource)).documents.find(item => item.id === issue.id);
     await confirm(resource, capture([candidate])).expect(200);
+    const header = {
+      requesterId: issue.requesterId, advisorId: issue.advisorId, clientId: issue.clientId,
+      departmentId: issue.departmentId, projectNumber: issue.projectNumber,
+      requestDate: issue.requestDate.toISOString(), observations: 'Cambio no permitido'
+    };
+    const details = [resource === 'wastes' ? { wasteId: ids.waste, quantity: 5 }
+      : { materialId: ids.materials, supplierId: fixture.suppliers[0].id, quantity: 5 }];
+    for (const suffix of ['', '/header']) {
+      const refused = await request(app).patch(`/${resource}/${issue.id}${suffix}`).set('Cookie', cookie)
+        .send({ ...header, details }).expect(409);
+      expect(refused.body.code).toBe('HISTORICAL_DELIVERY_CONFLICT');
+    }
     if (resource === 'wastes') await prisma.waste.update({ where: { id: ids.waste }, data: { maxUnitCost: 100 } });
     const before = await stockSnapshot();
     const path = `/${resource}/${issue.id}/details/${issue.details[0].id}/returns`;
@@ -156,7 +169,7 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
     const read = await request(app).get(`/${resource}/${issue.id}`).set('Cookie', cookie).expect(200);
     const document = read.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'];
     expect(document.historicalDeliveryBatch).toMatchObject({ reason: 'Entregas físicas verificadas con almacén' });
-    if (resource === 'wastes') expect(document.details[0].maxUnitCost).toBeNull();
+    expect(document.details[0].maxUnitCost).toBe('10');
     const reports = await import('../../../src/services/warehouse/reportService.js');
     const report = resource === 'wastes' ? reports.findWasteIssueReportRows : reports.findGoodsIssueReportRows;
     const rows = [];

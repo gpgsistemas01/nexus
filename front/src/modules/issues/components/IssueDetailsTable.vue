@@ -29,6 +29,7 @@ const props = defineProps<{
     resource: IssueResource;
     isDisabled: boolean;
     canReadCosts: boolean;
+    isHistorical: boolean;
     canReturnDetails: boolean;
 }>();
 const emit = defineEmits<{
@@ -42,28 +43,33 @@ const groupWasteColumns = (title: string, columns: DataTableHeader<IssueDetail>[
         ? [{ title, align: 'center' as const, children: columns }]
         : columns;
 
+const detailAmounts = (item: IssueDetail) => getIssueDetailAmounts(item, props.isHistorical);
+
+const amountText = (value: number | null) =>
+    props.isHistorical && value == null ? 'Sin verificar' : currencyText(value);
+
 const amountColumns = [
     {
         title: 'Monto solicitado',
         key: 'requested',
         align: 'end',
-        value: (item) => getIssueDetailAmounts(item).requested,
+        value: (item) => detailAmounts(item).requested,
     },
     {
         title: 'Monto entregado neto',
         key: 'delivered',
         align: 'end',
-        value: (item) => getIssueDetailAmounts(item).delivered,
+        value: (item) => detailAmounts(item).delivered,
     },
 ] satisfies DataTableHeader<IssueDetail>[];
 
 const totals = computed(() => {
     if (!props.canReadCosts) return [];
 
-    const { requested, delivered } = getIssueTotals(props.rows);
+    const { requested, delivered } = getIssueTotals(props.rows, props.isHistorical);
     return [
-        { label: 'Total solicitado', value: currencyText(requested) },
-        { label: 'Total entregado neto', value: currencyText(delivered) },
+        { label: 'Total solicitado', value: amountText(requested) },
+        { label: 'Total entregado neto', value: amountText(delivered) },
     ];
 });
 
@@ -175,8 +181,7 @@ const cardValue = (item: IssueDetail, key: string) => {
 
     if (key === 'maxUnitCost') return currencyText(item.maxUnitCost);
 
-    if (key === 'requested' || key === 'delivered')
-        return currencyText(getIssueDetailAmounts(item)[key]);
+    if (key === 'requested' || key === 'delivered') return amountText(detailAmounts(item)[key]);
 
     if (key === 'pendingQuantity') return numberText(getIssuePendingQuantity(item));
 
@@ -199,7 +204,7 @@ const cardValue = (item: IssueDetail, key: string) => {
 };
 
 const sortValue = (item: IssueDetail, key: string): unknown => {
-    if (key === 'requested' || key === 'delivered') return getIssueDetailAmounts(item)[key];
+    if (key === 'requested' || key === 'delivered') return detailAmounts(item)[key];
 
     if (key === 'pendingQuantity') return getIssuePendingQuantity(item);
 
@@ -277,7 +282,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
                 :key="key"
                 #[`item.${key}`]="{ value }"
             >
-                {{ currencyText(value) }}
+                {{ amountText(value) }}
             </template>
             <template #[`item.quantityToSupply`]="{ item }">
                 <IssueSupplyField
@@ -403,12 +408,6 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
         label="Totales de salida"
         :fields="totals"
     />
-    <p
-        v-if="canReadCosts && resource === 'wastes' && rows.some((row) => row.maxUnitCost != null)"
-        class="text-caption mt-2"
-    >
-        Importes de referencia con el costo vigente de la merma.
-    </p>
 </template>
 
 <style scoped>

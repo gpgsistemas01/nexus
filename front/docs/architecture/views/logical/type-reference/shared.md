@@ -358,6 +358,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `page` | `page: number;` |
 | `pageSize` | `pageSize: number;` |
 | `isLoading` | `isLoading: boolean;` |
+| `hidePageCount` | `hidePageCount?: boolean;` |
 | `pageSizeOptions` | `pageSizeOptions?: number[];` |
 | `tableLabel` | `tableLabel?: string;` |
 | `sortBy` | `sortBy?: DataTableSortItem[];` |
@@ -367,7 +368,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ServerTable.defineEmits
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 35, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

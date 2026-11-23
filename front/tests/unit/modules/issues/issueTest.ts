@@ -416,6 +416,11 @@ describe('salidas Vue: contratos y modos', () => {
       maxUnitCost: 25,
     };
     expect(getIssueDetailAmounts(partial)).toEqual({ requested: 20000, delivered: 7500 });
+    expect(getIssueDetailAmounts(partial, true)).toEqual({ requested: 20000, delivered: null });
+    expect(getIssueTotals([{ ...partial, isCanceled: true }], true)).toEqual({
+      requested: 20000,
+      delivered: null,
+    });
     expect(getIssueTotals([partial, fractional, { ...line, isCanceled: true }])).toEqual({
       requested: 20018.75,
       delivered: 7512.5,
