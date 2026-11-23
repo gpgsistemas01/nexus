@@ -26,7 +26,7 @@ import { findFulfillmentStatusIdByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
 import { handleServiceError } from "../../serviceErrorHandler.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { assertIssueDepartmentAccess, assertIssueImmediateSupplyAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
+import { assertIssueDepartmentAccess, buildIssueDepartmentWhere, resolveIssueImmediateSupply } from '../issues/issueAccessService.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../shared/constants/fulfillmentStatuses.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
@@ -146,10 +146,10 @@ export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MA
 
     try {
 
-        const { requesterId, advisorId, departmentId, clientId, details, supplyImmediately, ...goodsIssueData } = goodsIssueDto;
+        const { requesterId, advisorId, departmentId, clientId, details, supplyImmediately: requested, ...goodsIssueData } = goodsIssueDto;
         assertIssueDepartmentAccess({ accesses, departmentId });
 
-        if (supplyImmediately) assertIssueImmediateSupplyAccess({ accesses, permission: PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE });
+        const supplyImmediately = resolveIssueImmediateSupply({ accesses, requested, permission: PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE });
 
         const headerData = await resolveIssueHeaderData({
             requesterId,

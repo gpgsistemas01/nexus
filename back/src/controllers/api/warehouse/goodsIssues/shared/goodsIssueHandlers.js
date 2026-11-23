@@ -7,6 +7,7 @@ import {
 } from "../../../../../dtos/goodsIssueDTO.js";
 import { presentIssueDocument, presentIssueReturn } from '../../../../../dtos/issueDTO.js';
 import { successCodeMessages } from "../../../../../shared/constants/apiSuccessCodes.js";
+import { FULFILLMENT_STATUS_NAMES } from '../../../../../shared/constants/fulfillmentStatuses.js';
 import { sanitizeEmptyStrings } from '../../../../../utils/formattersUtils.js';
 import { emitInventoryUpdated } from "../../../../../utils/socketUtils.js";
 import { getIssueDataTableQuery } from '../../../../../utils/issueQueryUtils.js';
@@ -45,7 +46,9 @@ export const buildRegisterHandler = (createGoodsIssue, inventoryContext) => asyn
         goodsIssueDto: sanitizedGoodsIssueDto
     });
 
-    if (sanitizedGoodsIssueDto.supplyImmediately) emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-supplied' });
+    if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.COMPLETE) {
+        emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-supplied' });
+    }
 
     return res.status(200).json({
         goodsIssue: presentIssueDocument(goodsIssue, req.user),

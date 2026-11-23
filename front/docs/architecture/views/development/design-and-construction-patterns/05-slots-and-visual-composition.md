@@ -121,3 +121,9 @@ al consumidor que los define; las escrituras permanecen en sus servicios.
 
 [catalogs.spec.ts](../../../../../tests/e2e/catalogs.spec.ts) observa tabla y apertura del
 editor.
+
+En los formularios, [readOnlyField.ts](../../../../../src/shared/ui/readOnlyField.ts)
+adapta el estado de solo lectura a los atributos del control de Vuetify.
+`DateField`, `WrappingTextField` y los campos directos comparten esta función.
+Cada formulario decide qué campos son editables. La adaptación conserva el valor
+seleccionable y omite el campo al navegar con Tab.

@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { getReadOnlyFieldProps } from '../ui/readOnlyField.js';
 import { VTextarea } from 'vuetify/components/VTextarea';
+
+defineProps<{ readonly?: boolean }>();
 
 const model = defineModel<string>({
     required: true,
@@ -29,6 +32,7 @@ const submitOnEnter = (event: KeyboardEvent) => {
     <VTextarea
         class="wrapping-text-field"
         :model-value="model"
+        v-bind="getReadOnlyFieldProps(readonly)"
         :rows="1"
         auto-grow
         no-resize

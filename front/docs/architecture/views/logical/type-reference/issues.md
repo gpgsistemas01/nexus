@@ -43,7 +43,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 22, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 26, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -52,6 +52,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `resource` | `resource: IssueResource;` |
 | `isDisabled` | `isDisabled: boolean;` |
 | `canReadCosts` | `canReadCosts: boolean;` |
+| `canReturnDetails` | `canReturnDetails: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -61,7 +62,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 34, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -89,12 +90,14 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `isConflicted` | `isConflicted: boolean;` |
 | `canEditHeader` | `canEditHeader: boolean;` |
 | `canEditDetails` | `canEditDetails: boolean;` |
+| `canReturnDetails` | `canReturnDetails: boolean;` |
 | `mode` | `mode: IssueMode;` |
 | `resource` | `resource: IssueResource;` |
 | `selects` | `selects: IssueHeaderSelect[];` |
 | `canCreateClient` | `canCreateClient: boolean;` |
 | `canReadCosts` | `canReadCosts: boolean;` |
-| `canSupplyOnCreate` | `canSupplyOnCreate: boolean;` |
+| `autoSupplyOnCreate` | `autoSupplyOnCreate: boolean;` |
+| `canChooseSupplyOnCreate` | `canChooseSupplyOnCreate: boolean;` |
 | `supplyImmediately` | `supplyImmediately: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
@@ -108,7 +111,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 41, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 43, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -215,7 +218,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `name` | `name: string;` |
+| `context` | `context: string;` |
 | `presentation` | `presentation: string;` |
 | `supplied` | `supplied: number;` |
 | `returned` | `returned: number;` |

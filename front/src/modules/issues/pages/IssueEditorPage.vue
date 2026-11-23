@@ -4,7 +4,7 @@ import { PERMISSIONS } from '@nexus/permissions';
 import { usePageAccess } from '../../../app/composables/usePageAccess.js';
 import { useIssueEditor } from '../composables/useIssueEditor.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
-import { getIssueReturnableQuantity } from '../issueRules.js';
+import { canReturnIssue, canReturnIssueDetail } from '../issueRules.js';
 import type { IssueResource, IssueTarget, IssueHeaderSelect, IssueDetail } from '../issue.js';
 import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
 import type { LookupCreation } from '../../../shared/lookup.js';
@@ -90,16 +90,16 @@ const title = `${editorActionLabels[mode]} ${entityLabel}${issueDocument ? ` - F
 const canReadItems = computed(() =>
     has(props.resource === 'wastes' ? PERMISSIONS.WASTES_READ : PERMISSIONS.MATERIALS_READ),
 );
+const canReturnDetails = computed(
+    () =>
+        (mode === 'view' || mode === 'return') &&
+        !!issueDocument &&
+        canReturnIssue(issueDocument) &&
+        has(ISSUE_CONFIG[props.resource].supplyPermission),
+);
 
 const openReturnDialog = (line: IssueDetail) => {
-    if (
-        mode === 'return' &&
-        issueDocument &&
-        has(ISSUE_CONFIG[props.resource].supplyPermission) &&
-        !line.isCanceled &&
-        getIssueReturnableQuantity(line) > 0
-    )
-        returnDetail.value = line;
+    if (canReturnDetails.value && canReturnIssueDetail(line)) returnDetail.value = line;
 };
 </script>
 
@@ -114,12 +114,14 @@ const openReturnDialog = (line: IssueDetail) => {
         :is-conflicted="editor.isConflicted.value"
         :can-edit-header="editor.canEditHeader"
         :can-edit-details="editor.canEditDetails"
+        :can-return-details="canReturnDetails"
         :mode="mode"
         :resource="resource"
         :selects="selects"
         :can-create-client="canCreateClient"
         :can-read-costs="has(PERMISSIONS.INVENTORY_COSTS_READ)"
-        :can-supply-on-create="editor.canSupplyOnCreate.value"
+        :auto-supply-on-create="editor.autoSupplyOnCreate.value"
+        :can-choose-supply-on-create="editor.canChooseSupplyOnCreate.value"
         :supply-immediately="editor.supplyImmediately.value"
         @update:supply-immediately="editor.supplyImmediately.value = $event"
         @create-client="

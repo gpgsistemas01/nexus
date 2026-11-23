@@ -630,7 +630,15 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         const before = await prisma.supplierMaterial.findUniqueOrThrow({ where });
         try {
             await prisma.supplierMaterial.update({ where, data: { currentStock: 5 } });
-            const created = await request(app).post(issuePath(resource)).send({ ...header(), supplyImmediately: true, details: [detail(resource)] }).expect(200);
+            const payload = { ...header(), details: [detail(resource)] };
+            if (resource === 'consumable') {
+                const pending = await request(app).post(issuePath(resource)).send(payload).expect(200);
+                const savedPending = await prisma.goodsIssue.findUniqueOrThrow({ where: { id: pending.body.goodsIssue.id }, include: { fulfillmentStatus: true } });
+                expect(savedPending.fulfillmentStatus.name).toBe('Pendiente');
+                expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where })).currentStock)).toBe(5);
+            }
+            const requestedSupply = resource === 'consumable' ? { supplyImmediately: true } : {};
+            const created = await request(app).post(issuePath(resource)).send({ ...payload, ...requestedSupply }).expect(200);
             expect(created.body.goodsIssue.fulfillmentStatus).toMatchObject({ name: 'Surtido' });
             const saved = await prisma.goodsIssue.findUniqueOrThrow({ where: { id: created.body.goodsIssue.id }, include: { details: true } });
             expect(Number(saved.details[0].suppliedQuantity)).toBe(2);
@@ -641,7 +649,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             expect(Number(movement.details[0].quantity)).toBe(-2);
             const count = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
             const movementCount = await prisma.inventoryMovement.count();
-            await request(app).post(issuePath(resource)).send({ ...header(), supplyImmediately: true, details: [{ ...detail(resource), quantity: 4 }] }).expect(409);
+            await request(app).post(issuePath(resource)).send({ ...payload, ...requestedSupply, details: [{ ...detail(resource), quantity: 4 }] }).expect(409);
             expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(count);
             expect(await prisma.inventoryMovement.count()).toBe(movementCount);
             expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where })).currentStock)).toBe(3);

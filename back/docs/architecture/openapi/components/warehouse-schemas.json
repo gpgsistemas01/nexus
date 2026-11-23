@@ -2448,7 +2448,7 @@
       "supplyImmediately": {
         "type": "boolean",
         "default": false,
-        "description": "Surtir todas las partidas al guardar. Requiere permiso de surtido de Almacén o Sistemas. Alta, stock y movimientos se confirman en una transacción; sin stock se revierte toda la operación."
+        "description": "Opción de surtido para Sistemas con permiso. La API aplica surtido automático a Almacén con permiso. El alta, el stock y el movimiento se confirman en una transacción. Si falta stock, la operación se revierte completa."
       }
     },
     "additionalProperties": false,
@@ -2492,7 +2492,7 @@
       "supplyImmediately": {
         "type": "boolean",
         "default": false,
-        "description": "Surtir todas las partidas al guardar. Requiere permiso de surtido de Almacén o Sistemas. Alta, stock y movimientos se confirman en una transacción; sin stock se revierte toda la operación."
+        "description": "Opción de surtido para Sistemas con permiso. La API aplica surtido automático a Almacén con permiso. El alta, el stock y el movimiento se confirman en una transacción. Si falta stock, la operación se revierte completa."
       }
     },
     "additionalProperties": false,

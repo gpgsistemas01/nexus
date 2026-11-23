@@ -80,7 +80,6 @@ const supplierName = computed(() => {
                 label="Presentación"
                 :model-value="presentation"
                 readonly
-                tabindex="-1"
             />
         </template>
         <template #actions>

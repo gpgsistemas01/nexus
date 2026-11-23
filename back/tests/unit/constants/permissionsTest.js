@@ -21,6 +21,13 @@ describe('políticas funcionales de acceso', () => {
             { roleKey: ROLE_KEYS.AUXILIARY, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
         ])).not.toContain(PERMISSIONS.ISSUES_RECONCILE);
     });
+    it('el surtido automático requiere una asignación autorizada de Almacén', () => {
+        const systems = { roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS };
+        const warehouseOperator = { roleKey: ROLE_KEYS.OPERATOR, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY };
+        const warehouseCoordinator = { ...warehouseOperator, roleKey: ROLE_KEYS.COORDINATOR };
+        expect(getGrantedPermissions([systems, warehouseOperator])).not.toContain(PERMISSIONS.ISSUES_AUTO_SUPPLY);
+        expect(getGrantedPermissions([systems, warehouseCoordinator])).toContain(PERMISSIONS.ISSUES_AUTO_SUPPLY);
+    });
     const operationalDepartments = [
         DEPARTMENT_KEYS.PRINTING,
         DEPARTMENT_KEYS.ROUTER,

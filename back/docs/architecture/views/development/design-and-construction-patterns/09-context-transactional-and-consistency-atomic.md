@@ -45,6 +45,12 @@ nuevas; stock y costo se actualizan en la misma escritura. Corregir o cancelar u
 partida no recalcula el costo máximo. Dentro del callback se usa `tx` directamente
 o se propaga a sus colaboradores.
 
+En las altas de salidas con surtido inmediato, `createGoodsIssue` y
+`createWasteIssueTransaction` crean la salida y reutilizan el servicio de surtido
+con el mismo `tx`. Folio, entrega, descuento y movimiento se confirman juntos.
+Un error de existencias revierte el alta completa. El controller publica el cambio
+de inventario después del commit.
+
 ## Protección de escrituras concurrentes
 
 `repository/warehouse/documentLockRepository.js` concentra los bloqueos de fila de

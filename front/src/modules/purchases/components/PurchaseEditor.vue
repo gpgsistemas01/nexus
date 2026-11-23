@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getReadOnlyFieldProps } from '../../../shared/ui/readOnlyField.js';
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import WrappingTextField from '../../../shared/components/WrappingTextField.vue';
 import DateField from '../../../shared/components/DateField.vue';
@@ -181,7 +182,7 @@ const emit = defineEmits<{
                         label="Observaciones"
                         :model-value="values.observations"
                         :maxlength="FORM_FIELD_LIMITS.OBSERVATIONS"
-                        :readonly="isReadOnly"
+                        v-bind="getReadOnlyFieldProps(isReadOnly)"
                         :disabled="isSubmitting"
                         :error-messages="errors.observations"
                         rows="4"

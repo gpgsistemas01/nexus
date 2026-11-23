@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getReadOnlyFieldProps } from '../../../shared/ui/readOnlyField.js';
 import { VTextField } from 'vuetify/components/VTextField';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import OrganizationFields from '../../../shared/components/OrganizationFields.vue';
@@ -52,7 +53,7 @@ const emit = defineEmits<{
             autocomplete="off"
             :model-value="values.name"
             :error-messages="errors.name"
-            :readonly="action === 'password'"
+            v-bind="getReadOnlyFieldProps(action === 'password')"
             :disabled="isSubmitting || isConflicted"
             @update:model-value="emit('update', 'name', $event ?? '')"
             @blur="emit('blur', 'name')"
@@ -94,7 +95,7 @@ const emit = defineEmits<{
             v-if="row && action !== 'password'"
             label="Persona vinculada"
             :model-value="row.personName || 'Sin persona vinculada'"
-            readonly
+            v-bind="getReadOnlyFieldProps(true)"
             hint="La edición conserva la vinculación existente."
             persistent-hint
         />

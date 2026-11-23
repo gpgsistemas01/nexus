@@ -43,7 +43,7 @@ Si dispone de una sola área, permanece seleccionada al limpiar filtros.
 1. Pulse **Nueva salida** y seleccione cliente, asesor, área y solicitante.
 2. Capture proyecto, fecha y observaciones. Para **GPG INTERNO**, conserve el proyecto del área.
 3. En el último renglón de detalles, seleccione el artículo en su columna, capture **Cantidad** bajo **Salida** y pulse **Agregar**.
-4. Revise las partidas, pulse **Guardar** y compruebe el folio pendiente.
+4. Revise las partidas, pulse **Guardar** y compruebe el folio y su estado.
 
 <!-- module:any reference salidas-materiales -->
 
@@ -54,12 +54,12 @@ Si dispone de una sola área, permanece seleccionada al limpiar filtros.
 El nombre, las medidas, la presentación y la unidad corresponden al catálogo del artículo. El proveedor se muestra debajo del nombre en cada detalle, para distinguir las ofertas del mismo artículo. Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida distinta. En móvil se conserva esta identificación en las fichas.
 Materiales y consumibles requieren al menos una unidad; merma admite cantidades positivas menores.
 Al surtir, revise **Cantidad surtida** y **Pendiente de surtir** antes de capturar la nueva entrega. Al devolver, revise **Cantidad devuelta** y **Saldo entregado**.
-Solicitar no descuenta inventario.
+Las solicitudes pendientes conservan las existencias.
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
-Almacén y Sistemas pueden marcar **Surtir al guardar** al crear una salida. Entrega
-todas las partidas y descuenta sus existencias en la misma operación. Sin marcar,
-queda pendiente. Si falta stock, no se guarda la salida ni se descuentan partidas.
+Almacén surte todas las partidas al guardar una nueva salida. Sistemas puede marcar
+**Surtir al guardar** o dejar la solicitud pendiente. El surtido inmediato descuenta
+existencias en la misma operación del alta. Si falta stock, el sistema revierte toda la operación.
 <!-- manual:end -->
 
 Seleccione un cliente y artículos con proveedor ya registrado. Si su cuenta pertenece
@@ -157,12 +157,12 @@ lo previsto con la cantidad convertida. El descuento de stock usa **Cantidad a s
 
 ## Devolver una entrega
 
-La devolución sólo captura la cantidad a devolver y sus observaciones para la partida
-seleccionada. No modifica cliente, proyecto, artículo ni la cantidad solicitada.
+Almacén y Sistemas pueden devolver partidas desde la consulta de la salida.
 
-1. En una salida **Surtida**, pulse **Devolver material surtido**.
-2. Elija **Devolver detalle de salida** y compruebe el saldo retornable.
-3. Capture cantidad y observaciones, confirme **Devolver** y revise el reintegro.
+1. En una salida **Surtida**, pulse **Devolver detalle de salida** en la partida correspondiente.
+   El listado también ofrece el acceso **Devolver material surtido** en esa salida.
+2. Revise el folio, el artículo y el saldo disponible. Capture la cantidad recibida y las observaciones.
+3. Pulse **Devolver**. El material se reintegra al inventario y la devolución queda vinculada a la partida original.
 
 <!-- module:any reference salidas-materiales -->
 

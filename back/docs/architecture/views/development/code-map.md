@@ -289,7 +289,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/issues/historicalDeliverySelect.js`](../../../../src/services/warehouse/issues/historicalDeliverySelect.js) | `HISTORICAL_DELIVERY_SELECT` |
 | [`src/services/warehouse/issues/historicalDeliveryService.js`](../../../../src/services/warehouse/issues/historicalDeliveryService.js) | `confirmHistoricalDeliveries`, `previewHistoricalDeliveries` |
 | [`src/services/warehouse/issues/historicalReturnRules.js`](../../../../src/services/warehouse/issues/historicalReturnRules.js) | `assertHistoricalPhysicalReturn` |
-| [`src/services/warehouse/issues/issueAccessService.js`](../../../../src/services/warehouse/issues/issueAccessService.js) | `assertIssueDepartmentAccess`, `assertIssueImmediateSupplyAccess`, `buildIssueDepartmentWhere` |
+| [`src/services/warehouse/issues/issueAccessService.js`](../../../../src/services/warehouse/issues/issueAccessService.js) | `assertIssueDepartmentAccess`, `buildIssueDepartmentWhere`, `resolveIssueImmediateSupply` |
 | [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `assertIssueNotCanceled`, `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
 | [`src/services/warehouse/issues/issueSupplyRules.js`](../../../../src/services/warehouse/issues/issueSupplyRules.js) | `buildInitialIssueSupplyDetails`, `resolveIssueSupplyChange` |

@@ -14,7 +14,11 @@ import {
     currencyText,
     convertedQuantityText,
 } from '../../../shared/utils/formatNumbers.js';
-import { getIssueReturnableQuantity, getIssuePendingQuantity } from '../issueRules.js';
+import {
+    canReturnIssueDetail,
+    getIssueReturnableQuantity,
+    getIssuePendingQuantity,
+} from '../issueRules.js';
 import { getIssueDetailAmounts, getIssueTotals } from '../issueDetails.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
 import type { IssueDetail, IssueMode, IssueResource, IssueSupplyChanges } from '../issue.js';
@@ -25,6 +29,7 @@ const props = defineProps<{
     resource: IssueResource;
     isDisabled: boolean;
     canReadCosts: boolean;
+    canReturnDetails: boolean;
 }>();
 const emit = defineEmits<{
     remove: [id: string];
@@ -63,7 +68,7 @@ const totals = computed(() => {
 });
 
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
-    const { mode, resource, canReadCosts } = props;
+    const { mode, resource, canReadCosts, canReturnDetails } = props;
 
     return [
         {
@@ -137,7 +142,7 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
                   },
               ]
             : []),
-        ...(['create', 'edit', 'return'].includes(mode)
+        ...(canReturnDetails || mode === 'create' || mode === 'edit'
             ? [
                   {
                       title: 'Acciones',
@@ -311,11 +316,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
             </template>
             <template #[`item.actions`]="{ item }">
                 <TableAction
-                    v-if="
-                        mode === 'return' &&
-                        !item.isCanceled &&
-                        getIssueReturnableQuantity(item) > 0
-                    "
+                    v-if="canReturnDetails && canReturnIssueDetail(item)"
                     label="Devolver detalle de salida"
                     :icon="`svg:${mdiUndoVariant}`"
                     color="accent"
@@ -379,11 +380,7 @@ const sortValue = (item: IssueDetail, key: string): unknown => {
             </template>
             <template #[`item.actions`]="{ item }">
                 <TableAction
-                    v-if="
-                        mode === 'return' &&
-                        !item.isCanceled &&
-                        getIssueReturnableQuantity(item) > 0
-                    "
+                    v-if="canReturnDetails && canReturnIssueDetail(item)"
                     label="Devolver detalle de salida"
                     :icon="`svg:${mdiUndoVariant}`"
                     color="accent"

@@ -153,7 +153,7 @@ sequenceDiagram
         activate Prisma
         Prisma-->>Domain: create(): Promise[WasteIssue]
         deactivate Prisma
-        opt supplyImmediately con permiso de surtido
+        opt Surtido automático de Almacén o solicitado por Sistemas
             Note over Domain,Prisma: supplyWasteIssue reutiliza tx: detalles, stock y movimiento.<br/>Un fallo revierte también el alta.
         end
         Prisma-->>Domain: commit

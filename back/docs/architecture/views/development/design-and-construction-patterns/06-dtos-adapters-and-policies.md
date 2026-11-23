@@ -115,3 +115,11 @@ El middleware comprueba ese resultado en `req.user.permissions`; la presentació
 utiliza los permisos obtenidos por la sesión. El mismo registro conserva la
 definición de roles y áreas para ambos consumidores.
 El resultado es política declarativa evaluada por funciones comunes, sin jerarquía GoF.
+
+En el alta de salidas de [material](../../processes/backend-code-sequences/issues/cu-sal-02.md),
+[consumible](../../processes/backend-code-sequences/issues/cu-sal-16.md) y
+[merma](../../processes/backend-code-sequences/issues/cu-sal-09.md),
+`resolveIssueImmediateSupply` evalúa la sesión antes de abrir la transacción.
+Almacén con permiso surte automáticamente. Sistemas con permiso puede solicitar
+surtido inmediato. Las demás altas quedan pendientes y una solicitud explícita de
+surtido sin el permiso se rechaza. La política usa las asignaciones ya cargadas.

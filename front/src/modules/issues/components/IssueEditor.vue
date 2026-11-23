@@ -30,12 +30,14 @@ defineProps<{
     isConflicted: boolean;
     canEditHeader: boolean;
     canEditDetails: boolean;
+    canReturnDetails: boolean;
     mode: IssueMode;
     resource: IssueResource;
     selects: IssueHeaderSelect[];
     canCreateClient: boolean;
     canReadCosts: boolean;
-    canSupplyOnCreate: boolean;
+    autoSupplyOnCreate: boolean;
+    canChooseSupplyOnCreate: boolean;
     supplyImmediately: boolean;
 }>();
 const emit = defineEmits<{
@@ -59,6 +61,11 @@ const emit = defineEmits<{
     <RecordEditorDialog
         :title="title"
         eyebrow="SALIDAS"
+        :note="
+            autoSupplyOnCreate
+                ? 'Al guardar, la salida se surte y se descuentan las existencias.'
+                : ''
+        "
         :message="message"
         :is-submitting="isSubmitting"
         :is-conflicted="isConflicted"
@@ -181,7 +188,7 @@ const emit = defineEmits<{
         </VRow>
         <h3>Detalles de la salida</h3>
         <VCheckbox
-            v-if="canSupplyOnCreate"
+            v-if="canChooseSupplyOnCreate"
             label="Surtir al guardar"
             hint="Entrega toda la cantidad solicitada y descuenta las existencias al guardar."
             persistent-hint
@@ -202,6 +209,7 @@ const emit = defineEmits<{
             :mode="mode"
             :resource="resource"
             :can-read-costs="canReadCosts"
+            :can-return-details="canReturnDetails"
             :is-disabled="isSubmitting"
             @remove="emit('remove', $event)"
             @supply="(id, changes) => emit('supply', id, changes)"

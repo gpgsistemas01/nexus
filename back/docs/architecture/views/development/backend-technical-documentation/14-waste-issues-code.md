@@ -42,6 +42,10 @@ materiales. `wasteIssueHelpers.js` conserva la preparación de detalles, la sele
 de relaciones y la adaptación de respuesta compartidas con el CRUD. Las operaciones
 de edición, surtido y devolución conservan el bloqueo de la salida durante su `tx`.
 
+`resolveIssueImmediateSupply` activa el surtido en las altas de Almacén con permiso
+de surtido y en las de Sistemas con `supplyImmediately: true`. La entrega y el alta
+comparten la transacción.
+
 `issueDTO.js` expone el costo vigente sólo con `inventory:costs-read`. También
 filtra el costo de la relación `waste` cuando la sesión carece del permiso o la
 regularización histórica tiene costo sin verificar.

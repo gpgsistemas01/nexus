@@ -8,7 +8,7 @@ import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vu
 import { numberText } from '../../../shared/utils/formatNumbers.js';
 
 defineProps<{
-    name: string;
+    context: string;
     presentation: string;
     supplied: number;
     returned: number;
@@ -36,7 +36,7 @@ const emit = defineEmits<{
     <RecordEditorDialog
         title="Devolver detalle de salida"
         eyebrow="SALIDAS"
-        :context="`Material a devolver: ${name}`"
+        :context="context"
         :message="message"
         :is-submitting="isSubmitting"
         :is-conflicted="isConflicted"

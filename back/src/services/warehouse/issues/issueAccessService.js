@@ -1,5 +1,5 @@
 import { ForbiddenError } from '../../../errors/authError.js';
-import { DATA_SCOPES, getGrantedPermissions, hasDataScope } from '../../../constants/permissions.js';
+import { DATA_SCOPES, hasGrantedPermission, hasDataScope } from '../../../constants/permissions.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 // Los IDs y las claves proceden de la sesión, nunca del body o de la query.
@@ -9,7 +9,7 @@ export const buildIssueDepartmentWhere = ({ accesses = [], departmentId = '' } =
     }
 
     const departmentIds = [...new Set(accesses
-        .filter(access => getGrantedPermissions([access]).includes(PERMISSIONS.GOODS_ISSUES_MANAGE))
+        .filter(access => hasGrantedPermission([access], PERMISSIONS.GOODS_ISSUES_MANAGE))
         .map(access => access.departmentId)
         .filter(id => id && (!departmentId || id === departmentId)))];
 
@@ -23,8 +23,11 @@ export const assertIssueDepartmentAccess = ({ accesses = [], departmentId }) => 
     }
 };
 
-export const assertIssueImmediateSupplyAccess = ({ accesses = [], permission }) => {
-    if (!getGrantedPermissions(accesses).includes(permission)) {
+export const resolveIssueImmediateSupply = ({ accesses, permission, requested }) => {
+    const canSupply = hasGrantedPermission(accesses, permission);
+    if (requested && !canSupply) {
         throw new ForbiddenError('No tiene permiso para surtir salidas al registrarlas.');
     }
+
+    return canSupply && (requested === true || hasGrantedPermission(accesses, PERMISSIONS.ISSUES_AUTO_SUPPLY));
 };

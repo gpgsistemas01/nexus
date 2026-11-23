@@ -46,8 +46,16 @@
     color: rgb(var(--v-theme-muted));
 }
 
-.warehouse-control .v-field--focused:not(.v-field--error) {
+.warehouse-control .v-field--focused:not(.v-field--error, :has([readonly][tabindex='-1'])) {
     box-shadow: 0 0 0 3px rgba(var(--v-theme-primary), 0.12);
+}
+
+.warehouse-control
+    .v-field--focused:not(.v-field--error):has([readonly][tabindex='-1'])
+    .v-field__outline {
+    --v-field-border-width: 1px;
+    --v-field-border-opacity: 0.38;
+    --v-theme-primary: var(--v-theme-on-surface);
 }
 
 .warehouse-control.v-input--readonly .v-field,
