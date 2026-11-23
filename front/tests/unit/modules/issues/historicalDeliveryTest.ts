@@ -111,7 +111,7 @@ describe('registro histórico: contrato, selección explícita y recuperación d
       .mockResolvedValueOnce(historicalReceipt());
     let mounted = await mount();
     mounted.value.preview.value = historicalPreview();
-    await mounted.value.selectAll();
+    mounted.value.selectPage();
     mounted.value.values.reason = 'Entrega física comprobada';
     expect(mounted.value.canConfirm.value).toBe(false);
     mounted.value.values.declaredDelivered = true;
@@ -135,7 +135,7 @@ describe('registro histórico: contrato, selección explícita y recuperación d
       .mockReturnValue({ data: {} });
     apiClient.http.defaults.adapter = mockHttpAdapter(transport);
     const mounted = await mount();
-    await mounted.value.selectAll();
+    mounted.value.selectPage();
     mounted.value.values.reason = 'Entrega física comprobada';
     mounted.value.values.declaredDelivered = true;
     await mounted.value.confirm();
@@ -156,7 +156,7 @@ describe('registro histórico: contrato, selección explícita y recuperación d
   it('un conflicto definitivo exige volver a leer antes de confirmar', async () => {
     const mounted = await mount();
     mounted.value.preview.value = historicalPreview();
-    await mounted.value.selectAll();
+    mounted.value.selectPage();
     mounted.value.values.reason = 'Entregado';
     mounted.value.values.declaredDelivered = true;
     vi.spyOn(historicalDeliveryService, 'confirm').mockRejectedValue(
@@ -167,61 +167,55 @@ describe('registro histórico: contrato, selección explícita y recuperación d
     expect(mounted.value.recoveryRequired.value).toBe(false);
     mounted.wrapper.unmount();
   });
-  it('seleccionar todo carga todas las páginas y conserva las revisiones seleccionadas', async () => {
+  it('selecciona sólo la página visible y conserva la revisión original al volver a cargar', async () => {
     const mounted = await mount();
-    mounted.value.preview.value = { ...historicalPreview(), hasMore: true };
-    const secondPage = {
-      ...historicalPreview(),
-      page: 2,
-      documents: [
-        {
-          ...historicalPreview().documents[0]!,
-          id: ids.material,
-          revision: 'b'.repeat(64),
-          referenceNumber: 'SMA-HIST-002',
-        },
-      ],
-    };
-    const cutoffDate = mounted.preview.mock.calls[0]![1].cutoffDate;
-    mounted.preview.mockResolvedValue(secondPage);
-    await mounted.value.selectAll();
-    expect(mounted.preview).toHaveBeenCalledWith(
-      'materials',
-      {
-        cutoffDate,
-        page: 2,
-      },
-      expect.any(AbortSignal),
-    );
-    expect(mounted.value.selected.value).toEqual([
-      historicalPreview().documents[0]!.id,
-      ids.material,
+    const [first] = historicalPreview().documents;
+    mounted.value.selectPage();
+    expect(mounted.preview).toHaveBeenCalledTimes(1);
+
+    const updated = { ...first!, revision: 'b'.repeat(64) };
+    mounted.preview.mockResolvedValueOnce({ ...historicalPreview(), documents: [updated] });
+    await mounted.value.load(1);
+    mounted.value.selectPage();
+    mounted.value.values.reason = 'Entrega física comprobada';
+    mounted.value.values.declaredDelivered = true;
+
+    const send = vi
+      .spyOn(historicalDeliveryService, 'confirm')
+      .mockResolvedValue(historicalReceipt());
+    await mounted.value.confirm();
+    expect(send.mock.calls[0]![1].documents).toEqual([
+      { id: first!.id, revision: first!.revision },
     ]);
-    expect(mounted.value.allSelected.value).toBe(true);
-    mounted.value.toggle(historicalPreview().documents[0]!.id);
-    expect(mounted.value.selected.value).toEqual([ids.material]);
-    expect(mounted.value.allSelected.value).toBe(false);
     mounted.wrapper.unmount();
   });
-  it('no selecciona resultados globales que exceden el límite de un lote', async () => {
+  it('completa el lote hasta 100 y permite sustituir una salida sin perder otras selecciones', async () => {
     const mounted = await mount();
-    mounted.value.preview.value = {
-      ...historicalPreview(),
-      hasMore: true,
-      documents: Array.from({ length: 100 }, (_, index) => ({
-        ...historicalPreview().documents[0]!,
-        id: `document-${index}`,
-      })),
-    };
-    mounted.preview.mockResolvedValue({
+    const first = historicalPreview().documents[0]!;
+    mounted.value.selectPage();
+    const documents = Array.from({ length: 100 }, (_, index) => ({
+      ...first,
+      id: `document-${index}`,
+    }));
+    mounted.preview.mockResolvedValueOnce({
       ...historicalPreview(),
       page: 2,
-      documents: [{ ...historicalPreview().documents[0]!, id: 'document-101' }],
+      documents,
     });
-    await mounted.value.selectAll();
-    expect(mounted.value.selected.value).toEqual([]);
-    expect(mounted.value.allSelected.value).toBe(false);
-    expect(mounted.value.error.value).toContain('más de 100 salidas');
+    await mounted.value.load(2);
+    mounted.value.selectPage();
+    expect(mounted.preview).toHaveBeenCalledTimes(2);
+    expect(mounted.value.selected.value).toEqual([
+      first.id,
+      ...documents.slice(0, 99).map(({ id }) => id),
+    ]);
+    mounted.value.toggle(documents[99]!.id);
+    expect(mounted.value.selected.value).toHaveLength(100);
+    expect(mounted.value.selected.value).not.toContain(documents[99]!.id);
+    mounted.value.toggle(documents[0]!.id);
+    mounted.value.toggle(documents[99]!.id);
+    expect(mounted.value.selected.value).toHaveLength(100);
+    expect(mounted.value.selected.value).toContain(documents[99]!.id);
     mounted.wrapper.unmount();
   });
   it('rechaza respuestas incompletas o de otro recurso aunque el HTTP sea 200', async () => {

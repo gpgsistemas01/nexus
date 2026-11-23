@@ -244,8 +244,10 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 1. Pulse **Registrar entregas históricas** en Salidas de Materiales, Consumibles o Mermas.
    La fecha y hora de apertura del diálogo fijan el corte. La tabla muestra el rango y el total
    con 100 registros por página.
-2. Seleccione sólo salidas entregadas por completo. Use **Seleccionar todo** si verificó todas
-   las salidas elegibles y son hasta 100. Para más de 100, confirme lotes de hasta 100 por módulo.
+2. Seleccione sólo salidas entregadas por completo. Si ya verificó la página visible, pulse
+   **Seleccionar de esta página** para agregarlas en el orden de la tabla hasta completar
+   el lote. La selección se conserva al cambiar de página. Puede desmarcar una salida o
+   pulsar **Limpiar selección**. Para más de 100, confirme varios lotes por módulo.
 3. Escriba el **Motivo de la regularización**. Si tiene un comprobante, incluya su referencia.
    Confirme la entrega física completa antes del corte y pulse
    **Registrar entregas seleccionadas**. Conserve el recibo de cada lote y vuelva a abrir el

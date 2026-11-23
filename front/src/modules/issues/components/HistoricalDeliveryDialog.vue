@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
@@ -14,7 +15,7 @@ import type {
     HistoricalDeliveryReceipt,
 } from '../historicalDelivery.js';
 
-defineProps<{
+const props = defineProps<{
     values: {
         reason: string;
         declaredDelivered: boolean;
@@ -22,19 +23,20 @@ defineProps<{
     preview: HistoricalDeliveryPreview | null;
     receipt: HistoricalDeliveryReceipt | null;
     selected: string[];
-    allSelected: boolean;
     isWorking: boolean;
-    isSelectingAll: boolean;
     recoveryRequired: boolean;
     canConfirm: boolean;
     error: string;
 }>();
+const selectedIds = computed(() => new Set(props.selected));
+
 const emit = defineEmits<{
     update: [field: 'reason', value: string];
     declare: [value: boolean];
     select: [id: string];
-    selectAll: [selected: boolean];
-    load: [page?: number, preserveSelection?: boolean];
+    selectPage: [];
+    clearSelection: [];
+    load: [page?: number];
     confirm: [];
     recover: [];
     close: [];
@@ -142,32 +144,40 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                 >
                     Esta página está vacía. Cambia de página para consultar los resultados.
                 </p>
-                <template v-if="preview.documents.length || preview.hasMore">
-                    <div class="my-4">
-                        <span>
-                            {{ selected.length }}
-                            {{
-                                selected.length === 1
-                                    ? 'salida seleccionada'
-                                    : 'salidas seleccionadas'
-                            }}
-                            en todas las páginas.
-                        </span>
-                    </div>
-                </template>
                 <div
-                    v-if="preview.documents.length"
-                    class="historical-select-all-cards"
+                    v-if="preview.documents.length || selected.length"
+                    class="my-4"
                 >
-                    <VCheckbox
-                        :model-value="allSelected"
-                        :indeterminate="selected.length > 0 && !allSelected"
-                        aria-label="Seleccionar todas las salidas de todas las páginas"
-                        :disabled="isWorking || isSelectingAll"
-                        :loading="isSelectingAll"
-                        hide-details
-                        @update:model-value="emit('selectAll', $event === true)"
-                    />
+                    <p role="status">
+                        {{ selected.length }} de {{ limits.maxDocuments }} salidas seleccionadas.
+                        <template v-if="selected.length >= limits.maxDocuments">
+                            Lote completo. Confirma el registro o desmarca una salida.
+                        </template>
+                    </p>
+                    <div class="d-flex flex-wrap ga-2 mt-2">
+                        <VBtn
+                            variant="outlined"
+                            :disabled="
+                                isWorking ||
+                                selected.length >= limits.maxDocuments ||
+                                preview.documents.every(({ id }) => selectedIds.has(id))
+                            "
+                            @click="emit('selectPage')"
+                        >
+                            Seleccionar de esta página
+                        </VBtn>
+                        <VBtn
+                            variant="text"
+                            :disabled="isWorking || !selected.length"
+                            @click="emit('clearSelection')"
+                        >
+                            Limpiar selección
+                        </VBtn>
+                    </div>
+                    <p class="mt-2">
+                        La selección de página agrega salidas en el orden de la tabla hasta
+                        completar el lote.
+                    </p>
                 </div>
                 <ServerTable
                     :headers="deliveryHeaders"
@@ -182,20 +192,9 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                         $event.page !== preview.page &&
                         $event.page <= limits.maxPage &&
                         !isWorking &&
-                        emit('load', $event.page, true)
+                        emit('load', $event.page)
                     "
                 >
-                    <template #[`header.actions`]>
-                        <VCheckbox
-                            :model-value="allSelected"
-                            :indeterminate="selected.length > 0 && !allSelected"
-                            aria-label="Seleccionar todas las salidas de todas las páginas"
-                            :disabled="isWorking || isSelectingAll"
-                            :loading="isSelectingAll"
-                            hide-details
-                            @update:model-value="emit('selectAll', $event === true)"
-                        />
-                    </template>
                     <template #[`item.details`]="{ item }">
                         <ul class="historical-details">
                             <li
@@ -211,9 +210,13 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
                     </template>
                     <template #[`item.actions`]="{ item }">
                         <VCheckbox
-                            :model-value="selected.includes(item.id)"
+                            :model-value="selectedIds.has(item.id)"
                             :aria-label="`Seleccionar salida ${item.referenceNumber}`"
-                            :disabled="isWorking"
+                            :disabled="
+                                isWorking ||
+                                (!selectedIds.has(item.id) &&
+                                    selected.length >= limits.maxDocuments)
+                            "
                             hide-details
                             @update:model-value="emit('select', item.id)"
                         />
@@ -241,9 +244,6 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
 </template>
 
 <style scoped>
-.historical-select-all-cards {
-    display: none;
-}
 .historical-fields {
     display: grid;
     gap: 1rem;
@@ -255,9 +255,6 @@ const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
 @media (max-width: 599px) {
     .historical-details {
         min-width: 0;
-    }
-    .historical-select-all-cards {
-        display: block;
     }
 }
 </style>
