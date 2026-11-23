@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { mdiUnfoldMoreHorizontal } from '@mdi/js';
 import { mockIssues } from './issueFixtures.js';
 import { chooseOption } from './warehouseFixtures.js';
 import { issuePermissions, issueDetailId, departmentId, issueFor } from '../fixtures/issues.js';
@@ -27,6 +28,17 @@ test('salidas: muestra fichas en móvil y tabla desplazable desde 600 px', async
   ).toHaveText('Costo máximo unitario');
   await expect(detailCards.getByText('Lona', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  const noSort = detailCards.getByRole('button', { name: 'Sin ordenar', exact: true });
+  await expect(noSort).toBeDisabled();
+  await detailCards.getByRole('combobox', { name: 'Ordenar por' }).press('Enter');
+  await page.getByRole('option', { name: 'Salida', exact: true }).click();
+  const toDescending = detailCards.getByRole('button', { name: 'Cambiar a orden descendente' });
+  await expect(toDescending).toHaveText('Ascendente');
+  await toDescending.click();
+  const clearSort = detailCards.getByRole('button', { name: 'Quitar orden' });
+  await expect(clearSort).toHaveText('Descendente');
+  await clearSort.click();
+  await expect(noSort).toBeDisabled();
 
   await page.setViewportSize({ width: 599, height: 844 });
   await expect(detailCards).toBeVisible();
@@ -38,6 +50,18 @@ test('salidas: muestra fichas en móvil y tabla desplazable desde 600 px', async
   await expect(details).toBeVisible();
   await expect(detailCards).toBeHidden();
   await expect(dialog.getByRole('table')).toBeVisible();
+  const quantity = dialog.getByRole('columnheader', { name: 'Salida', exact: true });
+  const sortIcon = quantity.locator('.v-data-table-header__sort-icon');
+  const sortPath = sortIcon.locator('path');
+  await expect(sortIcon).toHaveCSS('opacity', '1');
+  await expect(sortPath).toHaveAttribute('d', mdiUnfoldMoreHorizontal);
+  await quantity.press('Enter');
+  await expect(quantity).toHaveAttribute('aria-sort', 'ascending');
+  await expect(sortPath).not.toHaveAttribute('d', mdiUnfoldMoreHorizontal);
+  await quantity.press('Enter');
+  await expect(quantity).toHaveAttribute('aria-sort', 'descending');
+  await quantity.press('Enter');
+  await expect(sortPath).toHaveAttribute('d', mdiUnfoldMoreHorizontal);
   await expect(
     dialog.getByRole('columnheader', { name: 'Conversión', exact: true }),
   ).toHaveAttribute('colspan', '2');

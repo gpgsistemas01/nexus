@@ -334,12 +334,13 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `formatValue` | `formatValue?: (row: Row, key: string) => string;` |
 | `sortBy` | `sortBy?: DataTableSortItem[];` |
 | `sortRows` | `sortRows?: boolean;` |
+| `mustSort` | `mustSort?: boolean;` |
 | `sortValue` | `sortValue?: (row: Row, key: string) => unknown;` |
 | `emptyText` | `emptyText?: string;` |
 
 ## ResponsiveTableCards.defineEmits
 
-**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 27, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ResponsiveTableCards.vue](../../../../../src/shared/components/ResponsiveTableCards.vue) · línea 29, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

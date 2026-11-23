@@ -160,6 +160,10 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
 .table-frame :deep(th .v-icon) {
     color: var(--table-header-text, white);
 }
+.table-frame :deep(th .v-data-table-header__sort-icon) {
+    opacity: 1;
+    flex-shrink: 0;
+}
 .table-frame :deep(th .v-data-table-header__content) {
     justify-content: center;
 }

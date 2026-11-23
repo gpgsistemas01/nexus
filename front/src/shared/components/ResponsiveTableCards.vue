@@ -12,6 +12,7 @@ const props = withDefaults(
         formatValue?: (row: Row, key: string) => string;
         sortBy?: DataTableSortItem[];
         sortRows?: boolean;
+        mustSort?: boolean;
         sortValue?: (row: Row, key: string) => unknown;
         emptyText?: string;
     }>(),
@@ -20,6 +21,7 @@ const props = withDefaults(
         formatValue: undefined,
         sortBy: () => [],
         sortRows: false,
+        mustSort: false,
         sortValue: undefined,
         emptyText: 'No hay registros para mostrar.',
     },
@@ -52,10 +54,17 @@ const columns = computed(() =>
 const selectedSortKey = computed(
     () =>
         sortableColumns.value.find((column) => column.key === String(props.sortBy[0]?.key))?.key ??
-        sortableColumns.value[0]?.key ??
-        '',
+        null,
 );
-const sortDirection = computed(() => props.sortBy[0]?.order ?? 'asc');
+const sortDirection = computed(() => (selectedSortKey.value ? props.sortBy[0]?.order : undefined));
+const directionLabels = { asc: 'Ascendente', desc: 'Descendente' };
+const nextDirection = computed(() => {
+    if (sortDirection.value === 'asc') return 'desc';
+
+    if (sortDirection.value === 'desc' && !props.mustSort) return null;
+
+    return 'asc';
+});
 const displayedRows = computed(() => {
     if (!props.sortRows || !props.sortBy[0]) return props.rows;
 
@@ -82,16 +91,15 @@ const displayedRows = computed(() => {
 });
 
 const changeSortKey = (key: string | null) => {
-    if (key) emit('sortBy', [{ key, order: sortDirection.value }]);
+    if (key) emit('sortBy', [{ key, order: sortDirection.value === 'desc' ? 'desc' : 'asc' }]);
 };
 
-const toggleSortDirection = () =>
-    emit('sortBy', [
-        {
-            key: selectedSortKey.value,
-            order: sortDirection.value === 'asc' ? 'desc' : 'asc',
-        },
-    ]);
+const toggleSortDirection = () => {
+    const key = selectedSortKey.value;
+    if (!key) return;
+
+    emit('sortBy', nextDirection.value ? [{ key, order: nextDirection.value }] : []);
+};
 
 const cellText = (row: Row, key: string) => {
     if (props.formatValue) return props.formatValue(row, key);
@@ -119,10 +127,21 @@ const cellText = (row: Row, key: string) => {
             />
             <VBtn
                 variant="outlined"
-                :aria-label="`Cambiar a orden ${sortDirection === 'asc' ? 'descendente' : 'ascendente'}`"
+                :disabled="!selectedSortKey"
+                :aria-label="
+                    !selectedSortKey
+                        ? 'Sin ordenar'
+                        : nextDirection
+                          ? `Cambiar a orden ${directionLabels[nextDirection].toLowerCase()}`
+                          : 'Quitar orden'
+                "
                 @click="toggleSortDirection"
             >
-                {{ sortDirection === 'asc' ? 'Ascendente' : 'Descendente' }}
+                {{
+                    sortDirection === 'asc' || sortDirection === 'desc'
+                        ? directionLabels[sortDirection]
+                        : 'Sin ordenar'
+                }}
             </VBtn>
         </div>
         <article

@@ -28,8 +28,6 @@ const props = defineProps<{
     canConfirm: boolean;
     error: string;
 }>();
-const selectedIds = computed(() => new Set(props.selected));
-
 const emit = defineEmits<{
     update: [field: 'reason', value: string];
     declare: [value: boolean];
@@ -41,6 +39,9 @@ const emit = defineEmits<{
     recover: [];
     close: [];
 }>();
+
+const selectedIds = computed(() => new Set(props.selected));
+
 const deliveryHeaders: DataTableHeader<HistoricalDeliveryCandidate>[] = [
     { title: 'Folio', key: 'referenceNumber', sortable: false },
     { title: 'Área', key: 'departmentName', sortable: false },

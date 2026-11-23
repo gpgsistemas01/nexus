@@ -92,6 +92,7 @@ const updateCardSort = (sortBy: DataTableSortItem[]) =>
             :rows="rows"
             :row-class="(row) => rowProps?.({ item: row }).class ?? ''"
             :format-value="formatValue"
+            :must-sort="mustSort"
             :sort-by="sortBy"
             @sort-by="updateCardSort"
         >
