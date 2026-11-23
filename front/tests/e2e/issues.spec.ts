@@ -683,7 +683,7 @@ test(
       (p) =>
         !['goods:issue-details-manage', 'issues:auto-supply', 'inventory:costs-read'].includes(p),
     );
-    const { writes } = await mockIssues(page, permissions, 'Surtido');
+    const { writes } = await mockIssues(page, permissions, 'Surtido', 'IMPRESIÓN');
     await page.route('**/api/auth/me', (route) =>
       route.fulfill({
         json: {
@@ -704,10 +704,30 @@ test(
     await expect(page.getByRole('button', { name: 'Editar salida', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
     const createDialog = page.getByRole('dialog');
+    const assignedArea = createDialog.getByRole('combobox', { name: 'Área', exact: true });
+    await expect(assignedArea).toHaveValue('IMPRESIÓN');
+    await expect(assignedArea).toBeDisabled();
     await expect(
       createDialog.getByRole('checkbox', { name: 'Surtir al guardar', exact: true }),
     ).toHaveCount(0);
     await createDialog.getByRole('button', { name: 'Regresar', exact: true }).click();
+    let departmentReads = 0;
+    await page.route('**/api/admin/departments?**', (route) => {
+      departmentReads += 1;
+      return route.fulfill({
+        json: pageOf([
+          { id: departmentId, name: 'IMPRESIÓN' },
+          { id: 'router-id', name: 'ROUTER' },
+        ]),
+      });
+    });
+    await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
+    const editDialog = page.getByRole('dialog', { name: /^Editar salida - Folio/ });
+    const editArea = editDialog.getByRole('combobox', { name: 'Área', exact: true });
+    await expect(editArea).toHaveValue('IMPRESIÓN');
+    await expect(editArea).toBeDisabled();
+    expect(departmentReads).toBe(0);
+    await editDialog.getByRole('button', { name: 'Regresar', exact: true }).click();
     await page.getByRole('button', { name: 'Consultar salida', exact: true }).click();
     const view = page.getByRole('dialog');
     await expect(view.getByRole('columnheader', { name: 'Pendiente de surtir' })).toBeVisible();

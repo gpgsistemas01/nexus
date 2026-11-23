@@ -12,7 +12,11 @@ import IssueEditor from '../components/IssueEditor.vue';
 import IssueLineEntryPage from './IssueLineEntryPage.vue';
 import IssueReturnPage from './IssueReturnPage.vue';
 
-const props = defineProps<{ resource: IssueResource; target: IssueTarget }>();
+const props = defineProps<{
+    resource: IssueResource;
+    target: IssueTarget;
+    canChangeDepartment: boolean;
+}>();
 const emit = defineEmits<{
     saved: [result: MutationConfirmation];
     detailSaved: [result: MutationConfirmation];
@@ -58,11 +62,11 @@ const selects = computed<IssueHeaderSelect[]>(() => [
         state: headerSelection.departments.state.value,
         initialOption: headerSelection.initialOptions.value.departmentId,
         isDisabled:
-            !headerSelection.canReadDepartments.value || headerSelection.departments.isLocked.value,
+            !headerSelection.canReadDepartments.value || headerSelection.isDepartmentLocked.value,
         hint: !headerSelection.canReadDepartments.value
             ? 'Sin permiso para consultar áreas.'
-            : headerSelection.departments.isLocked.value
-              ? 'Su cuenta utiliza únicamente esta área.'
+            : headerSelection.isDepartmentLocked.value
+              ? 'El área de la salida está asignada.'
               : '',
     },
     {

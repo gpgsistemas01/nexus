@@ -77,6 +77,8 @@ Al final de las fichas o la tabla se indica cuántos registros contiene la pági
 selector **Registros por página** permite cambiar ese límite.
 Las fichas de todas las tablas conservan sus acciones e inputs, incluidos los detalles
 de compras y salidas y las asignaciones de personas.
+En las tablas de detalle, los encabezados largos se distribuyen en dos líneas
+para aprovechar el ancho de la tabla.
 Los nombres y otros datos largos ocupan varias líneas en los campos de texto y en
 las opciones seleccionadas. **Observaciones** crece al escribir. Con ratón, arrastre
 su esquina inferior para ajustar la altura.

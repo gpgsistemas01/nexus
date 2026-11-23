@@ -150,7 +150,7 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto, accesses }) => g
     });
 
     if (!current) throw new WasteIssueNotFound();
-    assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
+    assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId, currentDepartmentId: current.departmentId });
     assertIssueNotCanceled(current);
     if (current.details.some(detail => Number(detail.suppliedQuantity) > 0)) {
         throw new WasteIssueAlreadySuppliedConflict();
@@ -201,10 +201,10 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto, accesses = [] 
             await lockWasteIssue({ tx, id });
             const current = await tx.wasteIssue.findUnique({
                 where: { id, ...buildIssueDepartmentWhere({ accesses }) },
-                select: { id: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
+                select: { id: true, departmentId: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
             });
             if (!current) throw new WasteIssueNotFound();
-            assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
+            assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId, currentDepartmentId: current.departmentId });
             assertIssueNotCanceled(current);
             const headerData = await resolveWasteIssueHeaderData({ tx, dto: wasteIssueDto });
 

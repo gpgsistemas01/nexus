@@ -1,5 +1,5 @@
 import { ForbiddenError } from '../../../errors/authError.js';
-import { DATA_SCOPES, hasGrantedPermission, hasDataScope } from '../../../constants/permissions.js';
+import { DATA_SCOPES, getOrganizationContext, hasGrantedPermission, hasDataScope } from '../../../constants/permissions.js';
 import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 // Los IDs y las claves proceden de la sesión, nunca del body o de la query.
@@ -16,10 +16,15 @@ export const buildIssueDepartmentWhere = ({ accesses = [], departmentId = '' } =
     return { departmentId: { in: departmentIds } };
 };
 
-export const assertIssueDepartmentAccess = ({ accesses = [], departmentId }) => {
+export const assertIssueDepartmentAccess = ({ accesses = [], departmentId, currentDepartmentId }) => {
     const where = buildIssueDepartmentWhere({ accesses, departmentId });
     if (!departmentId || (typeof where.departmentId === 'object' && !where.departmentId.in.length)) {
         throw new ForbiddenError('Sólo puede registrar salidas para sus áreas autorizadas.');
+    }
+
+    if (currentDepartmentId && departmentId !== currentDepartmentId) {
+        const { isWarehouse, isSystem } = getOrganizationContext(accesses);
+        if (!isWarehouse && !isSystem) throw new ForbiddenError('El área de esta salida no se puede cambiar desde su cuenta.');
     }
 };
 

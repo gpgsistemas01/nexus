@@ -29,7 +29,9 @@ surtido** y **Devolución** muestran las cantidades de cada operación cuando
 corresponden.
 
 <!-- module:end -->
-Si dispone de una sola área, permanece seleccionada al limpiar filtros.
+Las cuentas operativas consultan las salidas de las áreas que tienen asignadas.
+Su tabla omite la columna **Área**. Si dispone de una sola área, permanece
+seleccionada al limpiar filtros.
 
 <!-- module:any reference salidas-materiales -->
 
@@ -40,7 +42,9 @@ Si dispone de una sola área, permanece seleccionada al limpiar filtros.
 <!-- manual:any goods:issues-manage waste:issues-manage -->
 ## Registrar una solicitud
 
-1. Pulse **Nueva salida** y seleccione cliente, asesor, área y solicitante.
+1. Pulse **Nueva salida** y seleccione cliente, asesor y solicitante. Si su cuenta
+   tiene una sola área autorizada, aparecerá seleccionada y bloqueada. Si tiene
+   varias asignaciones, elija el área de la solicitud.
 2. Capture proyecto, fecha y observaciones. Para **GPG INTERNO**, conserve el proyecto del área.
 3. En el último renglón de detalles, seleccione el artículo en su columna, capture **Cantidad** bajo **Salida** y pulse **Agregar**.
 4. Revise las partidas, pulse **Guardar** y compruebe el folio y su estado.
@@ -104,7 +108,9 @@ Para corregir una cantidad mientras la salida sigue pendiente, retire la partida
 y agréguela con la cantidad correcta. Revise las sumas si repite artículo y proveedor.
 Después de una entrega no se modifican las partidas desde la edición.
 
-Si la cuenta sólo tiene un área disponible, se conserva seleccionada. Para **GPG
+Al editar desde un área operativa, el campo **Área** muestra el área original
+de la salida y queda bloqueado. Almacén y Sistemas pueden cambiarla según sus
+permisos. Para **GPG
 INTERNO**, el sistema propone el proyecto del área; conserve ese valor, ya que
 la validación exige que corresponda al área elegida. Cliente, área
 y permisos delimitan los selectores de asesor y solicitante; revise esas selecciones

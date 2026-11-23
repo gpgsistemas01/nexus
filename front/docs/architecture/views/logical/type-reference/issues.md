@@ -26,7 +26,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineEmits
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 31, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -686,7 +686,8 @@ RecordQuery & IssueFilters
 | Miembro | Firma completa |
 | --- | --- |
 | `resource` | `resource: IssueResource;` |
-| `target` | `target: IssueTarget` |
+| `target` | `target: IssueTarget;` |
+| `canChangeDepartment` | `canChangeDepartment: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -695,7 +696,7 @@ RecordQuery & IssueFilters
 
 ## IssueEditorPage.defineEmits
 
-**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 16, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

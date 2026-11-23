@@ -71,6 +71,12 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             sessions[area] = { departmentId: department.id, cookie: `accessToken=${jwt.sign({ id: user.id }, secret, { expiresIn: '10m' })}` };
             await prisma.personRoleDepartment.create({ data: { personId: ids.requester, roleId, departmentId: department.id } });
         }
+        const multipleAreas = await prisma.user.create({ data: {
+            name: `IT Access Multiple Areas ${suffix}`, password: 'integration-only',
+            accesses: { create: areas.slice(0, 2).map(area => ({ roleId: operator.id, departmentId: sessions[area].departmentId })) }
+        } });
+        users.push(multipleAreas.id);
+        sessions.multipleAreas = { cookie: `accessToken=${jwt.sign({ id: multipleAreas.id }, secret, { expiresIn: '10m' })}` };
         const warehouse = await prisma.department.upsert({
             where: { key: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }, update: {},
             create: { name: 'ALMACÉN Y PROVEDURÍA', key: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
@@ -236,6 +242,29 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             expect(await model.findUnique({ where: { id: foreign.id }, include: { details: true } })).toEqual(foreign);
         }
         expect(await stockSnapshot()).toEqual(before);
+    });
+
+    it('conserva el área original al editar, incluso con dos asignaciones operativas autorizadas', async () => {
+        const { cookie } = sessions.multipleAreas;
+        const [originalArea, otherArea] = areas.map(area => sessions[area].departmentId);
+        const departments = await request(app).get('/api/admin/departments').set('Cookie', cookie)
+            .query({ context: 'issues' }).expect(200);
+        expect(departments.body.data.map(row => row.id)).toEqual(expect.arrayContaining([originalArea, otherArea]));
+
+        for (const resource of ['materials', 'consumables', 'wastes']) {
+            const path = issuePath(resource);
+            const model = resource === 'wastes' ? prisma.wasteIssue : prisma.goodsIssue;
+            const { id } = await model.findFirstOrThrow({
+                where: { clientId: ids.client, departmentId: originalArea,
+                    ...(resource !== 'wastes' && { type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE' }) },
+                select: { id: true }
+            });
+            const payload = { ...header(otherArea), details: [detail(resource)] };
+            for (const suffix of ['', '/header']) {
+                await request(app).patch(`${path}/${id}${suffix}`).set('Cookie', cookie).send(payload).expect(403);
+            }
+            expect((await model.findUniqueOrThrow({ where: { id } })).departmentId).toBe(originalArea);
+        }
     });
 
     it.each([ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR])('Almacén / %s consulta y surte al registrar salidas para otra área', async roleKey => {

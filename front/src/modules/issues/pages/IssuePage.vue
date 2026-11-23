@@ -207,6 +207,7 @@ onMounted(() => {
         :key="editorKey"
         :resource="resource"
         :target="editor"
+        :can-change-department="showDepartment"
         @saved="actions.handleSaved"
         @detail-saved="actions.handleDetailSaved"
         @close="actions.close"
