@@ -35,6 +35,9 @@ for (const width of [1280, 600, 599, 390]) {
         .getByRole('button', { name: 'Registrar entregas históricas', exact: true })
         .click();
       let dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
+      await expect(
+        dialog.getByText(/Selecciona sólo salidas que ya se entregaron por completo/),
+      ).toBeVisible();
       await expect(dialog.getByText('Registros 1–1 de 1', { exact: true })).toBeVisible();
       await expect(dialog.getByText('1 registro en esta página', { exact: true })).toBeVisible();
       await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
@@ -48,14 +51,18 @@ for (const width of [1280, 600, 599, 390]) {
         const cards = dialog.locator('.responsive-table-cards');
         await expect(cards).toBeVisible();
         await expect(dialog.getByRole('table')).toBeHidden();
-        await expect(cards.getByText(/Lona: 3 por registrar/)).toBeVisible();
+        await expect(
+          cards.getByText(/Lona · Por registrar 3 · Registradas 2 · Devueltas 1/),
+        ).toBeVisible();
       } else {
         const table = dialog.getByRole('table', {
           name: 'Salidas pendientes y parcialmente surtidas',
         });
         await expect(table).toBeVisible();
         await expect(dialog.locator('.responsive-table-cards')).toBeHidden();
-        await expect(table.getByText(/Lona: 3 por registrar/)).toBeVisible();
+        await expect(
+          table.getByText(/Lona · Por registrar 3 · Registradas 2 · Devueltas 1/),
+        ).toBeVisible();
         if (width < 900) {
           await expect(
             dialog.getByRole('button', { name: 'Desplazar tabla a la derecha' }),
@@ -77,14 +84,16 @@ for (const width of [1280, 600, 599, 390]) {
       await expect(rowCheckbox).not.toBeChecked();
       await dialog.getByRole('checkbox', { name: /SMA-HIST-001/ }).check();
       await dialog
-        .getByLabel('Motivo y evidencia de la entrega histórica', { exact: true })
+        .getByLabel('Motivo de la regularización', { exact: true })
         .fill('Entrega física comprobada');
       const submit = dialog.getByRole('button', {
         name: 'Registrar entregas seleccionadas',
         exact: true,
       });
       await expect(submit).toBeDisabled();
-      await dialog.getByRole('checkbox', { name: /Confirmo que todas las partidas/ }).check();
+      await dialog
+        .getByRole('checkbox', { name: /Confirmo que las salidas seleccionadas/ })
+        .check();
       await expect(submit).toBeEnabled();
       expect(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
         true,
@@ -105,7 +114,9 @@ for (const width of [1280, 600, 599, 390]) {
       await dialog
         .getByRole('button', { name: 'Revisar y reintentar registro', exact: true })
         .click();
-      await expect(dialog.getByText(/Se registraron 1 entregas/)).toBeVisible();
+      await expect(
+        dialog.getByText(/Se regularizó 1 salida. Las existencias siguen sin cambios/),
+      ).toBeVisible();
       expect(writes).toHaveLength(2);
       expect(writes[1]).toEqual(writes[0]);
       expect(writes[0]).toMatchObject({
