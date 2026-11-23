@@ -25,7 +25,7 @@ import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
 import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
 import { assertIssueDepartmentAccess, buildIssueDepartmentWhere, resolveIssueImmediateSupply } from '../issues/issueAccessService.js';
-import { assertIssueNotCanceled } from '../issues/issueFulfillmentRules.js';
+import { assertIssueNotCanceled, assertIssueNotHistorical } from '../issues/issueFulfillmentRules.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
 
@@ -151,6 +151,7 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto, accesses }) => g
 
     if (!current) throw new WasteIssueNotFound();
     assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId, currentDepartmentId: current.departmentId });
+    assertIssueNotHistorical(current);
     assertIssueNotCanceled(current);
     if (current.details.some(detail => Number(detail.suppliedQuantity) > 0)) {
         throw new WasteIssueAlreadySuppliedConflict();
@@ -201,10 +202,11 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto, accesses = [] 
             await lockWasteIssue({ tx, id });
             const current = await tx.wasteIssue.findUnique({
                 where: { id, ...buildIssueDepartmentWhere({ accesses }) },
-                select: { id: true, departmentId: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
+                select: { id: true, departmentId: true, historicalDeliveryBatchId: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
             });
             if (!current) throw new WasteIssueNotFound();
             assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId, currentDepartmentId: current.departmentId });
+            assertIssueNotHistorical(current);
             assertIssueNotCanceled(current);
             const headerData = await resolveWasteIssueHeaderData({ tx, dto: wasteIssueDto });
 

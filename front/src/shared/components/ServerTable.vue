@@ -14,6 +14,7 @@ const props = withDefaults(
         page: number;
         pageSize: number;
         isLoading: boolean;
+        hidePageCount?: boolean;
         pageSizeOptions?: number[];
         tableLabel?: string;
         sortBy?: DataTableSortItem[];
@@ -22,6 +23,7 @@ const props = withDefaults(
         formatValue?: (row: Row, key: string) => string;
     }>(),
     {
+        hidePageCount: false,
         pageSizeOptions: () => [10, 20, 50],
         tableLabel: undefined,
         sortBy: () => [],
@@ -107,7 +109,7 @@ const updateCardSort = (sortBy: DataTableSortItem[]) =>
             </template>
         </ResponsiveTableCards>
         <p
-            v-if="!isLoading"
+            v-if="!isLoading && !hidePageCount"
             class="server-table__count"
             role="status"
             aria-live="polite"

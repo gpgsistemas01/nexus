@@ -159,22 +159,20 @@ export const useHistoricalDelivery = (options: {
         selection.value = next;
     };
 
-    const selectPage = () => {
+    const selectPage = (select = true) => {
         if (isWorking.value || recoveryRequired.value || !preview.value) return;
 
         const next = new Map(selection.value);
 
         for (const { id, revision } of preview.value.documents) {
-            if (next.size >= limits.maxDocuments) break;
-
-            if (!next.has(id)) next.set(id, revision);
+            if (!select) {
+                next.delete(id);
+            } else if (next.size < limits.maxDocuments && !next.has(id)) {
+                next.set(id, revision);
+            }
         }
 
         selection.value = next;
-    };
-
-    const clearSelection = () => {
-        if (!isWorking.value && !recoveryRequired.value) selection.value = new Map();
     };
 
     onBeforeUnmount(() => {
@@ -199,6 +197,5 @@ export const useHistoricalDelivery = (options: {
         recover,
         toggle,
         selectPage,
-        clearSelection,
     };
 };

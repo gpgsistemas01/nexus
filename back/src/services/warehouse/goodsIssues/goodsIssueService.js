@@ -32,7 +32,7 @@ import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
 import { GOODS_ISSUE_DETAIL_READ_SELECT, GOODS_ISSUE_DETAIL_SELECT } from "./goodsIssueDetailSelect.js";
-import { assertIssueNotCanceled } from "../issues/issueFulfillmentRules.js";
+import { assertIssueNotCanceled, assertIssueNotHistorical } from "../issues/issueFulfillmentRules.js";
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
@@ -249,6 +249,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
                 select: {
                     id: true,
                     departmentId: true,
+                    historicalDeliveryBatchId: true,
                     status: true,
                     fulfillmentStatus: true,
                     details: {
@@ -270,6 +271,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
 
             if (!goodsIssue) throw new GoodsIssueNotFound();
             assertIssueDepartmentAccess({ accesses, departmentId, currentDepartmentId: goodsIssue.departmentId });
+            assertIssueNotHistorical(goodsIssue);
 
             if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.PENDING) throw new GoodsIssueNotPendingConflict();
 
@@ -364,11 +366,12 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto, type = MATERIA
             await lockGoodsIssue({ tx, id });
             const goodsIssue = await tx.goodsIssue.findUnique({
                 where: { id, ...buildGoodsIssueContextWhere(type), ...buildIssueDepartmentWhere({ accesses }) },
-                select: { id: true, departmentId: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
+                select: { id: true, departmentId: true, historicalDeliveryBatchId: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
             });
 
             if (!goodsIssue) throw new GoodsIssueNotFound();
             assertIssueDepartmentAccess({ accesses, departmentId, currentDepartmentId: goodsIssue.departmentId });
+            assertIssueNotHistorical(goodsIssue);
 
             assertIssueNotCanceled(goodsIssue);
 

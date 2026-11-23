@@ -540,7 +540,7 @@
           "string",
           "null"
         ],
-        "description": "Costo por unidad de conversión. Sólo se incluye con inventory:costs-read. Materiales y consumibles usan el costo guardado en el detalle; mermas usan el costo vigente. Un costo histórico sin verificar se devuelve como null."
+        "description": "Costo por unidad de conversión guardado al registrar la partida. Sólo se incluye con inventory:costs-read. Las mermas anteriores a la captura del costo pueden devolver null. El costo permite valorar el monto solicitado de una salida regularizada."
       },
       "materialName": {
         "type": "string",
@@ -567,7 +567,7 @@
       },
       "waste": {
         "type": "object",
-        "description": "Merma con presentation y unitMeasure. maxUnitCost se omite sin inventory:costs-read o si corresponde a una regularización histórica sin costo verificado.",
+        "description": "Merma con presentation y unitMeasure. Su maxUnitCost vigente se omite sin inventory:costs-read. Para valorar la solicitud se usa el costo del detalle.",
         "additionalProperties": true
       },
       "materialSpecification": {

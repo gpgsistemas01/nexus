@@ -39,7 +39,17 @@ for (const width of [1280, 600, 599, 390]) {
         dialog.getByText(/Selecciona sólo salidas que ya se entregaron por completo/),
       ).toBeVisible();
       await expect(dialog.getByText('Registros 1–1 de 1', { exact: true })).toBeVisible();
-      await expect(dialog.getByText('1 registro en esta página', { exact: true })).toBeVisible();
+      const motive = dialog.getByLabel('Motivo de la regularización', { exact: true });
+      await expect(motive).toBeVisible();
+      expect(
+        await motive.evaluate((input) =>
+          Boolean(
+            input.compareDocumentPosition(input.closest('form')!.querySelector('.table-frame')!) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
+          ),
+        ),
+      ).toBe(true);
+      await expect(dialog.getByText('1 registro en esta página', { exact: true })).toHaveCount(0);
       await expect(dialog.getByLabel('Fecha y hora de corte')).toHaveCount(0);
       await expect(dialog.getByLabel('Fecha real de entrega (opcional)')).toHaveCount(0);
       if (width < 600) {
@@ -54,6 +64,15 @@ for (const width of [1280, 600, 599, 390]) {
           name: 'Salidas pendientes y parcialmente surtidas',
         });
         await expect(table).toBeVisible();
+        await expect(table.getByRole('columnheader', { name: 'Folio' })).toHaveCSS(
+          'text-align',
+          'center',
+        );
+        await expect(table.getByRole('cell', { name: 'SMA-HIST-001', exact: true })).toHaveCSS(
+          'text-align',
+          'start',
+        );
+        await expect(table.getByRole('cell', { name: '120010' })).toHaveCSS('text-align', 'center');
         await expect(dialog.locator('.responsive-table-cards')).toBeHidden();
         await expect(
           table.getByText(/Lona · Por registrar 3 · Registradas 2 · Devueltas 1/),
@@ -65,14 +84,14 @@ for (const width of [1280, 600, 599, 390]) {
           await expect(dialog.locator('.table-frame__scroll-controls')).toBeVisible();
         }
       }
-      await dialog.getByRole('button', { name: 'Seleccionar de esta página' }).click();
+      await dialog.getByRole('checkbox', { name: 'Seleccionar salidas de esta página' }).check();
       const rowCheckbox = dialog.getByRole('checkbox', {
         name: 'Seleccionar salida SMA-HIST-001',
         exact: true,
       });
       await expect(rowCheckbox).toBeChecked();
       await expect(dialog.getByText('1 de 100 salidas seleccionadas.')).toBeVisible();
-      await dialog.getByRole('button', { name: 'Limpiar selección' }).click();
+      await dialog.getByRole('checkbox', { name: 'Desmarcar salidas de esta página' }).uncheck();
       await expect(rowCheckbox).not.toBeChecked();
       await dialog.getByRole('checkbox', { name: /SMA-HIST-001/ }).check();
       await dialog
@@ -152,21 +171,21 @@ for (const width of [1280, 390]) {
     await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: 'Registrar entregas históricas', exact: true });
     await expect(dialog.getByText('Registros 1–100 de 101', { exact: true })).toBeVisible();
-    await expect(dialog.getByText('100 registros en esta página', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('100 registros en esta página', { exact: true })).toHaveCount(0);
     await expect(dialog.getByRole('checkbox', { name: /^Seleccionar salida HIST-/ })).toHaveCount(
       100,
     );
     await dialog.getByRole('checkbox', { name: 'Seleccionar salida HIST-1', exact: true }).check();
     await dialog.getByRole('button', { name: 'Siguiente', exact: true }).click();
     await expect(dialog.getByText('Registros 101–101 de 101', { exact: true })).toBeVisible();
-    await expect(dialog.getByText('1 registro en esta página', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('1 registro en esta página', { exact: true })).toHaveCount(0);
     await expect(dialog.getByRole('button', { name: 'Siguiente', exact: true })).toBeDisabled();
     await expect(dialog.getByText('1 de 100 salidas seleccionadas.')).toBeVisible();
     await dialog.getByRole('button', { name: 'Anterior', exact: true }).click();
     await expect(
       dialog.getByRole('checkbox', { name: 'Seleccionar salida HIST-1', exact: true }),
     ).toBeChecked();
-    const selectPage = dialog.getByRole('button', { name: 'Seleccionar de esta página' });
+    const selectPage = dialog.getByRole('checkbox', { name: 'Seleccionar salidas de esta página' });
     await selectPage.click();
     await expect(dialog.getByText(/100 de 100 salidas seleccionadas/)).toBeVisible();
     await dialog.getByRole('button', { name: 'Siguiente', exact: true }).click();
@@ -177,9 +196,22 @@ for (const width of [1280, 390]) {
     await expect(lastRow).toBeDisabled();
     await expect(lastRow).not.toBeChecked();
     await expect(selectPage).toBeDisabled();
-    await dialog.getByRole('button', { name: 'Limpiar selección' }).click();
+    const firstRow = dialog.getByRole('checkbox', {
+      name: 'Seleccionar salida HIST-1',
+      exact: true,
+    });
+    await dialog.getByRole('button', { name: 'Anterior', exact: true }).click();
+    await firstRow.uncheck();
+    await dialog.getByRole('button', { name: 'Siguiente', exact: true }).click();
     await expect(lastRow).toBeEnabled();
-    await selectPage.click();
+    await selectPage.check();
+    await expect(lastRow).toBeChecked();
+    await dialog.getByRole('button', { name: 'Anterior', exact: true }).click();
+    const mixedPage = dialog.getByRole('checkbox', { name: 'Desmarcar salidas de esta página' });
+    await expect(mixedPage).toHaveAttribute('aria-checked', 'mixed');
+    await mixedPage.click();
+    await expect(dialog.getByText('1 de 100 salidas seleccionadas.')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Siguiente', exact: true }).click();
     await expect(lastRow).toBeChecked();
     await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
     await page.route('**/api/warehouse/historical-deliveries/materials/**', async (route) => {
@@ -197,7 +229,7 @@ for (const width of [1280, 390]) {
     });
     await page.getByRole('button', { name: 'Registrar entregas históricas', exact: true }).click();
     await expect(dialog.getByText('Registros 0–0 de 0', { exact: true })).toBeVisible();
-    await expect(dialog.getByText('0 registros en esta página', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('0 registros en esta página', { exact: true })).toHaveCount(0);
     await expect(dialog.getByRole('button', { name: 'Siguiente', exact: true })).toBeDisabled();
   });
 }
@@ -230,12 +262,17 @@ test('la devolución de una entrega histórica exige declarar la entrada física
     },
   });
   await page.goto('/salidas/materiales');
+  await expect(page.getByRole('button', { name: 'Editar salida', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
   await expect(
     page
       .getByRole('dialog', { name: /^Devolver salida - Folio SAL-001$/ })
       .getByText('Regularizada por entrega histórica', { exact: true }),
   ).toBeVisible();
+  const totals = page.getByRole('dialog').getByLabel('Totales de salida');
+  await expect(totals).toContainText('Total solicitado$20,000.00');
+  await expect(totals).toContainText('Total entregado netoSin verificar');
+  await expect(page.getByRole('dialog').getByRole('cell', { name: 'Sin verificar' })).toBeVisible();
   await page.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Devolver detalle de salida', exact: true });
   await dialog.getByLabel('Cantidad a devolver', { exact: true }).fill('1');

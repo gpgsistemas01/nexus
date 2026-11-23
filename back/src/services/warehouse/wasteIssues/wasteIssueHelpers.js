@@ -13,16 +13,15 @@ import { resolveIssueHeaderData } from '../issues/issueHeaderService.js';
 import { calculateConvertedQuantity } from '../../../shared/inventory/stockQuantity.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 
-const normalizeWasteIssueDetailResponse = (detail, historical = false) => ({
+const normalizeWasteIssueDetailResponse = detail => ({
     ...detail,
-    maxUnitCost: historical ? null : detail.maxUnitCost ?? detail.waste?.maxUnitCost ?? null,
     projectConvertedQuantity: detail.projectConvertedQuantity ?? null,
     convertedQuantityDifference: detail.convertedQuantityDifference ?? null
 });
 
 export const normalizeWasteIssueResponse = issue => issue && ({
     ...issue,
-    ...(issue.details && { details: issue.details.map(detail => normalizeWasteIssueDetailResponse(detail, !!issue.historicalDeliveryBatchId)) })
+    ...(issue.details && { details: issue.details.map(normalizeWasteIssueDetailResponse) })
 });
 
 export const WASTE_ISSUE_INCLUDE = {
@@ -78,6 +77,7 @@ const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId, pr
         materialName: previous?.materialName ?? waste.name,
         supplierName: previous?.supplierName || waste.supplier.tradeName,
         quantity: detail.quantity,
+        maxUnitCost: previous ? (previous.maxUnitCost ?? null) : waste.maxUnitCost,
         convertedQuantity: calculateConvertedQuantity({
             quantity: detail.quantity,
             base: waste.base,

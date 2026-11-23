@@ -183,12 +183,17 @@ describe('waste issue controller database integration', () => {
     const listedIssue = listed.body.data.find(issue => issue.id === issueId);
 
     expect(listedIssue).not.toHaveProperty('details');
-    const retrieved = await request(app).get(`/waste-issues/${issueId}`).expect(200);
-    expect(retrieved.body.wasteIssue.details[0]).toMatchObject({
-      maxUnitCost: '25',
-      projectConvertedQuantity: null,
-      convertedQuantityDifference: null
-    });
+    await prisma.waste.update({ where: { id: ids.waste }, data: { maxUnitCost: 30 } });
+    try {
+      const retrieved = await request(app).get(`/waste-issues/${issueId}`).expect(200);
+      expect(retrieved.body.wasteIssue.details[0]).toMatchObject({
+        maxUnitCost: '25',
+        projectConvertedQuantity: null,
+        convertedQuantityDifference: null
+      });
+    } finally {
+      await prisma.waste.update({ where: { id: ids.waste }, data: { maxUnitCost: 25 } });
+    }
     expect(listedIssue.status).toMatchObject({ name: 'Aprobada' });
 
     const observationsTerm = 'Salida editada antes del surtido';

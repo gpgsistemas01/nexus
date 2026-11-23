@@ -48,8 +48,9 @@ Coordinador de Almacén, y Administrador del sistema, tienen alcance de todas la
 áreas; los demás accesos autorizados se limitan a sus áreas asignadas.
 
 `issueDTO.js` incluye `maxUnitCost` en los detalles sólo con `inventory:costs-read`.
-El dato proviene del detalle persistido. Una regularización histórica devuelve
-`null` cuando el costo está sin verificar.
+El dato proviene del detalle persistido y permite mostrar el monto solicitado
+también en una salida regularizada. El monto entregado histórico queda sin verificar.
+Las salidas regularizadas admiten consulta y devolución física.
 
 El surtido reside en `goodsIssueDetailService.js`; los adaptadores de materiales
 y consumibles lo importan directamente. `goodsIssueService.js` conserva consultas,

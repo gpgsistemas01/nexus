@@ -95,7 +95,7 @@ const mapIssueDetailRow = ({ issue, detail, material, requestDate }) => ({
     historicalDeliveryReference: issue.historicalDeliveryBatch?.id ?? '',
     historicalDeliveryReason: issue.historicalDeliveryBatch?.reason ?? '',
     historicalDeliveryRegisteredAt: issue.historicalDeliveryBatch ? formatDateLongWithTime(issue.historicalDeliveryBatch.createdAt) : '',
-    historicalDeliveryNote: issue.historicalDeliveryBatch ? 'Entrega histórica: costo y cantidad de proyecto sin verificar; sin descuento de stock.' : ''
+    historicalDeliveryNote: issue.historicalDeliveryBatch ? 'Entrega histórica sin descuento de stock. Monto entregado y cantidad de proyecto sin verificar.' : ''
 });
 
 const mapGoodsIssueDetailRows = function* (goodsIssues = [], { supplierId = '', materialId = '' } = {}) {

@@ -33,8 +33,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `update` | `update: [field: 'reason', value: string];` |
 | `declare` | `declare: [value: boolean];` |
 | `select` | `select: [id: string];` |
-| `selectPage` | `selectPage: [];` |
-| `clearSelection` | `clearSelection: [];` |
+| `selectPage` | `selectPage: [selected: boolean];` |
 | `load` | `load: [page?: number];` |
 | `confirm` | `confirm: [];` |
 | `recover` | `recover: [];` |
@@ -51,6 +50,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `resource` | `resource: IssueResource;` |
 | `isDisabled` | `isDisabled: boolean;` |
 | `canReadCosts` | `canReadCosts: boolean;` |
+| `isHistorical` | `isHistorical: boolean;` |
 | `canReturnDetails` | `canReturnDetails: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
@@ -61,7 +61,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 34, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 35, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

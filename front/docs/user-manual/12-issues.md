@@ -126,8 +126,9 @@ de surtir y saldo entregado de cada partida. **Regresar** cierra sin cambios.
 En Sistemas y Almacén, **Costo máximo unitario** aparece después de **Conversión**.
 **Importes** agrupa **Monto solicitado** y **Monto entregado neto**. Este último
 descuenta las devoluciones. **Totales de salida** suma los importes de las partidas
-activas. Para Mermas, los montos son de referencia y usan el costo vigente. El guion
-indica que el costo o importe no está disponible.
+activas. Los importes usan el costo guardado en cada partida al registrar la salida.
+Las mermas antiguas pueden carecer de ese dato. El guion indica que el importe
+no está disponible.
 <!-- manual:end -->
 
 | Cumplimiento | Qué significa |
@@ -250,11 +251,12 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 1. Pulse **Registrar entregas históricas** en Salidas de Materiales, Consumibles o Mermas.
    La fecha y hora de apertura del diálogo fijan el corte. La tabla muestra el rango y el total
    con 100 registros por página.
-2. Seleccione sólo salidas entregadas por completo. Si ya verificó la página visible, pulse
-   **Seleccionar de esta página** para agregarlas en el orden de la tabla hasta completar
-   el lote. La selección se conserva al cambiar de página. Puede desmarcar una salida o
-   pulsar **Limpiar selección**. Para más de 100, confirme varios lotes por módulo.
-3. Escriba el **Motivo de la regularización**. Si tiene un comprobante, incluya su referencia.
+2. Seleccione sólo salidas entregadas por completo. Si ya verificó la página visible, marque
+   la casilla del encabezado para agregarlas en el orden de la tabla hasta completar
+   el lote. En móvil, la casilla aparece encima de las fichas. Al desmarcarla sólo se
+   quitan las salidas de esa página. Para más de 100, confirme varios lotes por módulo.
+3. Encima de la tabla, escriba el **Motivo de la regularización**. Si tiene un comprobante,
+   incluya su referencia.
    Confirme la entrega física completa antes del corte y pulse
    **Registrar entregas seleccionadas**. Conserve el recibo de cada lote y vuelva a abrir el
    diálogo para cargar las salidas restantes.
@@ -287,8 +289,11 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 <!-- manual:end -->
 
 Completa sólo lo que faltaba registrar. Conserva devoluciones y no vuelve a descontar
-stock ni genera movimientos. Consulta y Excel identifican la procedencia histórica;
-costos y datos de proyecto históricos quedan sin verificar.
+stock ni genera movimientos. Consulta y Excel identifican la procedencia histórica.
+La salida regularizada queda disponible para consulta. Con permiso de costos, la
+consulta muestra el **Monto solicitado** a partir del costo guardado. El **Monto
+entregado neto** queda **Sin verificar**, igual que el solicitado si falta el costo de
+origen.
 Si cambia un documento, vuelva a abrir el diálogo y revise los folios. Si la confirmación queda
 pendiente, pulse **Revisar y reintentar registro** para retomar el mismo lote.
 

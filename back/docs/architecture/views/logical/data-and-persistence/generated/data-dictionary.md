@@ -623,6 +623,7 @@ usuarios y responsables se mantiene en el
 | `supplierName` | `String` | Sí | — | `""` | `@db.VarChar(200)` |
 | `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `maxUnitCost` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `projectConvertedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `convertedQuantityDifference` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `suppliedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |

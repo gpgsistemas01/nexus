@@ -27,15 +27,20 @@ export const getIssueDetailsToSupply = (details: IssueDetail[]) =>
         (detail) => detail.isSupplied && !detail.isOriginallySupplied && !detail.isCanceled,
     );
 
-export const getIssueDetailAmounts = (detail: IssueDetail) => {
-    if (detail.isCanceled) return { requested: null, delivered: null };
+export const getIssueDetailAmounts = (detail: IssueDetail, isHistorical = false) => {
+    if (detail.isCanceled && !isHistorical) return { requested: null, delivered: null };
 
     const cost = detail.maxUnitCost;
-    const delivered = getIssueReturnableQuantity(detail);
     const requestedAmount = cost == null || cost <= 0 ? null : detail.convertedQuantity * cost;
 
+    const requested = requestedAmount == null ? null : roundTo(requestedAmount, 2);
+
+    if (isHistorical) return { requested, delivered: null };
+
+    const delivered = getIssueReturnableQuantity(detail);
+
     return {
-        requested: requestedAmount == null ? null : roundTo(requestedAmount, 2),
+        requested,
         delivered:
             delivered <= 0
                 ? 0
@@ -45,14 +50,14 @@ export const getIssueDetailAmounts = (detail: IssueDetail) => {
     };
 };
 
-export const getIssueTotals = (details: IssueDetail[]) => {
+export const getIssueTotals = (details: IssueDetail[], isHistorical = false) => {
     let requested: number | null = 0;
-    let delivered: number | null = 0;
+    let delivered: number | null = isHistorical ? null : 0;
 
     for (const detail of details) {
-        if (detail.isCanceled) continue;
+        if (detail.isCanceled && !isHistorical) continue;
 
-        const amounts = getIssueDetailAmounts(detail);
+        const amounts = getIssueDetailAmounts(detail, isHistorical);
         requested =
             requested == null || amounts.requested == null ? null : requested + amounts.requested;
         delivered =

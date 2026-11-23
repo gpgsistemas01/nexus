@@ -292,13 +292,13 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
     .table-frame--details :deep(.v-table__wrapper td) {
         min-width: 6.5rem !important;
         max-width: 14rem;
-        padding: 0.65rem 0.75rem;
+        padding: 0.4rem 0.55rem;
         font-size: 0.875rem;
         line-height: 1.45;
         overflow-wrap: normal;
         word-break: normal;
         white-space: normal !important;
-        text-align: start;
+        text-align: center;
     }
     .table-frame--details :deep(.v-table__wrapper th[colspan]:not([colspan='1'])) {
         text-align: center;
@@ -310,12 +310,15 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
         max-width: 20rem;
         overflow-wrap: break-word;
     }
+    .table-frame--details :deep(.v-table__wrapper td:first-child) {
+        text-align: start;
+    }
     .table-frame--details :deep(.v-table__wrapper th:last-child),
     .table-frame--details :deep(.v-table__wrapper td:last-child) {
         width: auto;
     }
     .table-frame--details :deep(th .v-data-table-header__content) {
-        justify-content: flex-start;
+        justify-content: center;
         overflow-wrap: normal;
     }
     .table-frame--details :deep(th .v-data-table-header__content > span:first-child) {
@@ -323,16 +326,7 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
         max-inline-size: 12ch;
         text-wrap: balance;
     }
-    .table-frame--details :deep(th[colspan]:not([colspan='1']) .v-data-table-header__content),
-    .table-frame--details
-        :deep(th.v-data-table-column--align-center .v-data-table-header__content) {
-        justify-content: center;
-    }
-    .table-frame--details :deep(th.v-data-table-column--align-end .v-data-table-header__content) {
-        justify-content: flex-end;
-    }
     .table-frame--details :deep(.v-table__wrapper .v-data-table-column--align-end) {
-        text-align: end;
         font-variant-numeric: tabular-nums lining-nums slashed-zero;
     }
     .table-frame--details :deep(td.v-data-table-column--align-end) {
@@ -348,10 +342,11 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
     .table-frame--details :deep(.v-table__wrapper td .v-input:has(input[type='number'])) {
         min-width: 0;
         inline-size: 8rem;
+        margin-inline: auto;
         max-inline-size: 100%;
     }
     .table-frame--details :deep(input[type='number']) {
-        text-align: end;
+        text-align: center;
         font-variant-numeric: tabular-nums lining-nums slashed-zero;
     }
     .table-frame--details :deep(.v-data-table-column--fixed),

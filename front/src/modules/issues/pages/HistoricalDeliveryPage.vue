@@ -28,7 +28,6 @@ const { values, preview, receipt, selected, isWorking, error, recoveryRequired, 
         @declare="values.declaredDelivered = $event"
         @select="state.toggle"
         @select-page="state.selectPage"
-        @clear-selection="state.clearSelection"
         @load="state.load"
         @confirm="state.confirm"
         @recover="state.recover"

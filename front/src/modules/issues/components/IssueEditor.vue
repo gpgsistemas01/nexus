@@ -110,8 +110,8 @@ const emit = defineEmits<{
                 }}
             </p>
             <p class="mt-2">
-                Los costos y las cantidades de proyecto históricos quedan sin verificar. Registra
-                una devolución sólo cuando el material entre físicamente a Almacén.
+                El monto entregado y las cantidades de proyecto quedan sin verificar. Registra una
+                devolución sólo cuando el material entre físicamente a Almacén.
             </p>
         </VAlert>
         <h3>Datos de la salida</h3>
@@ -209,6 +209,7 @@ const emit = defineEmits<{
             :mode="mode"
             :resource="resource"
             :can-read-costs="canReadCosts"
+            :is-historical="!!historicalDelivery"
             :can-return-details="canReturnDetails"
             :is-disabled="isSubmitting"
             @remove="emit('remove', $event)"
