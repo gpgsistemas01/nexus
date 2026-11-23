@@ -350,7 +350,7 @@ test('salidas: devolución de un detalle existente ya surtido', async ({ page })
   await mockIssues(page, issuePermissions, 'Surtido');
   await readOnly(page);
   await page.goto('/salidas/materiales');
-  await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
+  await page.getByRole('button', { name: 'Consultar salida', exact: true }).click();
   await page.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Devolver detalle de salida', exact: true });
   await dialog.getByLabel('Cantidad a devolver', { exact: true }).fill('1');

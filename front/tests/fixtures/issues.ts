@@ -8,6 +8,7 @@ export const issuePermissions = [
   'goods:issues-page-view',
   'goods:issues-manage',
   'goods:issue-details-manage',
+  'issues:auto-supply',
   'waste:issues-page-view',
   'waste:issues-manage',
   'waste:issues-supply',

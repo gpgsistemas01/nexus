@@ -182,7 +182,7 @@ sequenceDiagram
             Note over Core: CONSUMABLE selecciona SCO
             Core->>Reference: generateYearlyReferenceNumber({ tx, type: referenceType })
             Core->>Prisma: tx.goodsIssue.create({ data: { type, referenceNumber, ... } })
-            opt supplyImmediately con permiso de surtido
+            opt Surtido automático de Almacén o solicitado por Sistemas
                 Note over Core,Prisma: supplyGoodsIssue reutiliza tx: detalles, stock y movimiento.<br/>Si falla una partida, rollback del alta completa.
             end
         end

@@ -83,13 +83,17 @@ export const useIssueActions = (options: {
     };
 
     const handleDetailSaved = async (result: MutationConfirmation) => {
-        const document = editorState.editor.value?.document;
-        if (!document) return;
+        const editor = editorState.editor.value;
+        if (!editor?.document) return;
 
         editorState.closeEditor();
         void options.reload();
         void showSuccess(result.message);
-        await loadEditor({ row: document, mode: 'return', afterReturn: true });
+        await loadEditor({
+            row: editor.document,
+            mode: editor.mode === 'view' ? 'view' : 'return',
+            afterReturn: true,
+        });
     };
 
     return {

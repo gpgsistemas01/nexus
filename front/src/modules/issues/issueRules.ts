@@ -24,6 +24,9 @@ export const canReturnIssue = (row: IssueRow) =>
 export const getIssueReturnableQuantity = (row: IssueDetail) =>
     roundTo(row.suppliedQuantity - row.returnedQuantity);
 
+export const canReturnIssueDetail = (row: IssueDetail) =>
+    !row.isCanceled && getIssueReturnableQuantity(row) > 0;
+
 export const getIssuePendingQuantity = (row: IssueDetail) =>
     roundTo(row.quantity - row.suppliedQuantity);
 

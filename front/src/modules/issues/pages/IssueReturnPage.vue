@@ -23,7 +23,11 @@ const form = useIssueReturn({
 
 <template>
     <IssueReturnForm
-        :name="detail.name"
+        :context="
+            [`Folio ${document.referenceNumber}`, detail.name, detail.supplierName]
+                .filter(Boolean)
+                .join(' · ')
+        "
         :presentation="detail.presentation"
         :supplied="detail.suppliedQuantity"
         :returned="detail.returnedQuantity"

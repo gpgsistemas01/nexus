@@ -66,7 +66,7 @@ sequenceDiagram
             Parent->>Parent: nowrap: returnDetail = undefined
             Parent->>Screen: nowrap: emit('detailSaved', result)
             Screen->>Actions: nowrap: handleDetailSaved(result)
-            Actions->>Actions: nowrap: loadEditor({ row: document,<br/>mode: 'return', afterReturn: true })
+            Actions->>Actions: nowrap: loadEditor({ row: editor.document,<br/>mode: editor.mode === 'view' ? 'view' : 'return',<br/>afterReturn: true })
         end
     else nowrap: catch(cause)
         Service-->>Return: nowrap: throw ApiError
@@ -79,9 +79,10 @@ sequenceDiagram
     end
 ```
 
-La lectura posterior conserva devolución si queda saldo o abre consulta al quedar
-cancelada. Si falla, cierra el documento anterior y permite reintentar sólo la
-consulta. No se vuelve a enviar la devolución.
+El formulario recibe el documento y la partida desde la consulta o el acceso de
+devolución del listado. Al confirmar, se actualizan los saldos del mismo folio. La
+consulta sigue abierta si fue el punto de entrada o si la salida quedó cancelada.
+Si falla la lectura posterior, se cierra el documento anterior y se puede reintentar la lectura.
 
 ## Fuentes de los participantes
 

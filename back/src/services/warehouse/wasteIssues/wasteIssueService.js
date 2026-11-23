@@ -24,7 +24,7 @@ import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
 import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
-import { assertIssueDepartmentAccess, assertIssueImmediateSupplyAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
+import { assertIssueDepartmentAccess, buildIssueDepartmentWhere, resolveIssueImmediateSupply } from '../issues/issueAccessService.js';
 import { assertIssueNotCanceled } from '../issues/issueFulfillmentRules.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
@@ -94,11 +94,11 @@ export const findAllWasteIssues = async ({
     return { ...page, data: page.data.map(normalizeWasteIssueResponse) };
 };
 
-const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb().$transaction(async tx => {
+const createWasteIssueTransaction = async ({ wasteIssueDto, userId, supplyImmediately }) => getDb().$transaction(async tx => {
 
     const statusIds = await findWasteIssueFulfillmentStatusIds(tx);
     const pendingStatusId = statusIds.get(FULFILLMENT_STATUS_NAMES.PENDING);
-    const { details: requestedDetails, supplyImmediately, ...headerDto } = wasteIssueDto;
+    const { details: requestedDetails, ...headerDto } = wasteIssueDto;
     const details = await buildWasteIssueDetails({
         tx,
         details: requestedDetails,
@@ -133,8 +133,11 @@ export const createWasteIssue = async ({ wasteIssueDto, userId, accesses = [] })
     fallbackError: new WasteIssueCreateDatabaseError(),
     action: () => {
         assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
-        if (wasteIssueDto.supplyImmediately) assertIssueImmediateSupplyAccess({ accesses, permission: PERMISSIONS.WASTE_ISSUES_SUPPLY });
-        return createWasteIssueTransaction({ wasteIssueDto, userId });
+        const { supplyImmediately: requested, ...issueData } = wasteIssueDto;
+        const supplyImmediately = resolveIssueImmediateSupply({
+            accesses, requested, permission: PERMISSIONS.WASTE_ISSUES_SUPPLY
+        });
+        return createWasteIssueTransaction({ wasteIssueDto: issueData, userId, supplyImmediately });
     }
 });
 

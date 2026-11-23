@@ -122,6 +122,12 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
     afterAll(async () => {
         if (prisma) {
             const issueWhere = { clientId: ids.client ?? randomUUID() };
+            const goodsMovementWhere = { goodsIssue: issueWhere };
+            const wasteMovementWhere = { wasteIssue: issueWhere };
+            await prisma.movementDetail.deleteMany({ where: { movement: goodsMovementWhere } });
+            await prisma.inventoryMovement.deleteMany({ where: goodsMovementWhere });
+            await prisma.wasteMovementDetail.deleteMany({ where: { movement: wasteMovementWhere } });
+            await prisma.wasteMovement.deleteMany({ where: wasteMovementWhere });
             await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssue: issueWhere } });
             await prisma.goodsIssue.deleteMany({ where: issueWhere });
             await prisma.wasteIssue.deleteMany({ where: issueWhere });
@@ -232,10 +238,10 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
         expect(await stockSnapshot()).toEqual(before);
     });
 
-    it.each([ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR])('Almacén / %s consulta todas las áreas y registra solicitudes para otra área', async roleKey => {
+    it.each([ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR])('Almacén / %s consulta y surte al registrar salidas para otra área', async roleKey => {
         const { cookie } = sessions[roleKey];
         const departmentId = sessions[areas[1]].departmentId;
-        const before = await stockSnapshot();
+        const [beforeStock, beforeWaste] = await stockSnapshot();
         const departments = await request(app).get('/api/admin/departments').set('Cookie', cookie)
             .query({ context: 'issues', length: '100' }).expect(200);
         expect(departments.body.data.map(row => row.id)).toEqual(expect.arrayContaining(areas.map(area => sessions[area].departmentId)));
@@ -248,12 +254,17 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             const read = await request(app).get(`${path}/${row.id}`).set('Cookie', cookie).expect(200);
             expect(readIssue(read, resource).details[0].maxUnitCost).toBe('25');
             const created = await request(app).post(path).set('Cookie', cookie)
-                .send({ ...header(departmentId), details: [detail(resource)] }).expect(resource === 'wastes' ? 201 : 200);
+                .send({ ...header(departmentId), details: [detail(resource)],
+                    ...(roleKey === ROLE_KEYS.COORDINATOR && { supplyImmediately: false })
+                }).expect(resource === 'wastes' ? 201 : 200);
             expect(readIssue(created, resource)).toMatchObject({
-                departmentId, details: [expect.objectContaining({ maxUnitCost: '25' })]
+                departmentId, fulfillmentStatus: { name: 'Surtido' },
+                details: [expect.objectContaining({ maxUnitCost: '25', suppliedQuantity: '2' })]
             });
         }
-        expect((await stockSnapshot()).slice(0, 2)).toEqual(before.slice(0, 2));
+        const [afterStock, afterWaste] = await stockSnapshot();
+        expect(afterStock.map(row => Number(row.currentStock))).toEqual(beforeStock.map(row => Number(row.currentStock) - 2));
+        expect(Number(afterWaste.currentStock)).toBe(Number(beforeWaste.currentStock) - 2);
     });
 
     it.each(['IMPRESIÓN', 'printingCoordinator'])('%s rechaza surtido, devoluciones, cambios de inventario y altas comerciales sin efectos persistidos', async sessionKey => {
@@ -274,6 +285,8 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
                 ...(resource !== 'wastes' && { type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE' })
             }, include: { details: true } });
             const detailId = issue.details[0].id;
+            await request(app).post(path).set('Cookie', cookie)
+                .send({ ...header(sessions[areas[0]].departmentId), details: [detail(resource)], supplyImmediately: true }).expect(403);
             await request(app).patch(`${path}/${issue.id}/details`).set('Cookie', cookie)
                 .send({ details: [{ id: detailId, isSupplied: true, projectConvertedQuantity: 3 }] }).expect(403);
             await request(app).patch(`${path}/${issue.id}/details/${detailId}/returns`).set('Cookie', cookie)

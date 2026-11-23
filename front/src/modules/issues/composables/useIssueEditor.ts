@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue';
+import { PERMISSIONS } from '@nexus/permissions';
 import { ISSUE_CONFIG } from '../issueConfig.js';
 import { useForm } from 'vee-validate';
 import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
@@ -29,6 +30,12 @@ export const useIssueEditor = (options: {
     const supplyImmediately = ref(false);
     const canSupplyOnCreate = computed(
         () => mode === 'create' && options.has(ISSUE_CONFIG[options.resource].supplyPermission),
+    );
+    const autoSupplyOnCreate = computed(
+        () => canSupplyOnCreate.value && options.has(PERMISSIONS.ISSUES_AUTO_SUPPLY),
+    );
+    const canChooseSupplyOnCreate = computed(
+        () => canSupplyOnCreate.value && !autoSupplyOnCreate.value,
     );
     const isReadOnly = mode === 'view' || mode === 'return';
     const canEditHeader = ['create', 'edit', 'header'].includes(mode);
@@ -88,7 +95,7 @@ export const useIssueEditor = (options: {
                   target,
                   payload: {
                       ...mapIssueFormToRequest(values, options.resource, target.mode),
-                      ...(canSupplyOnCreate.value &&
+                      ...(canChooseSupplyOnCreate.value &&
                           supplyImmediately.value && { supplyImmediately: true }),
                   },
                   signal,
@@ -99,7 +106,8 @@ export const useIssueEditor = (options: {
     return {
         ...record,
         supplyImmediately,
-        canSupplyOnCreate,
+        autoSupplyOnCreate,
+        canChooseSupplyOnCreate,
         values: form.values,
         errors: form.errors,
         isReadOnly,

@@ -90,22 +90,28 @@ for (const [path, resource] of [
     page,
   }) => {
     test.setTimeout(60_000);
-    const { writes, docs } = await mockIssues(page, undefined, 'Surtido');
+    const { reads, writes, docs } = await mockIssues(page, undefined, 'Surtido');
     const line = docs[resource].details[0]!;
     if (line.material) line.material.presentation.name = 'PIEZA';
     else if ('waste' in line) line.waste.presentation.name = 'PIEZA';
+    if (resource === 'wastes') await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`/salidas/${path}`);
     const returnAction = page.getByRole('button', {
       name: 'Devolver material surtido',
       exact: true,
     });
     await expect(returnAction).toHaveClass(/bg-accent/);
-    await returnAction.click();
+    await page.getByRole('button', { name: 'Consultar salida', exact: true }).click();
     const main = page.getByRole('dialog', {
-      name: /^Devolver salida( de merma)? - Folio SAL-001$/,
+      name: /^Consultar salida( de merma)? - Folio SAL-001$/,
     });
+    await expect(main).toBeVisible();
+    const issueReads = () => reads.filter((url) => url.pathname.endsWith(`/${docs[resource].id}`));
+    expect(issueReads()).toHaveLength(1);
     await main.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
     const detail = page.getByRole('dialog', { name: 'Devolver detalle de salida', exact: true });
+    await expect(detail.getByText(/^Folio SAL-001 · /)).toBeVisible();
+    expect(issueReads()).toHaveLength(1);
     await expect(detail.getByLabel('Cantidad a devolver', { exact: true })).toHaveAttribute(
       'step',
       '1',
@@ -124,24 +130,28 @@ for (const [path, resource] of [
       main.getByRole('button', { name: 'Devolver detalle de salida', exact: true }),
     ).toBeEnabled();
     await main.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
+    await expect(detail.getByLabel('Cantidad a devolver', { exact: true })).toHaveAttribute(
+      'max',
+      '1',
+    );
     await detail.getByLabel('Cantidad a devolver', { exact: true }).fill('1');
     await detail.getByRole('button', { name: 'Devolver', exact: true }).click();
     await expect(detail).toBeHidden();
-    const read = page.getByRole('dialog', {
-      name: /^Consultar salida( de merma)? - Folio SAL-001$/,
-    });
-    await expect(read).toBeVisible();
-    await expect(read.getByRole('cell', { name: 'Cancelado', exact: true })).toBeVisible();
+    if (resource === 'wastes') await page.setViewportSize({ width: 1280, height: 844 });
+    await expect(main).toBeVisible();
+    await expect(main.getByRole('cell', { name: 'Cancelado', exact: true })).toBeVisible();
     await expect(
-      read.getByRole('button', { name: 'Devolver detalle de salida', exact: true }),
+      main.getByRole('button', { name: 'Devolver detalle de salida', exact: true }),
     ).toHaveCount(0);
     expect(writes).toHaveLength(2);
+    for (const write of writes)
+      expect(write.url.pathname).toContain(`/${docs[resource].id}/details/${line.id}/returns`);
     expect(writes.map((write) => write.data)).toEqual([
       { returnQuantity: 1, observations: '' },
       { returnQuantity: 1, observations: '' },
     ]);
-    await read.getByRole('cell', { name: 'Cancelado', exact: true }).scrollIntoViewIfNeeded();
-    await read.screenshot({
+    await main.getByRole('cell', { name: 'Cancelado', exact: true }).scrollIntoViewIfNeeded();
+    await main.screenshot({
       path: test.info().outputPath('piece-return-confirmed.png'),
       animations: 'disabled',
     });
@@ -159,7 +169,19 @@ for (const [path, resource, title, label] of [
     await page.addInitScript(() => {
       Object.defineProperty(crypto, 'randomUUID', { value: undefined });
     });
-    const { writes, reads } = await mockIssues(page);
+    const autoSupply = resource !== 'consumables';
+    const permissions = autoSupply
+      ? issuePermissions
+      : issuePermissions.filter((permission) => permission !== 'issues:auto-supply');
+    const { writes, reads } = await mockIssues(page, permissions);
+    if (!autoSupply)
+      await page.route('**/api/auth/me', (route) =>
+        route.fulfill({
+          json: {
+            user: { ...user, permissions, organization: { isWarehouse: false, isSystem: true } },
+          },
+        }),
+      );
     await page.goto(`/salidas/${path}`);
     await expect(
       page.getByRole('heading', { name: `Tabla de ${title}`, exact: true }),
@@ -188,8 +210,15 @@ for (const [path, resource, title, label] of [
       name: 'Surtir al guardar',
       exact: true,
     });
-    await expect(immediateSupply).not.toBeChecked();
-    if (resource === 'materials') await immediateSupply.check();
+    if (autoSupply) {
+      await expect(immediateSupply).toHaveCount(0);
+      await expect(
+        dialog.getByText('Al guardar, la salida se surte y se descuentan las existencias.'),
+      ).toBeVisible();
+    } else {
+      await expect(immediateSupply).not.toBeChecked();
+      await immediateSupply.check();
+    }
     await dialog.getByLabel('Observaciones', { exact: true }).fill('A'.repeat(501));
     await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue('A'.repeat(500));
     await dialog.getByLabel('Observaciones', { exact: true }).fill('');
@@ -251,7 +280,7 @@ for (const [path, resource, title, label] of [
         ? [{ wasteId: ids.waste, quantity: 2 }]
         : [{ materialId: ids.material, supplierId: ids.supplier, quantity: 2 }],
     );
-    expect(writes[0]!.data.supplyImmediately).toBe(resource === 'materials' ? true : undefined);
+    expect(writes[0]!.data.supplyImmediately).toBe(autoSupply ? undefined : true);
     expect(writes[0]!.data).not.toHaveProperty('status');
     expect(writes[0]!.data.departmentId).toBe(departmentId);
     await page.getByLabel('Observaciones contiene:', { exact: true }).fill('otro filtro');
@@ -627,9 +656,10 @@ test(
   { tag: '@essential' },
   async ({ page }) => {
     const permissions = issuePermissions.filter(
-      (p) => !['goods:issue-details-manage', 'inventory:costs-read'].includes(p),
+      (p) =>
+        !['goods:issue-details-manage', 'issues:auto-supply', 'inventory:costs-read'].includes(p),
     );
-    const { writes } = await mockIssues(page, permissions);
+    const { writes } = await mockIssues(page, permissions, 'Surtido');
     await page.route('**/api/auth/me', (route) =>
       route.fulfill({
         json: {
@@ -658,6 +688,7 @@ test(
     const view = page.getByRole('dialog');
     await expect(view.getByRole('columnheader', { name: 'Pendiente de surtir' })).toBeVisible();
     await expect(view.getByRole('columnheader', { name: 'Costo máximo unitario' })).toHaveCount(0);
+    await expect(view.getByRole('button', { name: 'Devolver detalle de salida' })).toHaveCount(0);
     await expect(view.getByLabel('Totales de salida')).toHaveCount(0);
     await view.getByRole('button', { name: 'Regresar', exact: true }).click();
     expect(writes).toHaveLength(0);

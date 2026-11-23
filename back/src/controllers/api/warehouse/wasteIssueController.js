@@ -16,6 +16,7 @@ import {
 import { returnWasteIssueDetail } from '../../../services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { successCodeMessages } from '../../../shared/constants/apiSuccessCodes.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../../shared/constants/fulfillmentStatuses.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
 import { getIssueDataTableQuery } from '../../../utils/issueQueryUtils.js';
 
@@ -59,7 +60,9 @@ export const registerWasteIssue = async (req, res) => {
         userId: req.user.id
     });
 
-    if (sanitizedWasteIssueDto.supplyImmediately) emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' });
+    if (wasteIssue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.COMPLETE) {
+        emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' });
+    }
 
     return res.status(201).json({
         wasteIssue: presentIssueDocument(wasteIssue, req.user),

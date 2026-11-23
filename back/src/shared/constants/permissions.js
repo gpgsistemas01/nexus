@@ -1,5 +1,6 @@
 export const PERMISSIONS = Object.freeze({
     ISSUES_RECONCILE: 'issues:reconcile',
+    ISSUES_AUTO_SUPPLY: 'issues:auto-supply',
     MATERIALS_READ: 'materials:read',
     MATERIALS_WRITE: 'materials:write',
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',

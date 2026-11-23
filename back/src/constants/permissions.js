@@ -57,11 +57,21 @@ const operationalAccessPolicy = createPolicy({
     ]
 });
 
+const issueSupplyRoles = [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR, ROLE_KEYS.SYSTEM_ADMIN];
+const issueSupplyPolicy = createPolicy({
+    roles: issueSupplyRoles,
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
+});
+
 export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.ISSUES_RECONCILE]: createAccessConditions([
         { roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS },
         { roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
     ]),
+    [PERMISSIONS.ISSUES_AUTO_SUPPLY]: createPolicy({
+        roles: issueSupplyRoles,
+        departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY]
+    }),
     [PERMISSIONS.CATALOGS_MANAGE]: createPolicy({
         roles: [ROLE_KEYS.SYSTEM_ADMIN],
         departments: [DEPARTMENT_KEYS.SYSTEMS]
@@ -208,10 +218,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         DEPARTMENT_KEYS.WORKSHOP_3D
     ]
 }),
-    [PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE]: createPolicy({
-    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR, ROLE_KEYS.SYSTEM_ADMIN],
-    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
-}),
+    [PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE]: issueSupplyPolicy,
     [PERMISSIONS.GOODS_RECEIPTS_MANAGE]: createPolicy({
     roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
     departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
@@ -259,10 +266,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: [DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.WASTE_ISSUES_MANAGE]: operationalAccessPolicy,
-    [PERMISSIONS.WASTE_ISSUES_SUPPLY]: createPolicy({
-        roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
-        departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
-    }),
+    [PERMISSIONS.WASTE_ISSUES_SUPPLY]: issueSupplyPolicy,
     [PERMISSIONS.WASTE_ISSUES_PAGE_VIEW]: operationalAccessPolicy,
     [PERMISSIONS.PERSONS_PAGE_VIEW]: createPolicy({
     roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.WAREHOUSE_KEEPER],
@@ -307,9 +311,13 @@ export const getOrganizationContext = (accesses = []) => Object.fromEntries(
     ])
 );
 
-export const getGrantedPermissions = (accesses = []) => Object.entries(AUTHORIZATION_POLICIES)
-    .filter(([, policy]) => Array.isArray(policy) ? matchesAccessConditions(accesses, policy) : accesses.some(access => (
+export const hasGrantedPermission = (accesses, permission) => {
+    const policy = AUTHORIZATION_POLICIES[permission];
+    return Array.isArray(policy) ? matchesAccessConditions(accesses, policy) : accesses.some(access => (
         policy.departmentKeys.includes(access.departmentKey)
         && policy.roleKeys.includes(access.roleKey)
-    )))
-    .map(([permission]) => permission);
+    ));
+};
+
+export const getGrantedPermissions = (accesses = []) => Object.keys(AUTHORIZATION_POLICIES)
+    .filter(permission => hasGrantedPermission(accesses, permission));
