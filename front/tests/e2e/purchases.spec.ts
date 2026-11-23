@@ -236,6 +236,19 @@ for (const [path, title, item] of [
         'Monto s/ IVA',
         'Monto c/ IVA',
       ]);
+      const costHeader = dialog.getByRole('columnheader', {
+        name: 'Costo por presentación',
+        exact: true,
+      });
+      expect(
+        await costHeader.locator('.v-data-table-header__content > span').evaluate((title) => {
+          const range = document.createRange();
+          range.selectNodeContents(title);
+          return range.getClientRects().length;
+        }),
+      ).toBe(2);
+      const costField = dialog.getByRole('spinbutton', { name: 'Costo por presentación' });
+      expect((await costField.boundingBox())!.width).toBeLessThanOrEqual(144);
       await expect(
         dialog.getByRole('columnheader', { name: 'Medidas', exact: true }),
       ).toHaveAttribute('colspan', '2');

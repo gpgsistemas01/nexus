@@ -42,7 +42,8 @@ flowchart TB
 Consumibles y Mermas. Recibe las asignaciones de la sesión cargada por el servidor;
 los controllers no aceptan políticas del body. Listados, conteos, reportes y lectura
 por ID usan el mismo filtro. En ediciones se comprueba el área original al leer bajo
-bloqueo y el destino antes de modificar el encabezado o los detalles. Auxiliar y
+bloqueo y el destino antes de modificar el encabezado o los detalles. Las cuentas
+operativas conservan el área original, incluso con varias asignaciones. Auxiliar y
 Coordinador de Almacén, y Administrador del sistema, tienen alcance de todas las
 áreas; los demás accesos autorizados se limitan a sus áreas asignadas.
 

@@ -1,4 +1,3 @@
-import { ClientError } from '../../../shared/clientError.js';
 import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue';
 import { createUuid } from '../../../shared/utils/createUuid.js';
 import { ApiError } from '../../../shared/http/apiError.js';
@@ -28,13 +27,9 @@ export const useHistoricalDelivery = (options: {
     const cutoffDate = new Date().toISOString();
     const preview = shallowRef<HistoricalDeliveryPreview | null>(null);
     const receipt = shallowRef<HistoricalDeliveryReceipt | null>(null);
-    const selected = ref<string[]>([]);
-    const candidates = shallowRef(
-        new Map<string, HistoricalDeliveryPreview['documents'][number]>(),
-    );
-    const allSelected = ref(false);
+    const selection = shallowRef(new Map<string, string>());
+    const selected = computed(() => [...selection.value.keys()]);
     const isWorking = ref(false);
-    const isSelectingAll = ref(false);
     const error = ref('');
     const pending = shallowRef<HistoricalDeliveryCommand | null>(null);
     const recoveryRequired = ref(false);
@@ -91,9 +86,7 @@ export const useHistoricalDelivery = (options: {
                     pending.value = null;
                     recoveryRequired.value = false;
                     preview.value = null;
-                    selected.value = [];
-                    candidates.value = new Map();
-                    allSelected.value = false;
+                    selection.value = new Map();
                 }
             }
         } finally {
@@ -101,7 +94,7 @@ export const useHistoricalDelivery = (options: {
         }
     };
 
-    const load = (page = 1, preserveSelection = false) =>
+    const load = (page = 1) =>
         run(async () => {
             if (recoveryRequired.value || receipt.value) return;
 
@@ -111,14 +104,6 @@ export const useHistoricalDelivery = (options: {
                 controller.signal,
             );
             preview.value = result;
-            candidates.value =
-                page === 1 && !preserveSelection ? new Map() : new Map(candidates.value);
-            for (const candidate of result.documents) candidates.value.set(candidate.id, candidate);
-
-            if (page === 1 && !preserveSelection) {
-                selected.value = [];
-                allSelected.value = false;
-            }
         });
 
     const send = async () => {
@@ -148,15 +133,7 @@ export const useHistoricalDelivery = (options: {
                 deliveredAt: null,
                 reason: values.reason.trim(),
                 declaredDelivered: true,
-                documents: selected.value.map((id) => {
-                    const candidate = candidates.value.get(id);
-                    if (!candidate)
-                        throw new ClientError(
-                            'Una salida seleccionada ya no está disponible. Vuelve a abrir el diálogo y revisa los folios.',
-                        );
-
-                    return { id: candidate.id, revision: candidate.revision };
-                }),
+                documents: Array.from(selection.value, ([id, revision]) => ({ id, revision })),
             };
             storage.save(command);
             pending.value = command;
@@ -170,85 +147,34 @@ export const useHistoricalDelivery = (options: {
     const toggle = (id: string) => {
         if (isWorking.value || recoveryRequired.value) return;
 
-        if (selected.value.includes(id)) {
-            selected.value = selected.value.filter((value) => value !== id);
-            allSelected.value = false;
-            error.value = '';
-            return;
+        const next = new Map(selection.value);
+
+        if (!next.delete(id)) {
+            const candidate = preview.value?.documents.find((document) => document.id === id);
+            if (!candidate || next.size >= limits.maxDocuments) return;
+
+            next.set(id, candidate.revision);
         }
 
-        const candidate = candidates.value.get(id);
-        if (!candidate) return;
-
-        if (selected.value.length >= limits.maxDocuments) {
-            error.value = `Este lote ya tiene ${limits.maxDocuments} salidas. Confírmalo o desmarca una salida para cambiar la selección.`;
-            return;
-        }
-
-        selected.value = [...selected.value, id];
-        allSelected.value = false;
-        error.value = '';
+        selection.value = next;
     };
 
-    const selectAll = (isSelected = true) => {
-        if (isWorking.value || recoveryRequired.value) return Promise.resolve();
+    const selectPage = () => {
+        if (isWorking.value || recoveryRequired.value || !preview.value) return;
 
-        if (!isSelected) {
-            selected.value = [];
-            allSelected.value = false;
-            error.value = '';
-            return Promise.resolve();
+        const next = new Map(selection.value);
+
+        for (const { id, revision } of preview.value.documents) {
+            if (next.size >= limits.maxDocuments) break;
+
+            if (!next.has(id)) next.set(id, revision);
         }
 
-        return run(async () => {
-            const currentPreview = preview.value;
-            if (!currentPreview) return;
+        selection.value = next;
+    };
 
-            isSelectingAll.value = true;
-
-            try {
-                const allCandidates = new Map<
-                    string,
-                    HistoricalDeliveryPreview['documents'][number]
-                >();
-                let complete = false;
-
-                for (let page = 1; page <= limits.maxPage; page += 1) {
-                    const result =
-                        currentPreview.page === page
-                            ? currentPreview
-                            : await historicalDeliveryService.preview(
-                                  options.resource,
-                                  { cutoffDate, page },
-                                  controller.signal,
-                              );
-
-                    for (const candidate of result.documents) {
-                        allCandidates.set(candidate.id, candidate);
-                        if (allCandidates.size > limits.maxDocuments)
-                            throw new ClientError(
-                                `Hay más de ${limits.maxDocuments} salidas para este corte. Marca hasta ${limits.maxDocuments} por lote.`,
-                            );
-                    }
-
-                    if (!result.hasMore) {
-                        complete = true;
-                        break;
-                    }
-                }
-
-                if (!complete)
-                    throw new ClientError(
-                        `Hay más resultados de los que puedes seleccionar de una vez. Marca hasta ${limits.maxDocuments} salidas por lote.`,
-                    );
-
-                candidates.value = allCandidates;
-                selected.value = [...allCandidates.keys()];
-                allSelected.value = selected.value.length > 0;
-            } finally {
-                isSelectingAll.value = false;
-            }
-        });
+    const clearSelection = () => {
+        if (!isWorking.value && !recoveryRequired.value) selection.value = new Map();
     };
 
     onBeforeUnmount(() => {
@@ -264,9 +190,7 @@ export const useHistoricalDelivery = (options: {
         preview,
         receipt,
         selected,
-        allSelected,
         isWorking,
-        isSelectingAll,
         error,
         recoveryRequired,
         canConfirm,
@@ -274,6 +198,7 @@ export const useHistoricalDelivery = (options: {
         confirm,
         recover,
         toggle,
-        selectAll,
+        selectPage,
+        clearSelection,
     };
 };

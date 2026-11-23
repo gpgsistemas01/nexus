@@ -22,6 +22,7 @@ import type { MutationConfirmation } from '../../../shared/http/recordContract.j
 export const useIssueEditor = (options: {
     resource: IssueResource;
     target: IssueTarget;
+    canChangeDepartment?: boolean;
     has: (permission: string) => boolean;
     onSaved: (result: MutationConfirmation) => void;
     onDenied: (status: number) => void;
@@ -63,6 +64,7 @@ export const useIssueEditor = (options: {
         selectClient: (id) => record.update('clientId', id),
         values: form.values,
         document,
+        canChangeDepartment: options.canChangeDepartment,
         isEnabled: () => canEditHeader && !record.isDisabled(),
         setHeaderField: (field, value) => form.setFieldValue(field, value, false),
     });

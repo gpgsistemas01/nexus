@@ -6,7 +6,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineProps
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 17, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 18, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -14,9 +14,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `preview` | `preview: HistoricalDeliveryPreview \| null;` |
 | `receipt` | `receipt: HistoricalDeliveryReceipt \| null;` |
 | `selected` | `selected: string[];` |
-| `allSelected` | `allSelected: boolean;` |
 | `isWorking` | `isWorking: boolean;` |
-| `isSelectingAll` | `isSelectingAll: boolean;` |
 | `recoveryRequired` | `recoveryRequired: boolean;` |
 | `canConfirm` | `canConfirm: boolean;` |
 | `error` | `error: string;` |
@@ -28,15 +26,16 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## HistoricalDeliveryDialog.defineEmits
 
-**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 32, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/HistoricalDeliveryDialog.vue](../../../../../src/modules/issues/components/HistoricalDeliveryDialog.vue) · línea 31, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `update` | `update: [field: 'reason', value: string];` |
 | `declare` | `declare: [value: boolean];` |
 | `select` | `select: [id: string];` |
-| `selectAll` | `selectAll: [selected: boolean];` |
-| `load` | `load: [page?: number, preserveSelection?: boolean];` |
+| `selectPage` | `selectPage: [];` |
+| `clearSelection` | `clearSelection: [];` |
+| `load` | `load: [page?: number];` |
 | `confirm` | `confirm: [];` |
 | `recover` | `recover: [];` |
 | `close` | `close: [];` |
@@ -687,7 +686,8 @@ RecordQuery & IssueFilters
 | Miembro | Firma completa |
 | --- | --- |
 | `resource` | `resource: IssueResource;` |
-| `target` | `target: IssueTarget` |
+| `target` | `target: IssueTarget;` |
+| `canChangeDepartment` | `canChangeDepartment: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -696,7 +696,7 @@ RecordQuery & IssueFilters
 
 ## IssueEditorPage.defineEmits
 
-**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 16, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

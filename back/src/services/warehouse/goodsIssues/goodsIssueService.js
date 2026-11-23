@@ -248,6 +248,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
                 where: { id, ...buildGoodsIssueContextWhere(type), ...buildIssueDepartmentWhere({ accesses }) },
                 select: {
                     id: true,
+                    departmentId: true,
                     status: true,
                     fulfillmentStatus: true,
                     details: {
@@ -268,7 +269,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
             });
 
             if (!goodsIssue) throw new GoodsIssueNotFound();
-            assertIssueDepartmentAccess({ accesses, departmentId });
+            assertIssueDepartmentAccess({ accesses, departmentId, currentDepartmentId: goodsIssue.departmentId });
 
             if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.PENDING) throw new GoodsIssueNotPendingConflict();
 
@@ -363,11 +364,11 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto, type = MATERIA
             await lockGoodsIssue({ tx, id });
             const goodsIssue = await tx.goodsIssue.findUnique({
                 where: { id, ...buildGoodsIssueContextWhere(type), ...buildIssueDepartmentWhere({ accesses }) },
-                select: { id: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
+                select: { id: true, departmentId: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
             });
 
             if (!goodsIssue) throw new GoodsIssueNotFound();
-            assertIssueDepartmentAccess({ accesses, departmentId });
+            assertIssueDepartmentAccess({ accesses, departmentId, currentDepartmentId: goodsIssue.departmentId });
 
             assertIssueNotCanceled(goodsIssue);
 

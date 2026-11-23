@@ -76,7 +76,6 @@ const emit = defineEmits<{
         </template>
         <template #costPerUnitType>
             <VTextField
-                :label="PURCHASE_DETAIL_LABELS.costPerPresentation"
                 hint="Sin IVA"
                 type="number"
                 min="0"
@@ -86,7 +85,15 @@ const emit = defineEmits<{
                 :disabled="isDisabled"
                 @update:model-value="emit('update', 'costPerUnitType', $event ?? '')"
                 @blur="emit('blur', 'costPerUnitType')"
-            />
+            >
+                <template #label>
+                    <span
+                        class="cost-label-short"
+                        aria-hidden="true"
+                    />
+                    <span class="cost-label">{{ PURCHASE_DETAIL_LABELS.costPerPresentation }}</span>
+                </template>
+            </VTextField>
         </template>
         <template #presentation>
             <WrappingTextField
@@ -121,3 +128,18 @@ const emit = defineEmits<{
         </template>
     </DetailEntryRow>
 </template>
+
+<style scoped>
+@media (min-width: 600px) {
+    .cost-label-short::before {
+        content: 'Costo';
+    }
+    .cost-label {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+}
+</style>

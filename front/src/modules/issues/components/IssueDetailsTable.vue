@@ -124,7 +124,6 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => {
                           title: 'Cantidad a surtir',
                           key: 'quantityToSupply',
                           align: 'end',
-                          minWidth: 160,
                       },
                       {
                           title: 'Cantidad de proyecto',

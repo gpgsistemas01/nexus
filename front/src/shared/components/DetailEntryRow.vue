@@ -74,12 +74,9 @@ const reference = (column: string) => {
     display: none;
 }
 @media (min-width: 600px) {
-    .detail-entry > td[data-column='costPerUnitType'] {
-        min-width: 16rem !important;
-    }
     .detail-entry > td[data-column='costScope'] {
-        min-width: 18rem !important;
-        max-width: 22rem;
+        min-width: 12rem !important;
+        max-width: 14rem;
     }
 }
 @media (max-width: 599px) {

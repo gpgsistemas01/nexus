@@ -160,6 +160,10 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
 .table-frame :deep(th .v-icon) {
     color: var(--table-header-text, white);
 }
+.table-frame :deep(th .v-data-table-header__sort-icon) {
+    opacity: 1;
+    flex-shrink: 0;
+}
 .table-frame :deep(th .v-data-table-header__content) {
     justify-content: center;
 }
@@ -314,6 +318,11 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
         justify-content: flex-start;
         overflow-wrap: normal;
     }
+    .table-frame--details :deep(th .v-data-table-header__content > span:first-child) {
+        min-inline-size: min-content;
+        max-inline-size: 12ch;
+        text-wrap: balance;
+    }
     .table-frame--details :deep(th[colspan]:not([colspan='1']) .v-data-table-header__content),
     .table-frame--details
         :deep(th.v-data-table-column--align-center .v-data-table-header__content) {
@@ -335,6 +344,11 @@ const scrollWithKeyboard = (event: KeyboardEvent) => {
     }
     .table-frame--details :deep(.v-table__wrapper td .v-input) {
         min-width: 9rem;
+    }
+    .table-frame--details :deep(.v-table__wrapper td .v-input:has(input[type='number'])) {
+        min-width: 0;
+        inline-size: 8rem;
+        max-inline-size: 100%;
     }
     .table-frame--details :deep(input[type='number']) {
         text-align: end;

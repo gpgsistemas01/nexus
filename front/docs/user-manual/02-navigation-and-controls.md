@@ -67,11 +67,18 @@ sus campos identificados. Desde 600 px se muestra la tabla. Cuando no caben toda
 las columnas, use la barra inferior, los botones de flecha o el teclado al enfocar
 la tabla. El desplazamiento ocurre dentro de la tabla y mantiene el tamaño de
 letra. La columna de identificación y las acciones permanecen visibles cuando
-la tabla las tiene fijas. Use los encabezados o el selector para ordenar.
+la tabla las tiene fijas. En un encabezado ordenable, la doble flecha indica que
+esa columna no tiene un orden aplicado. La flecha hacia arriba indica orden
+ascendente y la flecha hacia abajo indica orden descendente. En las fichas, el
+control **Ordenar por** muestra la columna y el botón indica el sentido actual.
+Cuando el orden sea opcional, el siguiente paso después de **Descendente** es
+**Sin ordenar**.
 Al final de las fichas o la tabla se indica cuántos registros contiene la página actual; el
 selector **Registros por página** permite cambiar ese límite.
 Las fichas de todas las tablas conservan sus acciones e inputs, incluidos los detalles
 de compras y salidas y las asignaciones de personas.
+En las tablas de detalle, los encabezados largos se distribuyen en dos líneas
+para aprovechar el ancho de la tabla.
 Los nombres y otros datos largos ocupan varias líneas en los campos de texto y en
 las opciones seleccionadas. **Observaciones** crece al escribir. Con ratón, arrastre
 su esquina inferior para ajustar la altura.

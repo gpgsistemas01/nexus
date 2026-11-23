@@ -16,6 +16,7 @@ export const useIssueHeaderSelection = (options: {
     resource: IssueResource;
     values: IssueValues;
     document?: IssueDocument;
+    canChangeDepartment?: boolean;
     isEnabled: () => boolean;
     has: (permission: string) => boolean;
     selectClient: (id: string) => void;
@@ -35,14 +36,19 @@ export const useIssueHeaderSelection = (options: {
             ),
         computed(() => options.isEnabled() && canReadClients.value),
     );
+    const isDocumentDepartmentLocked = options.canChangeDepartment === false && !!options.document;
     const departments = useIssueDepartments({
         resource: options.resource,
-        isEnabled: () => options.isEnabled() && canReadDepartments.value,
+        isEnabled: () =>
+            options.isEnabled() && canReadDepartments.value && !isDocumentDepartmentLocked,
         getSelectedId: () => options.values.departmentId,
         selectDefault: (id) => {
             if (!options.document) options.setHeaderField('departmentId', id);
         },
     });
+    const isDepartmentLocked = computed(
+        () => isDocumentDepartmentLocked || departments.isLocked.value,
+    );
 
     const createInitialOption = (id: string, title: string): LookupItem => ({
         id,
@@ -168,6 +174,7 @@ export const useIssueHeaderSelection = (options: {
         selectCreatedClient,
         clients,
         departments,
+        isDepartmentLocked,
         advisors,
         requesters,
         initialOptions,

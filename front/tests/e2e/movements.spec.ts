@@ -125,6 +125,12 @@ test('movimientos: las fichas móviles etiquetan los datos y permiten ordenar po
   await page.getByRole('button', { name: 'Cambiar a orden ascendente' }).click();
   await expect.poll(() => reads.at(-1)?.searchParams.get('order[0][dir]')).toBe('asc');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.setViewportSize({ width: 1280, height: 844 });
+  const folio = page.getByRole('columnheader', { name: 'Folio', exact: true });
+  await expect(folio).toHaveAttribute('aria-sort', 'ascending');
+  await folio.press('Enter');
+  await expect(folio).toHaveAttribute('aria-sort', 'descending');
+  await expect.poll(() => reads.at(-1)?.searchParams.get('order[0][dir]')).toBe('desc');
 });
 
 test(

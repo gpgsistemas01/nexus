@@ -1,3 +1,7 @@
+import { mdiUnfoldMoreHorizontal } from '@mdi/js';
+
+const tableSortDefaults = { sortIcon: mdiUnfoldMoreHorizontal };
+
 // Defaults sólo para las páginas de operación; el login conserva su diseño.
 export const controlDefaults = {
     VBtn: {
@@ -46,6 +50,7 @@ export const controlDefaults = {
         color: 'primary',
         hideDetails: 'auto',
     },
-    VDataTableServer: { density: 'compact', hover: true },
+    VDataTable: tableSortDefaults,
+    VDataTableServer: { ...tableSortDefaults, density: 'compact', hover: true },
     VTooltip: { contentClass: 'warehouse-tooltip' },
 };
