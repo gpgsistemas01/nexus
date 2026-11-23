@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getReadOnlyFieldProps } from '../../../shared/ui/readOnlyField.js';
 import { VSelect } from 'vuetify/components/VSelect';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { LookupState, LookupItem } from '../../../shared/lookup.js';
@@ -122,7 +123,7 @@ const emit = defineEmits<{
                     step="0.01"
                     :model-value="values.base"
                     :error-messages="errors.base"
-                    :readonly="!canEditIdentity"
+                    v-bind="getReadOnlyFieldProps(!canEditIdentity)"
                     :disabled="isSubmitting || isConflicted"
                     @update:model-value="emit('update', 'base', $event ?? '')"
                     @blur="emit('blur', 'base')"
@@ -134,7 +135,7 @@ const emit = defineEmits<{
                     step="0.01"
                     :model-value="values.height"
                     :error-messages="errors.height"
-                    :readonly="!canEditIdentity"
+                    v-bind="getReadOnlyFieldProps(!canEditIdentity)"
                     :disabled="isSubmitting || isConflicted"
                     @update:model-value="emit('update', 'height', $event ?? '')"
                     @blur="emit('blur', 'height')"

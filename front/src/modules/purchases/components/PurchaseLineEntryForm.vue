@@ -93,7 +93,6 @@ const emit = defineEmits<{
                 label="Presentación"
                 :model-value="presentation"
                 readonly
-                tabindex="-1"
             />
         </template>
         <template #costScope>

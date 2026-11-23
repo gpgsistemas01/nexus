@@ -75,6 +75,8 @@ de compras y salidas y las asignaciones de personas.
 Los nombres y otros datos largos ocupan varias líneas en los campos de texto y en
 las opciones seleccionadas. **Observaciones** crece al escribir. Con ratón, arrastre
 su esquina inferior para ajustar la altura.
+**Tab** omite los campos de solo lectura. Para copiar el texto de uno de estos
+campos, selecciónelo con el puntero y use **Ctrl+C** o **⌘+C**.
 
 En los desplegables, la opción seleccionada se distingue por el fondo y una
 marca de verificación. Al salir de un campo de fecha, se muestra **día/mes/año**

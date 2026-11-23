@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getReadOnlyFieldProps } from '../../../shared/ui/readOnlyField.js';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
@@ -75,7 +76,7 @@ const update = (value: string | boolean) => {
         :name="field.name"
         :type="field.type === 'number' ? 'number' : undefined"
         :model-value="field.displayValue ?? String(value)"
-        :readonly="field.isReadOnly"
+        v-bind="getReadOnlyFieldProps(field.isReadOnly)"
         :class="{ 'consultation-field': field.isReadOnly }"
         :disabled="isDisabled"
         :error-messages="error"

@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { getReadOnlyFieldProps } from '../ui/readOnlyField.js';
 import { computed } from 'vue';
 import { VTextField } from 'vuetify/components/VTextField';
 
-const props = defineProps<{ type: 'date' | 'datetime-local' | 'month' }>();
+const props = defineProps<{ type: 'date' | 'datetime-local' | 'month'; readonly?: boolean }>();
 const value = defineModel<string>({ required: true });
 
 const display = computed(() => {
@@ -20,6 +21,7 @@ const display = computed(() => {
 <template>
     <VTextField
         :type="type"
+        v-bind="getReadOnlyFieldProps(readonly)"
         :model-value="value"
         class="date-field"
         lang="es-MX"

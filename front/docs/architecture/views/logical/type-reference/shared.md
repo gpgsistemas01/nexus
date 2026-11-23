@@ -30,11 +30,12 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## DateField.defineProps
 
-**Fuente:** [src/shared/components/DateField.vue](../../../../../src/shared/components/DateField.vue) · línea 5, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/DateField.vue](../../../../../src/shared/components/DateField.vue) · línea 6, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `type` | `type: 'date' \| 'datetime-local' \| 'month'` |
+| `type` | `type: 'date' \| 'datetime-local' \| 'month';` |
+| `readonly` | `readonly?: boolean` |
 
 ## DetailEntryRow.defineProps
 
@@ -412,6 +413,14 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `fitColumns` | `fitColumns?: boolean;` |
 | `mobileCards` | `mobileCards?: boolean;` |
 | `details` | `details?: boolean;` |
+
+## WrappingTextField.defineProps
+
+**Fuente:** [src/shared/components/WrappingTextField.vue](../../../../../src/shared/components/WrappingTextField.vue) · línea 5, columna 13. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `readonly` | `readonly?: boolean` |
 
 ## FileExportOptions
 

@@ -102,7 +102,7 @@ PersonAccess & { id: string }
 
 ## UserForm.defineProps
 
-**Fuente:** [src/modules/identity/components/UserForm.vue](../../../../../src/modules/identity/components/UserForm.vue) · línea 8, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/identity/components/UserForm.vue](../../../../../src/modules/identity/components/UserForm.vue) · línea 9, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -125,7 +125,7 @@ PersonAccess & { id: string }
 
 ## UserForm.defineEmits
 
-**Fuente:** [src/modules/identity/components/UserForm.vue](../../../../../src/modules/identity/components/UserForm.vue) · línea 19, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/identity/components/UserForm.vue](../../../../../src/modules/identity/components/UserForm.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

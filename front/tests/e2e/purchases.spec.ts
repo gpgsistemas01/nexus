@@ -43,6 +43,14 @@ test('compras: muestra el nombre completo del proveedor en alta y consulta', asy
   const field = detail.getByRole('textbox', { name: 'Proveedor', exact: true });
   await expect(field).toHaveValue(name);
   await expect(field).toHaveAttribute('readonly');
+  await expect(field).toHaveAttribute('tabindex', '-1');
+  await field.click();
+  await page.keyboard.press('ControlOrMeta+a');
+  expect(
+    await field.evaluate((input: HTMLTextAreaElement) =>
+      input.value.slice(input.selectionStart, input.selectionEnd),
+    ),
+  ).toBe(name);
   expect(
     await field.evaluate((element) => {
       const fieldStyle = getComputedStyle(element);
@@ -297,7 +305,15 @@ test('compras: edición de encabezado conserva proveedor, observaciones y detall
   await expect(
     dialog.getByRole('button', { name: 'Volver a cargar compra', exact: true }),
   ).toHaveCount(0);
-  await expect(dialog.getByLabel('Proveedor', { exact: true })).toHaveAttribute('readonly', '');
+  const supplierField = dialog.getByLabel('Proveedor', { exact: true });
+  await expect(supplierField).toHaveAttribute('readonly', '');
+  await expect(supplierField).toHaveAttribute('tabindex', '-1');
+  const receiver = dialog.getByRole('combobox', { name: 'Persona que recibe' });
+  await receiver.focus();
+  await page.keyboard.press('Shift+Tab');
+  await expect(supplierField).not.toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(receiver).toBeFocused();
   await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue(
     'Conservar esta observación',
   );
