@@ -11,6 +11,32 @@ en la raíz del repositorio.
 - No realices refactorizaciones ni cambios fuera del alcance solicitado.
 - Usa Node.js 22, 24 o 26 según los rangos `engines` de cada aplicación, y módulos ES. Conserva imports relativos con extensión `.js` y el estilo local del archivo.
 
+## Plan y alcance
+
+- Antes de modificar una funcionalidad, consulta las instrucciones del directorio, el plan maestro aprobado y las fuentes vigentes del flujo: código, arquitectura, requisitos, contratos, documentación y pruebas. Si el plan no está disponible en el checkout o en la tarea, pide su referencia cuando el trabajo dependa de él.
+- Reutiliza los componentes, servicios, repositorios, utilidades y patrones existentes. Evita duplicación, dependencias innecesarias y cambios ajenos al alcance. Evalúa rendimiento, consumo de recursos y mantenibilidad según el impacto.
+- Conserva la separación de responsabilidades, los permisos, la validación del servidor, las garantías de concurrencia y la integridad transaccional.
+- Solicita aprobación antes de decidir cambios relevantes de reglas de negocio, estados, permisos, contratos públicos o arquitectura que no estén cubiertos por el alcance aprobado.
+- Accede a producción sólo con autorización explícita. Esto incluye lecturas de datos, logs y métricas, además de escrituras, migraciones y despliegues.
+
+## Skills de Codex
+
+Las rutas parten de la raíz del repositorio. Antes de iniciar una tarea de la tabla,
+abre y lee el `SKILL.md` correspondiente si Codex no lo ha cargado. En Codex Web
+puedes pedirlo con «Lee `<ruta>` y aplica el flujo a esta tarea». Usa la lectura por
+ruta cuando el selector o la activación automática no estén disponibles.
+Para implementar un cambio habitual sigue este archivo y las instrucciones del
+directorio. Verifica las herramientas y permisos disponibles en la sesión antes de
+depender de un CLI, plugin o servidor MCP.
+
+| Tarea | Archivo |
+| --- | --- |
+| Analizar requisitos, flujos o reglas de negocio | [.agents/skills/functional-analysis/SKILL.md](.agents/skills/functional-analysis/SKILL.md) |
+| Diseñar o revisar migraciones y cambios de datos | [.agents/skills/database-migrations/SKILL.md](.agents/skills/database-migrations/SKILL.md) |
+| Revisar y verificar código, contratos y controles de seguridad | [.agents/skills/change-verification/SKILL.md](.agents/skills/change-verification/SKILL.md) |
+| Evaluar rendimiento, capacidad o costos de dimensionamiento | [.agents/skills/performance-capacity/SKILL.md](.agents/skills/performance-capacity/SKILL.md) |
+| Preparar despliegues o verificar infraestructura y operación | [.agents/skills/deployment-operations/SKILL.md](.agents/skills/deployment-operations/SKILL.md) |
+
 ## Fuentes de verdad
 
 - Consulta `docs/architecture/coding-standards/index.md` para formato, nombres, capas, imports, errores y convenciones de frontend y pruebas.
@@ -71,6 +97,11 @@ en la raíz del repositorio.
   La vista y toda escritura requieren `catalogs:manage` en el servidor.
 
 ## Documentación
+
+- Para cada cambio funcional, arquitectónico, de persistencia, API, seguridad o infraestructura, revisa la documentación propietaria y actualiza en el mismo cambio lo que resulte afectado.
+- Enlaza los requisitos o casos de uso vigentes, las decisiones aplicables, la implementación y la evidencia de pruebas. Mantén identificadas como pendientes las capacidades que aún lo estén.
+- Registra los comandos y los resultados reales de las pruebas correspondientes. Distingue las comprobaciones aprobadas, fallidas, bloqueadas y omitidas, con su motivo cuando corresponda.
+- Al cerrar una fase, actualiza el plan maestro aprobado con el avance, las decisiones, la evidencia y los pendientes. Si el plan no está disponible, informa qué registro quedó pendiente y conserva la evidencia en el reporte del cambio.
 
 - Revisa la documentación relacionada con cada cambio funcional: comportamiento, reglas, endpoints, flujos, validaciones, estructura y pruebas.
 - No modifiques documentación ajena al cambio.

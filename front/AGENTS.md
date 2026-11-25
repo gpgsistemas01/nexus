@@ -1,5 +1,9 @@
 # Reglas del frontend Vue
 
+Aplica también las reglas de [AGENTS.md de la raíz](../AGENTS.md) sobre el plan
+maestro, aprobaciones, trazabilidad y pruebas. Para las tareas del mapa de Skills,
+consulta el `SKILL.md` indicado desde la raíz antes de actuar.
+
 Consulta `docs/index.md` para las fuentes y criterios documentales, y
 `docs/architecture/views/development/code-structure.md` desde esta carpeta para las responsabilidades,
 convenciones y responsabilidades de implementación. Los comandos npm se ejecutan en `front/`.
