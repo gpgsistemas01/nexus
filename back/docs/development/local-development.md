@@ -99,12 +99,12 @@ LOG_LEVEL=info
 LOG_HTTP_ROUTINE=false
 GRAFANA_LOKI_HOST=host-publico-de-loki.grafana.net
 GRAFANA_LOKI_USERNAME=id-numerico-de-loki
-GRAFANA_LOKI_TOKEN_FILE=/ruta/privada/nexus-loki-token
+GRAFANA_LOKI_TOKEN=valor-del-token-de-escritura
 ```
 
-Guarda en el último archivo sólo el valor de un token de Grafana Cloud con
-`logs:write`, fuera del repositorio. Si la ruta contiene espacios, escríbela
-entre comillas en `.env`. En Grafana Explore, selecciona Loki y consulta
+Usa un token de Grafana Cloud con `logs:write`. Conserva `back/.env` fuera de
+Git. Si ya existe `GRAFANA_LOKI_TOKEN_FILE`, el valor de `GRAFANA_LOKI_TOKEN`
+tiene prioridad. En Grafana Explore, selecciona Loki y consulta
 `{job="nexus-api",environment="local"} | json | event="server_started"`.
 El nivel `info` permite ver ese evento con `NODE_ENV=test`. Si Alloy no puede
 arrancar, la API sigue emitiendo logs a stdout.

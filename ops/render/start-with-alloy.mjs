@@ -9,11 +9,13 @@ import { setTimeout as wait } from 'node:timers/promises';
 const launcherArgs = process.argv.slice(2);
 const local = launcherArgs[0] === '--local';
 const [command, ...args] = local ? launcherArgs.slice(1) : launcherArgs;
-const secretFile = process.env.GRAFANA_LOKI_TOKEN_FILE ?? '/etc/secrets/nexus-loki-token';
+const token = process.env.GRAFANA_LOKI_TOKEN?.trim() ?? '';
+const secretFile = process.env.GRAFANA_LOKI_TOKEN_FILE || '/etc/secrets/nexus-loki-token';
 const environment = {
     GRAFANA_LOKI_HOST: process.env.GRAFANA_LOKI_HOST,
     GRAFANA_LOKI_USERNAME: process.env.GRAFANA_LOKI_USERNAME,
-    GRAFANA_LOKI_TOKEN_FILE: secretFile,
+    GRAFANA_LOKI_TOKEN: token,
+    GRAFANA_LOKI_TOKEN_FILE: token ? '' : secretFile,
     NEXUS_LOG_ENVIRONMENT: process.env.NEXUS_LOG_ENVIRONMENT ?? (local ? 'local' : 'production'),
     PATH: process.env.PATH,
     GOMEMLIMIT: '96MiB',
@@ -40,11 +42,13 @@ const startCollector = () => {
         return;
     }
 
-    try {
-        accessSync(secretFile, constants.R_OK);
-    } catch {
-        report('El archivo del token de Loki no está disponible');
-        return;
+    if (!token) {
+        try {
+            accessSync(secretFile, constants.R_OK);
+        } catch {
+            report('Configura GRAFANA_LOKI_TOKEN o indica un archivo de token legible');
+            return;
+        }
     }
 
     let configDirectory = '/app/alloy';
@@ -100,7 +104,11 @@ const waitForCollector = async child => {
 const collector = startCollector();
 if (collector) await waitForCollector(collector);
 if (!shutdownSignal) {
-    application = spawn(command, args, { stdio: ['inherit', collector ? 'pipe' : 'inherit', 'inherit'] });
+    application = spawn(command, args, {
+        // Evita que dotenv vuelva a cargar el token de Alloy en la API.
+        env: { ...process.env, GRAFANA_LOKI_TOKEN: '' },
+        stdio: ['inherit', collector ? 'pipe' : 'inherit', 'inherit']
+    });
     application.on('error', () => report('No se pudo iniciar la API'));
 
     const completed = new Promise(resolve => application.once('close', (code, signal) => {
