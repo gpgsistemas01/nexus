@@ -269,13 +269,16 @@ Instala Grafana Alloy como servicio con acceso de lectura al journal de
 Docker, sin grupo `docker` ni acceso al socket. Copia los archivos de
 `ops/alloy/` a un directorio dedicado (por ejemplo `/etc/alloy/nexus/`) y apunta
 el servicio de Alloy a ese directorio. Deja su interfaz HTTP en loopback.
-Configura estas variables en el entorno de Alloy.
+Configura estas variables en el entorno de Alloy. Si usas systemd, puedes leerlas
+desde un `EnvironmentFile` exclusivo de Alloy con permisos restringidos.
+Para el servicio de Alloy configura sólo una de las dos opciones de token.
 
 | Variable de Alloy | Contenido |
 | --- | --- |
 | `NEXUS_LOG_ENVIRONMENT` | Nombre estable del ambiente, por ejemplo `staging`. |
 | `GRAFANA_LOKI_HOST` | Host de escritura de Loki que muestra Grafana Cloud, sin protocolo ni ruta. Alloy forma la URL HTTPS y añade `/loki/api/v1/push`. |
 | `GRAFANA_LOKI_USERNAME` | Identificador de usuario de Loki del stack. |
+| `GRAFANA_LOKI_TOKEN` | Token `logs:write` cargado desde el entorno. |
 | `GRAFANA_LOKI_TOKEN_FILE` | Ruta absoluta de un archivo con el token `logs:write`, legible sólo por Alloy y el administrador. |
 
 Antes de iniciar Alloy, ejecuta `alloy validate /etc/alloy/nexus` con las
