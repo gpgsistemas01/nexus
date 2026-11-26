@@ -1,16 +1,21 @@
 import { spawn } from 'node:child_process';
 import { createSocket } from 'node:dgram';
-import { accessSync, constants } from 'node:fs';
+import { accessSync, constants, copyFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createInterface } from 'node:readline';
 import { setTimeout as wait } from 'node:timers/promises';
 
-const [command, ...args] = process.argv.slice(2);
+const launcherArgs = process.argv.slice(2);
+const local = launcherArgs[0] === '--local';
+const [command, ...args] = local ? launcherArgs.slice(1) : launcherArgs;
 const secretFile = process.env.GRAFANA_LOKI_TOKEN_FILE ?? '/etc/secrets/nexus-loki-token';
 const environment = {
     GRAFANA_LOKI_HOST: process.env.GRAFANA_LOKI_HOST,
     GRAFANA_LOKI_USERNAME: process.env.GRAFANA_LOKI_USERNAME,
     GRAFANA_LOKI_TOKEN_FILE: secretFile,
-    NEXUS_LOG_ENVIRONMENT: process.env.NEXUS_LOG_ENVIRONMENT ?? 'production',
+    NEXUS_LOG_ENVIRONMENT: process.env.NEXUS_LOG_ENVIRONMENT ?? (local ? 'local' : 'production'),
+    PATH: process.env.PATH,
     GOMEMLIMIT: '96MiB',
     GOMAXPROCS: '1'
 };
@@ -42,8 +47,31 @@ const startCollector = () => {
         return;
     }
 
-    const child = spawn('/usr/local/bin/alloy', [
-        'run', '--server.http.listen-addr=127.0.0.1:12345', '--storage.path=/tmp/nexus-alloy', '/app/alloy'
+    let configDirectory = '/app/alloy';
+    let storageDirectory = '/tmp/nexus-alloy';
+    if (local) {
+        try {
+            configDirectory = mkdtempSync(join(tmpdir(), 'nexus-alloy-'));
+            const temporaryDirectory = configDirectory;
+            process.once('exit', () => {
+                try {
+                    rmSync(temporaryDirectory, { recursive: true, force: true });
+                } catch {
+                    report('No se pudo limpiar el directorio temporal de Alloy');
+                }
+            });
+            copyFileSync(new URL('./source.alloy', import.meta.url), join(configDirectory, 'source.alloy'));
+            copyFileSync(new URL('../alloy/pipeline.alloy', import.meta.url), join(configDirectory, 'pipeline.alloy'));
+            storageDirectory = join(configDirectory, 'data');
+        } catch {
+            report('No se pudo preparar la configuración local de Alloy');
+            return;
+        }
+    }
+
+    const binary = local ? (process.env.NEXUS_ALLOY_BIN ?? 'alloy') : '/usr/local/bin/alloy';
+    const child = spawn(binary, [
+        'run', '--server.http.listen-addr=127.0.0.1:12345', `--storage.path=${storageDirectory}`, configDirectory
     ], { env: environment, stdio: ['ignore', 'inherit', 'inherit'] });
 
     child.on('error', () => report('No se pudo iniciar Alloy'));

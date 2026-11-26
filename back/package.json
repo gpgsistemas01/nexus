@@ -23,6 +23,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
+    "start:logs": "node --env-file-if-exists=.env ../ops/render/start-with-alloy.mjs --local node src/server.js",
     "dev": "nodemon --config nodemon.json src/server.js",
     "test": "vitest run --config vitestConfig.js",
     "test:unit": "vitest run --config vitestConfig.js",
