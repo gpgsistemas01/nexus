@@ -12,7 +12,7 @@ import {
     GoodsReceiptUpdateDatabaseError,
     PersonReceivedByNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
-import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
 
 import { getDb } from "../../../repository/baseRepository.js";
 import {
@@ -232,15 +232,6 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
             return goodsReceipt;
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsReceipts.goodsReceiptService.createGoodsReceipt',
-            ...getModelLogContext('goodsReceipt', {
-                ...goodsReceiptDto,
-                id: result.id,
-                referenceNumber: result.referenceNumber
-            })
-        }, 'Compra registrada correctamente');
-
         return result;
 
     } catch (err) {
@@ -338,15 +329,6 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
 
             return updatedReceipt;
         });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceipt',
-            ...getModelLogContext('goodsReceipt', {
-                id,
-                ...goodsReceiptDto,
-                referenceNumber: updatedGoodsReceipt.referenceNumber
-            })
-        }, 'Compra actualizada correctamente');
 
         return updatedGoodsReceipt;
 

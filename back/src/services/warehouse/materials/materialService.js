@@ -31,7 +31,7 @@ import {
     throwMaterialWriteError
 } from './materialHelpers.js';
 import { createStockAdjustment } from "../adjustmentService.js";
-import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findInitialStockAdjustmentReason } from "../reasonService.js";
 import { MATERIAL_TYPES, MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT } from '../../../shared/constants/inventory.js';
@@ -209,11 +209,6 @@ export const createMaterial = async ({
             });
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.materials.materialService.createMaterial',
-            ...getModelLogContext('material', { ...materialDto, id: material?.materialId ?? material?.id ?? material?.material?.id })
-        }, 'Material creado correctamente');
-
         return material;
 
     } catch (err) {
@@ -271,11 +266,6 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
             });
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.materials.materialService.updateMaterial',
-            ...getModelLogContext('material', { id, ...materialDto })
-        }, 'Oferta del proveedor actualizada correctamente');
-
         return material;
 
     } catch (err) {
@@ -311,11 +301,6 @@ export const updateMaterialStock = async ({
             expectedVersion: materialDto.expectedVersion,
             userId
         });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.materials.materialService.updateMaterialStock',
-            ...getModelLogContext('materialStock', { id, userId, ...materialDto })
-        }, 'Stock de material ajustado correctamente');
 
         return stockAdjustment;
 
@@ -364,11 +349,6 @@ export const deleteMaterial = async (supplierMaterialId, { type = null } = {}) =
             // esta oferta no borra ni modifica el historial ni la ficha del artículo.
             return { id: supplierMaterialId, materialId };
         });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.materials.materialService.deleteMaterial',
-            ...getModelLogContext('supplierMaterial', { id: supplierMaterialId })
-        }, 'Relación entre material y proveedor eliminada correctamente');
 
         return deletedMaterial;
 

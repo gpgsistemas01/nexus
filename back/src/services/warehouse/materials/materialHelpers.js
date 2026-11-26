@@ -86,7 +86,7 @@ export const withRetry = async (fn) => {
                     {
                         operation: 'warehouse.materials.materialHelpers.withRetry',
                         attempts,
-                        level: 'warn'
+                        level: 'debug'
                     },
                     'Reintentando operación por conflicto de unicidad'
                 );

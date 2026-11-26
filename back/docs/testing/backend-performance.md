@@ -105,9 +105,11 @@ consultar la base por cada elemento ni alterar el orden del historial.
 - El timeout del navegador y el timeout transaccional no constituyen una medición del
   tiempo del endpoint. Pool, bloqueos y red forman parte del presupuesto de respuesta.
 
-`pinoHttp` ya registra `responseTime` con `LOG_LEVEL=info`; el nivel predeterminado
-`warn` no conserva las peticiones exitosas. Ese dato permite contrastar el despliegue
-con el benchmark sin registrar cuerpos, parámetros SQL ni credenciales.
+Los logs HTTP incluyen `durationMs` cuando se emite un evento. En producción, un
+éxito se registra al alcanzar `LOG_SLOW_HTTP_MS` o al habilitar temporalmente
+`LOG_HTTP_ROUTINE=true` con nivel `info`. Los logs de éxitos lentos sirven para
+diagnosticar casos individuales. Usa todas las muestras del benchmark para calcular
+percentiles y conserva el mismo perfil de logging al comparar dos revisiones.
 
 Los resultados de cada ejecución se conservan como evidencia de la entrega, no como
 valores permanentes de este documento. El perfilador sólo se carga desde el benchmark

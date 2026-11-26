@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
@@ -506,6 +506,12 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const response = await request(actual).post('/api/warehouse/inventory-imports/materials/preview').set('Cookie', cookie)
             .attach('file', buffer, 'inventario.xlsx').expect(200);
         expect(response.body.batch.preview.summary.errors).toBe(0);
+        const requestId = response.headers['x-request-id'];
+        expect(requestId).toMatch(/^[a-f0-9-]{36}$/);
+        await vi.waitFor(async () => {
+            const audit = await prisma.criticalWriteAudit.findFirst({ where: { requestId } });
+            expect(audit).toMatchObject({ actorId: fixture.user.id, statusCode: 200, action: 'CREATE' });
+        });
         await request(actual).post('/api/warehouse/inventory-imports/materials/preview').set('Cookie', cookie)
             .attach('file', Buffer.alloc(2 * 1024 * 1024 + 1), 'inventario.xlsx').expect(413);
         await request(actual).post('/api/warehouse/inventory-imports/materials/preview').set('Cookie', cookie)

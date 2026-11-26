@@ -53,7 +53,7 @@ export const previewInventoryImport = async ({ user, resource, mode, filename, b
         ...(payload && { payload }), preview: json(preview),
         expiresAt: new Date(Date.now() + limits.draftHours * 60 * 60 * 1000)
     } });
-    logServiceInfo(logger, { operation: 'preview', userId: user.id, resource, mode,
+    logServiceInfo(logger, { operation: 'preview', importId: batch.id, resource, mode,
         rows: rows.length, durationMs: Math.round(performance.now() - started) }, 'Vista previa de importación preparada');
     return view(batch);
 };
@@ -109,7 +109,7 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
             } });
             return { batch: view(persisted), replayed: false };
         }, { maxWait: 1500, timeout: 30000 });
-        logServiceInfo(logger, { operation: 'confirm', importId: id, userId: user.id,
+        logServiceInfo(logger, { operation: 'confirm', importId: id,
             replayed: completed.replayed, durationMs: Math.round(performance.now() - started) }, 'Importación confirmada');
         return completed;
     } catch (error) {

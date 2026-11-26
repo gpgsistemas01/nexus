@@ -11,7 +11,7 @@ import {
 import { getDb } from '../../../repository/baseRepository.js';
 import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { registerWasteStockEntry } from './wasteStockEntryService.js';
-import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.js';
 import { assertWasteMaterialReference, prepareWasteMeasurements } from './wasteHelpers.js';
@@ -218,11 +218,6 @@ export const createWaste = async ({
             }
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.wasteService.createWaste',
-            ...getModelLogContext('waste', { userId, ...wasteDto, id: waste.id })
-        }, 'Merma registrada correctamente');
-
         return waste;
 
     } catch (err) {
@@ -276,11 +271,6 @@ export const updateWaste = async ({
             return updateVersionedRecord({ model: tx.waste, where: { id }, expectedVersion, data });
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.wasteService.updateWaste',
-            ...getModelLogContext('waste', { id, ...wasteDto })
-        }, 'Merma actualizada correctamente');
-
         return waste;
 
     } catch (err) {
@@ -321,11 +311,6 @@ export const updateWasteStock = async ({
             });
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.wasteService.updateWasteStock',
-            ...getModelLogContext('wasteStock', { id, userId, ...stockAdjustmentDto })
-        }, 'Stock de merma ajustado correctamente');
-
         return waste;
 
     } catch (err) {
@@ -357,11 +342,6 @@ export const addWasteStock = async ({ id, stockEntryDto, userId, operationId }) 
                 return findWasteById({ tx, id });
             }
         });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.wasteService.addWasteStock',
-            ...getModelLogContext('wasteStockEntry', { id, userId, ...stockEntryDto })
-        }, 'Stock de merma agregado correctamente');
 
         return waste;
     } catch (err) {

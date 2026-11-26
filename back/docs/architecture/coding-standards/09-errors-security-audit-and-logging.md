@@ -28,6 +28,17 @@
 - Contraseñas, tokens, cookies, secretos y datos sensibles no se registran en logs.
 - El logger estructurado recibe contexto estable de operación; no se usa `console.log`
   en código de aplicación.
+- El middleware HTTP genera un UUID antes del parsing, devuelve `X-Request-Id` y lo
+  conserva en el contexto de la solicitud y en `CriticalWriteAudit`.
+- El cierre HTTP emite el fallo propagado una sola vez, con el código de respuesta
+  y, cuando está disponible, el código original y la operación del servicio.
+  Los fallos de tareas independientes, incluida la persistencia de auditoría, se
+  registran en el emisor correspondiente.
+- Usa campos permitidos y la plantilla de ruta de Express. Excluye parámetros,
+  consultas, encabezados, cuerpos, mensajes crudos de errores y metadatos de Prisma.
+  Los códigos y ubicaciones del código de Nexus ayudan a diagnosticar fallos.
+- Los eventos de seguridad, importación y ciclo de vida tienen un campo `event`.
+  Los éxitos de negocio se consultan en auditoría o historial PostgreSQL.
 - Una auditoría se registra después de confirmar el efecto que describe o dentro de la
   misma transacción cuando su atomicidad sea parte del contrato.
 - Las consultas usan Prisma o parámetros; nunca interpolan entrada del usuario en SQL.

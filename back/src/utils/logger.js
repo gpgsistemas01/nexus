@@ -1,164 +1,179 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { randomUUID } from 'node:crypto';
+import { performance } from 'node:perf_hooks';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
+import { PRISMA_ERROR_CODES } from '../constants/prisma.js';
+import { errorMap } from '../messages/codeMessages.js';
 import { isAppError } from '../errors/AppError.js';
 
-const DEFAULT_LOG_LEVEL = 'warn';
-const LOG_LEVELS = new Set(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
+const production = process.env.NODE_ENV === 'production';
+const defaultLevel = production ? 'info' : 'warn';
+const supportedLevels = new Set(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
+const configuredLevel = process.env.LOG_LEVEL?.trim().toLowerCase();
+const configuredSlowMs = Number(process.env.LOG_SLOW_HTTP_MS ?? 1000);
+const slowHttpMs = Number.isSafeInteger(configuredSlowMs) && configuredSlowMs > 0 ? configuredSlowMs : 1000;
+const routineHttp = !production && process.env.LOG_HTTP_ROUTINE !== 'false'
+    || process.env.LOG_HTTP_ROUTINE === 'true';
+const requestContext = new AsyncLocalStorage();
 
-const normalizeLogLevel = (level, fallback = DEFAULT_LOG_LEVEL) => {
-    if (typeof level !== 'string') return fallback;
+const safeCode = value => typeof value === 'string' && /^[A-Za-z][A-Za-z0-9_.-]{0,79}$/.test(value)
+    ? value : undefined;
+const safeDatabaseCode = value => typeof value === 'string' && /^[A-Z0-9]{5}$/.test(value)
+    ? value : undefined;
 
-    const normalizedLevel = level.toLowerCase();
+const serializeError = error => {
+    if (!error) return undefined;
 
-    return LOG_LEVELS.has(normalizedLevel) ? normalizedLevel : fallback;
+    // Error messages and Prisma metadata can embed SQL, credentials or request data.
+    const frames = typeof error.stack === 'string'
+        ? error.stack.split('\n').filter(line => /^\s+at /.test(line)).flatMap(line => {
+            const location = line.match(/\/(?:back\/)?src\/[\w/.-]+:\d+:\d+(?=\)?$)/)?.[0];
+            return location ? [location.replace(/^\/back\//, '/')] : [];
+        }).slice(0, 8)
+        : [];
+
+    return {
+        type: safeCode(error.name) ?? 'Error',
+        code: safeCode(error.code),
+        databaseCode: safeDatabaseCode(error.meta?.driverAdapterError?.cause?.originalCode ?? error.meta?.code),
+        frames: frames.length ? frames : undefined
+    };
 };
-
-const configuredLogLevel = normalizeLogLevel(process.env.LOG_LEVEL);
-
-const isLogValuePresent = (value) => value !== undefined && value !== null && value !== '';
-
-const getObjectIfNotEmpty = (value) =>
-    value && Object.keys(value).length > 0 ? value : undefined;
-
-const isIdentifierField = (key) => key === 'id' || key.endsWith('Id') || key.endsWith('Ids');
-
-const getLogSafeField = (key, value) => {
-    if (!isLogValuePresent(value)) return undefined;
-
-    if (isIdentifierField(key)) return value;
-
-    return undefined;
-};
-
-const getLogSafeData = (data = {}) => Object.entries(data).reduce((context, [key, value]) => {
-    if (key === 'details') return { ...context, ...getModelContextDetails(value) };
-
-    const safeValue = getLogSafeField(key, value);
-
-    if (safeValue !== undefined) context[key] = safeValue;
-
-    return context;
-}, {});
-
-const getModelContextDetails = (details) => Array.isArray(details)
-    ? { detailsCount: details.length }
-    : {};
-
-const getRequestDataLogContext = (data = {}) => Object.entries(data).reduce((context, [key, value]) => {
-    const safeValue = getLogSafeField(key, value);
-
-    if (safeValue !== undefined) context[key] = safeValue;
-
-    return context;
-}, {});
-
-export const getModelLogContext = (model, data = {}) => ({
-    model,
-    ...getLogSafeData(data)
-});
-
-export const getRequestLogContext = (req) => ({
-    userId: req.userId ?? req.user?.id,
-    path: req.path ?? req.baseUrl ?? req.url,
-    route: req.route?.path,
-    params: getObjectIfNotEmpty(getRequestDataLogContext(req.params)),
-    query: getObjectIfNotEmpty(getRequestDataLogContext(req.query)),
-    ip: req.ip,
-    userAgent: req.get?.('user-agent')
-});
 
 export const logger = pino({
-    level: configuredLogLevel,
-    serializers: {
-        err: pino.stdSerializers.err,
-        error: pino.stdSerializers.err,
-        req: pino.stdSerializers.req,
-        res: pino.stdSerializers.res
-    },
+    level: supportedLevels.has(configuredLevel) ? configuredLevel : defaultLevel,
+    base: { log_schema: 'nexus.v1' },
+    mixin: () => ({ requestId: requestContext.getStore()?.requestId }),
+    serializers: { err: serializeError, error: serializeError, warning: serializeError },
     timestamp: pino.stdTimeFunctions.isoTime
 });
 
-if (process.env.LOG_LEVEL && configuredLogLevel !== process.env.LOG_LEVEL.toLowerCase()) {
-    logger.warn(
-        {
-            configuredLevel: process.env.LOG_LEVEL,
-            fallbackLevel: DEFAULT_LOG_LEVEL,
-            supportedLevels: [...LOG_LEVELS]
-        },
-        'Nivel de log no soportado; se usará el nivel por defecto'
-    );
+if (configuredLevel && !supportedLevels.has(configuredLevel)) {
+    logger.warn({ fallbackLevel: defaultLevel }, 'Nivel de log no soportado');
 }
 
-export const createServiceLogger = (service) => logger.child({ layer: 'service', service });
+if (slowHttpMs !== configuredSlowMs) {
+    logger.warn({ slowHttpMs }, 'Umbral HTTP no válido; se usará el valor predeterminado');
+}
 
-const getDefaultErrorLogLevel = (err) => isAppError(err) ? 'warn' : 'error';
+export const createServiceLogger = service => logger.child({ layer: 'service', service });
 
-const STOCK_ERROR_CODES_WITH_REQUESTED_QUANTITY = new Set([
-    'GOODS_ISSUE_INSUFFICIENT_STOCK'
-]);
-
-const getAppErrorMetaLogContext = (err) => {
-    const meta = getLogSafeData(err.meta);
-
-    if (
-        STOCK_ERROR_CODES_WITH_REQUESTED_QUANTITY.has(err.code) &&
-        isLogValuePresent(err.meta?.requestedQuantity)
-    ) {
-        meta.requestedQuantity = err.meta.requestedQuantity;
-    }
-
-    return meta;
-};
-
-const getAppErrorLogContext = (err) => isAppError(err)
-    ? {
-        errorCode: err.code,
-        statusCode: err.statusCode,
-        meta: getAppErrorMetaLogContext(err)
-    }
-    : {};
+export const getModelLogContext = (model, data) => ({
+    model,
+    detailsCount: Array.isArray(data?.details) ? data.details.length : undefined
+});
 
 export const logServiceError = (
     serviceLogger,
     err,
-    { level, ...context } = {},
+    { level, operation, model, inventoryType, attempts, detailsCount } = {},
     message = 'Error en servicio'
 ) => {
-    serviceLogger[normalizeLogLevel(level, getDefaultErrorLogLevel(err))](
-        { err, errorMessage: err?.message, ...getAppErrorLogContext(err), ...context },
-        message
-    );
+    const severity = supportedLevels.has(level) ? level : isAppError(err) && err.statusCode < 500 ? 'debug' : 'error';
+    const fields = { err, operation, model, inventoryType, attempts, detailsCount };
+    const context = requestContext.getStore();
+
+    if (context && severity === 'error') {
+        context.serviceFailure ??= fields;
+        return;
+    }
+
+    serviceLogger[severity](fields, message);
 };
 
-export const logServiceInfo = (
-    serviceLogger,
-    context = {},
-    message = 'Operación de negocio completada'
-) => {
-    serviceLogger.info(context, message);
+export const logServiceInfo = (serviceLogger, context, message) => {
+    serviceLogger.info({ event: 'inventory_import', ...context }, message);
 };
 
-export const pinoLogger = pinoHttp({
+export const logInvalidToken = error => {
+    if (error?.name === 'TokenExpiredError') return;
+
+    const context = requestContext.getStore();
+    if (context) {
+        context.invalidToken = true;
+        return;
+    }
+
+    logger.warn({ event: 'security_invalid_token' }, 'Token rechazado');
+};
+
+export const recordHttpError = (req, err, code, statusCode) => {
+    const context = requestContext.getStore();
+    if (context) {
+        context.httpError = { err, errorCode: safeCode(code) };
+        return;
+    }
+
+    if (statusCode >= 500) {
+        logger.error({ err, method: req.method, errorCode: safeCode(code) }, 'Error HTTP');
+    }
+};
+
+const requestLogger = pinoHttp({
     logger,
-    customProps: (req) => getRequestLogContext(req),
-    customLogLevel: (_req, res, err) => {
-        if (err || res.statusCode >= 500) return 'error';
-        if (res.statusCode >= 400) return 'warn';
-
-        return 'info';
-    },
-    customSuccessMessage: (req, res) => {
-        const statusMessage = res.statusCode >= 500
-            ? 'falló'
-            : res.statusCode >= 400
-                ? 'fue rechazado'
-                : 'operación completada';
-
-        return `${req.method} ${req.url} ${statusMessage}`;
-    },
-    customErrorMessage: (req, res) => `${req.method} ${req.url} falló`,
-    redact: [
-        'req.headers.cookie',
-        'req.headers.authorization'
-    ]
+    autoLogging: false,
+    genReqId: () => randomUUID(),
+    quietReqLogger: true,
+    quietResLogger: true,
+    customAttributeKeys: { reqId: 'requestId' },
+    serializers: { req: () => undefined }
 });
+
+const logHttpCompletion = (req, res, context, started) => {
+    const elapsedMs = performance.now() - started;
+    const statusCode = res.headersSent ? res.statusCode : undefined;
+    const interrupted = !res.writableFinished;
+    const serviceErrorCode = context.serviceFailure?.err?.code;
+    const expectedConflict = (statusCode === 409 && (
+        serviceErrorCode === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE
+        || serviceErrorCode === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT
+    )) || (statusCode === 404 && serviceErrorCode === PRISMA_ERROR_CODES.RECORD_NOT_FOUND);
+    const expectedIdentifier = statusCode === 400 && context.httpError?.errorCode === errorMap.id.INVALID_UUID;
+    const serviceRejection = statusCode >= 400 && context.serviceFailure && !expectedConflict && !expectedIdentifier;
+    const failure = interrupted || statusCode >= 500 || serviceRejection;
+    const security = context.invalidToken || statusCode === 403 || context.httpError?.errorCode === 'LOGIN_ERROR';
+    const success = (statusCode >= 200 && statusCode < 300) || statusCode === 304;
+    const slowSuccess = success && elapsedMs >= slowHttpMs;
+
+    if (!failure && !security && !slowSuccess && !routineHttp) return;
+
+    const route = typeof req.route?.path === 'string' ? req.route.path : undefined;
+    const fields = {
+        requestId: context.requestId, method: req.method, route, statusCode, durationMs: Math.round(elapsedMs)
+    };
+
+    if (failure) {
+        const { err, operation, model, inventoryType, detailsCount } = context.serviceFailure ?? {};
+        logger.error({
+            ...fields, event: interrupted ? 'http_interrupted' : 'http_error',
+            err: err ?? context.httpError?.err, operation, model, inventoryType, detailsCount, errorCode: context.httpError?.errorCode
+        }, 'Error HTTP');
+    }
+    if (security) {
+        const event = context.invalidToken ? 'security_invalid_token'
+            : statusCode === 403 ? 'security_forbidden' : 'security_login_failed';
+        logger.warn({ ...fields, event }, 'Solicitud de seguridad rechazada');
+    }
+    if (!failure && !security) {
+        const event = slowSuccess ? 'http_slow' : 'http_request';
+        const level = slowSuccess ? 'warn' : statusCode >= 400 ? 'debug' : 'info';
+        logger[level]({ ...fields, event }, 'Solicitud HTTP completada');
+    }
+};
+
+export const pinoLogger = (req, res, next) => {
+    const started = performance.now();
+    requestLogger(req, res, () => {
+        const context = { requestId: req.id };
+        res.setHeader('X-Request-Id', context.requestId);
+        const complete = () => {
+            res.removeListener('finish', complete);
+            res.removeListener('close', complete);
+            logHttpCompletion(req, res, context, started);
+        };
+        res.once('finish', complete);
+        res.once('close', complete);
+        requestContext.run(context, next);
+    });
+};

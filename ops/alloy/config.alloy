@@ -1,0 +1,10 @@
+// This configuration reads only the Nexus API container's journal.
+loki.source.journal "nexus_api" {
+	matches = "CONTAINER_TAG=nexus-api"
+	max_age = "1h"
+	labels  = {
+		job         = "nexus-api",
+		environment = sys.env("NEXUS_LOG_ENVIRONMENT"),
+	}
+	forward_to = [loki.process.nexus_api.receiver]
+}

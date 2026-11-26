@@ -1,0 +1,13 @@
+loki.source.syslog "nexus_api" {
+  listener {
+    address            = "127.0.0.1:15140"
+    protocol           = "udp"
+    max_message_length = 16448
+    labels = {
+      job         = "nexus-api",
+      environment = sys.env("NEXUS_LOG_ENVIRONMENT"),
+    }
+  }
+
+  forward_to = [loki.process.nexus_api.receiver]
+}

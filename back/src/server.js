@@ -21,7 +21,7 @@ const shutdown = registerServerLifecycle({
 });
 
 server.on('error', err => {
-    logger.error({ err }, 'Error del servidor HTTP');
+    logger.error({ event: 'server_error', err }, 'Error del servidor HTTP');
     process.exitCode = 1;
     void shutdown('server-error');
 });
@@ -29,9 +29,9 @@ server.on('error', err => {
 const port = process.env.PORT || 3000;
 server.listen(port, '0.0.0.0', () => {
     ready = true;
-    logger.info({ port }, 'Servidor escuchando');
+    logger.info({ event: 'server_started', port }, 'Servidor escuchando');
 });
 
 process.on('warning', warning => {
-    logger.warn({ warning }, 'Warning detectado');
+    logger.warn({ event: 'process_warning', warning }, 'Advertencia del proceso');
 });
