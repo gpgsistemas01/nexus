@@ -13,7 +13,7 @@ import {
     GoodsIssueInternalClientProjectNumberConflict,
     GoodsIssueSuppliedConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
-import { createServiceLogger, getModelLogContext, logServiceInfo } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext } from "../../../utils/logger.js";
 
 import { getDb } from "../../../repository/baseRepository.js";
 import { lockGoodsIssue } from "../../../repository/warehouse/documentLockRepository.js";
@@ -211,15 +211,6 @@ export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MA
             return { goodsIssue };
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsIssues.goodsIssueService.createGoodsIssue',
-            ...getModelLogContext('goodsIssue', {
-                ...goodsIssueDto,
-                id: result.goodsIssue.id,
-                referenceNumber: result.goodsIssue.referenceNumber
-            })
-        }, 'Salida de almacén registrada correctamente');
-
         return result.goodsIssue;
 
     } catch (err) {
@@ -333,15 +324,6 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
             });
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssue',
-            ...getModelLogContext('goodsIssue', {
-                id,
-                ...goodsIssueDto,
-                referenceNumber: updatedGoodsIssue.referenceNumber
-            })
-        }, 'Salida de almacén actualizada correctamente');
-
         return updatedGoodsIssue;
 
     } catch (err) {
@@ -401,15 +383,6 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto, type = MATERIA
             });
 
         });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
-            ...getModelLogContext('goodsIssue', {
-                id,
-                ...goodsIssueDto,
-                referenceNumber: updatedGoodsIssue.referenceNumber
-            })
-        }, 'Encabezado de salida actualizado correctamente');
 
         return updatedGoodsIssue;
 

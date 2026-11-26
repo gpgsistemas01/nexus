@@ -238,3 +238,78 @@ socket local. Inventario exige el permiso de lectura de su contexto y movimiento
 exige `movements:read`. Un fallo de notificación se registra sin convertir una
 escritura confirmada en error. Esta distribución es de una sola instancia y añade
 una lectura de permisos por conexión y aviso; debe medirse antes de escalar.
+
+## Logs técnicos hacia Grafana Cloud
+
+El destino es el endpoint público de ingestión de Loki del stack. Copia el host
+y el ID de instancia de Loki desde **Grafana Cloud Portal → Loki → Details**.
+
+La API emite JSON Pino por stdout. En producción, el nivel predeterminado es
+`info` para conservar el arranque, el cierre y los resúmenes de importación.
+El perfil HTTP de producción omite éxitos rutinarios y conserva errores
+inesperados, eventos de seguridad y respuestas exitosas excepcionalmente lentas.
+
+| Variable de la API | Valor y efecto |
+| --- | --- |
+| `LOG_LEVEL` | `info` en producción y `warn` en los demás ambientes. Configura el nivel mínimo de Pino. |
+| `LOG_SLOW_HTTP_MS` | Umbral positivo en milisegundos. El valor predeterminado es 1000. |
+| `LOG_HTTP_ROUTINE` | En producción, `true` habilita temporalmente los accesos rutinarios. Se registran a nivel `info`, o `debug` para rechazos esperados. En desarrollo, `false` los omite. |
+
+### VPS con Docker y systemd
+
+`compose.logs.yml` es una sobreescritura para un host Linux con systemd y Docker.
+Valida la combinación desde la raíz con `docker compose -f docker-compose.yml
+-f compose.logs.yml config --quiet`, usando la configuración del ambiente.
+Aplica ambos archivos en el siguiente arranque autorizado o recreación de la API.
+Docker etiqueta sus entradas del journal con `CONTAINER_TAG=nexus-api`.
+Configura en journald límites de espacio y retención acordes a los demás servicios
+del host. Usa este perfil para un solo ambiente de Nexus por host y journal.
+
+Instala Grafana Alloy como servicio con acceso de lectura al journal de
+Docker, sin grupo `docker` ni acceso al socket. Copia los archivos de
+`ops/alloy/` a un directorio dedicado (por ejemplo `/etc/alloy/nexus/`) y apunta
+el servicio de Alloy a ese directorio. Deja su interfaz HTTP en loopback.
+Configura estas variables en el entorno de Alloy.
+
+| Variable de Alloy | Contenido |
+| --- | --- |
+| `NEXUS_LOG_ENVIRONMENT` | Nombre estable del ambiente, por ejemplo `staging`. |
+| `GRAFANA_LOKI_HOST` | Host de escritura de Loki que muestra Grafana Cloud, sin protocolo ni ruta. Alloy forma la URL HTTPS y añade `/loki/api/v1/push`. |
+| `GRAFANA_LOKI_USERNAME` | Identificador de usuario de Loki del stack. |
+| `GRAFANA_LOKI_TOKEN_FILE` | Ruta absoluta de un archivo con el token `logs:write`, legible sólo por Alloy y el administrador. |
+
+Antes de iniciar Alloy, ejecuta `alloy validate /etc/alloy/nexus` con las
+variables del servicio. Alloy filtra la etiqueta Docker y acepta sólo el esquema
+Pino `nexus.v1` y eventos de hasta 16 KB. El primer arranque limita la lectura del
+journal a una hora. En Grafana Explore selecciona Loki y consulta
+`{job="nexus-api",environment="staging"} | json | event="server_started"` después de
+un arranque de ensayo. Si no aparece, compara con
+`journalctl CONTAINER_TAG=nexus-api --since "15 min ago"` y revisa los logs de
+Alloy, sus permisos de lectura y la respuesta del destino. `requestId` es un campo
+del JSON que se puede consultar en Explore. Las etiquetas identifican el servicio
+y el ambiente. La auditoría y el historial de movimientos se consultan en PostgreSQL.
+
+### Render
+
+Activa el recolector sólo en el servicio Docker de la API. El sitio estático Vue
+mantiene su configuración. Configura las variables anteriores y
+`NEXUS_ALLOY_ENABLED=true` en el servicio Docker. Guarda el token de escritura
+Loki como archivo secreto `nexus-loki-token`. El proceso usa
+`/etc/secrets/nexus-loki-token` si se omite `GRAFANA_LOKI_TOKEN_FILE`. El usuario
+`node` de la imagen debe poder leer ese archivo. El token queda fuera de las
+capas de la imagen y del contexto de build.
+
+Con la opción activada, el entrypoint inicia Alloy y la API dentro de la misma
+instancia. La API mantiene su salida stdout para Render. El recolector recibe
+sólo líneas JSON de hasta 16 KB por syslog UDP en loopback y comparte con el
+VPS el filtro Pino y la configuración de escritura TLS. El envío local tiene
+una cola acotada y puede perder eventos si Alloy está caído o el buffer se
+satura. Render conserva stdout como fuente operativa en esos casos. Alloy no
+es parte de la comprobación de disponibilidad de la API. Para una reversión
+operativa se puede desactivar la opción y volver a desplegar la API.
+
+Comprueba la presencia de `server_started` en Explore con el ambiente configurado
+y revisa el consumo de memoria de la instancia antes de mantener esta opción
+activa. El nombre del archivo, el ID de Loki y el host se configuran en la API,
+aunque los logs se consulten desde el panel de Grafana. Conserva el esquema y el
+flujo de migraciones existentes al cambiar la telemetría.

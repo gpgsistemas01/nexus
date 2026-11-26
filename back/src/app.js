@@ -23,11 +23,11 @@ export const createApp = ({ isReady = () => true } = {}) => {
     const textRoute = '/text';
     const uploadRoute = '/upload';
 
+    app.use(pinoLogger);
     app.use(apiRoute, express.json());
     app.use(textRoute, express.text({ type: 'text/plain' }));
     app.use(cookieParser());
 
-    app.use(pinoLogger);
     app.use(auditWrites);
 
     //middleware

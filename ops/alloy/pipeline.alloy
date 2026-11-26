@@ -1,0 +1,40 @@
+loki.process "nexus_api" {
+	stage.json {
+		expressions = {schema = "log_schema"}
+	}
+
+	stage.labels {
+		values = {schema = ""}
+	}
+
+	stage.match {
+		selector = "{job=\"nexus-api\",schema!=\"nexus.v1\"}"
+		action   = "drop"
+	}
+
+	stage.label_drop {
+		values = ["schema"]
+	}
+
+	stage.drop {
+		longer_than         = "16KB"
+		drop_counter_reason = "nexus_log_too_large"
+	}
+
+	forward_to = [loki.write.grafana_cloud.receiver]
+}
+
+loki.write "grafana_cloud" {
+	endpoint {
+		url = "https://" + sys.env("GRAFANA_LOKI_HOST") + "/loki/api/v1/push"
+
+		basic_auth {
+			username      = sys.env("GRAFANA_LOKI_USERNAME")
+			password_file = sys.env("GRAFANA_LOKI_TOKEN_FILE")
+		}
+
+		tls_config {
+			min_version = "TLS12"
+		}
+	}
+}

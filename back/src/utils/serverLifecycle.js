@@ -6,10 +6,10 @@ export const registerServerLifecycle = ({
     const shutdown = (signal) => {
         if (shutdownPromise) return shutdownPromise;
         setReady(false);
-        logger.info({ signal }, 'Cierre del servidor iniciado');
+        logger.info({ event: 'shutdown_started', signal }, 'Cierre del servidor iniciado');
 
         const deadline = setTimeout(() => {
-            logger.error('El cierre del servidor excedió el plazo');
+            logger.error({ event: 'shutdown_timeout' }, 'El cierre del servidor excedió el plazo');
             io.disconnectSockets(true);
             server.closeAllConnections();
             processRef.exit(1);
@@ -27,9 +27,9 @@ export const registerServerLifecycle = ({
                 await Promise.all([httpClosed, socketsClosed]);
                 await beforeDisconnect();
                 await prisma.$disconnect();
-                logger.info('Cierre del servidor completado');
+                logger.info({ event: 'shutdown_completed' }, 'Cierre del servidor completado');
             } catch (err) {
-                logger.error({ err }, 'Error durante el cierre del servidor');
+                logger.error({ event: 'shutdown_failed', err }, 'Error durante el cierre del servidor');
                 processRef.exit(1);
             } finally {
                 clearTimeout(deadline);

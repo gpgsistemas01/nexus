@@ -1,0 +1,6 @@
+services:
+  app:
+    logging:
+      driver: journald
+      options:
+        tag: nexus-api

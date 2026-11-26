@@ -9,7 +9,7 @@ import {
 } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
-import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.supplierService');
 
@@ -124,11 +124,6 @@ export const createSupplier = async (supplierDto) => {
             });
         });
 
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.supplierService.createSupplier',
-            ...getModelLogContext('supplier', supplier)
-        }, 'Proveedor creado correctamente');
-
         return supplier;
 
     } catch (err) {
@@ -151,11 +146,6 @@ export const updateSupplier = async (supplierDto, id) => {
 
         const { expectedVersion, ...data } = supplierDto;
         const supplier = await updateVersionedRecord({ model: db.supplier, where: { id }, expectedVersion, data });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.supplierService.updateSupplier',
-            ...getModelLogContext('supplier', supplier)
-        }, 'Proveedor actualizado correctamente');
 
         return supplier;
 

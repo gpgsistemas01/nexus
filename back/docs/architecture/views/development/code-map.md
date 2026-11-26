@@ -52,6 +52,7 @@ flowchart LR
     services["services (86 módulos)"] --> validators["validators (18 módulos)"]
     utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (15 módulos)"] --> errors["errors (25 módulos)"]
+    utils["utils (15 módulos)"] --> messages["messages (1 módulos)"]
     utils["utils (15 módulos)"] --> services["services (86 módulos)"]
     utils["utils (15 módulos)"] --> shared["shared (25 módulos)"]
     validators["validators (18 módulos)"] --> constants["constants (11 módulos)"]

@@ -1,8 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { createServiceLogger, logServiceError } from "../utils/logger.js";
-
-const serviceLogger = createServiceLogger('jwtService');
-
+import { logInvalidToken } from '../utils/logger.js';
 
 const JWT_SECRET_ACCESS = process.env.JWT_SECRET_ACCESS;
 const JWT_SECRET_REFRESH = process.env.JWT_SECRET_REFRESH;
@@ -26,7 +23,7 @@ export const verifyToken = (token, secretAccess) => {
         return jwt.verify(token, secretAccess);
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'jwtService.verifyToken', level: 'warn' });
+        logInvalidToken(err);
 
         return null;
     }

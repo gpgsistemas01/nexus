@@ -80,3 +80,31 @@ exportar documentación técnica, usa `npm --prefix back run docs:export -- <fam
 <sección> <docx|pdf|ambos>`; la [guía de exportación](documentation.md)
 describe formatos, herramientas y selecciones disponibles. Capturas y manuales de
 usuario se generan desde la [guía de desarrollo Vue](../../../front/docs/development/index.md).
+
+## Arrancar Node con logs en Grafana Cloud
+
+El arranque opcional `npm run start:logs` desde `back/` carga `back/.env` y
+ejecuta la API y Alloy en el equipo local. Requiere Alloy instalado y disponible
+como `alloy` en el PATH. Si está en otra ubicación, indica la ruta del ejecutable
+con `NEXUS_ALLOY_BIN`. Esta modalidad ejecuta Node directamente y conserva el
+`NODE_ENV` del entorno. Con `NODE_ENV=test`, la API usa `DATABASE_TEST_URL`.
+Arrancar la API con este comando no aplica migraciones de Prisma.
+
+Agrega estos valores al `back/.env` existente y conserva la configuración de
+base de datos de prueba:
+
+```dotenv
+NEXUS_LOG_ENVIRONMENT=local
+LOG_LEVEL=info
+LOG_HTTP_ROUTINE=false
+GRAFANA_LOKI_HOST=host-publico-de-loki.grafana.net
+GRAFANA_LOKI_USERNAME=id-numerico-de-loki
+GRAFANA_LOKI_TOKEN_FILE=/ruta/privada/nexus-loki-token
+```
+
+Guarda en el último archivo sólo el valor de un token de Grafana Cloud con
+`logs:write`, fuera del repositorio. Si la ruta contiene espacios, escríbela
+entre comillas en `.env`. En Grafana Explore, selecciona Loki y consulta
+`{job="nexus-api",environment="local"} | json | event="server_started"`.
+El nivel `info` permite ver ese evento con `NODE_ENV=test`. Si Alloy no puede
+arrancar, la API sigue emitiendo logs a stdout.

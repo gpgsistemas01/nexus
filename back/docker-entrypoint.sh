@@ -29,4 +29,8 @@ case "${RUN_MIGRATIONS:-true}" in
     ;;
 esac
 
+if [ "${NEXUS_ALLOY_ENABLED:-false}" = "true" ]; then
+  exec node /app/start-with-alloy.mjs "$@"
+fi
+
 exec "$@"
