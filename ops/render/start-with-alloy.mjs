@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { createSocket } from 'node:dgram';
-import { accessSync, constants, copyFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { accessSync, constants, copyFileSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline';
@@ -9,6 +9,7 @@ import { setTimeout as wait } from 'node:timers/promises';
 const launcherArgs = process.argv.slice(2);
 const local = launcherArgs[0] === '--local';
 const [command, ...args] = local ? launcherArgs.slice(1) : launcherArgs;
+const alloyHttpAddress = local ? '127.0.0.1:15141' : '127.0.0.1:12345';
 const token = process.env.GRAFANA_LOKI_TOKEN?.trim() ?? '';
 const secretFile = process.env.GRAFANA_LOKI_TOKEN_FILE || '/etc/secrets/nexus-loki-token';
 const environment = {
@@ -18,6 +19,7 @@ const environment = {
     GRAFANA_LOKI_TOKEN_FILE: token ? '' : secretFile,
     NEXUS_LOG_ENVIRONMENT: process.env.NEXUS_LOG_ENVIRONMENT ?? (local ? 'local' : 'production'),
     PATH: process.env.PATH,
+    SystemRoot: process.env.SystemRoot,
     GOMEMLIMIT: '96MiB',
     GOMAXPROCS: '1'
 };
@@ -73,12 +75,19 @@ const startCollector = () => {
         }
     }
 
-    const binary = local ? (process.env.NEXUS_ALLOY_BIN ?? 'alloy') : '/usr/local/bin/alloy';
+    const windowsBinary = local && process.platform === 'win32' && process.env.ProgramFiles
+        ? join(process.env.ProgramFiles, 'GrafanaLabs', 'Alloy', 'alloy-windows-amd64.exe')
+        : undefined;
+    const defaultLocalBinary = windowsBinary && existsSync(windowsBinary) ? windowsBinary : 'alloy';
+    const binary = local ? (process.env.NEXUS_ALLOY_BIN?.trim() || defaultLocalBinary) : '/usr/local/bin/alloy';
     const child = spawn(binary, [
-        'run', '--server.http.listen-addr=127.0.0.1:12345', `--storage.path=${storageDirectory}`, configDirectory
+        'run', `--server.http.listen-addr=${alloyHttpAddress}`, `--storage.path=${storageDirectory}`, configDirectory
     ], { env: environment, stdio: ['ignore', 'inherit', 'inherit'] });
 
-    child.on('error', () => report('No se pudo iniciar Alloy'));
+    child.on('error', error => {
+        report(`No se pudo iniciar Alloy (${error.code ?? 'ERROR'})`);
+        if (local) report('Instala Alloy o indica la ruta de su ejecutable con NEXUS_ALLOY_BIN en .env');
+    });
     child.on('exit', () => {
         if (!shutdownSignal && application?.exitCode === null) {
             report('Alloy se detuvo. Los logs siguen disponibles en stdout');
@@ -91,7 +100,7 @@ const waitForCollector = async child => {
     const deadline = Date.now() + 3000;
     while (Date.now() < deadline && child.pid && child.exitCode === null && !shutdownSignal) {
         try {
-            const response = await fetch('http://127.0.0.1:12345/-/ready', { signal: AbortSignal.timeout(250) });
+            const response = await fetch(`http://${alloyHttpAddress}/-/ready`, { signal: AbortSignal.timeout(250) });
             await response.body?.cancel();
             if (response.ok) return;
         } catch {

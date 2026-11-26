@@ -84,9 +84,13 @@ usuario se generan desde la [guía de desarrollo Vue](../../../front/docs/develo
 ## Arrancar Node con logs en Grafana Cloud
 
 El arranque opcional `npm run start:logs` desde `back/` carga `back/.env` y
-ejecuta la API y Alloy en el equipo local. Requiere Alloy instalado y disponible
-como `alloy` en el PATH. Si está en otra ubicación, indica la ruta del ejecutable
-con `NEXUS_ALLOY_BIN`. Esta modalidad ejecuta Node directamente y conserva el
+ejecuta la API y Alloy en el equipo local. En Windows, detecta la instalación
+estándar en `%ProgramFiles%\GrafanaLabs\Alloy\alloy-windows-amd64.exe`. También
+admite `alloy` en el PATH o una ruta explícita en `NEXUS_ALLOY_BIN`. Si la ruta
+contiene espacios, escríbela entre comillas en `.env`. Para instalar Alloy en
+Windows se puede usar `winget install GrafanaLabs.Alloy`.
+El lanzador usa el puerto local 15141 para comprobar Alloy, separado del puerto
+12345 que usa el servicio estándar de Alloy. Esta modalidad conserva el
 `NODE_ENV` del entorno. Con `NODE_ENV=test`, la API usa `DATABASE_TEST_URL`.
 Arrancar la API con este comando no aplica migraciones de Prisma.
 
