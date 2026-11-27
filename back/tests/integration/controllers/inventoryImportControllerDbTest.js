@@ -151,22 +151,29 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
     });
 
     it('aplica un folio con los saldos distintos y conserva el recibo al reintentar', async () => {
-        const offers = await Promise.all(['Conteo cero', 'Conteo mayor', 'Conteo igual'].map(seedOffer));
+        const offers = await Promise.all(['Conteo cero', 'Conteo mayor', 'Conteo igual', 'Sin contar'].map(seedOffer));
         offers[2] = await prisma.supplierMaterial.update({ where: { id: offers[2].id },
             data: { convertedQuantity: 11 }, include: { material: true } });
         const capture = await adjustmentCapture();
-        const rows = offers.map((offer, index) => countRow(offer, [0, 5, 2][index]));
+        const rows = offers.map((offer, index) => countRow(offer, [0, 5, 2, ''][index]));
+        rows[3].name = offers[3].material.name;
+        rows.push(countRow(offers[0], '   '));
         const batch = await preview(rows, 'materials', 'adjust', capture);
-        expect(batch.preview.summary).toMatchObject({ updates: 2, unchanged: 1, errors: 0 });
+        expect(batch.preview.summary).toMatchObject({ total: 5, updates: 2, unchanged: 1, skipped: 2, errors: 0 });
         expect(batch.preview.rows[0]).toMatchObject({ before: { currentStock: 2 }, after: { currentStock: 0 }, details: { difference: -2 } });
         expect(batch.preview.rows[2]).toMatchObject({ action: 'unchanged', after: { currentStock: 2, convertedQuantity: 11 } });
+        expect(batch.preview.rows[3]).toMatchObject({ row: 5, name: offers[3].material.name, action: 'skipped', before: null, after: null });
         expect(await prisma.stockAdjustment.count({ where: { inventoryImportId: batch.id } })).toBe(0);
+        offers[3] = await prisma.supplierMaterial.update({ where: { id: offers[3].id },
+            data: { currentStock: 3, convertedQuantity: 18 }, include: { material: true } });
         const operationId = randomUUID();
         const applied = await confirm(batch, operationId).expect(200);
-        const { adjustment, rows: resultRows } = applied.body.batch.result;
+        const { adjustment, rows: resultRows, summary } = applied.body.batch.result;
+        expect(summary).toEqual(batch.preview.summary);
+        expect(resultRows[3]).toMatchObject(batch.preview.rows[3]);
         expect(adjustment.referenceNumber).toMatch(/^AJU-/);
         expect(resultRows.map(row => row.details.adjustmentReference)).toEqual([
-            adjustment.referenceNumber, adjustment.referenceNumber, undefined
+            adjustment.referenceNumber, adjustment.referenceNumber, undefined, undefined, undefined
         ]);
         const snapshot = await inventorySnapshot();
         const retried = await confirm(batch, operationId).expect(200);
@@ -174,8 +181,8 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(await inventorySnapshot()).toEqual(snapshot);
         for (const [index, offer] of offers.entries()) {
             const saved = await prisma.supplierMaterial.findUnique({ where: { id: offer.id }, include: { material: true } });
-            expect(Number(saved.currentStock)).toBe([0, 5, 2][index]);
-            expect(Number(saved.convertedQuantity)).toBe([0, 30, 11][index]);
+            expect(Number(saved.currentStock)).toBe([0, 5, 2, 3][index]);
+            expect(Number(saved.convertedQuantity)).toBe([0, 30, 11, 18][index]);
             expect(Number(saved.maxUnitCost)).toBe(10);
             expect(saved.material).toEqual(offer.material);
             expect(saved.version).toBe(offer.version + (index < 2 ? 1 : 0));
@@ -197,12 +204,12 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         });
     });
 
-    it('confirma un archivo sin cambios sin tocar existencias, documentos, movimientos ni contadores', async () => {
-        const offer = await seedOffer('Todo igual');
-        const batch = await preview([countRow(offer, 2)], 'materials', 'adjust', {});
+    it.each([[2, 1, 0], ['', 0, 1]])('confirma un archivo sin cambios (captura %j) sin consumir folio', async (count, unchanged, skipped) => {
+        const offer = await seedOffer(skipped ? 'Todo en blanco' : 'Todo igual');
+        const batch = await preview([countRow(offer, count)], 'materials', 'adjust', {});
         const counters = await prisma.referenceNumberCounter.findMany({ where: { prefix: 'AJU' }, orderBy: { year: 'asc' } });
         const result = (await confirm(batch).expect(200)).body.batch.result;
-        expect(result.summary).toMatchObject({ updates: 0, unchanged: 1, errors: 0 });
+        expect(result.summary).toMatchObject({ updates: 0, unchanged, skipped, errors: 0 });
         expect(result).not.toHaveProperty('adjustment');
         expect(result.rows[0].details).not.toHaveProperty('adjustmentReference');
         expect(await prisma.supplierMaterial.findUnique({ where: { id: offer.id }, include: { material: true } })).toEqual(offer);
@@ -281,10 +288,10 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         }
     });
 
-    it('rechaza vacío, negativo, motivo ausente, duplicado y recurso cruzado sin aplicar el conteo válido', async () => {
+    it('rechaza negativo, motivo ausente, duplicado y recurso cruzado sin aplicar el conteo válido', async () => {
         const offer = await seedOffer('Conteo inválido');
         const valid = countRow(offer, 4);
-        for (const rows of [[{ ...valid, newStock: '' }], [{ ...valid, newStock: -1 }], [valid, valid]]) {
+        for (const rows of [[{ ...valid, newStock: -1 }], [valid, valid]]) {
             const batch = await preview(rows, 'materials', 'adjust');
             expect(batch.preview.summary.errors).toBeGreaterThan(0);
             await confirm(batch).expect(400);

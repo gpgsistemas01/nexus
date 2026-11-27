@@ -568,7 +568,7 @@ string | number | boolean | null
 
 | Miembro | Firma completa |
 | --- | --- |
-| `summary` | `summary: { total: number; creates: number; updates: number; unchanged: number; errors: number };` |
+| `summary` | `summary: { total: number; creates: number; updates: number; unchanged: number; skipped?: number; errors: number; };` |
 | `rows` | `rows: InventoryImportRow[];` |
 
 | Relación | Destino | Origen de la referencia |
@@ -577,7 +577,7 @@ string | number | boolean | null
 
 ## InventoryImportResult
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 34, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 41, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends InventoryImportPreview`.
 
@@ -591,7 +591,7 @@ string | number | boolean | null
 
 ## InventoryImportBatch
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 37, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 44, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -614,7 +614,7 @@ string | number | boolean | null
 
 ## PendingInventoryImport
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 48, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 55, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

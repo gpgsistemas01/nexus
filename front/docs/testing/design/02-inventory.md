@@ -76,7 +76,9 @@ o confirmación incierta. Particiones por permiso y por operación compatible/cr
 transiciones selección → carga → vista previa → confirmación/recuperación.
 Un operador con ajuste y sin costos sólo ve Ajustar existencias. Las descargas
 conservan la operación en su nombre; un rechazo deja la captura sin confirmar.
-El conteo muestra stock anterior/final, incluido cero, y confirma una sola solicitud.
+El conteo muestra stock anterior y final, incluido cero, y confirma una sola solicitud.
+Las filas con Stock contado en blanco aparecen como Sin conteo antes y después
+de confirmar. Si no cambia ningún saldo, la confirmación muestra un recibo sin folio.
 HTTP/Prisma comprueba columnas de consulta e IDs, identidad, versiones, datos
 compartidos, rollback y ausencia de efectos de archivos incompatibles. Chromium
 no sustituye esa evidencia persistente.

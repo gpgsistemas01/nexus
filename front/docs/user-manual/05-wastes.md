@@ -43,12 +43,14 @@ sistema calcula las medidas. La edición de datos conserva el stock.
 <!-- manual:end -->
 
 <!-- manual:any wastes:adjust-stock -->
-En ajuste capture el saldo físico final: cero es válido y vacío se rechaza. Retire
-las filas que aún no haya contado y evite movimientos durante la captura. Para
+En ajuste capture el saldo físico final. Escriba cero si comprobó que no hay
+existencias. Deje en blanco el **Stock contado** de las filas que aún no haya contado.
+Nexus las omite y las muestra como **Sin conteo** en la vista previa y el recibo.
+Evite movimientos durante la captura. Para
 cambiar datos y stock complete dos operaciones con una descarga actual entre ellas.
 
 Al confirmar, Nexus muestra un solo folio AME con las partidas cuyo saldo cambió.
-Si todos los saldos coinciden, confirme con B4 y B5 vacías para obtener un recibo
+Si ningún saldo cambia, confirme con B4 y B5 vacías para obtener un recibo
 sin folio. Use un archivo por motivo y descargue la plantilla actual si su
 archivo tiene motivo y observaciones por fila.
 <!-- manual:end -->

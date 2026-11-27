@@ -35,7 +35,10 @@ reintentar una solicitud cuyo resultado sea incierto.
 ## Conteo de existencias por Excel
 
 La plantilla de ajuste actual usa `NEXUS_INVENTORY_V3`. En `Datos` se captura
-`Stock contado` por fila. `Instrucciones!B4` contiene el motivo activo y
+`Stock contado` en las filas con conteo, incluido el cero explícito.
+Las filas con esa celda en blanco aparecen en la vista previa y en el recibo
+con `action: "skipped"` y se cuentan en `summary.skipped`. Se omiten al
+validar destinos y al aplicar existencias. `Instrucciones!B4` contiene el motivo activo y
 `Instrucciones!B5` las observaciones del documento. Ambos datos son
 obligatorios cuando cambia algún saldo. Los archivos de ajuste con formato
 anterior requieren descargar la plantilla actual.
@@ -44,8 +47,9 @@ El archivo se analiza en memoria. El borrador sólo conserva datos de la vista
 previa y metadatos de la carga. Al confirmar un conteo, sólo los saldos físicos
 distintos generan partidas y el recibo identifica el documento común en
 `result.adjustment`. Las filas aplicadas conservan el folio en
-`details.adjustmentReference`. Si todos los saldos coinciden, el recibo indica
-que las filas quedaron sin cambios y omite `result.adjustment`. La misma clave
+`details.adjustmentReference`. Cuando no cambia ningún saldo, incluso con
+todos los conteos en blanco, la confirmación guarda el recibo sin
+`result.adjustment` ni consumo de folio. La misma clave
 de confirmación recupera el recibo y el folio ya emitido, si lo hubo.
 
 ## Surtimiento parcial

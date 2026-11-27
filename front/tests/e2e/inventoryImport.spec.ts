@@ -212,7 +212,7 @@ test('el conteo confirmado sin cambios muestra el recibo sin folio de ajuste', a
   const batch = inventoryImportDraft();
   batch.mode = 'adjust';
   batch.preview = {
-    summary: { total: 1, creates: 0, updates: 0, unchanged: 1, errors: 0 },
+    summary: { total: 2, creates: 0, updates: 0, unchanged: 1, skipped: 1, errors: 0 },
     rows: [
       {
         row: 2,
@@ -222,6 +222,17 @@ test('el conteo confirmado sin cambios muestra el recibo sin folio de ajuste', a
         before: { currentStock: 2 },
         after: { currentStock: 2 },
         details: { difference: 0 },
+        errors: [],
+        warnings: [],
+      },
+      {
+        row: 3,
+        id: null,
+        name: 'Existencia sin capturar',
+        action: 'skipped',
+        before: null,
+        after: null,
+        details: {},
         errors: [],
         warnings: [],
       },
@@ -248,10 +259,13 @@ test('el conteo confirmado sin cambios muestra el recibo sin folio de ajuste', a
     buffer: Buffer.from('fixture: conteo sin cambios'),
   });
   await dialog.getByRole('button', { name: 'Validar archivo', exact: true }).click();
+  const skippedRow = dialog.getByRole('listitem').filter({ hasText: 'Existencia sin capturar' });
+  await expect(skippedRow).toContainText('Sin conteo');
   await dialog.getByRole('button', { name: 'Confirmar importación', exact: true }).click();
   await expect(
     dialog.getByText('Importación confirmada sin cambios de existencias.'),
   ).toBeVisible();
+  await expect(skippedRow).toContainText('Sin conteo');
   await expect(dialog.getByText('Ajuste aplicado. Folio', { exact: false })).toHaveCount(0);
 });
 
@@ -537,7 +551,7 @@ test('un duplicado informa el bloqueo completo y permite descargar los errores',
   await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Importar Excel de materiales', exact: true });
   await expect(
-    dialog.getByText('Todas las filas realizan la operación seleccionada.', { exact: false }),
+    dialog.getByText('Aplica una sola operación por archivo.', { exact: false }),
   ).toBeVisible();
   await dialog.locator('input[type=file]').setInputFiles({
     name: 'materiales.xlsx',

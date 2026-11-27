@@ -8,18 +8,25 @@ import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
 import { errorMap } from '../../../messages/codeMessages.js';
 import { isAppError } from '../../../errors/AppError.js';
 
+export const isBlankStockCount = ({ values: { newStock } }) => newStock === '' || newStock == null;
+
 // El conteo reemplaza el saldo. Las columnas de referencia del Excel nunca son una fuente de datos.
 export const validateInventoryStockCountRows = async ({ config, rows, context }) => {
     const targets = new Map();
     const results = [];
     let documentCapture;
     for (const input of rows) {
+        if (isBlankStockCount(input)) {
+            const name = String(input.values.name ?? '');
+            results.push({ row: input.row, id: null, name, before: null, after: null, reference: null,
+                dto: { name, newStock: null }, details: {}, action: actions.SKIPPED, errors: [], warnings: [] });
+            continue;
+        }
         const body = { ...input.values, reasonId: importCatalogValue(input.values.reasonId) };
         const errors = [];
         const add = (field, message, code = errorMap.inventoryImport.VALIDATION) => errors.push({ field, message, code,
             column: inventoryImportColumnLabel(config, field) });
         if (!UUID_V4_PATTERN.test(String(body.id ?? ''))) add('id', 'El identificador del registro no es válido.');
-        if (body.newStock === '' || body.newStock == null) add('newStock', 'Captura el stock contado. Cero es válido; una celda vacía no es un conteo.');
         const validated = await validateInventoryImportRow({ ...config, body });
         const documentErrors = [];
         for (const error of validated.errors) {
@@ -80,5 +87,7 @@ export const validateInventoryStockCountRows = async ({ config, rows, context })
     }
     return { context, rows: results, summary: { total: results.length, creates: 0,
         updates: results.filter(row => row.action === actions.UPDATE).length,
-        unchanged: results.filter(row => row.action === actions.UNCHANGED).length, errors: results.filter(row => row.action === actions.ERROR).length } };
+        unchanged: results.filter(row => row.action === actions.UNCHANGED).length,
+        skipped: results.filter(row => row.action === actions.SKIPPED).length,
+        errors: results.filter(row => row.action === actions.ERROR).length } };
 };
