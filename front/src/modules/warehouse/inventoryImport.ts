@@ -28,7 +28,14 @@ export interface InventoryImportRow {
     warnings: string[];
 }
 export interface InventoryImportPreview {
-    summary: { total: number; creates: number; updates: number; unchanged: number; errors: number };
+    summary: {
+        total: number;
+        creates: number;
+        updates: number;
+        unchanged: number;
+        skipped?: number;
+        errors: number;
+    };
     rows: InventoryImportRow[];
 }
 export interface InventoryImportResult extends InventoryImportPreview {

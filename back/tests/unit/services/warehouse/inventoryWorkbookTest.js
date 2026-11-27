@@ -130,7 +130,8 @@ describe('fronteras y contenido del libro de inventario', () => {
             } else {
                 expect(instruction('Qué hacer')).toContain('conteo físico final');
                 expect(instruction('Cantidad inicial')).toBeUndefined();
-                expect(instruction('Conteo físico')).toContain('cero es válido');
+                expect(instruction('Conteo físico')).toContain('Cero es válido');
+                expect(instruction('Conteo físico')).toContain('la fila se mostrará como Sin conteo');
                 expect(instruction('Catálogos')).toContain('Motivo');
                 expect(instruction('Catálogos')).toContain('UUID | nombre');
             }

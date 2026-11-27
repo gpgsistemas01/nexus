@@ -156,7 +156,7 @@ const template = async ({ config, rows = [], catalogs }) => {
     const captureDescription = isArticle
         ? 'Una fila por artículo. Elige Tipo, Presentación y Unidad de Catalogos. Captura Base y Altura juntas cuando correspondan, sin fórmulas.'
         : config.mode === 'adjust'
-        ? 'Una fila por registro. Captura el saldo como número; no uses fórmulas.'
+        ? 'Captura el saldo como número, sin fórmulas. Deja en blanco el Stock contado de los registros que no hayas contado.'
         : 'Una fila por registro. Usa números sin signo de moneda. Activo: SI o NO. No uses fórmulas.';
     const catalogCaptureInstructions = [
         ...(applicableCatalogs.some(({ key }) => key === 'supplierCode')
@@ -172,7 +172,7 @@ const template = async ({ config, rows = [], catalogs }) => {
         ['Formato', isStockCount ? INVENTORY_STOCK_COUNT_FORMAT : INVENTORY_IMPORT_FORMAT],
         ['Recurso', config.resource], ['Operacion', config.mode],
         ...(isStockCount ? INVENTORY_STOCK_COUNT_FIELDS.map(({ label }) => [label, '']) : []),
-        ['Operación del archivo', `${INVENTORY_IMPORT_MODE_LABELS[config.mode]}. Todas las filas realizan esta operación. Selecciona la misma operación al importar; para otra operación descarga otra plantilla.`],
+        ['Operación del archivo', `${INVENTORY_IMPORT_MODE_LABELS[config.mode]}. Selecciona la misma operación al importar. Para otra operación descarga otra plantilla.`],
         ['Qué hacer', operationDescription],
         ['Límites', limitDescription],
         ['Columnas editables', `Para esta operación captura sólo: ${config.columns.filter(([, key]) => !config.readonlyFields.includes(key)).map(([header]) => header).join(', ')}.`],
@@ -182,10 +182,12 @@ const template = async ({ config, rows = [], catalogs }) => {
             : 'Los IDs y versiones del destino se incluyen automáticamente; no los escribas ni cambies. El nombre no identifica el destino.'],
         ['Captura', captureDescription],
         ...(applicableCatalogs.length ? [['Catálogos', `Catalogos incluye sólo: ${applicableCatalogs.map(({ header }) => header).join(', ')}. ${catalogCaptureInstructions.join(' ')} No son registros de inventario para importar.`]] : []),
-        ['Duplicados', 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
+        ['Duplicados', isStockCount
+            ? 'Nexus valida identidad y duplicados entre las filas con Stock contado. Un error en una de esas filas bloquea la confirmación.'
+            : 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
         ...(config.mode === 'create' && !isArticle ? [['Cantidad inicial', 'Es cantidad por presentación, no área ni peso. Pieza exige enteros.']] : []),
         ...(config.mode === 'adjust' ? [
-            ['Conteo físico', 'Stock contado es el saldo final en la unidad del registro; cero es válido y vacío se rechaza. Stock actual y Conversión son referencias y no se suman.'],
+            ['Conteo físico', 'Stock contado es el saldo final en la unidad del registro. Cero es válido. Si dejas la celda en blanco, la fila se mostrará como Sin conteo. Stock actual y Conversión son referencias y no se suman.'],
             ['Corte del conteo', 'Usa un conteo físico actual y evita movimientos mientras capturas. Si cambió una versión, descarga una plantilla nueva y vuelve a verificar el conteo.']
         ] : []),
         ...(config.mode === 'create' && isWaste ? [['Medidas', 'Base y altura en metros. En Rollo deja ambas vacías: el servidor las calcula con los tres pesos en kg.']] : []),

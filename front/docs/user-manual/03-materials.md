@@ -80,20 +80,22 @@ Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->
-En **Stock contado**, cero significa que comprobó que no hay existencias; vacío no
-es un conteo y bloquea el archivo. Retire las filas que aún no haya contado. Capture
-el saldo físico final por presentación y evite movimientos
+En **Stock contado**, escriba cero si comprobó que no hay existencias. Deje en blanco
+las celdas de las filas que aún no haya contado. Nexus las omite y las muestra como
+**Sin conteo** en la vista previa y el recibo. Capture el saldo físico final por
+presentación y evite movimientos
 durante el conteo. Si también necesita editar datos, complete una operación y descargue
 una plantilla actual para la siguiente.
 
 Al confirmar, Nexus muestra un solo folio AJU con una partida por cada existencia
-cuyo saldo cambió. Las demás se muestran como **Sin cambios**. Si todos los saldos
-coinciden, confirme con B4 y B5 vacías para obtener un recibo sin folio. Si las
+cuyo saldo cambió. Los saldos contados que coinciden se muestran como **Sin cambios**.
+Si ningún saldo cambia, confirme con B4 y B5 vacías para obtener un recibo sin folio. Si las
 existencias requieren motivos distintos, use un archivo por ajuste. Descargue
 una plantilla actual si su archivo tiene motivo y observaciones por fila.
 <!-- manual:end -->
 
-Un duplicado, error o versión desactualizada bloquea **todo el archivo**. Ante datos
+Un duplicado, error o versión desactualizada en una fila incluida bloquea la
+confirmación de **todo el archivo**. Ante datos
 cambiados, descargue una plantilla actual y revise sus correcciones antes de volver
 a capturarlas. Cambiar la operación retira el archivo seleccionado. Use siempre
 la plantilla actual de la operación seleccionada.

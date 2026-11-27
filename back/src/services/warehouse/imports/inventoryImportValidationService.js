@@ -9,7 +9,7 @@ import { getMaterialMeasurementError } from '../materials/materialHelpers.js';
 import { createMaterialDtoForRegister, createMaterialDtoForEdit } from '../../../dtos/materialDTO.js';
 import { createWasteDtoForRegister, createWasteDtoForEdit } from '../../../dtos/wasteDTO.js';
 import { loadInventoryImportContext, importKey, importCatalogValue, materialImportIdentity, wasteImportIdentity } from './inventoryImportContext.js';
-import { validateInventoryStockCountRows } from './inventoryStockCountValidationService.js';
+import { isBlankStockCount, validateInventoryStockCountRows } from './inventoryStockCountValidationService.js';
 import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_MODES as modes, INVENTORY_IMPORT_ROW_ACTIONS as actions } from '../../../shared/constants/inventoryImport.js';
 import { inventoryImportColumnLabel } from './inventoryImportConfig.js';
 import { errorMap } from '../../../messages/codeMessages.js';
@@ -41,8 +41,11 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
     const captureRows = config.mode === modes.CREATE ? rows.map(input => ({ ...input,
         values: Object.fromEntries(Object.entries(input.values).filter(([key]) => !config.readonlyFields.includes(key)))
     })) : rows;
-    const context = await loadInventoryImportContext({ db, config, rows: captureRows });
-    if (config.mode === modes.ADJUST) return validateInventoryStockCountRows({ config, rows: captureRows, context });
+    const isAdjustment = config.mode === modes.ADJUST;
+    const context = await loadInventoryImportContext({
+        db, config, rows: isAdjustment ? captureRows.filter(row => !isBlankStockCount(row)) : captureRows
+    });
+    if (isAdjustment) return validateInventoryStockCountRows({ config, rows: captureRows, context });
     const results = [];
     const targets = new Map();
     const shared = new Map();

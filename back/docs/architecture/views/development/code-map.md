@@ -285,7 +285,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/imports/inventoryImportTemplateService.js`](../../../../src/services/warehouse/imports/inventoryImportTemplateService.js) | `createInventoryImportTemplate` |
 | [`src/services/warehouse/imports/inventoryImportValidationService.js`](../../../../src/services/warehouse/imports/inventoryImportValidationService.js) | `validateInventoryImportRows` |
 | [`src/services/warehouse/imports/inventoryImportWriteService.js`](../../../../src/services/warehouse/imports/inventoryImportWriteService.js) | `writeInventoryImport` |
-| [`src/services/warehouse/imports/inventoryStockCountValidationService.js`](../../../../src/services/warehouse/imports/inventoryStockCountValidationService.js) | `validateInventoryStockCountRows` |
+| [`src/services/warehouse/imports/inventoryStockCountValidationService.js`](../../../../src/services/warehouse/imports/inventoryStockCountValidationService.js) | `isBlankStockCount`, `validateInventoryStockCountRows` |
 | [`src/services/warehouse/imports/inventoryWorkbookService.js`](../../../../src/services/warehouse/imports/inventoryWorkbookService.js) | `processInventoryWorkbook` |
 | [`src/services/warehouse/issues/historicalDeliverySelect.js`](../../../../src/services/warehouse/issues/historicalDeliverySelect.js) | `HISTORICAL_DELIVERY_SELECT` |
 | [`src/services/warehouse/issues/historicalDeliveryService.js`](../../../../src/services/warehouse/issues/historicalDeliveryService.js) | `confirmHistoricalDeliveries`, `previewHistoricalDeliveries` |

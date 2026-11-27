@@ -63,7 +63,7 @@ const createWastes = async ({ tx, rows, context, userId }) => {
 
 // Las reglas y conversiones son las de los formularios; el lote agrupa las escrituras dentro de su única tx.
 export const writeInventoryImport = async ({ tx, config, rows, context, userId, inventoryImportId }) => {
-    const changed = rows.filter(row => row.action !== actions.UNCHANGED);
+    const changed = rows.filter(row => row.action === actions.CREATE || row.action === actions.UPDATE);
     if (config.mode === modes.ADJUST) {
         await lockInventoryStockCount({ tx, context });
         if (!changed.length) return { savedIds: new Map() };

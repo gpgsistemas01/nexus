@@ -69,8 +69,11 @@ const readBatch = (
         if (!isRecord(data) || !isRecord(data.summary)) throw invalid();
 
         const summary = data.summary;
+        const countKeys = ['total', 'creates', 'updates', 'unchanged', 'errors'];
+        if (summary.skipped !== undefined) countKeys.push('skipped');
+
         if (
-            !['total', 'creates', 'updates', 'unchanged', 'errors'].every(
+            !countKeys.every(
                 (key) =>
                     Number.isInteger(summary[key]) &&
                     Number(summary[key]) >= 0 &&

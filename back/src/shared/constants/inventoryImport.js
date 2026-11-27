@@ -31,5 +31,6 @@ export const INVENTORY_IMPORT_ROW_ACTIONS = Object.freeze({
     CREATE: 'create',
     UPDATE: 'update',
     UNCHANGED: 'unchanged',
+    SKIPPED: 'skipped',
     ERROR: 'error'
 });

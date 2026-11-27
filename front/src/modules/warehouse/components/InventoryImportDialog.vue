@@ -103,7 +103,7 @@ const operationHint = computed(() => {
         return 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.';
 
     if (props.mode === modes.ADJUST)
-        return 'Descarga la plantilla actual. En Datos, captura el Stock contado para cada registro. Cero es válido; vacío se rechaza. Si hay cambios, captura el motivo y las observaciones una sola vez en Instrucciones. Conserva las columnas grises y evita movimientos durante el conteo.';
+        return 'Descarga la plantilla actual. En Datos, captura el Stock contado de los registros que hayas contado. Las celdas en blanco se omiten. Cero es válido. Si hay cambios, captura el motivo y las observaciones una sola vez en Instrucciones. Conserva las columnas grises y evita movimientos durante el conteo.';
 
     return props.resource === 'wastes'
         ? 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y conserva las columnas grises.'
@@ -147,6 +147,7 @@ const actions = {
     create: 'Nuevo',
     update: 'Actualizar',
     unchanged: 'Sin cambios',
+    skipped: 'Sin conteo',
     error: 'Corregir',
 };
 
@@ -183,7 +184,7 @@ const selectMode = (value: unknown) => {
         :show-submit="!batch && !recoveryRequired"
         :is-submit-disabled="!file"
         submit-label="Validar archivo"
-        :note="`Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB. La confirmación aplica todo el lote.`"
+        :note="`Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB. La confirmación aplica los cambios en un solo lote.`"
         @close="emit('close')"
         @submit="emit('prepare')"
     >
@@ -224,9 +225,9 @@ const selectMode = (value: unknown) => {
             />
             <p class="mb-4">{{ operationHint }}</p>
             <p class="mb-4">
-                Todas las filas realizan la operación seleccionada. Descarga su plantilla y
-                selecciona esa misma operación al cargarla. Un duplicado o error bloquea todo el
-                archivo. Cambiar la operación retira el archivo seleccionado.
+                Aplica una sola operación por archivo. Descarga su plantilla y selecciona esa misma
+                operación al cargarla. Un duplicado o error bloquea todo el archivo. Cambiar la
+                operación retira el archivo seleccionado.
             </p>
             <VAlert
                 type="info"
@@ -382,6 +383,9 @@ const selectMode = (value: unknown) => {
                     {{ batch.status === 'COMPLETED' ? 'Resultado de' : 'Vista previa de' }}
                     <strong>{{ batch.filename }}</strong>
                     : {{ preview.summary.creates }} nuevos, {{ preview.summary.updates }} cambios,
+                    <template v-if="preview.summary.skipped">
+                        {{ preview.summary.skipped }} sin conteo,
+                    </template>
                     {{ preview.summary.unchanged }} sin cambios y {{ preview.summary.errors }} con
                     errores.
                 </p>

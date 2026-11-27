@@ -19,7 +19,12 @@ describe('conteo físico: particiones y fronteras del saldo final', () => {
         expect(result.summary.errors).toBe(0);
         expect(result.rows[0]).toMatchObject({ action, after: { currentStock: count, convertedQuantity: count * 6 }, details: { difference } });
     });
-    it.each(['', null, -1, 1.5, 'no numérico'])('rechaza conteo inválido de PIEZA: %s', async count => {
+    it.each(['', null, undefined])('omite conteo ausente: %s', async count => {
+        const result = await validate(count);
+        expect(result.summary).toMatchObject({ total: 1, skipped: 1, updates: 0, errors: 0 });
+        expect(result.rows[0]).toMatchObject({ action: 'skipped', before: null, after: null });
+    });
+    it.each([-1, 1.5, 'no numérico'])('rechaza conteo inválido de PIEZA: %s', async count => {
         const result = await validate(count);
         expect(result.rows[0].action).toBe('error');
         expect(result.rows[0].errors.some(error => error.field === 'newStock')).toBe(true);

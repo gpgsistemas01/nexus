@@ -247,7 +247,7 @@ Si entregó 10 y ya regresaron 4, puede recibir hasta 6 más en devolución.
 | Plantilla operativa | Excel de una operación de inventario, con hojas, captura y referencias. |
 | Informe de errores | Filas y columnas que debe corregir en la copia de captura; no sustituye esa copia. |
 | ID y versión | Identidad del registro y de la lectura descargada; detectan cambios posteriores. |
-| Stock contado | Saldo físico final; cero expresa ausencia de existencias y vacío no es un conteo. |
+| Stock contado | Saldo físico final. Cero expresa ausencia de existencias. La celda en blanco omite la fila del ajuste. |
 
 <!-- module:end -->
 <!-- module:end -->
