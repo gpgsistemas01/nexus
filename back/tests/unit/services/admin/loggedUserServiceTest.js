@@ -32,7 +32,7 @@ describe('getLoggedUser active access assignments', () => {
 
     it('queries only active account, person, role, and department assignments', async () => {
         findMany.mockResolvedValue([{
-            user: { id: 'user-1', name: 'warehouse-user' },
+            user: { id: 'user-1', name: 'warehouse-user', person: { fullName: 'María López' } },
             role: { id: 'role-1', key: 'warehouse_keeper', name: 'Etiqueta de rol' },
             department: { id: 'department-1', key: 'warehouse_and_supply', name: 'Etiqueta de área' }
         }]);
@@ -53,11 +53,12 @@ describe('getLoggedUser active access assignments', () => {
                 department: { is: { isActive: true } }
             },
             select: {
-                user: { select: { id: true, name: true } },
+                user: { select: { id: true, name: true, person: { select: { fullName: true } } } },
                 role: { select: { id: true, key: true, name: true } },
                 department: { select: { id: true, key: true, name: true } }
             }
         });
+        expect(user).toMatchObject({ name: 'warehouse-user', personName: 'María López' });
         expect(user.accesses).toEqual([{
             roleId: 'role-1',
             roleKey: 'warehouse_keeper',

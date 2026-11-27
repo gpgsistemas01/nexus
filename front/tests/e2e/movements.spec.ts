@@ -61,6 +61,18 @@ for (const [path, title, item] of [
     await expect(page.getByRole('cell', { name: 'SAL-001', exact: true })).toBeVisible();
   });
 
+test('movimientos: muestra el costo con seis decimales y el histórico sin verificar', async ({
+  page,
+}) => {
+  await mockMovements(page, ['movements:read', 'inventory:costs-read']);
+  await page.goto('/movimientos/materiales');
+  await expect(page.getByRole('columnheader', { name: 'Costo unitario sin IVA' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: '12.123456', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('cell', { name: 'Sin verificar', exact: true }).first(),
+  ).toBeVisible();
+});
+
 test('movimientos: menú exclusivo, enlaces Vue, acceso directo y móvil', async ({ page }) => {
   const { reads } = await mockMovements(page, ['movements:read']);
   await page.goto('/almacen');

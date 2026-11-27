@@ -26,7 +26,7 @@ describe('saldos de movimientos de inventario', () => {
   it('distribuye el saldo real entre detalles repetidos sin modificar la oferta recibida', async () => {
     const offer = Object.freeze({ materialId: 'material', supplierId: 'supplier', maxUnitCost: 10, currentStock: 20, material: Object.freeze({ base: 1, height: 1 }) });
     const create = vi.fn().mockImplementation(async ({ data }) => ({ details: data.details.create }));
-    const queryRaw = vi.fn().mockResolvedValue([{ materialId: 'material', supplierId: 'supplier', currentStock: 13 }]);
+    const queryRaw = vi.fn().mockResolvedValue([{ materialId: 'material', supplierId: 'supplier', currentStock: 13, maxUnitCost: 20 }]);
     const result = await applyInventoryMovement({
       tx: { $queryRaw: queryRaw, inventoryMovement: { create } },
       supplierMaterials: [offer], movementType: 'ISSUE', details: [
@@ -36,6 +36,7 @@ describe('saldos de movimientos de inventario', () => {
     });
     expect(result.details.map(detail => [detail.previousStock, detail.newStock])).toEqual([[16, 15], [15, 13]]);
     expect(result.details.map(detail => detail.goodsIssueDetailId)).toEqual(['detail-1', 'detail-2']);
+    expect(result.details.map(detail => detail.cost.create.unitCost)).toEqual([20, 20]);
     expect(queryRaw).toHaveBeenCalledTimes(1);
     expect(offer.currentStock).toBe(20);
   });

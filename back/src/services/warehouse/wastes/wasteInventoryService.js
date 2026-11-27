@@ -2,7 +2,7 @@ import { WasteIssueStockConflict } from '../../../errors/warehouse/wasteIssueErr
 import { updateWasteStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 
-export const applyWasteStockChanges = async ({ tx, changes }) => {
+export const applyWasteStockChanges = async ({ tx, changes, includeMaxUnitCost = false }) => {
     const rows = await updateWasteStocks({ tx, changes });
     const balances = new Map(rows.map(row => [row.id, row]));
 
@@ -11,7 +11,11 @@ export const applyWasteStockChanges = async ({ tx, changes }) => {
         if (!updated) throw new WasteIssueStockConflict({ materialName: change.materialName });
 
         const newStock = normalizeDecimal(updated.currentStock);
-        balances.set(change.id, { previousStock: normalizeDecimal(newStock - change.quantityChange), newStock });
+        balances.set(change.id, {
+            previousStock: normalizeDecimal(newStock - change.quantityChange),
+            newStock,
+            ...(includeMaxUnitCost && { maxUnitCost: updated.maxUnitCost })
+        });
     }
 
     return balances;

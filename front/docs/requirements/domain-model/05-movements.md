@@ -41,3 +41,8 @@ tipo, stock anterior, cantidad y nuevo stock. `MovementRow` no es el agregado co
 completo ni habilita editar el historial. El filtro y el reporte reutilizan su consulta;
 la [secuencia de filtros](../../architecture/views/processes/08-movements-and-reports/01-movement-filters.md)
 explica cuándo se aplican y cómo se conserva la consulta previa si son inválidos.
+
+Cada efecto de compra, surtido o devolución puede conservar un costo unitario sin
+IVA. El historial lo muestra con `inventory:costs-read`. La compra usa el costo
+de su partida, el surtido toma el máximo vigente y la devolución conserva el del
+surtido de origen. Un costo histórico sin evidencia se muestra como **Sin verificar**.

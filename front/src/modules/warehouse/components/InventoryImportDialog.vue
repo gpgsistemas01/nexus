@@ -64,6 +64,27 @@ watch(
     },
 );
 const preview = computed(() => props.batch?.result ?? props.batch?.preview);
+const adjustment = computed(() => props.batch?.result?.adjustment);
+const adjustmentCapture = computed(() => {
+    if (props.batch?.mode !== modes.ADJUST) return null;
+
+    const changed = preview.value?.rows.filter((row) => row.action === 'update') ?? [];
+    const capture = changed[0]?.details;
+    if (!capture?.reason || !capture.observations) return null;
+
+    if (
+        changed.some(
+            ({ details }) =>
+                details.reason !== capture.reason || details.observations !== capture.observations,
+        )
+    )
+        return null;
+
+    return { reason: capture.reason, observations: capture.observations };
+});
+const adjustmentHasNoChanges = computed(
+    () => props.batch?.mode === modes.ADJUST && props.batch.result?.summary.updates === 0,
+);
 const modeOptions = computed(() =>
     props.availableModes.map((value) => ({
         value,
@@ -82,7 +103,7 @@ const operationHint = computed(() => {
         return 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.';
 
     if (props.mode === modes.ADJUST)
-        return 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.';
+        return 'Descarga la plantilla actual. En Datos, captura el Stock contado para cada registro. Cero es válido; vacío se rechaza. Si hay cambios, captura el motivo y las observaciones una sola vez en Instrucciones. Conserva las columnas grises y evita movimientos durante el conteo.';
 
     return props.resource === 'wastes'
         ? 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y conserva las columnas grises.'
@@ -140,7 +161,12 @@ const text = (value: ImportValue | undefined) =>
 
 const details = (value: Record<string, ImportValue>) =>
     Object.entries(value).filter(
-        ([key, content]) => IMPORT_FIELD_LABELS[key] && content !== null && content !== '',
+        ([key, content]) =>
+            IMPORT_FIELD_LABELS[key] &&
+            content !== null &&
+            content !== '' &&
+            !(adjustmentCapture.value && ['reason', 'observations'].includes(key)) &&
+            !(adjustment.value && key === 'adjustmentReference'),
     );
 
 const locked = computed(() => props.isWorking || props.isDownloading);
@@ -314,11 +340,21 @@ const selectMode = (value: unknown) => {
                 variant="tonal"
                 class="mb-4"
             >
-                {{
-                    isArticle
-                        ? 'Importación confirmada. El catálogo de artículos se actualizó.'
-                        : 'Importación confirmada. El inventario se actualizó.'
-                }}
+                <template v-if="adjustment">
+                    Ajuste aplicado. Folio
+                    <strong>{{ adjustment.referenceNumber }}</strong>
+                    .
+                </template>
+                <template v-else-if="adjustmentHasNoChanges">
+                    Importación confirmada sin cambios de existencias.
+                </template>
+                <template v-else>
+                    {{
+                        isArticle
+                            ? 'Importación confirmada. El catálogo de artículos se actualizó.'
+                            : 'Importación confirmada. El inventario se actualizó.'
+                    }}
+                </template>
             </VAlert>
             <VAlert
                 v-else-if="['CANCELED', 'EXPIRED'].includes(batch.status)"
@@ -349,6 +385,15 @@ const selectMode = (value: unknown) => {
                     {{ preview.summary.unchanged }} sin cambios y {{ preview.summary.errors }} con
                     errores.
                 </p>
+                <dl
+                    v-if="adjustmentCapture"
+                    class="preview-values mb-4"
+                >
+                    <dt>Motivo del ajuste</dt>
+                    <dd>{{ adjustmentCapture.reason }}</dd>
+                    <dt>Observaciones del ajuste</dt>
+                    <dd>{{ adjustmentCapture.observations }}</dd>
+                </dl>
                 <VAlert
                     v-if="mode === modes.UPDATE && !isArticle && resource !== 'wastes'"
                     type="info"

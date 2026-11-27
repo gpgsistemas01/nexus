@@ -179,9 +179,11 @@ observaciones no cierra las demás brechas ni sustituye integraciones backend.
 
 ## Conciliación y archivo por operación
 
-`RF-VUE-015`, `RF-IMP-001/002` y `RF-ADJ-001/002`: `inventoryImport.spec.ts` verifica
-selector, plantilla, carga y confirmación de una operación por archivo; `inventoryImportControllerDbTest.js`
-comprueba stock, costos, historia, versiones y rollback de todas las filas de una operación y rechazo de archivos incompatibles.
+`RF-VUE-015`, `RF-IMP-001/002` y `RF-ADJ-001/002` se comprueban en
+`inventoryImport.spec.ts` con selector, plantilla, carga y confirmación de una
+operación por archivo. Para conteo se verifica el folio común o el aviso sin
+cambios. `inventoryImportControllerDbTest.js` comprueba stock, costos, historia,
+versiones, rollback y rechazo de archivos incompatibles.
 `RF-VUE-010` y `RF-ISS-009`: `historicalDeliveryTest.ts` y `historicalDelivery.spec.ts`
 comprueban declaración, selección, devolución explícita y recuperación; la integración
 `historicalDeliveryControllerDbTest.js` prueba ausencia de descuento, carreras, recibos

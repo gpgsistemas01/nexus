@@ -18,12 +18,51 @@ Prisma y sus migraciones son la fuente técnica. El
 define el significado de negocio; los procedimientos de migración y cuentas pertenecen
 a la [vista física](../../physical/index.md).
 
+## Costo unitario de movimientos
+
+`MovementDetailCost` y `WasteMovementDetailCost` guardan a lo sumo un costo propio
+por detalle como `DECIMAL(18,6)` obligatorio, en la unidad de conversión y sin IVA.
+La entrada de compra guarda el costo calculado de su partida. Una corrección
+o cancelación de compra que disminuye stock guarda el costo de la partida que
+se revierte. El surtido guarda el máximo vigente de la oferta material–proveedor
+o de la merma, leído al actualizar la existencia con bloqueo de fila.
+`MovementReturnAllocation` y `WasteMovementReturnAllocation` relacionan la partida
+devuelta con cada surtido mediante dos claves foráneas `UUID`. La clave primaria
+compuesta identifica el par. Cada vínculo guarda únicamente la cantidad devuelta
+en `DECIMAL(18,6)`. El costo de la devolución se lee del surtido original. Cuando
+una devolución tiene varios orígenes, los surtidos comparten el mismo costo.
+El bloqueo documental cubre la validación de saldos y la escritura conjunta de
+devoluciones, asignaciones y existencias.
+La lectura de disponibilidad suma las asignaciones por surtido en PostgreSQL y
+devuelve únicamente los orígenes con saldo. El índice por origen y el índice de
+la partida de salida acotan esa lectura. El historial utiliza la clave compuesta
+de asignaciones para consultar un solo costo por devolución de la página.
+
+La migración `20261127120000_snapshot_movement_unit_costs` recupera compras con
+partida, artículo, proveedor, cantidad original y costo comprobables. Los
+surtidos y devoluciones históricos sin costo comprobable quedan sin fila de
+costo. El máximo actual de inventario tampoco sustituye el costo histórico.
+La migración `20261127130000_normalize_movement_return_allocations` traslada los
+orígenes del JSON a las relaciones. Verifica el contexto, los costos y las cantidades
+antes de retirar las copias del costo. La versión del backend que lee la columna
+anterior requiere una actualización coordinada con esta migración.
+La migración `20261127140000_add_movement_date_indexes` añade índices B-tree de
+fecha a `InventoryMovement` y `WasteMovement` para rangos selectivos del historial.
+
 ## Lectura del ER
 
 `InventoryImport` guarda borradores privados y recibos de lotes de los tres tipos
 de inventario. El payload y la vista previa son temporales; el resultado confirmado
 permanece para recuperar reintentos. Su FK al actor admite `SET NULL` al retirar la
 cuenta. La unicidad de actor/clave impide reutilizar una confirmación en otro lote.
+Al confirmar un conteo con cambios, `StockAdjustment` (AJU) o
+`WasteStockAdjustment` (AME) se vincula al recibo mediante `inventoryImportId`
+único. El documento comparte un movimiento de cabecera. Cada existencia que cambia
+tiene una partida con motivo, observaciones y saldos, y un detalle de movimiento.
+La cabecera conserva motivo y observaciones comunes cuando coinciden en todas las
+partidas. El tipo `MIXED` identifica documentos que aumentan y disminuyen
+existencias. Un conteo sin cambios conserva sólo el recibo. La migración copia
+motivos y observaciones a los detalles históricos conservando los folios previos.
 El [Contrato HTTP](../../../openapi/index.md) define
 permisos, transacción y limpieza.
 

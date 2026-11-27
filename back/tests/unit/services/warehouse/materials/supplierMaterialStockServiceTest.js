@@ -3,13 +3,13 @@ import { updateSupplierMaterialStock } from '../../../../../src/services/warehou
 
 describe('existencias de la relación material–proveedor', () => {
   it('descuenta ambas cantidades atómicamente incluso al agotar un consumible', async () => {
-    const queryRaw = vi.fn().mockResolvedValue([{ materialId: 'material', supplierId: 'supplier', currentStock: 0 }]);
+    const queryRaw = vi.fn().mockResolvedValue([{ materialId: 'material', supplierId: 'supplier', currentStock: 0, maxUnitCost: 10 }]);
     const balances = await updateSupplierMaterialStock({
       tx: { $queryRaw: queryRaw }, movementType: 'ISSUE',
       grouped: new Map([['material:supplier', 1]]),
       supplierMaterialsByKey: new Map([['material:supplier', { materialId: 'material', supplierId: 'supplier', maxUnitCost: 10, material: { base: null, height: null } }]])
     });
-    expect(balances.get('material:supplier')).toEqual({ previousStock: 1, newStock: 0 });
+    expect(balances.get('material:supplier')).toEqual({ previousStock: 1, newStock: 0, maxUnitCost: 10 });
     expect(queryRaw.mock.calls[0][0].values).toEqual(['material', 'supplier', -1, -1, null]);
   });
 

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { prepareMaterialData } from '../materials/materialHelpers.js';
-import { createMaterialStockAdjustmentsBatch } from '../adjustmentService.js';
-import { registerWasteStockAdjustmentsBatch } from '../wastes/wasteStockAdjustmentService.js';
+import { createMaterialStockAdjustmentDocuments } from '../adjustmentService.js';
+import { registerWasteStockAdjustmentDocument } from '../wastes/wasteStockAdjustmentService.js';
 import { registerWasteStockEntriesBatch } from '../wastes/wasteStockEntryService.js';
 import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 import { materialImportIdentity } from './inventoryImportContext.js';
@@ -36,7 +36,9 @@ const createMaterials = async ({ tx, config, rows, context, userId }) => {
     }
     if (materials.length) await tx.material.createMany({ data: materials });
     await tx.supplierMaterial.createMany({ data: offers });
-    await createMaterialStockAdjustmentsBatch({ tx, entries: initialStock, userId, reasonId: context.initialStockReason.id });
+    await createMaterialStockAdjustmentDocuments({
+        tx, documents: initialStock.map(entry => [{ ...entry, reasonId: context.initialStockReason.id }]), userId
+    });
     return saved;
 };
 
@@ -60,29 +62,37 @@ const createWastes = async ({ tx, rows, context, userId }) => {
 };
 
 // Las reglas y conversiones son las de los formularios; el lote agrupa las escrituras dentro de su única tx.
-export const writeInventoryImport = async ({ tx, config, rows, context, userId }) => {
+export const writeInventoryImport = async ({ tx, config, rows, context, userId, inventoryImportId }) => {
     const changed = rows.filter(row => row.action !== actions.UNCHANGED);
-    if (config.resource === ARTICLE_IMPORT_RESOURCE) {
-        return changed.length ? writeArticleImport({ tx, config, rows: changed, context }) : new Map();
-    }
     if (config.mode === modes.ADJUST) {
         await lockInventoryStockCount({ tx, context });
-        const references = config.type
-            ? await createMaterialStockAdjustmentsBatch({ tx, userId, entries: changed.map(row => ({
+        if (!changed.length) return { savedIds: new Map() };
+
+        let adjustment;
+        if (config.type) {
+            const entries = changed.map(row => ({
                 ...row.dto, materialId: row.id, supplierMaterial: context.offers.get(`${row.id}:${row.dto.supplierId}`)
-            })) })
-            : await registerWasteStockAdjustmentsBatch({ tx, userId, entries: changed.map(row => ({
+            }));
+            [adjustment] = await createMaterialStockAdjustmentDocuments({ tx, userId, inventoryImportId, documents: [entries] });
+        } else {
+            const entries = changed.map(row => ({
                 ...row.dto, waste: context.wastes.get(row.id)
-            })) });
-        changed.forEach((row, index) => { row.details.adjustmentReference = references[index]; });
-        return new Map(changed.map(row => [row.row, row.id]));
+            }));
+            adjustment = await registerWasteStockAdjustmentDocument({ tx, userId, inventoryImportId, entries });
+        }
+        for (const row of changed) row.details.adjustmentReference = adjustment.referenceNumber;
+        return { savedIds: new Map(), adjustment };
     }
-    if (!changed.length) return new Map();
+    if (!changed.length) return { savedIds: new Map() };
+    if (config.resource === ARTICLE_IMPORT_RESOURCE) {
+        return { savedIds: await writeArticleImport({ tx, config, rows: changed, context }) };
+    }
     if (config.mode === modes.CREATE) {
         await lockInventoryImportReferences({ tx, context });
-        return config.resource === 'wastes'
-            ? createWastes({ tx, rows: changed, context, userId })
-            : createMaterials({ tx, config, rows: changed, context, userId });
+        const savedIds = config.resource === 'wastes'
+            ? await createWastes({ tx, rows: changed, context, userId })
+            : await createMaterials({ tx, config, rows: changed, context, userId });
+        return { savedIds };
     }
     if (config.resource === 'wastes') {
         const changes = changed.map(row => {
@@ -98,5 +108,5 @@ export const writeInventoryImport = async ({ tx, config, rows, context, userId }
         });
         await updateImportedSupplierMaterials({ tx, offers });
     }
-    return new Map(changed.map(row => [row.row, row.id]));
+    return { savedIds: new Map() };
 };

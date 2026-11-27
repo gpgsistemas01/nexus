@@ -78,6 +78,9 @@ representativos del despliegue.
 | Exportaciones | Omiten conteos que no consumen. Usan un escritor XLSX progresivo sobre un temporal privado. Inventario lee por cursor en bloques de 5.000; los demás conservan sus consultas actuales. |
 | Stock de materiales y mermas | Agrupa los cambios por identidad y ejecuta una actualización parametrizada por lote. El repositorio bloquea filas en orden común, aplica la condición de saldo y devuelve los saldos de la escritura. Cualquier fila ausente provoca rollback desde el servicio. |
 | Preparación del movimiento | Valida relaciones mientras agrupa cantidades. Tras recibir saldos, recorre los detalles originales para construir su historial; esta segunda etapa depende del resultado de la escritura. |
+| Costos de movimientos | Hace una consulta por página autorizada mientras se resuelven sus conteos independientes. PostgreSQL obtiene a lo sumo un costo por detalle y usa `LIMIT 1` cuando lee el origen de una devolución. |
+| Historial de movimientos por fecha | Selecciona los identificadores por fecha e id antes de cargar detalles. Usa el índice de la cabecera y conserva el conteo y la paginación originales. Se aplica al listado sin filtros adicionales al rango de fecha. |
+| Disponibilidad de devolución | PostgreSQL suma las cantidades por origen con el índice de asignaciones. Node recibe sólo los surtidos con saldo en vez de cada devolución anterior. La consulta sigue dentro del bloqueo de la salida. |
 | Cumplimiento de salidas | Resuelve completo, parcial o pendiente con un recorrido y termina cuando el resultado parcial ya está determinado. |
 | Filas de reportes | Filtra y construye filas sin arrays intermedios por documento; formatea una fecha por encabezado y reutiliza `Intl.DateTimeFormat`. El resumen de merma normaliza cada grupo y acumula sus totales en la misma etapa. |
 | Resumen mensual | Acumula el importe mensual junto con las agrupaciones. Los porcentajes se calculan después, porque requieren conocer el total de todas las filas. |
@@ -102,6 +105,12 @@ consultar la base por cada elemento ni alterar el orden del historial.
   del listado para reducir el volumen sin adaptar también su consumidor.
 - Los índices se evalúan con planes y cardinalidades representativas. Una búsqueda
   `contains`/`ILIKE '%texto%'` no se acelera por añadir cualquier índice B-tree.
+- Para evaluar el historial de movimientos, compara una página de 50 filas con y
+  sin rango de un día, manteniendo los conteos exactos. Registra también el plan de
+  disponibilidad para una partida con pocos surtidos y 100 o 10.000 asignaciones.
+  Mide con los mismos registros, repeticiones y calentamiento. Inspecciona las filas
+  devueltas y `EXPLAIN (ANALYZE, BUFFERS)`. Los conteos totales y la paginación con
+  desplazamiento siguen dependiendo del volumen global.
 - El timeout del navegador y el timeout transaccional no constituyen una medición del
   tiempo del endpoint. Pool, bloqueos y red forman parte del presupuesto de respuesta.
 

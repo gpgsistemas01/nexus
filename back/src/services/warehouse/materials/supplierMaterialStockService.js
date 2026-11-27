@@ -61,7 +61,14 @@ export const updateSupplierMaterialStock = async ({
         }
 
         const newStock = normalizeDecimal(updated.currentStock);
-        balances.set(key, { previousStock: normalizeDecimal(newStock - change.quantityChange), newStock });
+        if (isIssue && !(Number(updated.maxUnitCost) > 0)) {
+            throw new GoodsIssueMissingMaxUnitCost(buildStockErrorMeta(supplierMaterialsByKey.get(key)));
+        }
+        balances.set(key, {
+            previousStock: normalizeDecimal(newStock - change.quantityChange),
+            newStock,
+            ...(isIssue && { maxUnitCost: updated.maxUnitCost })
+        });
     }
 
     return balances;

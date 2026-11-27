@@ -1490,6 +1490,18 @@
       "physicalReturnConfirmed": {
         "type": "boolean",
         "description": "Debe ser true para una salida regularizada: confirma la entrada física actual al almacén. Se rechaza sin efectos si falta."
+      },
+      "sourceMovementDetailId": {
+        "oneOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "const": "unverified"
+          }
+        ],
+        "description": "Identificador de la partida de surtido o valor unverified para saldo histórico sin costo verificable. Se exige cuando los surtidos disponibles tienen costos distintos o mezclan costos verificados con saldo histórico."
       }
     },
     "additionalProperties": false,

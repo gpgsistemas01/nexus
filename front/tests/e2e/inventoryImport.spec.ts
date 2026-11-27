@@ -133,6 +133,7 @@ test('el selector asigna una operación a todo el Excel y cambiarla retira el ar
 }) => {
   await mockWarehouse(page);
   const batch = inventoryImportDraft();
+  const referenceNumber = 'AJU-2026-000123';
   batch.mode = 'adjust';
   batch.preview!.summary = { total: 1, creates: 0, updates: 1, unchanged: 0, errors: 0 };
   batch.preview!.rows = [
@@ -156,10 +157,18 @@ test('el selector asigna una operación a todo el Excel y cambiarla retira el ar
       return route.fulfill({ json: { code: 'INVENTORY_IMPORT_PREVIEW', batch } });
     }
     writes.push(route.request().postDataJSON());
+    const result = {
+      ...batch.preview!,
+      adjustment: { id: '62114610-cc07-4a54-b317-af0517bcf913', referenceNumber },
+      rows: batch.preview!.rows.map((row) => ({
+        ...row,
+        details: { ...row.details, adjustmentReference: referenceNumber },
+      })),
+    };
     return route.fulfill({
       json: {
         code: 'INVENTORY_IMPORT_COMPLETED',
-        batch: { ...batch, status: 'COMPLETED', preview: null, result: batch.preview },
+        batch: { ...batch, status: 'COMPLETED', preview: null, result },
       },
     });
   });
@@ -185,16 +194,65 @@ test('el selector asigna una operación a todo el Excel y cambiarla retira el ar
   await dialog.locator('input[type=file]').setInputFiles(file);
   await dialog.getByRole('button', { name: 'Validar archivo', exact: true }).click();
   await expect(dialog.getByText('Artículo contado', { exact: false })).toBeVisible();
+  await expect(dialog.getByText('Motivo del ajuste', { exact: true })).toBeVisible();
+  await expect(dialog.getByText('Conteo comprobado', { exact: true })).toHaveCount(1);
   await expect(
     dialog.getByRole('combobox', { name: 'Operación del archivo', exact: true }),
   ).toHaveCount(0);
   await expect(dialog.getByText('Ajustar existencias', { exact: true })).toBeVisible();
   await dialog.getByRole('button', { name: 'Confirmar importación', exact: true }).click();
-  await expect(
-    dialog.getByText('Importación confirmada. El inventario se actualizó.'),
-  ).toBeVisible();
+  await expect(dialog.getByText(referenceNumber, { exact: true })).toHaveCount(1);
+  await expect(dialog.getByText('Ajuste aplicado. Folio', { exact: false })).toBeVisible();
   expect(uploads).toBe(1);
   expect(writes).toHaveLength(1);
+});
+
+test('el conteo confirmado sin cambios muestra el recibo sin folio de ajuste', async ({ page }) => {
+  await mockWarehouse(page);
+  const batch = inventoryImportDraft();
+  batch.mode = 'adjust';
+  batch.preview = {
+    summary: { total: 1, creates: 0, updates: 0, unchanged: 1, errors: 0 },
+    rows: [
+      {
+        row: 2,
+        id: ids.material,
+        name: 'Existencia sin cambios',
+        action: 'unchanged',
+        before: { currentStock: 2 },
+        after: { currentStock: 2 },
+        details: { difference: 0 },
+        errors: [],
+        warnings: [],
+      },
+    ],
+  };
+  await page.route('**/api/warehouse/inventory-imports/materials/preview?mode=adjust', (route) =>
+    route.fulfill({ json: { code: 'INVENTORY_IMPORT_PREVIEW', batch } }),
+  );
+  await page.route(`**/api/warehouse/inventory-imports/${batch.id}/confirm`, (route) =>
+    route.fulfill({
+      json: {
+        code: 'INVENTORY_IMPORT_COMPLETED',
+        batch: { ...batch, status: 'COMPLETED', preview: null, result: batch.preview },
+      },
+    }),
+  );
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Importar Excel de materiales', exact: true });
+  await selectOperation(page, 'Ajustar existencias');
+  await dialog.locator('input[type=file]').setInputFiles({
+    name: 'conteo.xlsx',
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: Buffer.from('fixture: conteo sin cambios'),
+  });
+  await dialog.getByRole('button', { name: 'Validar archivo', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Confirmar importación', exact: true }).click();
+  await expect(
+    dialog.getByText('Importación confirmada sin cambios de existencias.'),
+  ).toBeVisible();
+  await expect(dialog.getByText('Ajuste aplicado. Folio', { exact: false })).toHaveCount(0);
 });
 
 test('plantillas: actualización de consumibles y altas de merma con proveedor', async ({

@@ -450,7 +450,27 @@ erDiagram
     InventoryMovement ||..o{ MovementDetail : "movementId = InventoryMovement.id"
 ```
 
-### StockAdjustment · StockAdjustmentDetail · StockAdjustmentReason
+### MovementDetailCost · MovementReturnAllocation
+
+```mermaid
+erDiagram
+    direction LR
+    MovementDetailCost {
+        String movementDetailId PK,FK
+    }
+    MovementReturnAllocation {
+        String returnMovementDetailId PK,FK
+        String sourceMovementDetailId PK,FK
+    }
+    MovementDetail {
+        String id PK
+    }
+    MovementDetail ||--o| MovementDetailCost : "movementDetailId = MovementDetail.id"
+    MovementDetail ||--o{ MovementReturnAllocation : "returnMovementDetailId = MovementDetail.id"
+    MovementDetailCost ||--o{ MovementReturnAllocation : "sourceMovementDetailId = MovementDetailCost.movementDetailId"
+```
+
+### StockAdjustment
 
 ```mermaid
 erDiagram
@@ -459,20 +479,42 @@ erDiagram
         String id PK
         String referenceNumber UK
         String reasonId FK
+        String inventoryImportId UK,FK
         String createdById FK
         String approvedById FK
     }
+    StockAdjustmentReason {
+        String id PK
+    }
+    InventoryImport {
+        String id PK
+    }
+    User {
+        String id PK
+    }
+    StockAdjustmentReason o|..o{ StockAdjustment : "reasonId = StockAdjustmentReason.id"
+    InventoryImport o|..o| StockAdjustment : "inventoryImportId = InventoryImport.id"
+    User ||..o{ StockAdjustment : "createdById = User.id"
+    User o|..o{ StockAdjustment : "approvedById = User.id"
+```
+
+### StockAdjustmentDetail · StockAdjustmentReason
+
+```mermaid
+erDiagram
+    direction LR
     StockAdjustmentDetail {
         String id PK
         String stockAdjustmentId FK
         String materialId FK
         String supplierId FK
+        String reasonId FK
     }
     StockAdjustmentReason {
         String id PK
         String name UK
     }
-    User {
+    StockAdjustment {
         String id PK
     }
     Material {
@@ -481,12 +523,10 @@ erDiagram
     Supplier {
         String id PK
     }
-    StockAdjustmentReason ||..o{ StockAdjustment : "reasonId = StockAdjustmentReason.id"
-    User ||..o{ StockAdjustment : "createdById = User.id"
-    User o|..o{ StockAdjustment : "approvedById = User.id"
     StockAdjustment ||..o{ StockAdjustmentDetail : "stockAdjustmentId = StockAdjustment.id"
     Material ||..o{ StockAdjustmentDetail : "materialId = Material.id"
     Supplier ||..o{ StockAdjustmentDetail : "supplierId = Supplier.id"
+    StockAdjustmentReason o|..o{ StockAdjustmentDetail : "reasonId = StockAdjustmentReason.id"
 ```
 
 ## Mermas e inventario de merma
@@ -635,7 +675,7 @@ erDiagram
     Waste ||..o{ WasteIssueReturn : "wasteId = Waste.id"
 ```
 
-### WasteMovementDetail
+### WasteMovementDetail · WasteMovementDetailCost
 
 ```mermaid
 erDiagram
@@ -646,6 +686,9 @@ erDiagram
         String wasteStockAdjustmentDetailId FK
         String movementId FK
         String wasteIssueDetailId FK
+    }
+    WasteMovementDetailCost {
+        String movementDetailId PK,FK
     }
     Waste {
         String id PK
@@ -663,13 +706,18 @@ erDiagram
     WasteStockAdjustmentDetail o|..o{ WasteMovementDetail : "wasteStockAdjustmentDetailId = WasteStockAdjustmentDetail.id"
     WasteMovement ||..o{ WasteMovementDetail : "movementId = WasteMovement.id"
     WasteIssueDetail o|..o{ WasteMovementDetail : "wasteIssueDetailId = WasteIssueDetail.id"
+    WasteMovementDetail ||--o| WasteMovementDetailCost : "movementDetailId = WasteMovementDetail.id"
 ```
 
-### WasteStockEntry · WasteOperation
+### WasteMovementReturnAllocation · WasteStockEntry · WasteOperation
 
 ```mermaid
 erDiagram
     direction LR
+    WasteMovementReturnAllocation {
+        String returnMovementDetailId PK,FK
+        String sourceMovementDetailId PK,FK
+    }
     WasteStockEntry {
         String id PK
         String referenceNumber UK
@@ -690,13 +738,21 @@ erDiagram
     WasteMovement {
         String id PK
     }
+    WasteMovementDetail {
+        String id PK
+    }
+    WasteMovementDetailCost {
+        String movementDetailId PK,FK
+    }
     User ||--o{ WasteOperation : "userId = User.id"
     Waste ||..o{ WasteStockEntry : "wasteId = Waste.id"
     User ||..o{ WasteStockEntry : "createdById = User.id"
     WasteMovement ||..o| WasteStockEntry : "wasteMovementId = WasteMovement.id"
+    WasteMovementDetail ||--o{ WasteMovementReturnAllocation : "returnMovementDetailId = WasteMovementDetail.id"
+    WasteMovementDetailCost ||--o{ WasteMovementReturnAllocation : "sourceMovementDetailId = WasteMovementDetailCost.movementDetailId"
 ```
 
-### WasteStockAdjustment · WasteStockAdjustmentDetail
+### WasteStockAdjustment
 
 ```mermaid
 erDiagram
@@ -705,16 +761,15 @@ erDiagram
         String id PK
         String referenceNumber UK
         String reasonId FK
+        String inventoryImportId UK,FK
         String createdById FK
         String approvedById FK
         String wasteMovementId UK,FK
     }
-    WasteStockAdjustmentDetail {
-        String id PK
-        String wasteStockAdjustmentId FK
-        String wasteId FK
-    }
     StockAdjustmentReason {
+        String id PK
+    }
+    InventoryImport {
         String id PK
     }
     User {
@@ -723,15 +778,36 @@ erDiagram
     WasteMovement {
         String id PK
     }
-    Waste {
-        String id PK
-    }
-    StockAdjustmentReason ||..o{ WasteStockAdjustment : "reasonId = StockAdjustmentReason.id"
+    StockAdjustmentReason o|..o{ WasteStockAdjustment : "reasonId = StockAdjustmentReason.id"
+    InventoryImport o|..o| WasteStockAdjustment : "inventoryImportId = InventoryImport.id"
     User ||..o{ WasteStockAdjustment : "createdById = User.id"
     User o|..o{ WasteStockAdjustment : "approvedById = User.id"
     WasteMovement o|..o| WasteStockAdjustment : "wasteMovementId = WasteMovement.id"
+```
+
+### WasteStockAdjustmentDetail
+
+```mermaid
+erDiagram
+    direction LR
+    WasteStockAdjustmentDetail {
+        String id PK
+        String wasteStockAdjustmentId FK
+        String wasteId FK
+        String reasonId FK
+    }
+    WasteStockAdjustment {
+        String id PK
+    }
+    Waste {
+        String id PK
+    }
+    StockAdjustmentReason {
+        String id PK
+    }
     WasteStockAdjustment ||..o{ WasteStockAdjustmentDetail : "wasteStockAdjustmentId = WasteStockAdjustment.id"
     Waste ||..o{ WasteStockAdjustmentDetail : "wasteId = Waste.id"
+    StockAdjustmentReason o|..o{ WasteStockAdjustmentDetail : "reasonId = StockAdjustmentReason.id"
 ```
 
 ## Importaciones y conciliación de inventario
@@ -783,12 +859,14 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `Waste.supplierId` | `Supplier.id` | 1 | 0..N |
 | `Waste.presentationId` | `Presentation.id` | 1 | 0..N |
 | `Waste.unitMeasureId` | `UnitMeasure.id` | 1 | 0..N |
-| `WasteStockAdjustment.reasonId` | `StockAdjustmentReason.id` | 1 | 0..N |
+| `WasteStockAdjustment.reasonId` | `StockAdjustmentReason.id` | 0..1 | 0..N |
+| `WasteStockAdjustment.inventoryImportId` | `InventoryImport.id` | 0..1 | 0..1 |
 | `WasteStockAdjustment.createdById` | `User.id` | 1 | 0..N |
 | `WasteStockAdjustment.approvedById` | `User.id` | 0..1 | 0..N |
 | `WasteStockAdjustment.wasteMovementId` | `WasteMovement.id` | 0..1 | 0..1 |
 | `WasteStockAdjustmentDetail.wasteStockAdjustmentId` | `WasteStockAdjustment.id` | 1 | 0..N |
 | `WasteStockAdjustmentDetail.wasteId` | `Waste.id` | 1 | 0..N |
+| `WasteStockAdjustmentDetail.reasonId` | `StockAdjustmentReason.id` | 0..1 | 0..N |
 | `WasteMovement.wasteIssueId` | `WasteIssue.id` | 0..1 | 0..N |
 | `WasteOperation.userId` | `User.id` | 1 | 0..N |
 | `WasteStockEntry.wasteId` | `Waste.id` | 1 | 0..N |
@@ -798,6 +876,9 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `WasteMovementDetail.wasteStockAdjustmentDetailId` | `WasteStockAdjustmentDetail.id` | 0..1 | 0..N |
 | `WasteMovementDetail.movementId` | `WasteMovement.id` | 1 | 0..N |
 | `WasteMovementDetail.wasteIssueDetailId` | `WasteIssueDetail.id` | 0..1 | 0..N |
+| `WasteMovementDetailCost.movementDetailId` | `WasteMovementDetail.id` | 1 | 0..1 |
+| `WasteMovementReturnAllocation.returnMovementDetailId` | `WasteMovementDetail.id` | 1 | 0..N |
+| `WasteMovementReturnAllocation.sourceMovementDetailId` | `WasteMovementDetailCost.movementDetailId` | 1 | 0..N |
 | `WasteIssue.historicalDeliveryBatchId` | `HistoricalDeliveryBatch.id` | 0..1 | 0..N |
 | `WasteIssue.createdById` | `User.id` | 1 | 0..N |
 | `WasteIssue.departmentId` | `Department.id` | 1 | 0..N |
@@ -847,12 +928,17 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `MovementDetail.goodsIssueDetailId` | `GoodsIssueDetail.id` | 0..1 | 0..N |
 | `MovementDetail.stockAdjustmentDetailId` | `StockAdjustmentDetail.id` | 0..1 | 0..N |
 | `MovementDetail.movementId` | `InventoryMovement.id` | 1 | 0..N |
-| `StockAdjustment.reasonId` | `StockAdjustmentReason.id` | 1 | 0..N |
+| `MovementDetailCost.movementDetailId` | `MovementDetail.id` | 1 | 0..1 |
+| `MovementReturnAllocation.returnMovementDetailId` | `MovementDetail.id` | 1 | 0..N |
+| `MovementReturnAllocation.sourceMovementDetailId` | `MovementDetailCost.movementDetailId` | 1 | 0..N |
+| `StockAdjustment.reasonId` | `StockAdjustmentReason.id` | 0..1 | 0..N |
+| `StockAdjustment.inventoryImportId` | `InventoryImport.id` | 0..1 | 0..1 |
 | `StockAdjustment.createdById` | `User.id` | 1 | 0..N |
 | `StockAdjustment.approvedById` | `User.id` | 0..1 | 0..N |
 | `StockAdjustmentDetail.stockAdjustmentId` | `StockAdjustment.id` | 1 | 0..N |
 | `StockAdjustmentDetail.materialId` | `Material.id` | 1 | 0..N |
 | `StockAdjustmentDetail.supplierId` | `Supplier.id` | 1 | 0..N |
+| `StockAdjustmentDetail.reasonId` | `StockAdjustmentReason.id` | 0..1 | 0..N |
 | `GoodsReceiptDetailChange.goodsReceiptId` | `GoodsReceipt.id` | 1 | 0..N |
 | `GoodsReceiptDetailChange.goodsReceiptDetailId` | `GoodsReceiptDetail.id` | 1 | 0..N |
 | `GoodsReceiptDetailChange.reasonId` | `StockAdjustmentReason.id` | 1 | 0..N |

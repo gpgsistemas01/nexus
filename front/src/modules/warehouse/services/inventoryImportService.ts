@@ -3,6 +3,7 @@ import { successCodeMessages } from '@nexus/api-success-codes';
 import {
     ARTICLE_IMPORT_RESOURCE,
     INVENTORY_IMPORT_LIMITS,
+    INVENTORY_IMPORT_MODES,
     INVENTORY_IMPORT_STATUSES,
     INVENTORY_IMPORT_ROW_ACTIONS,
 } from '@nexus/inventory-imports';
@@ -77,6 +78,19 @@ const readBatch = (
             ) ||
             !Array.isArray(data.rows) ||
             data.rows.length > INVENTORY_IMPORT_LIMITS.maxRows
+        )
+            throw invalid();
+
+        if (
+            data.adjustment !== undefined &&
+            (data !== batch.result ||
+                batch.mode !== INVENTORY_IMPORT_MODES.ADJUST ||
+                !isRecord(data.adjustment) ||
+                typeof data.adjustment.id !== 'string' ||
+                !UUID_V4_PATTERN.test(data.adjustment.id) ||
+                typeof data.adjustment.referenceNumber !== 'string' ||
+                !data.adjustment.referenceNumber.trim() ||
+                Number(summary.updates) === 0)
         )
             throw invalid();
 

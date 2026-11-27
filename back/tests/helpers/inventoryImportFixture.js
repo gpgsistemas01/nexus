@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import ExcelJS from 'exceljs';
 import { getImportConfig } from '../../src/services/warehouse/imports/inventoryImportConfig.js';
-import { INVENTORY_IMPORT_FORMAT } from '../../src/constants/inventoryImport.js';
+import { INVENTORY_IMPORT_FORMAT, INVENTORY_STOCK_COUNT_FORMAT } from '../../src/constants/inventoryImport.js';
 import { PERMISSIONS } from '../../src/shared/constants/permissions.js';
 import { ROLE_KEYS } from '../../src/constants/roles.js';
 import { DEPARTMENT_KEYS } from '../../src/constants/departments.js';
@@ -13,16 +13,22 @@ export const writeInventoryWorkbook = async workbook => {
     return Buffer.from(await workbook.xlsx.writeBuffer());
 };
 
-export const inventoryWorkbook = async ({ resource = 'materials', mode = 'create', rows, alter }) => {
+export const inventoryWorkbook = async ({ resource = 'materials', mode = 'create', rows, adjustment = {}, alter }) => {
     const workbook = new ExcelJS.Workbook();
     const config = getImportConfig(resource, mode);
     const sheet = workbook.addWorksheet('Datos');
     sheet.addRow(config.columns.map(([header]) => header));
     for (const row of rows) sheet.addRow(config.columns.map(([, key]) => row[key] ?? ''));
     const instructions = workbook.addWorksheet('Instrucciones');
-    instructions.getCell('B1').value = INVENTORY_IMPORT_FORMAT;
+    instructions.getCell('B1').value = mode === 'adjust' ? INVENTORY_STOCK_COUNT_FORMAT : INVENTORY_IMPORT_FORMAT;
     instructions.getCell('B2').value = resource;
     instructions.getCell('B3').value = mode;
+    if (mode === 'adjust') {
+        instructions.getCell('A4').value = 'Motivo del ajuste';
+        instructions.getCell('B4').value = adjustment.reasonId ?? '';
+        instructions.getCell('A5').value = 'Observaciones del ajuste';
+        instructions.getCell('B5').value = adjustment.observations ?? '';
+    }
     workbook.addWorksheet('Catalogos');
     alter?.(workbook);
     return writeInventoryWorkbook(workbook);

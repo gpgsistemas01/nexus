@@ -3,9 +3,11 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VAlert } from 'vuetify/components/VAlert';
+import { VSelect } from 'vuetify/components/VSelect';
 import { isPiecePresentation } from '@nexus/piece-quantity';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
+import type { IssueReturnSource } from '../composables/useIssueReturn.js';
 
 defineProps<{
     context: string;
@@ -21,6 +23,9 @@ defineProps<{
     isHistorical?: boolean;
     physicalReturnConfirmed?: boolean;
     physicalReturnError?: string;
+    sources: IssueReturnSource[];
+    sourceMovementDetailId: string;
+    sourceError?: string;
 }>();
 const emit = defineEmits<{
     update: [field: 'returnQuantity' | 'observations', value: string];
@@ -29,7 +34,15 @@ const emit = defineEmits<{
     close: [];
     reload: [];
     confirmPhysicalReturn: [value: boolean];
+    selectSource: [id: string];
 }>();
+
+const sourceTitle = ({ id, date, quantity }: IssueReturnSource) => {
+    const source = date
+        ? `${new Date(date).toLocaleString('es-MX')} · ${id.slice(0, 8)}`
+        : 'Surtido histórico con costo sin verificar';
+    return `${source} · Disponible: ${numberText(quantity)}`;
+};
 </script>
 
 <template>
@@ -63,6 +76,17 @@ const emit = defineEmits<{
             :error-messages="physicalReturnError"
             :disabled="isSubmitting"
             @update:model-value="emit('confirmPhysicalReturn', $event === true)"
+        />
+        <VSelect
+            v-if="sources.length"
+            label="Surtido de origen"
+            :items="sources"
+            :item-title="sourceTitle"
+            item-value="id"
+            :model-value="sourceMovementDetailId || null"
+            :error-messages="sourceError"
+            :disabled="isSubmitting"
+            @update:model-value="emit('selectSource', $event ?? '')"
         />
         <VTextField
             label="Cantidad a devolver"

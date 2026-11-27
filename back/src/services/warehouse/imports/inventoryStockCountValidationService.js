@@ -12,6 +12,7 @@ import { isAppError } from '../../../errors/AppError.js';
 export const validateInventoryStockCountRows = async ({ config, rows, context }) => {
     const targets = new Map();
     const results = [];
+    let documentCapture;
     for (const input of rows) {
         const body = { ...input.values, reasonId: importCatalogValue(input.values.reasonId) };
         const errors = [];
@@ -19,16 +20,18 @@ export const validateInventoryStockCountRows = async ({ config, rows, context })
             column: inventoryImportColumnLabel(config, field) });
         if (!UUID_V4_PATTERN.test(String(body.id ?? ''))) add('id', 'El identificador del registro no es válido.');
         if (body.newStock === '' || body.newStock == null) add('newStock', 'Captura el stock contado. Cero es válido; una celda vacía no es un conteo.');
-        if (!String(body.observations ?? '').trim()) add('observations', 'Describe el conteo físico que justifica el ajuste.');
         const validated = await validateInventoryImportRow({ ...config, body });
-        for (const error of validated.errors) add(error.field, error.message, error.code);
+        const documentErrors = [];
+        for (const error of validated.errors) {
+            if (['reasonId', 'observations'].includes(error.field)) documentErrors.push(error);
+            else add(error.field, error.message, error.code);
+        }
         const dto = { newStock: Number(validated.body.newStock), reasonId: body.reasonId,
             observations: String(validated.body.observations ?? '').trim(), expectedVersion: Number(validated.body.expectedVersion),
             ...(config.type && { supplierId: body.supplierId, expectedMaterialVersion: Number(validated.body.expectedMaterialVersion) }) };
         const target = config.type ? context.offers.get(`${body.id}:${body.supplierId}`) : context.wastes.get(body.id);
         const reason = context.reasons.get(body.reasonId);
         if (!target || (config.type && target.material.type !== config.type)) add('id', 'El registro o proveedor no corresponde a este módulo.');
-        if (!reason) add('reasonId', 'Selecciona un motivo activo del catálogo.');
         const identity = config.type ? `${body.id}:${body.supplierId}` : body.id;
         if (targets.has(identity)) add('id', `El registro está repetido: coincide con la fila ${targets.get(identity)} del archivo.`);
         targets.set(identity, input.row);
@@ -44,11 +47,25 @@ export const validateInventoryStockCountRows = async ({ config, rows, context })
                 try {
                     const values = config.type ? calculateStockAdjustmentValues({ supplierMaterial: target, newStock: dto.newStock })
                         : calculateWasteStockAdjustmentValues({ waste: target, newStock: dto.newStock });
-                    after = { currentStock: values.newStock, convertedQuantity: values.newConvertedQuantity };
                     difference = values.difference;
+                    after = difference === 0 ? before : {
+                        currentStock: values.newStock, convertedQuantity: values.newConvertedQuantity
+                    };
                 } catch (error) {
                     if (!isAppError(error)) throw error;
                     add('newStock', error.message, error.code);
+                }
+            }
+        }
+        if (difference !== null && difference !== 0) {
+            for (const error of documentErrors) add(error.field, error.message, error.code);
+            if (!reason) add('reasonId', 'Selecciona un motivo activo del catálogo para todo el ajuste.');
+            if (!dto.observations) add('observations', 'Describe el conteo físico que justifica el ajuste.');
+            if (!errors.length) {
+                // Los borradores anteriores también se revalidan antes de confirmar.
+                documentCapture ??= dto;
+                if (documentCapture.reasonId !== dto.reasonId || documentCapture.observations !== dto.observations) {
+                    add('reasonId', 'Usa un solo motivo y observaciones por ajuste. Descarga la plantilla actual.');
                 }
             }
         }
@@ -56,8 +73,9 @@ export const validateInventoryStockCountRows = async ({ config, rows, context })
         results.push({ row: input.row, id: body.id ?? null, name: material?.name ?? String(body.name ?? ''),
             before, after, reference, dto,
             details: { supplier: target?.supplier?.tradeName ?? '', presentation: material?.presentation?.name ?? '',
-                unit: material?.unitMeasure?.symbol ?? '', difference, reason: reason?.name ?? '', observations: dto.observations },
-            action: errors.length ? actions.ERROR : difference === 0 && before.convertedQuantity === after.convertedQuantity ? actions.UNCHANGED : actions.UPDATE,
+                unit: material?.unitMeasure?.symbol ?? '', difference,
+                ...(difference !== null && difference !== 0 && { reason: reason?.name ?? '', observations: dto.observations }) },
+            action: errors.length ? actions.ERROR : difference === 0 ? actions.UNCHANGED : actions.UPDATE,
             errors, warnings: [] });
     }
     return { context, rows: results, summary: { total: results.length, creates: 0,

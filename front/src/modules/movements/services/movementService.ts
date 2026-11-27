@@ -43,6 +43,7 @@ const normalizeRow = (value: unknown): MovementRow => {
         previousStock: decimal(value.previousStock),
         quantity: decimal(value.quantity),
         newStock: decimal(value.newStock),
+        ...(Object.hasOwn(value, 'unitCost') && { unitCost: decimal(value.unitCost) }),
     };
 };
 

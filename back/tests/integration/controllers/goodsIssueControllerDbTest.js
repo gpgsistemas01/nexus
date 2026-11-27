@@ -10,6 +10,8 @@ import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
 import { resolveDatabaseUrl } from '../../../src/lib/databaseUrl.js';
+import { issueReturnValidation } from '../../../src/validators/forms/issueReturnValidations.js';
+import { validate } from '../../../src/middleware/validatorMiddleware.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -109,7 +111,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
                 router.patch(`${path}/:id`, controller[`edit${label}GoodsIssue`]);
                 router.patch(`${path}/:id/header`, controller[`edit${label}GoodsIssueHeader`]);
                 router.patch(`${path}/:id/details`, controller[`edit${label}GoodsIssueDetails`]);
-                router.patch(`${path}/:id/details/:detailId/returns`, controller[`register${label}GoodsIssueDetailReturn`]);
+                router.patch(`${path}/:id/details/:detailId/returns`, issueReturnValidation, validate, controller[`register${label}GoodsIssueDetailReturn`]);
             }
         } });
         for (const name of ['Pendiente', 'Surtido parcial', 'Surtido', 'Cancelado']) {
@@ -558,6 +560,76 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(Number(persisted.convertedQuantityDifference)).toBe(-1);
         expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(initialStock - 2);
         expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: issue.id } })).toBe(3);
+    });
+
+    it.each(['material', 'consumable'])('fija el costo de cada surtido de %s y limita las devoluciones por origen', async resource => {
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+        const original = await prisma.supplierMaterial.findUniqueOrThrow({ where });
+        try {
+            const created = await createIssue(resource).expect(200);
+            const { id, details: [line] } = created.body.goodsIssue;
+            const endpoint = `${issuePath(resource)}/${id}/details`;
+            const supply = expectedSuppliedQuantity => request(app).patch(endpoint).send({
+                details: [{ id: line.id, isSupplied: true, projectConvertedQuantity: 2, quantityToSupply: 1, expectedSuppliedQuantity }]
+            });
+            const returnLine = payload => request(app).patch(`${endpoint}/${line.id}/returns`).send(payload);
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: '12.123456' } });
+            await supply(0).expect(200);
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: 36 } });
+            await supply(1).expect(200);
+            const supplied = await prisma.movementDetail.findMany({ where: { goodsIssueDetailId: line.id }, include: { cost: true } });
+            const first = supplied.find(row => row.cost.unitCost.toString() === '12.123456');
+            const second = supplied.find(row => row.cost.unitCost.toString() === '36');
+            expect(first).toBeDefined();
+            expect(second).toBeDefined();
+
+            const invalidSource = await returnLine({ returnQuantity: 1, sourceMovementDetailId: 'no-válido' }).expect(400);
+            expect(invalidSource.body.errors.sourceMovementDetailId.code).toBe('ISSUE_RETURN_COST_SOURCE_INVALID');
+            const conflict = await returnLine({ returnQuantity: 1 }).expect(409);
+            expect(conflict.body.code).toBe('ISSUE_RETURN_COST_SOURCE_REQUIRED');
+            expect(conflict.body.meta.sources).toEqual(expect.arrayContaining([
+                { id: first.id, date: expect.any(String), quantity: 1 },
+                { id: second.id, date: expect.any(String), quantity: 1 }
+            ]));
+            expect(await prisma.goodsIssueReturn.count({ where: { goodsIssueId: id } })).toBe(0);
+            const returns = await Promise.all([
+                returnLine({ returnQuantity: 1, sourceMovementDetailId: first.id.toUpperCase() }),
+                returnLine({ returnQuantity: 1, sourceMovementDetailId: first.id })
+            ]);
+            expect(returns.map(result => result.status).sort()).toEqual([200, 409]);
+            await returnLine({ returnQuantity: 1 }).expect(200);
+            const returned = await prisma.movementDetail.findMany({
+                where: { goodsIssueDetailId: line.id, movement: { type: 'ENTRY' } },
+                select: { cost: true, returnAllocations: { include: { sourceCost: true } } }
+            });
+            expect(returned).toHaveLength(2);
+            expect(returned.map(row => row.cost)).toEqual([null, null]);
+            expect(returned.map(row => row.returnAllocations.map(allocation => [
+                allocation.sourceMovementDetailId, allocation.quantity.toString(), allocation.sourceCost.unitCost.toString()
+            ]))).toEqual(expect.arrayContaining([[[first.id, '1', '12.123456']], [[second.id, '1', '36']]]));
+            expect(Number((await prisma.supplierMaterial.findUniqueOrThrow({ where })).currentStock)).toBe(Number(original.currentStock));
+        } finally {
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: original.maxUnitCost } });
+        }
+    });
+
+    it('reparte una devolución entre surtidos del mismo costo con cantidades decimales', async () => {
+        const { body } = await createIssue('material').expect(200);
+        const { id, details: [line] } = body.goodsIssue;
+        const endpoint = `${issuePath('material')}/${id}/details`;
+        for (const [quantityToSupply, expectedSuppliedQuantity] of [[0.75, 0], [1.25, 0.75]]) {
+            await request(app).patch(endpoint).send({ details: [{
+                id: line.id, isSupplied: true, projectConvertedQuantity: 2, quantityToSupply, expectedSuppliedQuantity
+            }] }).expect(200);
+        }
+        await request(app).patch(`${endpoint}/${line.id}/returns`).send({ returnQuantity: 2 }).expect(200);
+        const returned = await prisma.movementDetail.findFirstOrThrow({
+            where: { goodsIssueDetailId: line.id, movement: { type: 'ENTRY' } },
+            include: { cost: true, returnAllocations: { include: { sourceCost: true } } }
+        });
+        expect(returned.cost).toBeNull();
+        expect(returned.returnAllocations.map(allocation => allocation.quantity.toString()).sort()).toEqual(['0.75', '1.25']);
+        expect(new Set(returned.returnAllocations.map(allocation => allocation.sourceCost.unitCost.toString())).size).toBe(1);
     });
 
     it('genera consecutivos independientes por tipo incluso con altas concurrentes', async () => {

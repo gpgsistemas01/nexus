@@ -182,6 +182,48 @@ for (const [path, resource] of [
   });
 }
 
+test('salidas: permite elegir el surtido de origen y reintentar la devolución', async ({
+  page,
+}) => {
+  const { writes } = await mockIssues(page, undefined, 'Surtido');
+  const sourceId = 'de2c80da-f628-4c77-b532-9e16d7eb71ec';
+  const message =
+    'Selecciona el surtido de origen y ajusta la cantidad a lo disponible en ese surtido.';
+  await page.route('**/api/warehouse/goods-issues/materials/*/details/*/returns', (route) => {
+    if (route.request().postDataJSON().sourceMovementDetailId) return route.fallback();
+
+    return route.fulfill({
+      status: 409,
+      json: {
+        code: 'ISSUE_RETURN_COST_SOURCE_REQUIRED',
+        meta: {
+          sources: [
+            { id: sourceId, date: '2026-10-07T12:30:00.000Z', quantity: 1 },
+            { id: 'unverified', date: null, quantity: 1 },
+          ],
+        },
+      },
+    });
+  });
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Consultar salida', exact: true }).click();
+  await page.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Devolver detalle de salida', exact: true });
+  const submit = dialog.getByRole('button', { name: 'Devolver', exact: true });
+  await dialog.getByLabel('Cantidad a devolver', { exact: true }).fill('1');
+  await submit.click();
+  const prompt = page.getByRole('alertdialog', { name: 'No se pudo completar la operación' });
+  await expect(prompt.getByText(message, { exact: true })).toBeVisible();
+  await prompt.getByRole('button', { name: 'Volver al formulario' }).click();
+  await dialog.getByRole('combobox', { name: 'Surtido de origen' }).press('ArrowDown');
+  await page.getByRole('option', { name: /de2c80da · Disponible: 1/ }).click();
+  await submit.click();
+  await expect(dialog).toBeHidden();
+  expect(writes.map(({ data }) => data)).toEqual([
+    { returnQuantity: 1, observations: '', sourceMovementDetailId: sourceId },
+  ]);
+});
+
 for (const [path, resource, title, label] of [
   ['materiales', 'materials', 'Salidas de materiales', 'Material'],
   ['consumibles', 'consumables', 'Salidas de consumibles', 'Consumible'],

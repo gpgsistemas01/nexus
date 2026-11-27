@@ -8,6 +8,7 @@ import { API_PATHS } from '../../shared/http/apiPaths.js';
 export interface SessionUser {
     id: string;
     name: string;
+    personName?: string;
     permissions: readonly string[];
     organization?: { isWarehouse: boolean; isSystem: boolean };
 }
@@ -33,6 +34,9 @@ export const createAuthSession = (request = apiClient.request) => {
                 user.value = {
                     id: data.user.id,
                     name: data.user.name,
+                    ...(typeof data.user.personName === 'string' && {
+                        personName: data.user.personName,
+                    }),
                     permissions: data.user.permissions,
                     ...(isRecord(data.user.organization)
                         ? {

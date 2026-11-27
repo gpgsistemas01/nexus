@@ -22,6 +22,8 @@ export const errorMessages = {
     INVENTORY_IMPORT_CONFLICT: 'Los datos cambiaron o la clave corresponde a otra confirmación. Revisa el resultado y valida una nueva plantilla.',
     INVENTORY_PIECE_QUANTITY_REQUIRED: PIECE_QUANTITY_MESSAGE,
     ISSUE_SUPPLY_QUANTITY_CONFLICT: 'La cantidad a surtir debe ser positiva y no superar el saldo pendiente del detalle.',
+    ISSUE_RETURN_COST_SOURCE_INVALID: 'El surtido de origen no es válido.',
+    ISSUE_RETURN_COST_SOURCE_REQUIRED: 'Selecciona el surtido de origen y ajusta la cantidad a lo disponible en ese surtido.',
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',
     DATABASE_TABLE_MISSING: 'Falta una tabla requerida en la base de datos. Contacta a soporte.',
     DATABASE_COLUMN_MISSING: 'Falta una columna requerida en la base de datos. Contacta a soporte.',

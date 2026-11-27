@@ -18,6 +18,7 @@ export const createWasteIssueDetailsDtoForEdit = (body = {}) => ({
 export const createWasteIssueDtoForReturn = (body = {}) => ({
     ...(body.physicalReturnConfirmed === true && { physicalReturnConfirmed: true }),
     returnQuantity: body.returnQuantity,
+    ...(body.sourceMovementDetailId && { sourceMovementDetailId: body.sourceMovementDetailId }),
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') && {
         observations: body.observations.trim()
     })

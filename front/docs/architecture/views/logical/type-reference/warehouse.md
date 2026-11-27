@@ -575,9 +575,23 @@ string | number | boolean | null
 | --- | --- | --- |
 | association | [InventoryImportRow](../../../../../src/modules/warehouse/inventoryImport.ts) | `rows` |
 
-## InventoryImportBatch
+## InventoryImportResult
 
 **Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 34, columna 1. **Declaración:** interface.
+
+**Extensión/implementación:** `extends InventoryImportPreview`.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `adjustment` | `adjustment?: { id: string; referenceNumber: string };` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| inheritance | [InventoryImportPreview](../../../../../src/modules/warehouse/inventoryImport.ts) | `extends` |
+
+## InventoryImportBatch
+
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 37, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -589,18 +603,18 @@ string | number | boolean | null
 | `filename` | `filename: string;` |
 | `expiresAt` | `expiresAt: string;` |
 | `preview` | `preview: InventoryImportPreview \| null;` |
-| `result` | `result: InventoryImportPreview \| null;` |
+| `result` | `result: InventoryImportResult \| null;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [InventoryImportResource](../../../../../src/modules/warehouse/inventoryImport.ts) | `resource` |
 | dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
 | association | [InventoryImportPreview](../../../../../src/modules/warehouse/inventoryImport.ts) | `preview` |
-| association | [InventoryImportPreview](../../../../../src/modules/warehouse/inventoryImport.ts) | `result` |
+| association | [InventoryImportResult](../../../../../src/modules/warehouse/inventoryImport.ts) | `result` |
 
 ## PendingInventoryImport
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 45, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 48, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

@@ -81,7 +81,7 @@ describe('fronteras y contenido del libro de inventario', () => {
             .rejects.toMatchObject({ code: 'INVENTORY_IMPORT_LIMIT' });
     });
     it.each(['materials', 'consumables', 'wastes'].flatMap(resource => ['create', 'update', 'adjust'].map(mode => ({ resource, mode }))))(
-        'genera una plantilla $resource/$mode compatible con el lector anterior', async ({ resource, mode }) => {
+        'genera y vuelve a leer una plantilla $resource/$mode', async ({ resource, mode }) => {
             const { workbook } = await readExcelReport(Buffer.from(await processInventoryWorkbook({
                 action: 'template', config: getImportConfig(resource, mode), catalogs: {
                     suppliers: [{ code: 'PRO-001', tradeName: 'Proveedor' }],
@@ -168,9 +168,17 @@ describe('fronteras y contenido del libro de inventario', () => {
                 }
             }
             if (mode === 'adjust') {
-                const reason = columns.findIndex(([, key]) => key === 'reasonId') + 1;
-                expect(data.getRow(2).getCell(reason).dataValidation.formulae).toEqual(["'Catalogos'!$A$2:$A$2"]);
+                const instructions = workbook.getWorksheet('Instrucciones');
+                expect(data.getRow(1).values).not.toContain('Motivo');
+                expect(data.getRow(1).values).not.toContain('Observaciones');
+                expect(instructions.getCell('A4').value).toBe('Motivo del ajuste');
+                expect(instructions.getCell('A5').value).toBe('Observaciones del ajuste');
+                expect(instructions.getCell('B4').dataValidation).toMatchObject({
+                    allowBlank: true, formulae: ["'Catalogos'!$A$2:$A$2"]
+                });
                 expect(workbook.getWorksheet('Catalogos').getCell('A2').value).toBe(catalogs.reasons[0]);
+                instructions.getCell('B4').value = catalogs.reasons[0];
+                instructions.getCell('B5').value = 'Conteo general';
             }
             const name = columns.findIndex(([, key]) => key === 'name') + 1;
             data.getRow(2).getCell(name).value = 'Captura editada';
@@ -178,8 +186,19 @@ describe('fronteras y contenido del libro de inventario', () => {
                 bytes: await writeInventoryWorkbook(workbook) });
             expect(parsed).toHaveLength(1);
             expect(parsed[0]).toMatchObject({ row: 2, values: { name: 'Captura editada' } });
+            if (mode === 'adjust') expect(parsed[0].values).toMatchObject({
+                reasonId: catalogs.reasons[0], observations: 'Conteo general'
+            });
         }
     );
+    it.each([
+        ['formato antiguo', book => { book.getWorksheet('Instrucciones').getCell('B1').value = 'NEXUS_INVENTORY_V2'; }],
+        ['fórmula en B5', book => { book.getWorksheet('Instrucciones').getCell('B5').value = { formula: '1+1', result: 2 }; }]
+    ])('rechaza un ajuste con %s', async (_name, alter) => {
+        const bytes = await inventoryWorkbook({ mode: 'adjust', rows: [{ newStock: 2 }], alter });
+        await expect(processInventoryWorkbook({ action: 'read', config: getImportConfig('materials', 'adjust'), bytes }))
+            .rejects.toMatchObject({ code: 'INVENTORY_IMPORT_FILE' });
+    });
     it('limita los bytes realmente descomprimidos aunque la cabecera ZIP declare menos', async () => {
         const name = Buffer.from('oversized.xml');
         const compressed = deflateRawSync(Buffer.alloc(16 * 1024 * 1024 + 1, 'x'));

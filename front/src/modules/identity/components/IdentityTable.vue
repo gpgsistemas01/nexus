@@ -22,12 +22,15 @@ const emit = defineEmits<{
     query: [changes: Partial<IdentityQuery>];
 }>();
 const headers = computed<DataTableHeader<IdentityEntry>[]>(() => [
-    { title: props.resource === 'persons' ? 'Nombre' : 'Usuario', key: 'name', sortable: true },
-    {
-        title: props.resource === 'persons' ? 'Accesos (área / rol)' : 'Persona',
-        key: props.resource === 'persons' ? 'accesses' : 'personName',
-        sortable: false,
-    },
+    ...(props.resource === 'persons'
+        ? [
+              { title: 'Nombre', key: 'name', sortable: true },
+              { title: 'Accesos (área / rol)', key: 'accesses', sortable: false },
+          ]
+        : [
+              { title: 'Persona', key: 'personName', sortable: false },
+              { title: 'Usuario', key: 'name', sortable: true },
+          ]),
     ...(props.canEdit ? [{ title: 'Acciones', key: 'actions', sortable: false }] : []),
 ]);
 const { sortBy, changesFromOptions } = useTableQuery(

@@ -30,8 +30,10 @@ Se conservan IDs/versiones, proveedor, material de origen, medidas, pesos y exis
 
 <!-- manual:any wastes:adjust-stock -->
 
-**Ajustar existencias:** capture **Stock contado**, **Motivo** y **Observaciones**.
-Se conservan IDs/versiones, identidad, medidas y pesos.
+**Ajustar existencias:** capture **Stock contado** por fila en **Datos**. Si algún
+saldo cambia, registre una sola vez el **Motivo del ajuste** (B4) y las
+**Observaciones del ajuste** (B5) en **Instrucciones**. Conserve los IDs, versiones,
+medidas y pesos de la plantilla.
 <!-- manual:end -->
 
 <!-- manual:all wastes:write inventory:costs-read -->
@@ -44,6 +46,11 @@ sistema calcula las medidas. La edición de datos conserva el stock.
 En ajuste capture el saldo físico final: cero es válido y vacío se rechaza. Retire
 las filas que aún no haya contado y evite movimientos durante la captura. Para
 cambiar datos y stock complete dos operaciones con una descarga actual entre ellas.
+
+Al confirmar, Nexus muestra un solo folio AME con las partidas cuyo saldo cambió.
+Si todos los saldos coinciden, confirme con B4 y B5 vacías para obtener un recibo
+sin folio. Use un archivo por motivo y descargue la plantilla actual si su
+archivo tiene motivo y observaciones por fila.
 <!-- manual:end -->
 
 En **Activo**, use **SI** o **NO**. Capture números con punto decimal y sin símbolos

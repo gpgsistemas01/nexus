@@ -484,6 +484,30 @@ usuarios y responsables se mantiene en el
 | `stockAdjustmentDetail` | `StockAdjustmentDetail` | `stockAdjustmentDetailId` | Cero o uno |
 | `movement` | `InventoryMovement` | `movementId` | Exactamente uno |
 
+### `MovementDetailCost`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `movementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `unitCost` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `movementDetail` | `MovementDetail` | `movementDetailId` | Exactamente uno |
+
+### `MovementReturnAllocation`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `returnMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `sourceMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `returnMovementDetail` | `MovementDetail` | `returnMovementDetailId` | Exactamente uno |
+| `sourceCost` | `MovementDetailCost` | `sourceMovementDetailId` | Exactamente uno |
+
 ### `StockAdjustment`
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
@@ -491,8 +515,9 @@ usuarios y responsables se mantiene en el
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `type` | `StockAdjustmentType` | Sí | — | — | — |
-| `reasonId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `reasonId` | `String?` | No | FK | — | `@db.Uuid` |
 | `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
+| `inventoryImportId` | `String?` | No | UK,FK | — | `@db.Uuid` |
 | `status` | `AdjustmentStatus` | Sí | — | `PENDING` | — |
 | `createdById` | `String` | Sí | FK | — | `@db.Uuid` |
 | `approvedById` | `String?` | No | FK | — | `@db.Uuid` |
@@ -502,7 +527,8 @@ usuarios y responsables se mantiene en el
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
-| `reason` | `StockAdjustmentReason` | `reasonId` | Exactamente uno |
+| `reason` | `StockAdjustmentReason` | `reasonId` | Cero o uno |
+| `inventoryImport` | `InventoryImport` | `inventoryImportId` | Cero o uno |
 | `createdBy` | `User` | `createdById` | Exactamente uno |
 | `approvedBy` | `User` | `approvedById` | Cero o uno |
 
@@ -515,6 +541,8 @@ usuarios y responsables se mantiene en el
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
+| `reasonId` | `String?` | No | FK | — | `@db.Uuid` |
+| `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
 | `previousStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `newStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `difference` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
@@ -529,6 +557,7 @@ usuarios y responsables se mantiene en el
 | `stockAdjustment` | `StockAdjustment` | `stockAdjustmentId` | Exactamente uno |
 | `material` | `Material` | `materialId` | Exactamente uno |
 | `supplier` | `Supplier` | `supplierId` | Exactamente uno |
+| `reason` | `StockAdjustmentReason` | `reasonId` | Cero o uno |
 
 ### `StockAdjustmentReason`
 
@@ -702,6 +731,30 @@ usuarios y responsables se mantiene en el
 | `movement` | `WasteMovement` | `movementId` | Exactamente uno |
 | `wasteIssueDetail` | `WasteIssueDetail` | `wasteIssueDetailId` | Cero o uno |
 
+### `WasteMovementDetailCost`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `movementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `unitCost` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `movementDetail` | `WasteMovementDetail` | `movementDetailId` | Exactamente uno |
+
+### `WasteMovementReturnAllocation`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `returnMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `sourceMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `returnMovementDetail` | `WasteMovementDetail` | `returnMovementDetailId` | Exactamente uno |
+| `sourceCost` | `WasteMovementDetailCost` | `sourceMovementDetailId` | Exactamente uno |
+
 ### `WasteStockEntry`
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
@@ -746,8 +799,9 @@ usuarios y responsables se mantiene en el
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `type` | `StockAdjustmentType` | Sí | — | — | — |
-| `reasonId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `reasonId` | `String?` | No | FK | — | `@db.Uuid` |
 | `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
+| `inventoryImportId` | `String?` | No | UK,FK | — | `@db.Uuid` |
 | `status` | `AdjustmentStatus` | Sí | — | `PENDING` | — |
 | `createdById` | `String` | Sí | FK | — | `@db.Uuid` |
 | `approvedById` | `String?` | No | FK | — | `@db.Uuid` |
@@ -758,7 +812,8 @@ usuarios y responsables se mantiene en el
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
-| `reason` | `StockAdjustmentReason` | `reasonId` | Exactamente uno |
+| `reason` | `StockAdjustmentReason` | `reasonId` | Cero o uno |
+| `inventoryImport` | `InventoryImport` | `inventoryImportId` | Cero o uno |
 | `createdBy` | `User` | `createdById` | Exactamente uno |
 | `approvedBy` | `User` | `approvedById` | Cero o uno |
 | `movement` | `WasteMovement` | `wasteMovementId` | Cero o uno |
@@ -770,6 +825,8 @@ usuarios y responsables se mantiene en el
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `wasteStockAdjustmentId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `wasteId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `reasonId` | `String?` | No | FK | — | `@db.Uuid` |
+| `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
 | `previousStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `newStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
@@ -784,6 +841,7 @@ usuarios y responsables se mantiene en el
 | --- | --- | --- | --- |
 | `wasteStockAdjustment` | `WasteStockAdjustment` | `wasteStockAdjustmentId` | Exactamente uno |
 | `waste` | `Waste` | `wasteId` | Exactamente uno |
+| `reason` | `StockAdjustmentReason` | `reasonId` | Cero o uno |
 
 ## Importaciones y conciliación de inventario
 
@@ -839,6 +897,6 @@ usuarios y responsables se mantiene en el
 | `MaterialType` | `MATERIAL`, `CONSUMABLE` |
 | `GoodsReceiptDetailStatus` | `ACTIVE`, `CANCELED` |
 | `AdjustmentStatus` | `PENDING`, `APPLIED`, `CANCELLED` |
-| `StockAdjustmentType` | `INCREASE`, `DECREASE` |
+| `StockAdjustmentType` | `INCREASE`, `DECREASE`, `MIXED` |
 | `InventoryMovementType` | `ENTRY`, `ISSUE`, `ADJUSTMENT` |
 | `GoodsReceiptDetailChangeType` | `QUANTITY`, `COST`, `QUANTITY_AND_COST`, `CANCELLATION` |

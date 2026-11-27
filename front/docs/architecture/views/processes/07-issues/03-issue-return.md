@@ -70,6 +70,9 @@ sequenceDiagram
         end
     else nowrap: catch(cause)
         Service-->>Return: nowrap: throw ApiError
+        opt nowrap: ISSUE_RETURN_COST_SOURCE_REQUIRED
+            Return->>Return: nowrap: actualizar opciones con cause.meta.sources
+        end
         Return-->>Record: nowrap: throw cause
         Record-->>Save: nowrap: throw cause
         opt nowrap: !controller.signal.aborted && cause instanceof<br/>ApiError
@@ -83,6 +86,9 @@ El formulario recibe el documento y la partida desde la consulta o el acceso de
 devolución del listado. Al confirmar, se actualizan los saldos del mismo folio. La
 consulta sigue abierta si fue el punto de entrada o si la salida quedó cancelada.
 Si falla la lectura posterior, se cierra el documento anterior y se puede reintentar la lectura.
+Cuando el servidor pide el surtido de origen, el composable conserva la captura y
+carga los orígenes con saldo. Al seleccionarlo, el siguiente envío agrega
+`sourceMovementDetailId` a la devolución.
 
 ## Fuentes de los participantes
 

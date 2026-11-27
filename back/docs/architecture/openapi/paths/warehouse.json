@@ -1271,6 +1271,16 @@
             }
           }
         },
+        "409": {
+          "description": "Conflicto de cantidad, estado, confirmación histórica u origen. Con ISSUE_RETURN_COST_SOURCE_REQUIRED, meta.sources contiene el identificador, fecha y cantidad disponible de cada origen.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         },
@@ -2389,6 +2399,16 @@
             }
           }
         },
+        "409": {
+          "description": "Conflicto de cantidad, estado, confirmación histórica u origen. Con ISSUE_RETURN_COST_SOURCE_REQUIRED, meta.sources contiene el identificador, fecha y cantidad disponible de cada origen.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         },
@@ -2465,6 +2485,16 @@
         },
         "404": {
           "description": "El registro o el detalle no está disponible en el contexto solicitado. Conserva el código del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflicto de cantidad, estado, confirmación histórica u origen. Con ISSUE_RETURN_COST_SOURCE_REQUIRED, meta.sources contiene el identificador, fecha y cantidad disponible de cada origen.",
           "content": {
             "application/json": {
               "schema": {

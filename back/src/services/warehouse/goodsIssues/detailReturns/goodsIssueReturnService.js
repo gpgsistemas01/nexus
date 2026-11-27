@@ -1,5 +1,7 @@
 import { lockGoodsIssue } from '../../../../repository/warehouse/documentLockRepository.js';
 import { assertHistoricalPhysicalReturn } from '../../issues/historicalReturnRules.js';
+import { resolveIssueReturnAllocations } from '../../issues/issueReturnAllocationService.js';
+import { findAvailableGoodsIssueSources } from '../../../../repository/warehouse/issueDetailRepository.js';
 import {
     GoodsIssueDetailNotFound,
     GoodsIssueReturnDatabaseError,
@@ -62,6 +64,12 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
                 throw new GoodsIssueReturnQuantityConflict();
             }
 
+            const returnAllocations = resolveIssueReturnAllocations({
+                pricedSources: await findAvailableGoodsIssueSources({ tx, issueDetailId: detail.id }),
+                availableQuantity: availableReturnQuantity,
+                returnQuantity: requestedReturnQuantity,
+                sourceMovementDetailId: returnDto.sourceMovementDetailId
+            });
             const movement = await applyInventoryMovement({
                 tx,
                 reference: { goodsIssueId: id },
@@ -70,7 +78,8 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
                     supplierId: detail.supplierId,
                     goodsIssueDetailId: detail.id,
                     materialSpecification: detail.materialSpecification,
-                    quantity: requestedReturnQuantity
+                    quantity: requestedReturnQuantity,
+                    returnAllocations
                 }],
                 movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });

@@ -53,6 +53,19 @@ sus fachadas fijan `Material.type` a `MATERIAL` o `CONSUMABLE` antes de ejecutar
 consulta y conteos. `recordsTotal` cuenta sólo el contexto, incluso sin filtros.
 Merma conserva `WasteMovement`/`WasteMovementDetail`. La consulta es de sólo lectura.
 
+`movementController` comprueba `inventory:costs-read` antes de habilitar la consulta
+de costos. `movementRepository` recupera los costos en una sola lectura acotada
+a los identificadores de la página. La fila incluye `unitCost` para compras, surtidos
+y devoluciones. Para una devolución, PostgreSQL toma un origen mediante el índice
+de asignaciones y `LIMIT 1`. Todas las asignaciones de la misma devolución comparten el costo.
+Cuando falta evidencia histórica, el valor es `null`. Los reportes de Excel
+mantienen la proyección de saldos.
+
+En el listado ordenado por fecha con sólo el rango como filtro, el repositorio
+selecciona los identificadores con el índice de fecha y luego carga la página.
+Mantiene la fecha y el identificador como orden y desempate. Los conteos, las
+consultas con filtros adicionales y los cursores usan la consulta de Prisma.
+
 El nombre y las medidas visibles proceden de `Material`. No se consultan los
 nombres históricos de compras, salidas o ajustes para componer la fila; esos
 valores permanecen guardados en los documentos.

@@ -1,5 +1,6 @@
 import { findAllMaterialMovements, findAllConsumableMovements, findAllWasteMovements } from "../../../services/inventory/movementQueryService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 const MOVEMENT_COLUMNS = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null];
 
@@ -21,6 +22,7 @@ const getMovementListParams = (req) => {
         materialId: req.query.materialId || '',
         wasteId: req.query.wasteId || '',
         supplierId: req.query.supplierId || '',
+        canReadCosts: req.user?.permissions?.includes(PERMISSIONS.INVENTORY_COSTS_READ) ?? false,
         ...(hasRequestedOrder
             ? requestedOrder
             : { orderBy: 'date', orderDir: 'desc' })

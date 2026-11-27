@@ -24,6 +24,9 @@ export const mockMovements = async (
       ...movement,
       id: `movement-${index}`,
       referenceNumber: `SAL-${String(index + 1).padStart(3, '0')}`,
+      ...(permissions.includes('inventory:costs-read') && {
+        unitCost: index === 0 ? '12.123456' : null,
+      }),
     }));
     return route.fulfill({
       json: { ...pageOf(rows.slice(start, start + length)), recordsTotal: 21, recordsFiltered: 21 },

@@ -49,7 +49,8 @@ const receiveGoodsReceiptDetails = ({ tx, receipt, details = receipt.details }) 
         materialId: detail.materialId,
         goodsReceiptDetailId: detail.id,
         supplierId: receipt.supplierId,
-        quantity: detail.quantity
+        quantity: detail.quantity,
+        cost: { unitCost: detail.conversionUnitCost }
     })),
     movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
 });

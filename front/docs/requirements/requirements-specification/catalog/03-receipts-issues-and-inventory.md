@@ -5,7 +5,7 @@
 | ID | Requisito y criterio de aceptación | Estado |
 | --- | --- | --- |
 | RF-IMP-001 | Importar hasta 2 MiB/500 filas desde un botón con selector Alta, Editar datos o Ajustar existencias para todo el archivo. Las plantillas de edición/ajuste incluyen todos los registros coincidentes hasta 500 y filtran por proveedor/nombre; no entregan resultados parciales por página. Plantillas con columnas y orden del inventario de consulta, más IDs/versiones y captura propios de la operación; explica campos grises y hoja Catalogos. IDs de edición/ajuste para toda cuenta autorizada, sin exigir administrador. Rechazar archivo de otro modo/módulo. Alta/edición requiere lectura, escritura y costos; conteo requiere lectura y ajuste. Vista previa sin modificar inventario. | Implementado |
-| RF-IMP-002 | Confirmar todas las filas de una operación o ninguna: revalidar versiones, identidad y duplicados, persistir cambios, stock, conversiones, movimientos, folios y recibo en una transacción según la operación elegida. Editar una oferta de material o consumible modifica el mínimo, costo y estado por proveedor. El nombre se administra en Artículos. Editar conserva stock; Ajustar usa Stock contado final, con motivo/observaciones. Cero válido; vacío rechazado. Un destino por fila, sin cambios se omiten. Repetir clave devuelve el recibo. | Implementado |
+| RF-IMP-002 | Confirmar la operación en una transacción tras revalidar versiones, identidad y duplicados. Editar una oferta de material o consumible modifica mínimo, costo y estado por proveedor y conserva el stock. El nombre se administra en Artículos. Ajustar usa el saldo físico final por fila y admite cero. Si cambia algún saldo, el archivo exige un motivo activo y observaciones comunes en Instrucciones. Una partida por existencia cuyo saldo cambie. Un solo documento con folio AJU o AME por archivo confirmado con cambios. Las existencias iguales quedan intactas, incluso su conversión y versión. Un archivo válido sin cambios conserva el recibo sin consumir folio. Repetir la clave devuelve el mismo recibo. | Implementado |
 | RF-IMP-003 | Permitir acceso sólo al creador autorizado. Descartar archivo tras analizarlo, vencer el borrador en 24 h y conservar el recibo confirmado. El navegador sólo guarda la referencia de confirmación. | Implementado |
 
 El [guía de importación](../../../user-manual/03-materials.md#importar-materiales-o-consumibles-desde-excel) concreta la
@@ -111,9 +111,16 @@ a Almacén y administración.
 - **CA-RF-ISS-002-1:** Vue limita la captura al saldo pendiente y muestra la cantidad
   ya entregada. Al confirmar un surtido parcial conserva la captura restante; una
   cantidad mayor al saldo o a la existencia es rechazada sin anunciar el cambio.
+- **CA-RF-ISS-002-2:** cada surtido de materiales, consumibles y mermas guarda el
+  máximo unitario vigente al surtir. La consulta de movimientos con permiso de
+  costos lo muestra en la unidad de conversión sin IVA.
 - **CA-RF-ISS-003-1:** la nueva devolución no supera cantidad suministrada menos
   devoluciones anteriores. Una devolución parcial conserva `Surtido`; devolver el saldo
   completo cancela el detalle. Cancelar todos los detalles cancela la salida.
+- **CA-RF-ISS-003-2:** al devolver, conserva el costo unitario de origen. Si hay
+  costos distintos, o saldo con y sin costo verificado, Vue pide seleccionar
+  el surtido y el servidor limita la devolución a su saldo. Los históricos sin
+  costo comprobable se muestran como `Sin verificar` en Movimientos.
 - **CA-RF-ISS-001-2:** con `inventory:costs-read`, la salida muestra costo por unidad
   de conversión, importes por partida y totales solicitado y entregado neto, sin IVA.
   El entregado resta las devoluciones y excluye partidas canceladas. Vue deriva los
@@ -146,3 +153,6 @@ Cada detalle de compra permite indicar si el costo capturado es el total sin IVA
 Para KILOGRAMOS y METRO LINEAL, las medidas son `1 × 1`: compras y surtidos suman o descuentan la cantidad capturada, incluidas fracciones desde `0.01`. Solicitar una salida no descuenta stock; cada entrega descuenta sólo lo surtido. En nuevas partidas de KILOGRAMOS y METRO LINEAL con medidas `1 × 1`, **Usar el costo por presentación como costo total** se activa automáticamente; el servidor resuelve presentación y medidas persistidas y aplica la regla aunque el cliente envíe `false`. En otras presentaciones la opción es manual. Las correcciones conservan el modo registrado en la partida original.
 
 - **CA-RF-REC-007-3:** Compras consulta identidades únicas de todo el catálogo del tipo correspondiente, con búsqueda y paginación, sin exigir vínculo previo al proveedor. Confirmar alta o nuevas partidas crea las ofertas faltantes con mínimo cero y suma la existencia en la misma transacción. Rechaza ofertas inactivas. Para cada oferta, compara el costo máximo guardado con el mayor costo unitario sin IVA de sus partidas nuevas y guarda el mayor junto con la recepción. Cancelar la captura no vincula artículos.
+- **CA-RF-REC-007-4:** la entrada en Movimientos conserva el costo unitario sin IVA
+  de cada partida recibida con hasta seis decimales, incluso cuando varias partidas
+  de la misma oferta tienen precios diferentes.

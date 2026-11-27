@@ -27,9 +27,10 @@ en **Proveedores**. Se conservan IDs/versiones, presentación, unidad, medidas y
 
 <!-- manual:any materials:adjust-stock -->
 
-**Ajustar existencias:** capture **Stock contado**, **Motivo** y **Observaciones**.
-Se conservan IDs/versiones y datos del artículo; el saldo final reemplaza la
-existencia anterior.
+**Ajustar existencias:** capture **Stock contado** por fila en **Datos**. Si algún
+saldo cambia, seleccione el **Motivo del ajuste** en **Instrucciones** (B4) y
+escriba las **Observaciones del ajuste** en esa misma hoja (B5). Los dos valores
+se aplican a todo el documento. Conserve los IDs y las versiones de la plantilla.
 <!-- manual:end -->
 
 1. Abra el inventario correspondiente y pulse **Importar Excel**.
@@ -81,9 +82,15 @@ Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo
 <!-- manual:any materials:adjust-stock -->
 En **Stock contado**, cero significa que comprobó que no hay existencias; vacío no
 es un conteo y bloquea el archivo. Retire las filas que aún no haya contado. Capture
-el saldo físico final por presentación, con motivo y observaciones, y evite movimientos
+el saldo físico final por presentación y evite movimientos
 durante el conteo. Si también necesita editar datos, complete una operación y descargue
 una plantilla actual para la siguiente.
+
+Al confirmar, Nexus muestra un solo folio AJU con una partida por cada existencia
+cuyo saldo cambió. Las demás se muestran como **Sin cambios**. Si todos los saldos
+coinciden, confirme con B4 y B5 vacías para obtener un recibo sin folio. Si las
+existencias requieren motivos distintos, use un archivo por ajuste. Descargue
+una plantilla actual si su archivo tiene motivo y observaciones por fila.
 <!-- manual:end -->
 
 Un duplicado, error o versión desactualizada bloquea **todo el archivo**. Ante datos

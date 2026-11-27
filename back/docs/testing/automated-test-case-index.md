@@ -35,7 +35,7 @@ en Vue. La detección de contención conserva su cobertura del adaptador Prisma.
 | `CP-INT-IMP-001` | PostgreSQL aislado, cuenta administradora y cuenta sin permisos; proveedores/catálogos privados. Libro de una fila y variantes PIEZA=1.5, 2 MiB+1 y multipart con campo extra. | Consultar/cargar sin permiso, validar sin confirmar, descargar errores y descartar/vencer borradores. | 401/403 antes de analizar, 404 a lote ajeno; 413 por tamaño. Captura inválida no crea artículos. Descarte/limpieza elimina JSON temporal y conserva recibos. | Cerrar requests y limpiar sólo IDs propios. |
 | `CP-INT-IMP-002` | Material 2×3 y dos proveedores con stock inicial 2 y 3, con mínimos distintos; Rollo 2×10, cono 1, total 5 y referencia 11 kg. | Confirmar altas/actualizaciones, repetir clave y competir; editar después de validar; inyectar fallo del recibo. | Un material compartido, conversiones 12/18 y dos ajustes; Rollo 2×4, neto 4 kg, cantidad 2 y conversión 16. Reintento no duplica. Versiones viejas y otra clave producen 409; bloqueo global produce 429. Fallo tardío conserva DRAFT y revierte artículos, stock, historia y contador. | Retirar trigger de fallo en finally y limpiar datos propios. |
 | `CP-INT-IMP-003` | Fixture privada de cada recurso: dos filas válidas y una repetida con otra cantidad inicial; variante con una fila nueva y otra ya registrada. Plantillas reales de actualización y referencia de merma. | Validar/confirmar duplicados; crear un rival tras validar; descargar, editar nombre y subir; omitir ID de edición o elegir referencia del catálogo. | Repetidos: 400 sin cambiar registros, stock, historia, folios ni recibos; se indica la primera fila coincidente. Rival tardío: 409 y ninguna fila aplicada. Editar conserva ID y saldo; faltar ID no crea un alta. La referencia elegida del catálogo genera una merma con ID nuevo. | Hooks del archivo limpian sólo IDs propios en PostgreSQL aislado. |
-| `CP-INT-IMP-004` | Material 2×3 con saldo 2/costo 10, dos proveedores y merma con stock; plantillas reales de Alta, Editar datos y Ajustar existencias. | Seleccionar modo incompatible; descargar/editar/subir conservando IDs; contar cero/positivo; repetir; cambiar versión; inyectar fallo del recibo de alta y ajuste. | XLSX incompatible no crea borradores ni escrituras. Nueve variantes conservan columnas de consulta y agregan captura técnica. Edición conserva identidad/stock y modifica el mínimo de la oferta; conteo genera saldo/conversión/folio exactos. Repetir no duplica, error/fallo revierte toda la operación. | Hooks propios y trigger retirado en finally. |
+| `CP-INT-IMP-004` | Material 2×3 con saldo 2/costo 10, dos proveedores y merma con stock; plantillas reales de Alta, Editar datos y Ajustar existencias. | Seleccionar modo incompatible; descargar/editar/subir conservando IDs; contar cero, positivo e igual (con cantidad convertida existente distinta de la derivada); repetir; cambiar versión; inyectar fallo del recibo de alta y ajuste. | XLSX incompatible no crea borradores ni escrituras. Nueve variantes conservan columnas de consulta y agregan captura técnica. Edición conserva identidad/stock. Un ajuste agrupa saldos distintos en un folio AJU o AME con motivo y movimiento por partida. Las filas iguales conservan versión y conversión. Un archivo sin cambios conserva sólo el recibo y el contador previo. Repetir recupera el mismo documento; el fallo revierte toda la operación. | Hooks propios y trigger retirado en finally. |
 | `CP-INT-IMP-005` | `inventoryImportModesDbTest.js`; tabla temporal con las restricciones previas y filas representativas. | Aplicar la migración, intentar modos no admitidos y repetir con un valor ajeno ya guardado. | Las tres operaciones conservan todos sus datos y se pueden insertar; los modos ajenos fallan sin escrituras. La migración fallida conserva filas y restricción previa. | Cerrar la conexión elimina la tabla temporal; no modifica tablas públicas. |
 
 Fuente: [integración HTTP/Prisma](../../tests/integration/controllers/inventoryImportControllerDbTest.js)
@@ -389,3 +389,17 @@ operativa no puede forzarlo. Comprueba documento, saldo, cantidad entregada y
 movimientos en PostgreSQL; restaura stock y limpia sus documentos al finalizar.
 
 `CP-INT-CAT-MAT-002` (`RF-CAT-030`): `catalogControllersDbTest.js` combina nombre, tipo, presentación y unidad. Comprueba conteos y segunda página, selección de una presentación inactiva y rechazo con `CATALOG_FILTER_INVALID`.
+
+## Costo de movimientos y devolución por surtido
+
+`CA-RF-REC-007-4` relaciona cada entrada con el costo de su partida en
+`goodsReceiptContextDbTest.js`. `CA-RF-ISS-002-2` y `CA-RF-ISS-003-2` comprueban
+en `goodsIssueControllerDbTest.js` dos surtidos a precios distintos, el requisito
+de elegir origen y el rechazo de una devolución concurrente del mismo saldo.
+`wasteIssueControllerDbTest.js` cubre la consulta y devolución de merma.
+`movementUnitCostsDbTest.js` aplica la migración a tablas temporales y verifica
+el costo exacto recuperado y el rechazo de valores nulos o inválidos.
+`movementReturnAllocationsDbTest.js` comprueba la conversión del JSON a vínculos
+con cantidades exactas y el rollback en ambos inventarios cuando el costo de
+origen difiere. La integración de salidas también verifica una devolución con
+varios orígenes del mismo costo y la lectura del costo desde el surtido.

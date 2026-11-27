@@ -9,7 +9,6 @@ import {
 } from '../../../constants/inventory.js';
 import {
     generateYearlyReferenceNumber,
-    reserveYearlyReferenceNumbers,
     throwIfReferenceNumberAlreadyExists
 } from '../../document/referenceNumberService.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
@@ -17,6 +16,7 @@ import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { calculateConvertedQuantity } from '../../../shared/inventory/stockQuantity.js';
 import { assertPieceQuantity, assertSufficientStock } from '../../inventory/stockHelpers.js';
 import { createWasteMovement } from './wasteMovementService.js';
+import { buildAppliedAdjustmentHeader } from '../stockAdjustmentDocument.js';
 
 export const calculateWasteStockAdjustmentValues = ({
     waste,
@@ -58,30 +58,32 @@ export const calculateWasteStockAdjustmentValues = ({
     };
 };
 
-export const registerWasteStockAdjustmentsBatch = async ({ tx, entries, userId }) => {
-    if (!entries.length) return [];
-    const references = await reserveYearlyReferenceNumbers({ type: DOCUMENT_REFERENCE_TYPES.WASTE_STOCK_ADJUSTMENT, tx, count: entries.length });
-    const adjustments = [], details = [], movements = [], movementDetails = [], changes = [];
-    const now = new Date();
-    entries.forEach((entry, index) => {
+export const registerWasteStockAdjustmentDocument = async ({ tx, entries, userId, inventoryImportId }) => {
+    const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.WASTE_STOCK_ADJUSTMENT, tx });
+    const id = randomUUID();
+    const movementId = randomUUID();
+    const movementDetails = [];
+    const changes = [];
+    const details = entries.map(entry => {
         const values = calculateWasteStockAdjustmentValues(entry);
-        const id = randomUUID(), detailId = randomUUID(), movementId = randomUUID();
-        movements.push({ id: movementId, type: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT });
-        adjustments.push({ id, referenceNumber: references[index], reasonId: entry.reasonId, observations: entry.observations,
-            type: values.difference >= 0 ? STOCK_ADJUSTMENT_TYPES.INCREASE : STOCK_ADJUSTMENT_TYPES.DECREASE,
-            status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED, appliedAt: now, createdById: userId, approvedById: userId, wasteMovementId: movementId });
-        details.push({ id: detailId, wasteStockAdjustmentId: id, wasteId: entry.waste.id, materialName: entry.waste.name, ...values });
-        movementDetails.push({ movementId, wasteId: entry.waste.id, wasteStockAdjustmentDetailId: detailId,
+        const detailId = randomUUID();
+        const { waste, reasonId, observations } = entry;
+        movementDetails.push({ movementId, wasteId: waste.id, wasteStockAdjustmentDetailId: detailId,
             quantity: values.difference, previousStock: values.previousStock, newStock: values.newStock });
-        changes.push({ id: entry.waste.id, quantityChange: values.difference, convertedQuantityChange: values.convertedDifference });
+        changes.push({ id: waste.id, quantityChange: values.difference, convertedQuantityChange: values.convertedDifference });
+        return { id: detailId, wasteStockAdjustmentId: id, wasteId: waste.id, materialName: waste.name,
+            reasonId, observations, ...values };
     });
-    await tx.wasteMovement.createMany({ data: movements });
-    await tx.wasteStockAdjustment.createMany({ data: adjustments });
+    await tx.wasteMovement.create({ data: { id: movementId, type: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT } });
+    await tx.wasteStockAdjustment.create({ data: {
+        id, referenceNumber, wasteMovementId: movementId, inventoryImportId,
+        ...buildAppliedAdjustmentHeader({ details, userId, appliedAt: new Date() })
+    } });
     await tx.wasteStockAdjustmentDetail.createMany({ data: details });
     await tx.wasteMovementDetail.createMany({ data: movementDetails });
     const balances = await updateWasteStocks({ tx, changes });
     if (balances.length !== entries.length) throw new RecordVersionConflictError();
-    return references;
+    return { id, referenceNumber };
 };
 
 export const registerWasteStockAdjustment = async ({
@@ -123,6 +125,8 @@ export const registerWasteStockAdjustment = async ({
                 details: {
                     create: {
                         waste: { connect: { id: wasteId } },
+                        reason: { connect: { id: reasonId } },
+                        observations,
                         materialName: waste.name,
                         previousStock: values.previousStock,
                         newStock: values.newStock,

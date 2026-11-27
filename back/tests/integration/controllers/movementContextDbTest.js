@@ -63,7 +63,10 @@ describe('movimientos por contexto, permisos y reportes', () => {
             for (const movementType of ['ENTRY', 'ISSUE', 'ADJUSTMENT']) {
                 const movement = await prisma.inventoryMovement.create({ data: {
                     type: movementType, referenceNumber: `IT-MOV-${resource}-${movementType}-${suffix}`, date: new Date('2026-10-12T12:00:00Z'),
-                    details: { create: { materialId: ids[resource], supplierId: ids.supplier, quantity: 2, previousStock: 10, newStock: 12 } }
+                    details: { create: {
+                        materialId: ids[resource], supplierId: ids.supplier, quantity: 2, previousStock: 10, newStock: 12,
+                        ...(movementType === 'ISSUE' && { cost: { create: { unitCost: '12.123456' } } })
+                    } }
                 }, include: { details: true } });
                 movementIds.push(movement.id);
                 detailIds[resource].push(movement.details[0].id);
@@ -100,6 +103,15 @@ describe('movimientos por contexto, permisos y reportes', () => {
         expect(detailIds[resource]).toContain(page.body.data[0].id);
     });
 
+    it.each(['materials', 'consumables'])('pagina %s por fecha con el mismo desempate y los mismos costos', async resource => {
+        const filter = { startDate: '2026-10-12', endDate: '2026-10-12', start: 1, length: 2 };
+        const dated = await request(app).get(`/movements/${resource}`).set('Cookie', authCookies.admin).query(filter).expect(200);
+        const scoped = await request(app).get(`/movements/${resource}`).set('Cookie', authCookies.admin)
+            .query({ ...filter, supplierId: ids.supplier }).expect(200);
+        expect(dated.body).toEqual(scoped.body);
+        expect(dated.body.data.map(row => row.id)).toEqual([...detailIds[resource]].sort().slice(1));
+    });
+
     it.each(['materials', 'consumables'])('rechaza filtros cruzados y limita la búsqueda y los tipos de movimiento en %s', async resource => {
         const other = resource === 'materials' ? 'consumables' : 'materials';
         for (const query of [{ materialId: ids[other] }, { search: { value: `IT MOV ${other}` } }]) {
@@ -112,7 +124,7 @@ describe('movimientos por contexto, permisos y reportes', () => {
         const response = await request(app).get(`/movements/${resource}`).set('Cookie', authCookies.admin)
             .query({ supplierId: ids.supplier, movementType: 'ISSUE', startDate: '2026-10-01', endDate: '2026-10-31' }).expect(200);
         expect(response.body.data).toHaveLength(1);
-        expect(response.body.data[0].type).toBe('Salida');
+        expect(response.body.data[0]).toMatchObject({ type: 'Salida', unitCost: '12.123456' });
     });
 
     it.each(['materials', 'consumables'])('exporta Excel personalizado y mensual exclusivamente de %s', async resource => {

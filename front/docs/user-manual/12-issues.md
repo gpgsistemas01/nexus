@@ -171,6 +171,11 @@ Almacén y Sistemas pueden devolver partidas desde la consulta de la salida.
 2. Revise el folio, el artículo y el saldo disponible. Capture la cantidad recibida y las observaciones.
 3. Pulse **Devolver**. El material se reintegra al inventario y la devolución queda vinculada a la partida original.
 
+Si hay surtidos con saldo por devolver y costos distintos, Nexus solicita el
+**Surtido de origen**. Pulse **Volver al formulario**, seleccione el surtido por
+fecha y referencia corta, y confirme una cantidad dentro del saldo disponible.
+Si la devolución abarca varios costos, registre una devolución por origen.
+
 <!-- module:any reference salidas-materiales -->
 
 ![Devolución de un detalle surtido.](images/25-issue-return.png)
