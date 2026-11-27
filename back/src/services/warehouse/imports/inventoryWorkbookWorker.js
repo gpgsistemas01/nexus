@@ -5,7 +5,7 @@ import { createSpreadsheet, spreadsheetColumn } from '../../../utils/spreadsheet
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { errorMap } from '../../../messages/codeMessages.js';
 import { INVENTORY_IMPORT_FORMAT, INVENTORY_STOCK_COUNT_FORMAT, INVENTORY_STOCK_COUNT_FIELDS,
-    INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
+    INVENTORY_STOCK_COUNT_SEAL_CELL, INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
 import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_LIMITS as limits,
     INVENTORY_IMPORT_MODE_LABELS } from '../../../shared/constants/inventoryImport.js';
 
@@ -50,9 +50,12 @@ const read = async ({ bytes, config }) => {
         return scalar(value);
     };
     const isStockCount = config.mode === 'adjust';
-    if (readCell('Instrucciones', 'B1') !== (isStockCount ? INVENTORY_STOCK_COUNT_FORMAT : INVENTORY_IMPORT_FORMAT)
-        || readCell('Instrucciones', 'B2') !== config.resource
+    if (readCell('Instrucciones', 'B2') !== config.resource
         || readCell('Instrucciones', 'B3') !== config.mode) fail('FILE');
+    const format = readCell('Instrucciones', 'B1');
+    if (isStockCount && format === 'NEXUS_INVENTORY_V3') fail('TEMPLATE_EXPIRED');
+    if (format !== (isStockCount ? INVENTORY_STOCK_COUNT_FORMAT : INVENTORY_IMPORT_FORMAT)) fail('FILE');
+    const templateSeal = isStockCount ? readCell('Instrucciones', INVENTORY_STOCK_COUNT_SEAL_CELL) : undefined;
     const documentValues = {};
     if (isStockCount) {
         for (const { key, label, row } of INVENTORY_STOCK_COUNT_FIELDS) {
@@ -82,7 +85,7 @@ const read = async ({ bytes, config }) => {
         } });
     }
     if (!rows.length) fail('FILE');
-    return rows;
+    return isStockCount ? { rows, templateSeal } : rows;
 };
 
 const createDataWorkbook = (columns, rows) => {
@@ -101,7 +104,7 @@ const createDataWorkbook = (columns, rows) => {
     return workbook;
 };
 
-const template = async ({ config, rows = [], catalogs }) => {
+const template = async ({ config, rows = [], catalogs, templateSeal }) => {
     const workbook = createDataWorkbook(config.columns, rows);
     workbook.newSheet('Instrucciones');
     workbook.setColWidth('Instrucciones', 'A', 32);
@@ -172,6 +175,7 @@ const template = async ({ config, rows = [], catalogs }) => {
         ['Formato', isStockCount ? INVENTORY_STOCK_COUNT_FORMAT : INVENTORY_IMPORT_FORMAT],
         ['Recurso', config.resource], ['Operacion', config.mode],
         ...(isStockCount ? INVENTORY_STOCK_COUNT_FIELDS.map(({ label }) => [label, '']) : []),
+        ...(isStockCount ? [['Sello de emisión', templateSeal]] : []),
         ['Operación del archivo', `${INVENTORY_IMPORT_MODE_LABELS[config.mode]}. Selecciona la misma operación al importar. Para otra operación descarga otra plantilla.`],
         ['Qué hacer', operationDescription],
         ['Límites', limitDescription],
@@ -187,6 +191,7 @@ const template = async ({ config, rows = [], catalogs }) => {
             : 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
         ...(config.mode === 'create' && !isArticle ? [['Cantidad inicial', 'Es cantidad por presentación, no área ni peso. Pieza exige enteros.']] : []),
         ...(config.mode === 'adjust' ? [
+            ['Vigencia', `Sube el archivo dentro de las ${limits.stockCountTemplateHours} horas desde que Nexus genera la plantilla. Conserva el sello de emisión.`],
             ['Conteo físico', 'Stock contado es el saldo final en la unidad del registro. Cero es válido. Si dejas la celda en blanco, la fila se mostrará como Sin conteo. Stock actual y Conversión son referencias y no se suman.'],
             ['Corte del conteo', 'Usa un conteo físico actual y evita movimientos mientras capturas. Si cambió una versión, descarga una plantilla nueva y vuelve a verificar el conteo.']
         ] : []),
@@ -263,5 +268,8 @@ try {
     const result = await actions[workerData.action](workerData);
     parentPort.postMessage({ result });
 } catch (error) {
-    parentPort.postMessage({ error: { kind: isResourceLimitError(error) || error.code === errorMap.inventoryImport.LIMIT ? 'LIMIT' : 'FILE' } });
+    const kind = isResourceLimitError(error) || error.code === errorMap.inventoryImport.LIMIT
+        ? 'LIMIT'
+        : error.code === errorMap.inventoryImport.TEMPLATE_EXPIRED ? 'TEMPLATE_EXPIRED' : 'FILE';
+    parentPort.postMessage({ error: { kind } });
 }

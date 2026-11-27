@@ -34,7 +34,14 @@ reintentar una solicitud cuyo resultado sea incierto.
 
 ## Conteo de existencias por Excel
 
-La plantilla de ajuste actual usa `NEXUS_INVENTORY_V3`. En `Datos` se captura
+La plantilla de ajuste usa `NEXUS_INVENTORY_V4`. Se puede cargar durante las
+24 horas siguientes a su generación. Nexus verifica el sello de emisión en
+`Instrucciones!B6` al cargar el archivo. Si el archivo venció, si el sello
+falta o es inválido, o si la plantilla usa V3, la carga devuelve
+`400 INVENTORY_IMPORT_TEMPLATE_EXPIRED` sin crear un borrador. El plazo de 24
+horas del borrador empieza después de validar la carga.
+
+En `Datos` se captura
 `Stock contado` en las filas con conteo, incluido el cero explícito.
 Las filas con esa celda en blanco aparecen en la vista previa y en el recibo
 con `action: "skipped"` y se cuentan en `summary.skipped`. Se omiten al

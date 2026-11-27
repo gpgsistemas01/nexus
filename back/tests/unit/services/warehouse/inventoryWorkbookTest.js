@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { deflateRawSync } from 'node:zlib';
 import { inventoryWorkbook, writeInventoryWorkbook } from '../../../helpers/inventoryImportFixture.js';
 import { getImportConfig } from '../../../../src/services/warehouse/imports/inventoryImportConfig.js';
 import { processInventoryWorkbook } from '../../../../src/services/warehouse/imports/inventoryWorkbookService.js';
+import { assertInventoryStockCountTemplateIsCurrent, sealInventoryStockCountTemplate } from '../../../../src/services/warehouse/imports/inventoryStockCountTemplate.js';
+import { INVENTORY_IMPORT_LIMITS } from '../../../../src/shared/constants/inventoryImport.js';
 import { readExcelReport } from '../../../helpers/readExcelReport.js';
 
 const config = getImportConfig('materials', 'create');
@@ -15,6 +17,9 @@ const catalogs = {
 };
 const read = bytes => processInventoryWorkbook({ action: 'read', config, bytes });
 describe('fronteras y contenido del libro de inventario', () => {
+    beforeAll(() => vi.stubEnv('JWT_SECRET_ACCESS', 'inventario-pruebas-sello'));
+    afterAll(() => vi.unstubAllEnvs());
+
     it('el informe de errores contiene sólo sus columnas y conserva nombres como texto', async () => {
         const rows = [{ row: 3, name: '=1+1', column: 'cantidad_inicial', message: 'Usa unidades enteras.' },
             { row: 4, name: 'Lona', column: 'nombre', message: 'El registro está repetido.' }];
@@ -129,6 +134,7 @@ describe('fronteras y contenido del libro de inventario', () => {
                 expect(instruction('Columnas grises')).toContain('versiones');
             } else {
                 expect(instruction('Qué hacer')).toContain('conteo físico final');
+                expect(instruction('Vigencia')).toContain(`${INVENTORY_IMPORT_LIMITS.stockCountTemplateHours} horas`);
                 expect(instruction('Cantidad inicial')).toBeUndefined();
                 expect(instruction('Conteo físico')).toContain('Cero es válido');
                 expect(instruction('Conteo físico')).toContain('la fila se mostrará como Sin conteo');
@@ -199,6 +205,18 @@ describe('fronteras y contenido del libro de inventario', () => {
         const bytes = await inventoryWorkbook({ mode: 'adjust', rows: [{ newStock: 2 }], alter });
         await expect(processInventoryWorkbook({ action: 'read', config: getImportConfig('materials', 'adjust'), bytes }))
             .rejects.toMatchObject({ code: 'INVENTORY_IMPORT_FILE' });
+    });
+    it('acepta la última fracción de vigencia y rechaza el límite, el futuro y el sello de otro módulo', () => {
+        const issuedAt = Date.now();
+        const expiresAt = issuedAt + INVENTORY_IMPORT_LIMITS.stockCountTemplateHours * 60 * 60 * 1000;
+        const seal = sealInventoryStockCountTemplate('materials', issuedAt);
+        expect(() => assertInventoryStockCountTemplateIsCurrent('materials', seal, expiresAt - 1)).not.toThrow();
+        expect(() => assertInventoryStockCountTemplateIsCurrent('materials', seal, expiresAt)).toThrow(
+            expect.objectContaining({ code: 'INVENTORY_IMPORT_TEMPLATE_EXPIRED' }));
+        expect(() => assertInventoryStockCountTemplateIsCurrent('materials', seal, issuedAt - 1)).toThrow(
+            expect.objectContaining({ code: 'INVENTORY_IMPORT_TEMPLATE_EXPIRED' }));
+        expect(() => assertInventoryStockCountTemplateIsCurrent('wastes', seal, issuedAt)).toThrow(
+            expect.objectContaining({ code: 'INVENTORY_IMPORT_TEMPLATE_EXPIRED' }));
     });
     it('limita los bytes realmente descomprimidos aunque la cabecera ZIP declare menos', async () => {
         const name = Buffer.from('oversized.xml');

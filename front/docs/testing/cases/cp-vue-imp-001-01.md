@@ -29,7 +29,9 @@ blanco en una nueva validación. La confirmación muestra el aviso
 de importación sin cambios y omite el folio. Las plantillas conservan su operación en los
 parámetros y nombre de descarga, no envían página, y la pantalla explica las columnas
 grises, las opciones de **Catalogos** y los filtros. Un archivo incompatible muestra
-el rechazo sin confirmación. Un operador de ajuste sin lectura de costos sólo ve
+el rechazo sin confirmación. Una plantilla de ajuste vencida pide descargar
+otra, mantiene la confirmación oculta y admite validar el reemplazo en el
+mismo diálogo. Un operador de ajuste sin lectura de costos sólo ve
 Ajustar existencias; sin escritura/costos ni ajuste, el botón permanece oculto.
 La integración contrasta columnas del reporte, IDs/versiones, conservación del destino,
 conteo real y recuperación de la misma confirmación.
