@@ -194,6 +194,7 @@ test('el selector asigna una operación a todo el Excel y cambiarla retira el ar
   await dialog.locator('input[type=file]').setInputFiles(file);
   await dialog.getByRole('button', { name: 'Validar archivo', exact: true }).click();
   await expect(dialog.getByText('Artículo contado', { exact: false })).toBeVisible();
+  await expect(dialog.getByText('se omiten del ajuste.', { exact: false })).toHaveCount(0);
   await expect(dialog.getByText('Motivo del ajuste', { exact: true })).toBeVisible();
   await expect(dialog.getByText('Conteo comprobado', { exact: true })).toHaveCount(1);
   await expect(
@@ -260,11 +261,21 @@ test('el conteo confirmado sin cambios muestra el recibo sin folio de ajuste', a
   });
   await dialog.getByRole('button', { name: 'Validar archivo', exact: true }).click();
   const skippedRow = dialog.getByRole('listitem').filter({ hasText: 'Existencia sin capturar' });
+  const skippedNotice = dialog.getByRole('status').filter({ hasText: 'se omiten del ajuste.' });
+  await expect(skippedNotice).toBeVisible();
+  await expect(skippedNotice).toContainText(
+    'Puedes confirmar la importación dejando esas filas en blanco.',
+  );
+  await expect(skippedNotice).toContainText('Si quieres incluirlas');
   await expect(skippedRow).toContainText('Sin conteo');
-  await dialog.getByRole('button', { name: 'Confirmar importación', exact: true }).click();
+  const confirm = dialog.getByRole('button', { name: 'Confirmar importación', exact: true });
+  await expect(confirm).toBeEnabled();
+  await confirm.click();
   await expect(
     dialog.getByText('Importación confirmada sin cambios de existencias.'),
   ).toBeVisible();
+  await expect(skippedNotice).toBeVisible();
+  await expect(skippedNotice).not.toContainText('descarta el borrador');
   await expect(skippedRow).toContainText('Sin conteo');
   await expect(dialog.getByText('Ajuste aplicado. Folio', { exact: false })).toHaveCount(0);
 });

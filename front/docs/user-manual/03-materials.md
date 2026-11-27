@@ -81,11 +81,13 @@ Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo
 
 <!-- manual:any materials:adjust-stock -->
 En **Stock contado**, escriba cero si comprobó que no hay existencias. Deje en blanco
-las celdas de las filas que aún no haya contado. Nexus las omite y las muestra como
-**Sin conteo** en la vista previa y el recibo. Capture el saldo físico final por
-presentación y evite movimientos
-durante el conteo. Si también necesita editar datos, complete una operación y descargue
-una plantilla actual para la siguiente.
+las celdas de las filas que aún no haya contado. La vista previa y el recibo muestran
+un aviso y marcan cada fila omitida como **Sin conteo**. Puede confirmar con las
+filas que tienen conteo. Si quiere incluir las filas en blanco, descarte el borrador,
+complete el conteo en Excel y vuelva a validar el archivo. Capture el saldo físico
+final por presentación y evite movimientos
+durante el conteo. Si también necesita editar datos, complete una operación y
+descargue una plantilla actual para la siguiente.
 
 Al confirmar, Nexus muestra un solo folio AJU con una partida por cada existencia
 cuyo saldo cambió. Los saldos contados que coinciden se muestran como **Sin cambios**.

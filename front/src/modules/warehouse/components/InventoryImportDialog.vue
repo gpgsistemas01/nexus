@@ -389,6 +389,24 @@ const selectMode = (value: unknown) => {
                     {{ preview.summary.unchanged }} sin cambios y {{ preview.summary.errors }} con
                     errores.
                 </p>
+                <VAlert
+                    v-if="preview.summary.skipped"
+                    type="info"
+                    variant="tonal"
+                    role="status"
+                    class="mb-4"
+                >
+                    Las filas marcadas como
+                    <strong>Sin conteo</strong>
+                    tienen
+                    <strong>Stock contado</strong>
+                    en blanco y se omiten del ajuste.
+                    <template v-if="canConfirm">
+                        Puedes confirmar la importación dejando esas filas en blanco. Si quieres
+                        incluirlas, descarta el borrador, completa el conteo en Excel y vuelve a
+                        validar el archivo.
+                    </template>
+                </VAlert>
                 <dl
                     v-if="adjustmentCapture"
                     class="preview-values mb-4"

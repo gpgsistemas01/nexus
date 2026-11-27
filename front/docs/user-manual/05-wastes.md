@@ -45,9 +45,12 @@ sistema calcula las medidas. La edición de datos conserva el stock.
 <!-- manual:any wastes:adjust-stock -->
 En ajuste capture el saldo físico final. Escriba cero si comprobó que no hay
 existencias. Deje en blanco el **Stock contado** de las filas que aún no haya contado.
-Nexus las omite y las muestra como **Sin conteo** en la vista previa y el recibo.
-Evite movimientos durante la captura. Para
-cambiar datos y stock complete dos operaciones con una descarga actual entre ellas.
+La vista previa y el recibo muestran un aviso y marcan cada fila omitida como
+**Sin conteo**. Puede confirmar con las filas que tienen conteo. Si quiere incluir
+las filas en blanco, descarte el borrador, complete el conteo en Excel y vuelva a
+validar el archivo. Evite movimientos durante
+la captura. Para cambiar datos y stock complete dos operaciones con una descarga
+actual entre ellas.
 
 Al confirmar, Nexus muestra un solo folio AME con las partidas cuyo saldo cambió.
 Si ningún saldo cambia, confirme con B4 y B5 vacías para obtener un recibo
