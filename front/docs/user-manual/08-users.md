@@ -2,8 +2,10 @@
 
 ## Crear una cuenta
 
-Abra **Identidad y acceso → Usuarios**. La tabla muestra cuenta, persona vinculada,
-área y rol.
+Abra **Identidad y acceso → Usuarios**. La tabla muestra primero **Persona** y
+después **Usuario**. Una cuenta sin persona vinculada muestra un guion en la
+columna **Persona**. El menú de sesión muestra primero el nombre completo cuando
+la cuenta tiene una persona vinculada.
 
 1. Pulse **Nuevo usuario**.
 2. En **Registrar usuario**, capture **Usuario** y **Contraseña**.

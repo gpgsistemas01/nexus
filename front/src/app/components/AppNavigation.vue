@@ -11,6 +11,7 @@ import type { NavigationGroup } from '../navigation.js';
 
 const props = defineProps<{
     userName: string;
+    personName?: string;
     groups: readonly NavigationGroup[];
     activeGroup: string;
     isCompact: boolean;
@@ -112,12 +113,16 @@ const expandNavigation = (group: string) => {
             </VListGroup>
         </VList>
         <div class="navigation-account">
-            <span
+            <div
                 v-if="!isCompact"
                 class="account-name"
             >
-                {{ userName }}
-            </span>
+                <template v-if="personName">
+                    <strong>{{ personName }}</strong>
+                    <span>{{ userName }}</span>
+                </template>
+                <template v-else>{{ userName }}</template>
+            </div>
             <form
                 action="/cerrar-sesion"
                 method="post"
@@ -214,9 +219,15 @@ const expandNavigation = (group: string) => {
     justify-content: center;
 }
 .account-name {
-    display: block;
+    display: grid;
+    gap: 0.15rem;
     padding: 0.25rem 0.75rem;
     color: rgba(var(--v-theme-menu-text), 0.8);
     font-size: 0.75rem;
+    overflow-wrap: anywhere;
+}
+.account-name strong {
+    font-size: 0.875rem;
+    color: rgb(var(--v-theme-menu-text));
 }
 </style>

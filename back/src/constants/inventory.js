@@ -6,7 +6,8 @@ export const INVENTORY_MOVEMENT_TYPES = Object.freeze({
 
 export const STOCK_ADJUSTMENT_TYPES = Object.freeze({
     INCREASE: 'INCREASE',
-    DECREASE: 'DECREASE'
+    DECREASE: 'DECREASE',
+    MIXED: 'MIXED'
 });
 
 export const STOCK_ADJUSTMENT_STATUS_NAMES = Object.freeze({

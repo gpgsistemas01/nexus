@@ -14,8 +14,14 @@ import { ARTICLE_IMPORT_RESOURCE } from '../../../src/shared/constants/inventory
 
 let prisma, app, fixture, cookie, deniedCookie, previousSecret;
 const extraUnitIds = [];
-const preview = async (rows, resource = 'materials', mode = 'create') => {
-    const buffer = await inventoryWorkbook({ resource, mode, rows });
+const adjustmentCapture = async () => ({
+    reasonId: (await prisma.stockAdjustmentReason.findUniqueOrThrow({ where: { name: 'Stock inicial' } })).id,
+    observations: 'Conteo físico actual verificado'
+});
+const preview = async (rows, resource = 'materials', mode = 'create', adjustment) => {
+    const buffer = await inventoryWorkbook({
+        resource, mode, rows, adjustment: mode === 'adjust' ? adjustment ?? await adjustmentCapture() : undefined
+    });
     const response = await request(app).post(`/${resource}/preview`).query({ mode }).set('Cookie', cookie)
         .attach('file', buffer, 'inventario.xlsx').expect(200);
     return response.body.batch;
@@ -56,10 +62,8 @@ const inventorySnapshot = async () => {
 };
 
 describe('importación XLSX: permisos, estados y persistencia atómica', () => {
-    const countRow = async (offer, newStock, extra = {}) => ({ id: offer.materialId, supplierId: offer.supplierId,
-        expectedVersion: offer.version, expectedMaterialVersion: offer.material.version, newStock,
-        reasonId: (await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } })).id,
-        observations: 'Conteo físico actual verificado', ...extra });
+    const countRow = (offer, newStock) => ({ id: offer.materialId, supplierId: offer.supplierId,
+        expectedVersion: offer.version, expectedMaterialVersion: offer.material.version, newStock });
     beforeAll(async () => {
         previousSecret = process.env.JWT_SECRET_ACCESS;
         process.env.JWT_SECRET_ACCESS = randomUUID();
@@ -146,26 +150,78 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(Number(saved.currentStock)).toBe(Number(first.currentStock));
     });
 
-    it('reemplaza el saldo por conteo cero o positivo, conserva datos, omite iguales y devuelve folios sin duplicar', async () => {
+    it('aplica un folio con los saldos distintos y conserva el recibo al reintentar', async () => {
         const offers = await Promise.all(['Conteo cero', 'Conteo mayor', 'Conteo igual'].map(seedOffer));
-        const batch = await preview(await Promise.all(offers.map((offer, index) => countRow(offer, [0, 5, 2][index]))), 'materials', 'adjust');
+        offers[2] = await prisma.supplierMaterial.update({ where: { id: offers[2].id },
+            data: { convertedQuantity: 11 }, include: { material: true } });
+        const capture = await adjustmentCapture();
+        const rows = offers.map((offer, index) => countRow(offer, [0, 5, 2][index]));
+        const batch = await preview(rows, 'materials', 'adjust', capture);
         expect(batch.preview.summary).toMatchObject({ updates: 2, unchanged: 1, errors: 0 });
         expect(batch.preview.rows[0]).toMatchObject({ before: { currentStock: 2 }, after: { currentStock: 0 }, details: { difference: -2 } });
+        expect(batch.preview.rows[2]).toMatchObject({ action: 'unchanged', after: { currentStock: 2, convertedQuantity: 11 } });
+        expect(await prisma.stockAdjustment.count({ where: { inventoryImportId: batch.id } })).toBe(0);
         const operationId = randomUUID();
         const applied = await confirm(batch, operationId).expect(200);
-        expect(applied.body.batch.result.rows.slice(0, 2).every(row => /^AJU-/.test(row.details.adjustmentReference))).toBe(true);
+        const { adjustment, rows: resultRows } = applied.body.batch.result;
+        expect(adjustment.referenceNumber).toMatch(/^AJU-/);
+        expect(resultRows.map(row => row.details.adjustmentReference)).toEqual([
+            adjustment.referenceNumber, adjustment.referenceNumber, undefined
+        ]);
         const snapshot = await inventorySnapshot();
-        await confirm(batch, operationId).expect(200);
+        const retried = await confirm(batch, operationId).expect(200);
+        expect(retried.body.batch).toEqual(applied.body.batch);
         expect(await inventorySnapshot()).toEqual(snapshot);
         for (const [index, offer] of offers.entries()) {
             const saved = await prisma.supplierMaterial.findUnique({ where: { id: offer.id }, include: { material: true } });
             expect(Number(saved.currentStock)).toBe([0, 5, 2][index]);
-            expect(Number(saved.convertedQuantity)).toBe([0, 30, 12][index]);
+            expect(Number(saved.convertedQuantity)).toBe([0, 30, 11][index]);
             expect(Number(saved.maxUnitCost)).toBe(10);
             expect(saved.material).toEqual(offer.material);
+            expect(saved.version).toBe(offer.version + (index < 2 ? 1 : 0));
         }
-        const adjustment = await prisma.stockAdjustment.findFirst({ where: { details: { some: { materialId: offers[0].materialId } } } });
-        expect(adjustment.type).toBe('DECREASE');
+        const document = await prisma.stockAdjustment.findUniqueOrThrow({ where: { inventoryImportId: batch.id },
+            include: { details: true, movement: { include: { details: true } } } });
+        expect(document).toMatchObject({ ...adjustment, ...capture, type: 'MIXED', status: 'APPLIED' });
+        expect(document.details).toHaveLength(2);
+        expect(document.movement.details).toHaveLength(2);
+        for (const [index, row] of rows.slice(0, 2).entries()) {
+            const detail = document.details.find(item => item.materialId === row.id);
+            expect(detail).toMatchObject(capture);
+            expect(Number(detail.difference)).toBe([-2, 3][index]);
+            expect(document.movement.details.find(item => item.stockAdjustmentDetailId === detail.id)?.quantity)
+                .toEqual(detail.difference);
+        }
+        expect(await prisma.inventoryImport.findUniqueOrThrow({ where: { id: batch.id } })).toMatchObject({
+            status: 'COMPLETED', payload: null, preview: null, result: { adjustment }
+        });
+    });
+
+    it('confirma un archivo sin cambios sin tocar existencias, documentos, movimientos ni contadores', async () => {
+        const offer = await seedOffer('Todo igual');
+        const batch = await preview([countRow(offer, 2)], 'materials', 'adjust', {});
+        const counters = await prisma.referenceNumberCounter.findMany({ where: { prefix: 'AJU' }, orderBy: { year: 'asc' } });
+        const result = (await confirm(batch).expect(200)).body.batch.result;
+        expect(result.summary).toMatchObject({ updates: 0, unchanged: 1, errors: 0 });
+        expect(result).not.toHaveProperty('adjustment');
+        expect(result.rows[0].details).not.toHaveProperty('adjustmentReference');
+        expect(await prisma.supplierMaterial.findUnique({ where: { id: offer.id }, include: { material: true } })).toEqual(offer);
+        expect(await prisma.stockAdjustment.count({ where: { inventoryImportId: batch.id } })).toBe(0);
+        expect(await prisma.movementDetail.count({ where: { materialId: offer.materialId } })).toBe(0);
+        expect(await prisma.referenceNumberCounter.findMany({ where: { prefix: 'AJU' }, orderBy: { year: 'asc' } })).toEqual(counters);
+    });
+
+    it('rechaza la confirmación de un borrador anterior con observaciones distintas por partida', async () => {
+        const offers = await Promise.all(['Borrador anterior A', 'Borrador anterior B'].map(seedOffer));
+        const batch = await preview(offers.map(offer => countRow(offer, 4)), 'materials', 'adjust');
+        const original = await prisma.inventoryImport.findUniqueOrThrow({ where: { id: batch.id } });
+        const payload = original.payload.map((row, index) => index === 0 ? row : {
+            ...row, dto: { ...row.dto, observations: 'Otra justificación de ajuste' }
+        });
+        const olderDraft = await prisma.inventoryImport.update({ where: { id: batch.id }, data: { payload } });
+        const before = await inventorySnapshot();
+        await confirm(olderDraft).expect(409);
+        expect(await inventorySnapshot()).toEqual(before);
     });
 
     it.each(['materials', 'consumables', 'wastes'])('rechaza una operación no admitida para %s antes de analizar el archivo', async resource => {
@@ -208,8 +264,12 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
             expect(headers.slice(0, 5)).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual']);
             expect(sheet.getCell(2, headers.indexOf('ID merma') + 1).value).toBe(id);
             const changes = mode === 'update' ? { Material: `${row.name} corregida`, 'Costo unitario': 19 }
-                : { 'Stock contado': 2, Motivo: `${reason.id} | ${reason.name}`, Observaciones: 'Conteo físico comprobado' };
+                : { 'Stock contado': 2 };
             for (const [header, value] of Object.entries(changes)) sheet.getCell(2, headers.indexOf(header) + 1).value = value;
+            if (mode === 'adjust') {
+                workbook.getWorksheet('Instrucciones').getCell('B4').value = `${reason.id} | ${reason.name}`;
+                workbook.getWorksheet('Instrucciones').getCell('B5').value = 'Conteo físico comprobado';
+            }
             const uploaded = await request(app).post('/wastes/preview').query({ mode }).set('Cookie', cookie)
                 .attach('file', await writeInventoryWorkbook(workbook), `merma-${mode}.xlsx`).expect(200);
             expect(uploaded.body.batch.preview.summary.errors).toBe(0);
@@ -223,12 +283,17 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
 
     it('rechaza vacío, negativo, motivo ausente, duplicado y recurso cruzado sin aplicar el conteo válido', async () => {
         const offer = await seedOffer('Conteo inválido');
-        const valid = await countRow(offer, 4);
-        for (const rows of [[{ ...valid, newStock: '' }], [{ ...valid, newStock: -1 }], [{ ...valid, reasonId: '' }], [valid, valid]]) {
+        const valid = countRow(offer, 4);
+        for (const rows of [[{ ...valid, newStock: '' }], [{ ...valid, newStock: -1 }], [valid, valid]]) {
             const batch = await preview(rows, 'materials', 'adjust');
             expect(batch.preview.summary.errors).toBeGreaterThan(0);
             await confirm(batch).expect(400);
         }
+        const missing = await preview([valid], 'materials', 'adjust', {});
+        expect(missing.preview.rows[0].errors.map(error => error.column)).toEqual(expect.arrayContaining([
+            'Instrucciones!B4 · Motivo del ajuste', 'Instrucciones!B5 · Observaciones del ajuste'
+        ]));
+        await confirm(missing).expect(400);
         const crossed = await preview([valid], 'consumables', 'adjust');
         expect(crossed.preview.summary.errors).toBe(1);
         expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).currentStock)).toBe(2);
@@ -237,7 +302,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
 
     it('conserva las versiones del archivo y revierte el lote si un movimiento cambia un saldo después de la vista previa', async () => {
         const offers = await Promise.all(['Conteo concurrente 1', 'Conteo concurrente 2'].map(seedOffer));
-        const rows = await Promise.all(offers.map(offer => countRow(offer, 6)));
+        const rows = offers.map(offer => countRow(offer, 6));
         const batch = await preview(rows, 'materials', 'adjust');
         await prisma.supplierMaterial.update({ where: { id: offers[1].id }, data: { currentStock: 3, convertedQuantity: 18 } });
         const before = await inventorySnapshot();
@@ -247,23 +312,32 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(stale.preview.summary.errors).toBe(1);
     });
 
-    it('ajusta merma con AME y sus conversiones sin registrarlo como entrada inicial', async () => {
-        const row = await newRow('wastes', 'Merma contada');
-        await confirm(await preview([row], 'wastes')).expect(200);
-        const waste = await prisma.waste.findFirst({ where: { name: row.name } });
+    it('registra dos partidas de merma en un AME y conserva sus entradas iniciales', async () => {
+        const rows = await Promise.all(['Merma contada', 'Otra merma contada'].map(name => newRow('wastes', name)));
+        await confirm(await preview(rows, 'wastes')).expect(200);
+        const wastes = await Promise.all(rows.map(row => prisma.waste.findFirstOrThrow({ where: { name: row.name } })));
         const reason = await prisma.stockAdjustmentReason.findUnique({ where: { name: 'Stock inicial' } });
-        const batch = await preview([{ id: waste.id, expectedVersion: waste.version, newStock: 1,
-            reasonId: `${reason.id} | ${reason.name}`, observations: 'Conteo físico de merma' }], 'wastes', 'adjust');
-        expect(batch.preview.summary.errors).toBe(0);
+        const batch = await preview(wastes.map((waste, index) => ({ id: waste.id, expectedVersion: waste.version, newStock: index + 1 })),
+            'wastes', 'adjust', { reasonId: `${reason.id} | ${reason.name}`, observations: 'Conteo físico de merma' });
+        expect(batch.preview.summary).toMatchObject({ updates: 2, errors: 0 });
         const result = await confirm(batch).expect(200);
-        expect(result.body.batch.result.rows[0].details.adjustmentReference).toMatch(/^AME-/);
-        const saved = await prisma.waste.findUnique({ where: { id: waste.id } });
-        expect(Number(saved.currentStock)).toBe(1);
-        expect(Number(saved.convertedQuantity)).toBe(3);
-        expect(await prisma.wasteStockEntry.count({ where: { wasteId: waste.id } })).toBe(1);
-        expect(await prisma.wasteStockAdjustmentDetail.findFirst({ where: { wasteId: waste.id } })).toMatchObject({
-            previousStock: expect.anything(), newStock: expect.anything(), difference: expect.anything()
-        });
+        const adjustment = result.body.batch.result.adjustment;
+        expect(adjustment.referenceNumber).toMatch(/^AME-/);
+        const document = await prisma.wasteStockAdjustment.findUniqueOrThrow({ where: { inventoryImportId: batch.id },
+            include: { details: true, movement: { include: { details: true } } } });
+        expect(document).toMatchObject({ ...adjustment, type: 'DECREASE', reasonId: reason.id });
+        expect(document.details).toHaveLength(2);
+        expect(document.movement.details).toHaveLength(2);
+        for (const [index, waste] of wastes.entries()) {
+            const saved = await prisma.waste.findUniqueOrThrow({ where: { id: waste.id } });
+            expect(Number(saved.currentStock)).toBe(index + 1);
+            expect(Number(saved.convertedQuantity)).toBe((index + 1) * 3);
+            expect(await prisma.wasteStockEntry.count({ where: { wasteId: waste.id } })).toBe(1);
+            const detail = document.details.find(item => item.wasteId === waste.id);
+            expect(detail).toMatchObject({ reasonId: reason.id, observations: 'Conteo físico de merma' });
+            expect(document.movement.details.find(item => item.wasteStockAdjustmentDetailId === detail.id)?.quantity)
+                .toEqual(detail.difference);
+        }
     });
 
     it('descarga el conteo en blanco con datos actuales, sin columnas de costo ni edición de identidad', async () => {
@@ -283,7 +357,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
     it('al perder lectura de costos, protege las ediciones sin bloquear los conteos', async () => {
         const offer = await seedOffer('Permisos recuperables');
         const editing = await preview([{ ...updateRow(offer), maxUnitCost: 17 }], 'materials', 'update');
-        const counting = await preview([await countRow(offer, 3)], 'materials', 'adjust');
+        const counting = await preview([countRow(offer, 3)], 'materials', 'adjust');
         const user = { ...fixture.user, permissions: [PERMISSIONS.MATERIALS_READ, PERMISSIONS.MATERIALS_ADJUST_STOCK] };
         const { getInventoryImport } = await import('../../../src/services/warehouse/imports/inventoryImportService.js');
         await expect(getInventoryImport({ id: editing.id, user })).rejects.toMatchObject({ statusCode: 403 });
@@ -445,9 +519,9 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
     });
 
     it.each(['create', 'adjust'])('revierte filas, saldos, historia y folios si falla el recibo de %s', async mode => {
-        const offer = await seedOffer(`Rollback ${mode}`);
+        const offers = await Promise.all([`Rollback ${mode} A`, `Rollback ${mode} B`].map(seedOffer));
         const batch = mode === 'create' ? await preview([fixture.row('Rollback A'), fixture.row('Rollback B')])
-            : await preview([await countRow(offer, 0)], 'materials', 'adjust');
+            : await preview(offers.map(offer => countRow(offer, 0)), 'materials', 'adjust');
         expect(batch.preview.summary.errors).toBe(0);
         const inventoryBefore = await inventorySnapshot();
         await prisma.$executeRawUnsafe(`CREATE FUNCTION test_import_failure() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.id = '${batch.id}'::uuid AND NEW.status = 'COMPLETED' THEN RAISE EXCEPTION 'test receipt failure'; END IF; RETURN NEW; END $$`);
@@ -456,6 +530,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
             await confirm(batch).expect(500);
             expect(await savedOffer(fixture.row('Rollback A').name)).toBeNull();
             expect(await inventorySnapshot()).toEqual(inventoryBefore);
+            expect(await prisma.stockAdjustment.count({ where: { inventoryImportId: batch.id } })).toBe(0);
             expect(await prisma.inventoryImport.findUnique({ where: { id: batch.id } })).toMatchObject({ status: 'DRAFT', version: batch.version });
         } finally {
             await prisma.$executeRawUnsafe('DROP TRIGGER test_import_failure ON "InventoryImport"');

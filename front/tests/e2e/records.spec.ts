@@ -2,7 +2,14 @@ import { expect, test } from '@playwright/test';
 import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { mockRecords, recordRoutes } from './recordsFixtures.js';
 import { chooseOption } from './warehouseFixtures.js';
-import { personData, accountData, supplierData, recordIds } from '../fixtures/records.js';
+import {
+  personData,
+  accountData,
+  supplierData,
+  recordIds,
+  recordPermissions,
+} from '../fixtures/records.js';
+import { user } from '../fixtures/inventory.js';
 
 for (const entry of recordRoutes) {
   test(`Vue: ${entry.title} abre, se recarga y aparece en su sección del menú`, async ({
@@ -151,7 +158,25 @@ test('usuarios: alta con rol y área; edición preserva persona y no reenvía co
   page,
 }) => {
   const { writes } = await mockRecords(page);
+  await page.route('**/api/auth/me', (route) =>
+    route.fulfill({
+      json: { user: { ...user, permissions: recordPermissions, personName: personData.fullName } },
+    }),
+  );
   await page.goto('/identidad/usuarios');
+  const accountRow = page
+    .getByRole('row')
+    .filter({ has: page.getByRole('cell', { name: accountData.name, exact: true }) });
+  await expect(accountRow.getByRole('cell').nth(0)).toHaveText(personData.fullName);
+  await expect(accountRow.getByRole('cell').nth(1)).toHaveText(accountData.name);
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
+  const navigation = page.getByRole('navigation', { name: 'Navegación principal' });
+  const personLabel = navigation.getByText(personData.fullName, { exact: true });
+  const userLabel = navigation.getByText(user.name, { exact: true });
+  await expect(personLabel).toBeVisible();
+  await expect(userLabel).toBeVisible();
+  expect((await personLabel.boundingBox())!.y).toBeLessThan((await userLabel.boundingBox())!.y);
+  await navigation.getByRole('link', { name: 'Usuarios', exact: true }).click();
   await page.getByRole('button', { name: 'Nuevo usuario', exact: true }).click();
   const create = page.getByRole('dialog', { name: 'Registrar usuario', exact: true });
   await create.getByRole('textbox', { name: 'Usuario', exact: true }).fill('operador');

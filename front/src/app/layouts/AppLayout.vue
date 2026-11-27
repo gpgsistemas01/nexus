@@ -48,6 +48,7 @@ const groups = computed(() =>
             >
                 <AppNavigation
                     :user-name="session.user.value?.name ?? ''"
+                    :person-name="session.user.value?.personName"
                     :groups="groups"
                     :active-group="activeGroup"
                     :is-compact="!mobile && !isNavigationOpen"

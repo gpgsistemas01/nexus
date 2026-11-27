@@ -9,6 +9,8 @@ Los tokens sólo se envían en cookies `HttpOnly`; en producción, también `Sec
 El cierre de sesión usa `POST /cerrar-sesion`; no existe `POST /api/auth/logout`.
 Ante un `401` protegido, la aplicación renueva la sesión y repite una vez. Login y
 refresh no inician otra renovación; un fallo de red no demuestra credenciales inválidas.
+`GET /api/auth/me` devuelve `name` como nombre de usuario y agrega `personName`
+cuando la cuenta está vinculada a una persona.
 
 ## Listados y reportes
 
@@ -29,6 +31,22 @@ La creación/entrada de merma acepta `operationId`: repetir la misma clave y cue
 recupera el recibo; cambiar el cuerpo produce `409 OPERATION_KEY_CONFLICT`. Las demás
 escrituras no garantizan recuperar una respuesta repetida; consulte el estado antes de
 reintentar una solicitud cuyo resultado sea incierto.
+
+## Conteo de existencias por Excel
+
+La plantilla de ajuste actual usa `NEXUS_INVENTORY_V3`. En `Datos` se captura
+`Stock contado` por fila. `Instrucciones!B4` contiene el motivo activo y
+`Instrucciones!B5` las observaciones del documento. Ambos datos son
+obligatorios cuando cambia algún saldo. Los archivos de ajuste con formato
+anterior requieren descargar la plantilla actual.
+
+El archivo se analiza en memoria. El borrador sólo conserva datos de la vista
+previa y metadatos de la carga. Al confirmar un conteo, sólo los saldos físicos
+distintos generan partidas y el recibo identifica el documento común en
+`result.adjustment`. Las filas aplicadas conservan el folio en
+`details.adjustmentReference`. Si todos los saldos coinciden, el recibo indica
+que las filas quedaron sin cambios y omite `result.adjustment`. La misma clave
+de confirmación recupera el recibo y el folio ya emitido, si lo hubo.
 
 ## Surtimiento parcial
 

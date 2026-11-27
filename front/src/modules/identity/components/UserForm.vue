@@ -48,6 +48,14 @@ const emit = defineEmits<{
         @reload="emit('reload')"
     >
         <VTextField
+            v-if="row && (action !== 'password' || row.personName)"
+            label="Persona vinculada"
+            :model-value="row.personName || 'Sin persona vinculada'"
+            v-bind="getReadOnlyFieldProps(true)"
+            hint="La edición conserva la vinculación existente."
+            persistent-hint
+        />
+        <VTextField
             label="Usuario"
             name="name"
             autocomplete="off"
@@ -90,14 +98,6 @@ const emit = defineEmits<{
             @search="(resource, value) => emit('search', resource, value)"
             @more="emit('more', $event)"
             @retry="emit('retry', $event)"
-        />
-        <VTextField
-            v-if="row && action !== 'password'"
-            label="Persona vinculada"
-            :model-value="row.personName || 'Sin persona vinculada'"
-            v-bind="getReadOnlyFieldProps(true)"
-            hint="La edición conserva la vinculación existente."
-            persistent-hint
         />
     </RecordEditorDialog>
 </template>

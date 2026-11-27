@@ -151,7 +151,7 @@ export const getLoggedUser = async (userId) => {
             department: { is: { isActive: true } }
         },
         select: {
-            user: { select: { id: true, name: true } },
+            user: { select: { id: true, name: true, person: { select: { fullName: true } } } },
             role: { select: { id: true, key: true, name: true } },
             department: { select: { id: true, key: true, name: true } }
         }
@@ -159,9 +159,11 @@ export const getLoggedUser = async (userId) => {
 
     if (!accesses.length) return null;
 
+    const { id, name, person } = accesses[0].user;
     const user = {
-        id: accesses[0].user.id,
-        name: accesses[0].user.name,
+        id,
+        name,
+        ...(person?.fullName && { personName: person.fullName }),
         accesses: accesses.map(a => ({
             roleId: a.role.id,
             roleKey: a.role.key,

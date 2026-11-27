@@ -4,6 +4,7 @@ import { ForbiddenError } from '../../../errors/authError.js';
 import { INVENTORY_COLLECTIONS as resources, MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
 import { INVENTORY_SPREADSHEET_COLUMNS } from '../../../constants/inventorySpreadsheet.js';
+import { INVENTORY_STOCK_COUNT_FIELDS } from '../../../constants/inventoryImport.js';
 
 const weights = [
     ['Cono (kg)', 'coneWeightKg'], ['Merma con cono (kg)', 'totalWeightKg'],
@@ -33,13 +34,13 @@ export const getImportConfig = (resource, mode = modes.CREATE) => {
         .map(([header, , key]) => [header, mode === modes.CREATE && key === 'supplierName' ? 'supplierCode' : key]);
     const columns = [...inventory, ['Activo', 'isActive'],
         ...(mode === modes.CREATE ? [] : identity),
-        ...(mode === modes.ADJUST ? [['Stock contado', 'newStock'], ['Motivo', 'reasonId']]
+        ...(mode === modes.ADJUST ? [['Stock contado', 'newStock']]
             : mode === modes.CREATE ? [
                 ...(resource === resources.WASTES ? [['Material de referencia', 'materialId'], ...weights] : []),
                 ['Cantidad inicial', resource === resources.WASTES ? 'initialQuantity' : 'newStock']
             ] : []),
-        ...(mode === modes.UPDATE ? [] : [['Observaciones', 'observations']])];
-    const editable = mode === modes.ADJUST ? ['newStock', 'reasonId', 'observations']
+        ...(mode === modes.CREATE ? [['Observaciones', 'observations']] : [])];
+    const editable = mode === modes.ADJUST ? ['newStock']
         : mode === modes.UPDATE ? resource === resources.WASTES
             ? ['name', 'minStock', 'maxUnitCost', 'isActive']
             : ['minStock', 'maxUnitCost', 'isActive']
@@ -51,7 +52,11 @@ export const getImportConfig = (resource, mode = modes.CREATE) => {
 };
 
 export const importUnitLabel = unit => `${unit.symbol} · ${unit.name}`;
-export const inventoryImportColumnLabel = (config, field) => config.columns.find(([, key]) => key === field)?.[0] ?? field;
+export const inventoryImportColumnLabel = (config, field) => {
+    const documentField = config.mode === modes.ADJUST && INVENTORY_STOCK_COUNT_FIELDS.find(({ key }) => key === field);
+    return documentField ? `Instrucciones!B${documentField.row} · ${documentField.label}`
+        : config.columns.find(([, key]) => key === field)?.[0] ?? field;
+};
 
 export const authorizeInventoryImport = (user, resource, mode = modes.CREATE) => {
     const config = getImportConfig(resource, mode);

@@ -4,7 +4,8 @@ import unzipper from 'unzipper';
 import { createSpreadsheet, spreadsheetColumn } from '../../../utils/spreadsheetUtils.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { errorMap } from '../../../messages/codeMessages.js';
-import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
+import { INVENTORY_IMPORT_FORMAT, INVENTORY_STOCK_COUNT_FORMAT, INVENTORY_STOCK_COUNT_FIELDS,
+    INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
 import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_LIMITS as limits,
     INVENTORY_IMPORT_MODE_LABELS } from '../../../shared/constants/inventoryImport.js';
 
@@ -48,9 +49,17 @@ const read = async ({ bytes, config }) => {
         if (typeof value === 'string' && (workbook.getCellRichText(sheet, cell) || workbook.getCellHyperlink(sheet, cell))) fail('FILE');
         return scalar(value);
     };
-    if (readCell('Instrucciones', 'B1') !== INVENTORY_IMPORT_FORMAT
+    const isStockCount = config.mode === 'adjust';
+    if (readCell('Instrucciones', 'B1') !== (isStockCount ? INVENTORY_STOCK_COUNT_FORMAT : INVENTORY_IMPORT_FORMAT)
         || readCell('Instrucciones', 'B2') !== config.resource
         || readCell('Instrucciones', 'B3') !== config.mode) fail('FILE');
+    const documentValues = {};
+    if (isStockCount) {
+        for (const { key, label, row } of INVENTORY_STOCK_COUNT_FIELDS) {
+            if (readCell('Instrucciones', `A${row}`) !== label) fail('FILE');
+            documentValues[key] = readCell('Instrucciones', `B${row}`);
+        }
+    }
     const columns = config.columns.map((_, index) => spreadsheetColumn(index + 1));
     if (!config.columns.every(([header], index) => readCell('Datos', `${columns[index]}1`) === header)) fail('FILE');
     const rows = [];
@@ -68,7 +77,9 @@ const read = async ({ bytes, config }) => {
         });
         if (values.every(value => value === '')) continue;
         if (rows.length >= limits.maxRows) fail('LIMIT');
-        rows.push({ row: row.row, values: Object.fromEntries(config.columns.map(([, key], index) => [key, values[index]])) });
+        rows.push({ row: row.row, values: {
+            ...Object.fromEntries(config.columns.map(([, key], index) => [key, values[index]])), ...documentValues
+        } });
     }
     if (!rows.length) fail('FILE');
     return rows;
@@ -97,6 +108,7 @@ const template = async ({ config, rows = [], catalogs }) => {
     workbook.setColWidth('Instrucciones', 'B', 110);
     const isWaste = config.resource === 'wastes';
     const isArticle = config.resource === ARTICLE_IMPORT_RESOURCE;
+    const isStockCount = config.mode === 'adjust';
     const applicableCatalogs = [];
     if (isArticle) {
         applicableCatalogs.push(
@@ -133,7 +145,7 @@ const template = async ({ config, rows = [], catalogs }) => {
             ? isWaste
                 ? 'Editar datos modifica nombre, mínimo, costo y activo de la merma. El saldo se conserva.'
                 : 'Editar datos modifica el mínimo, costo y estado de la oferta de ese proveedor. El saldo y el artículo se conservan.'
-            : 'Ajustar existencias reemplaza el saldo con el conteo físico final. Captura stock contado, motivo activo y observaciones en cada fila.';
+            : 'Ajustar existencias reemplaza el saldo con el conteo físico final. Captura el motivo y las observaciones del documento en las dos celdas de esta hoja. Son obligatorios si algún saldo cambia.';
     const limitDescription = config.mode === 'create'
         ? `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. Conserva hojas y encabezados; retira filas vacías que no quieras importar.`
         : `Hasta ${limits.maxRows} filas y ${limits.maxBytes / (1024 * 1024)} MiB por archivo. La plantilla incluye registros coincidentes; si hay más, filtra por ${isArticle ? 'nombre' : 'proveedor o nombre'} y procesa grupos de hasta ${limits.maxRows}. Conserva hojas y encabezados.`;
@@ -157,7 +169,9 @@ const template = async ({ config, rows = [], catalogs }) => {
             ? ['Motivo: usa el valor completo con formato UUID | nombre.'] : [])
     ];
     const instructions = [
-        ['Formato', INVENTORY_IMPORT_FORMAT], ['Recurso', config.resource], ['Operacion', config.mode],
+        ['Formato', isStockCount ? INVENTORY_STOCK_COUNT_FORMAT : INVENTORY_IMPORT_FORMAT],
+        ['Recurso', config.resource], ['Operacion', config.mode],
+        ...(isStockCount ? INVENTORY_STOCK_COUNT_FIELDS.map(({ label }) => [label, '']) : []),
         ['Operación del archivo', `${INVENTORY_IMPORT_MODE_LABELS[config.mode]}. Todas las filas realizan esta operación. Selecciona la misma operación al importar; para otra operación descarga otra plantilla.`],
         ['Qué hacer', operationDescription],
         ['Límites', limitDescription],
@@ -201,6 +215,18 @@ const template = async ({ config, rows = [], catalogs }) => {
     const lists = Object.fromEntries(applicableCatalogs.map(({ key, values }, index) => [
         key, [spreadsheetColumn(index + 1), values.length]
     ]));
+    if (isStockCount) {
+        const inputStyle = workbook.addStyle({
+            fill: { pattern: 'solid', fgColor: '#FFF2CC' }, alignment: { wrapText: true, vertical: 'top' }
+        });
+        for (const { key, row } of INVENTORY_STOCK_COUNT_FIELDS) {
+            const cell = `B${row}`;
+            workbook.setCellStyle('Instrucciones', cell, inputStyle);
+            const list = lists[key];
+            if (list?.[1]) workbook.addDataValidation('Instrucciones', { sqref: cell, validationType: 'list', allowBlank: true,
+                formula1: `'Catalogos'!$${list[0]}$2:$${list[0]}$${list[1] + 1}` });
+        }
+    }
     const identityStyle = workbook.addStyle({ fill: { pattern: 'solid', fgColor: '#E7EDF0' } });
     for (let index = 0; index < config.columns.length; index++) {
         const key = config.columns[index][1];

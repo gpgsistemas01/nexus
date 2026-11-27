@@ -73,25 +73,27 @@ model HistoricalDeliveryBatch {
 }
 
 model InventoryImport {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  version     Int       @default(0)
-  userId      String?   @db.Uuid
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  version              Int                   @default(0)
+  userId               String?               @db.Uuid
   /// Artículos admite alta y edición de catálogo. Los recursos de existencias también admiten ajuste.
-  resource    String    @db.VarChar(16)
+  resource             String                @db.VarChar(16)
   /// Una operación para todo el archivo: create, update o adjust.
-  mode        String    @db.VarChar(8)
-  status      String    @default("DRAFT") @db.VarChar(16)
-  filename    String    @db.VarChar(120)
-  fileHash    String    @db.VarChar(64)
-  payload     Json?
-  preview     Json?
-  result      Json?
-  operationId String?   @db.Uuid
-  commandHash String?   @db.VarChar(64)
-  expiresAt   DateTime
-  createdAt   DateTime  @default(now())
-  completedAt DateTime?
-  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  mode                 String                @db.VarChar(8)
+  status               String                @default("DRAFT") @db.VarChar(16)
+  filename             String                @db.VarChar(120)
+  fileHash             String                @db.VarChar(64)
+  payload              Json?
+  preview              Json?
+  result               Json?
+  operationId          String?               @db.Uuid
+  commandHash          String?               @db.VarChar(64)
+  expiresAt            DateTime
+  createdAt            DateTime              @default(now())
+  completedAt          DateTime?
+  user                 User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  stockAdjustment      StockAdjustment?
+  wasteStockAdjustment WasteStockAdjustment?
 
   @@unique([userId, operationId])
   @@index([status, expiresAt, id])
@@ -315,9 +317,10 @@ model WasteStockAdjustment {
 
   referenceNumber String @unique @db.VarChar(50)
 
-  type         StockAdjustmentType
-  reasonId     String              @db.Uuid
-  observations String?             @db.VarChar(500)
+  type              StockAdjustmentType
+  reasonId          String?             @db.Uuid
+  observations      String?             @db.VarChar(500)
+  inventoryImportId String?             @unique @db.Uuid
 
   status AdjustmentStatus @default(PENDING)
 
@@ -325,9 +328,10 @@ model WasteStockAdjustment {
   approvedById    String? @db.Uuid
   wasteMovementId String? @unique @db.Uuid
 
-  reason     StockAdjustmentReason @relation(fields: [reasonId], references: [id])
-  createdBy  User                  @relation("CreatedWasteStockAdjustments", fields: [createdById], references: [id])
-  approvedBy User?                 @relation("ApprovedWasteStockAdjustments", fields: [approvedById], references: [id])
+  reason          StockAdjustmentReason? @relation(fields: [reasonId], references: [id], onDelete: Restrict)
+  inventoryImport InventoryImport?       @relation(fields: [inventoryImportId], references: [id], onDelete: SetNull)
+  createdBy       User                   @relation("CreatedWasteStockAdjustments", fields: [createdById], references: [id])
+  approvedBy      User?                  @relation("ApprovedWasteStockAdjustments", fields: [approvedById], references: [id])
 
   movement WasteMovement?               @relation(fields: [wasteMovementId], references: [id], onDelete: SetNull)
   details  WasteStockAdjustmentDetail[]
@@ -345,8 +349,10 @@ model WasteStockAdjustment {
 model WasteStockAdjustmentDetail {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  wasteStockAdjustmentId String @db.Uuid
-  wasteId                String @db.Uuid
+  wasteStockAdjustmentId String  @db.Uuid
+  wasteId                String  @db.Uuid
+  reasonId               String? @db.Uuid
+  observations           String? @db.VarChar(500)
 
   materialName String @db.VarChar(200)
 
@@ -358,8 +364,9 @@ model WasteStockAdjustmentDetail {
   newConvertedQuantity      Decimal @db.Decimal(18, 6)
   convertedDifference       Decimal @db.Decimal(18, 6)
 
-  wasteStockAdjustment WasteStockAdjustment  @relation(fields: [wasteStockAdjustmentId], references: [id], onDelete: Cascade)
-  waste                Waste                 @relation(fields: [wasteId], references: [id])
+  wasteStockAdjustment WasteStockAdjustment   @relation(fields: [wasteStockAdjustmentId], references: [id], onDelete: Cascade)
+  waste                Waste                  @relation(fields: [wasteId], references: [id])
+  reason               StockAdjustmentReason? @relation(fields: [reasonId], references: [id], onDelete: Restrict)
   movementDetails      WasteMovementDetail[]
 
   createdAt DateTime @default(now())
@@ -367,6 +374,7 @@ model WasteStockAdjustmentDetail {
 
   @@index([wasteStockAdjustmentId])
   @@index([wasteId])
+  @@index([reasonId])
 }
 
 model WasteMovement {
@@ -836,18 +844,20 @@ model StockAdjustment {
 
   referenceNumber String @unique @db.VarChar(50)
 
-  type         StockAdjustmentType
-  reasonId     String              @db.Uuid
-  observations String?             @db.VarChar(500)
+  type              StockAdjustmentType
+  reasonId          String?             @db.Uuid
+  observations      String?             @db.VarChar(500)
+  inventoryImportId String?             @unique @db.Uuid
 
   status AdjustmentStatus @default(PENDING)
 
   createdById  String  @db.Uuid
   approvedById String? @db.Uuid
 
-  reason     StockAdjustmentReason @relation(fields: [reasonId], references: [id])
-  createdBy  User                  @relation("CreatedStockAdjustments", fields: [createdById], references: [id])
-  approvedBy User?                 @relation("ApprovedStockAdjustments", fields: [approvedById], references: [id])
+  reason          StockAdjustmentReason? @relation(fields: [reasonId], references: [id], onDelete: Restrict)
+  inventoryImport InventoryImport?       @relation(fields: [inventoryImportId], references: [id], onDelete: SetNull)
+  createdBy       User                   @relation("CreatedStockAdjustments", fields: [createdById], references: [id])
+  approvedBy      User?                  @relation("ApprovedStockAdjustments", fields: [approvedById], references: [id])
 
   movement InventoryMovement?
 
@@ -868,6 +878,7 @@ enum AdjustmentStatus {
 enum StockAdjustmentType {
   INCREASE
   DECREASE
+  MIXED
 }
 
 model StockAdjustmentDetail {
@@ -875,9 +886,11 @@ model StockAdjustmentDetail {
 
   stockAdjustmentId String @db.Uuid
 
-  materialId   String @db.Uuid
-  supplierId   String @db.Uuid
-  materialName String @db.VarChar(200)
+  materialId   String  @db.Uuid
+  supplierId   String  @db.Uuid
+  materialName String  @db.VarChar(200)
+  reasonId     String? @db.Uuid
+  observations String? @db.VarChar(500)
 
   previousStock Decimal @db.Decimal(18, 6)
   newStock      Decimal @db.Decimal(18, 6)
@@ -889,8 +902,9 @@ model StockAdjustmentDetail {
 
   stockAdjustment StockAdjustment @relation(fields: [stockAdjustmentId], references: [id])
 
-  material Material @relation(fields: [materialId], references: [id])
-  supplier Supplier @relation(fields: [supplierId], references: [id])
+  material Material               @relation(fields: [materialId], references: [id])
+  supplier Supplier               @relation(fields: [supplierId], references: [id])
+  reason   StockAdjustmentReason? @relation(fields: [reasonId], references: [id], onDelete: Restrict)
 
   movementDetails MovementDetail[]
 
@@ -900,6 +914,7 @@ model StockAdjustmentDetail {
   @@index([stockAdjustmentId])
   @@index([materialId])
   @@index([supplierId])
+  @@index([reasonId])
 }
 
 enum InventoryMovementType {
@@ -968,9 +983,11 @@ model StockAdjustmentReason {
 
   isActive Boolean @default(true)
 
-  stockAdjustments          StockAdjustment[]
-  goodsReceiptDetailChanges GoodsReceiptDetailChange[]
-  wasteStockAdjustments     WasteStockAdjustment[]
+  stockAdjustments            StockAdjustment[]
+  stockAdjustmentDetails      StockAdjustmentDetail[]
+  goodsReceiptDetailChanges   GoodsReceiptDetailChange[]
+  wasteStockAdjustments       WasteStockAdjustment[]
+  wasteStockAdjustmentDetails WasteStockAdjustmentDetail[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

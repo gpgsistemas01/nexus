@@ -148,6 +148,20 @@
       "rows"
     ],
     "properties": {
+      "adjustment": {
+        "type": "object",
+        "description": "Documento único del conteo confirmado, presente sólo si se ajustaron existencias.",
+        "required": ["id", "referenceNumber"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referenceNumber": {
+            "type": "string"
+          }
+        }
+      },
       "summary": {
         "$ref": "../openapi.json#/components/schemas/InventoryImportSummary"
       },

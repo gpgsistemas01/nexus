@@ -31,6 +31,9 @@ export interface InventoryImportPreview {
     summary: { total: number; creates: number; updates: number; unchanged: number; errors: number };
     rows: InventoryImportRow[];
 }
+export interface InventoryImportResult extends InventoryImportPreview {
+    adjustment?: { id: string; referenceNumber: string };
+}
 export interface InventoryImportBatch {
     id: string;
     version: number;
@@ -40,7 +43,7 @@ export interface InventoryImportBatch {
     filename: string;
     expiresAt: string;
     preview: InventoryImportPreview | null;
-    result: InventoryImportPreview | null;
+    result: InventoryImportResult | null;
 }
 export interface PendingInventoryImport {
     id: string;

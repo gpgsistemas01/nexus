@@ -24,6 +24,14 @@ a la [vista física](../../physical/index.md).
 de inventario. El payload y la vista previa son temporales; el resultado confirmado
 permanece para recuperar reintentos. Su FK al actor admite `SET NULL` al retirar la
 cuenta. La unicidad de actor/clave impide reutilizar una confirmación en otro lote.
+Al confirmar un conteo con cambios, `StockAdjustment` (AJU) o
+`WasteStockAdjustment` (AME) se vincula al recibo mediante `inventoryImportId`
+único. El documento comparte un movimiento de cabecera. Cada existencia que cambia
+tiene una partida con motivo, observaciones y saldos, y un detalle de movimiento.
+La cabecera conserva motivo y observaciones comunes cuando coinciden en todas las
+partidas. El tipo `MIXED` identifica documentos que aumentan y disminuyen
+existencias. Un conteo sin cambios conserva sólo el recibo. La migración copia
+motivos y observaciones a los detalles históricos conservando los folios previos.
 El [Contrato HTTP](../../../openapi/index.md) define
 permisos, transacción y limpieza.
 

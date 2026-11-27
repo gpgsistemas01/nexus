@@ -50,7 +50,7 @@ export const prepareInventoryImport = async (req, res) => {
 export const applyInventoryImport = async (req, res) => {
     const result = await confirmInventoryImport({ user: req.user, id: req.params.id,
         expectedVersion: req.body.expectedVersion, operationId: req.body.operationId });
-    if (!result.replayed) {
+    if (!result.replayed && (result.batch.mode !== INVENTORY_IMPORT_MODES.ADJUST || result.batch.result.adjustment)) {
         try { emitInventoryUpdated({ context: result.batch.resource === 'wastes' ? 'waste' : 'material', source: 'inventory-import-completed' }); }
         catch (error) { logger.warn({ err: error, importId: req.params.id }, 'La importación se confirmó pero no se pudo notificar el inventario'); }
     }

@@ -99,10 +99,12 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
                     || !isDeepStrictEqual(current.before, saved.before)
                     || !isDeepStrictEqual(current.dto, saved.dto)) throw new InventoryImportError('CONFLICT');
             }
-            const saved = await writeInventoryImport({ tx, config, rows: validated.rows, context: validated.context, userId: user.id });
-            const changes = validated.rows.map(row => ({ ...publicRow(row), id: saved.get(row.row) ?? row.id,
+            const { savedIds, adjustment } = await writeInventoryImport({
+                tx, config, rows: validated.rows, context: validated.context, userId: user.id, inventoryImportId: batch.id
+            });
+            const changes = validated.rows.map(row => ({ ...publicRow(row), id: savedIds.get(row.row) ?? row.id,
                 supplierId: row.dto.supplierId ?? validated.context.wastes?.get(row.id)?.supplierId ?? null }));
-            const result = json({ summary: validated.summary, rows: changes });
+            const result = json({ summary: validated.summary, rows: changes, ...(adjustment && { adjustment }) });
             const persisted = await tx.inventoryImport.update({ where: { id, version: expectedVersion }, data: {
                 status: statuses.COMPLETED, operationId, commandHash, completedAt: new Date(), result,
                 payload: Prisma.DbNull, preview: Prisma.DbNull
