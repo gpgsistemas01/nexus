@@ -484,6 +484,30 @@ usuarios y responsables se mantiene en el
 | `stockAdjustmentDetail` | `StockAdjustmentDetail` | `stockAdjustmentDetailId` | Cero o uno |
 | `movement` | `InventoryMovement` | `movementId` | Exactamente uno |
 
+### `MovementDetailCost`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `movementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `unitCost` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `movementDetail` | `MovementDetail` | `movementDetailId` | Exactamente uno |
+
+### `MovementReturnAllocation`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `returnMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `sourceMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `returnMovementDetail` | `MovementDetail` | `returnMovementDetailId` | Exactamente uno |
+| `sourceCost` | `MovementDetailCost` | `sourceMovementDetailId` | Exactamente uno |
+
 ### `StockAdjustment`
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
@@ -706,6 +730,30 @@ usuarios y responsables se mantiene en el
 | `wasteStockAdjustmentDetail` | `WasteStockAdjustmentDetail` | `wasteStockAdjustmentDetailId` | Cero o uno |
 | `movement` | `WasteMovement` | `movementId` | Exactamente uno |
 | `wasteIssueDetail` | `WasteIssueDetail` | `wasteIssueDetailId` | Cero o uno |
+
+### `WasteMovementDetailCost`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `movementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `unitCost` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `movementDetail` | `WasteMovementDetail` | `movementDetailId` | Exactamente uno |
+
+### `WasteMovementReturnAllocation`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `returnMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `sourceMovementDetailId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `returnMovementDetail` | `WasteMovementDetail` | `returnMovementDetailId` | Exactamente uno |
+| `sourceCost` | `WasteMovementDetailCost` | `sourceMovementDetailId` | Exactamente uno |
 
 ### `WasteStockEntry`
 

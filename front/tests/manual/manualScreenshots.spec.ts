@@ -358,7 +358,7 @@ test('salidas: devolución de un detalle existente ya surtido', async ({ page })
 });
 
 test('movimientos y alcance del reporte', async ({ page }) => {
-  await mockMovements(page);
+  await mockMovements(page, Object.values(PERMISSIONS));
   await readOnly(page);
   await page.goto('/movimientos/materiales');
   await expect(page.getByRole('cell', { name: 'SAL-001', exact: true })).toBeVisible();

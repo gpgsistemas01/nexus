@@ -213,7 +213,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueReturnForm.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 10, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 12, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -230,10 +230,17 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `isHistorical` | `isHistorical?: boolean;` |
 | `physicalReturnConfirmed` | `physicalReturnConfirmed?: boolean;` |
 | `physicalReturnError` | `physicalReturnError?: string;` |
+| `sources` | `sources: IssueReturnSource[];` |
+| `sourceMovementDetailId` | `sourceMovementDetailId: string;` |
+| `sourceError` | `sourceError?: string;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [IssueReturnSource](../../../../../src/modules/issues/composables/useIssueReturn.ts) | `sources` |
 
 ## IssueReturnForm.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 30, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -243,6 +250,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |
 | `confirmPhysicalReturn` | `confirmPhysicalReturn: [value: boolean];` |
+| `selectSource` | `selectSource: [id: string];` |
 
 ## IssueSupplyField.defineProps
 
@@ -319,6 +327,16 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- | --- |
 | association | [IssueRow](../../../../../src/modules/issues/issue.ts) | `row` |
 | dependency | [IssueOpenMode](../../../../../src/modules/issues/issue.ts) | `mode` |
+
+## IssueReturnSource
+
+**Fuente:** [src/modules/issues/composables/useIssueReturn.ts](../../../../../src/modules/issues/composables/useIssueReturn.ts) · línea 13, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `id` | `id: string;` |
+| `date` | `date: string \| null;` |
+| `quantity` | `quantity: number;` |
 
 ## HistoricalDeliveryCandidate
 

@@ -23,6 +23,7 @@ export interface MovementRow {
     previousStock: string | number | null;
     quantity: string | number | null;
     newStock: string | number | null;
+    unitCost?: string | number | null;
 }
 
 export const MOVEMENT_CONFIG = {

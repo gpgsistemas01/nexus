@@ -13,6 +13,7 @@ const props = defineProps<{
     rows: MovementRow[];
     total: number;
     isLoading: boolean;
+    canReadCosts: boolean;
 }>();
 const emit = defineEmits<{ query: [changes: Partial<MovementQuery>] }>();
 const numericKeys = [
@@ -57,6 +58,9 @@ const headers = computed<DataTableHeader<MovementRow>[]>(() => [
     { title: 'Proveedor', key: 'supplierName', sortable: false, nowrap: true },
     ...movementColumns('Medidas', measures),
     ...movementColumns('Cambio de existencia', stockChange),
+    ...(props.canReadCosts
+        ? [{ title: 'Costo unitario sin IVA', key: 'unitCost', sortable: false, nowrap: true }]
+        : []),
 ]);
 const { sortBy, changesFromOptions } = useTableQuery(
     () => props.query,
@@ -83,6 +87,9 @@ const { sortBy, changesFromOptions } = useTableQuery(
             #[`item.${key}`]="{ item }"
         >
             {{ numberText(item[key]) }}
+        </template>
+        <template #[`item.unitCost`]="{ item }">
+            {{ item.unitCost === null ? 'Sin verificar' : (item.unitCost ?? '—') }}
         </template>
     </ServerTable>
 </template>

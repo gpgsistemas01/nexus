@@ -391,6 +391,7 @@ model WasteMovement {
   wasteIssue           WasteIssue?           @relation(fields: [wasteIssueId], references: [id])
 
   @@index([wasteIssueId])
+  @@index([date])
 }
 
 /// Entrada inicial o incremental de merma con folio EME-AAAA-consecutivo.
@@ -446,6 +447,8 @@ model WasteMovementDetail {
   movement                   WasteMovement               @relation(fields: [movementId], references: [id], onDelete: Cascade)
   wasteIssueDetail           WasteIssueDetail?           @relation(fields: [wasteIssueDetailId], references: [id])
   wasteIssueReturn           WasteIssueReturn?
+  cost                       WasteMovementDetailCost?
+  returnAllocations          WasteMovementReturnAllocation[]
   createdAt                  DateTime                    @default(now())
   updatedAt                  DateTime                    @updatedAt
 
@@ -453,6 +456,24 @@ model WasteMovementDetail {
   @@index([wasteStockAdjustmentDetailId])
   @@index([movementId])
   @@index([wasteIssueDetailId])
+}
+
+model WasteMovementDetailCost {
+  movementDetailId  String                          @id @db.Uuid
+  unitCost          Decimal                         @db.Decimal(18, 6)
+  movementDetail    WasteMovementDetail             @relation(fields: [movementDetailId], references: [id], onDelete: Cascade)
+  returnAllocations WasteMovementReturnAllocation[]
+}
+
+model WasteMovementReturnAllocation {
+  returnMovementDetailId String                  @db.Uuid
+  sourceMovementDetailId String                  @db.Uuid
+  quantity               Decimal                 @db.Decimal(18, 6)
+  returnMovementDetail   WasteMovementDetail     @relation(fields: [returnMovementDetailId], references: [id], onDelete: Cascade)
+  sourceCost             WasteMovementDetailCost @relation(fields: [sourceMovementDetailId], references: [movementDetailId], onDelete: NoAction)
+
+  @@id([returnMovementDetailId, sourceMovementDetailId])
+  @@index([sourceMovementDetailId])
 }
 
 model WasteIssue {
@@ -804,6 +825,7 @@ model InventoryMovement {
 
   @@index([goodsReceiptId])
   @@index([goodsIssueId])
+  @@index([date])
 }
 
 model MovementDetail {
@@ -830,6 +852,8 @@ model MovementDetail {
   stockAdjustmentDetail StockAdjustmentDetail? @relation(fields: [stockAdjustmentDetailId], references: [id])
   movement              InventoryMovement      @relation(fields: [movementId], references: [id])
   goodsIssueReturn      GoodsIssueReturn?
+  cost                  MovementDetailCost?
+  returnAllocations     MovementReturnAllocation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -837,6 +861,25 @@ model MovementDetail {
   @@index([materialId])
   @@index([supplierId])
   @@index([movementId])
+  @@index([goodsIssueDetailId])
+}
+
+model MovementDetailCost {
+  movementDetailId  String                     @id @db.Uuid
+  unitCost          Decimal                    @db.Decimal(18, 6)
+  movementDetail    MovementDetail             @relation(fields: [movementDetailId], references: [id], onDelete: Cascade)
+  returnAllocations MovementReturnAllocation[]
+}
+
+model MovementReturnAllocation {
+  returnMovementDetailId String             @db.Uuid
+  sourceMovementDetailId String             @db.Uuid
+  quantity               Decimal            @db.Decimal(18, 6)
+  returnMovementDetail   MovementDetail     @relation(fields: [returnMovementDetailId], references: [id], onDelete: Cascade)
+  sourceCost             MovementDetailCost @relation(fields: [sourceMovementDetailId], references: [movementDetailId], onDelete: NoAction)
+
+  @@id([returnMovementDetailId, sourceMovementDetailId])
+  @@index([sourceMovementDetailId])
 }
 
 model StockAdjustment {

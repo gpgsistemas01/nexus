@@ -58,3 +58,16 @@ la compatibilidad con clientes que surten todo el pendiente seleccionado.
 
 La cantidad para presentación `PIEZA/PIEZAS` debe ser entera según el registro del
 servidor; una fracción responde `409 INVENTORY_PIECE_QUANTITY_REQUIRED`.
+
+## Costo de los movimientos y origen de devoluciones
+
+Los listados de movimientos incluyen `unitCost` con permiso `inventory:costs-read`
+cuando el movimiento admite costo. Se devuelve como decimal en texto, sin IVA, o
+`null` si el costo histórico sigue sin verificar. El campo se omite para operaciones
+sin valoración y para cuentas sin permiso.
+
+Si los surtidos disponibles tienen distintos costos, o combinan saldo verificado e
+histórico, la devolución responde `409 ISSUE_RETURN_COST_SOURCE_REQUIRED` sin modificar
+el inventario. `meta.sources` incluye `id`, `date` y `quantity` pendiente por origen.
+Para el saldo histórico, `id` es `unverified` y `date` es `null`. Envíe el `id` como
+`sourceMovementDetailId` y una cantidad que no supere el saldo de ese origen.

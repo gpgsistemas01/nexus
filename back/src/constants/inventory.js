@@ -4,6 +4,8 @@ export const INVENTORY_MOVEMENT_TYPES = Object.freeze({
     ADJUSTMENT: 'ADJUSTMENT'
 });
 
+export const UNVERIFIED_ISSUE_RETURN_SOURCE = 'unverified';
+
 export const STOCK_ADJUSTMENT_TYPES = Object.freeze({
     INCREASE: 'INCREASE',
     DECREASE: 'DECREASE',

@@ -264,6 +264,7 @@ describe('waste issue controller database integration', () => {
       referenceNumber: issue.referenceNumber,
       materialName: `IT WasteIssue Material ${ suffix }`,
       supplierName: `IT WasteIssue Supplier ${ suffix }`,
+      unitCost: '25',
       quantity: '-4'
     }));
 
@@ -279,6 +280,19 @@ describe('waste issue controller database integration', () => {
     });
     const wasteAfterReturn = await prisma.waste.findUnique({ where: { id: ids.waste } });
     expect(Number(wasteAfterReturn.currentStock)).toBe(7);
+    const returnMovement = await prisma.wasteMovementDetail.findUniqueOrThrow({
+      where: { id: returned.body.wasteIssueReturn.movementDetailId },
+      include: { cost: true, returnAllocations: { include: { sourceCost: true } } }
+    });
+    expect(returnMovement.cost).toBeNull();
+    expect(returnMovement.returnAllocations).toHaveLength(1);
+    const [allocation] = returnMovement.returnAllocations;
+    expect(allocation.sourceMovementDetailId).toBe(movement.details[0].id);
+    expect(allocation.quantity.toString()).toBe('1');
+    expect(allocation.sourceCost.unitCost.toString()).toBe('25');
+    const listedReturns = await request(app).get('/waste-movements')
+      .query({ wasteId: ids.waste, movementType: 'RETURN' }).expect(200);
+    expect(listedReturns.body.data).toContainEqual(expect.objectContaining({ id: returnMovement.id, unitCost: '25' }));
 
     await request(app)
       .patch(`/waste-issues/${ issueId }/details/${ detailId }/returns`)

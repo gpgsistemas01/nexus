@@ -32,6 +32,7 @@ describe('movimientos de inventario de merma', () => {
 
     expect(applyWasteStockChanges).toHaveBeenCalledWith({
       tx,
+      includeMaxUnitCost: false,
       changes: [{
         id: 'waste-1',
         materialName: undefined,
@@ -72,6 +73,7 @@ describe('movimientos de inventario de merma', () => {
 
     expect(applyWasteStockChanges).toHaveBeenLastCalledWith({
       tx,
+      includeMaxUnitCost: false,
       changes: [{ id: 'waste-1', materialName: undefined, quantityChange: -3, convertedQuantityChange: -6 }]
     });
     expect(movement.details.map(detail => [detail.previousStock, detail.newStock])).toEqual([[10, 9], [9, 7]]);

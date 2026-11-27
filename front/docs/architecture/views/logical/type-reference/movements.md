@@ -54,6 +54,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `rows` | `rows: MovementRow[];` |
 | `total` | `total: number;` |
 | `isLoading` | `isLoading: boolean;` |
+| `canReadCosts` | `canReadCosts: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -63,7 +64,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## MovementTable.defineEmits
 
-**Fuente:** [src/modules/movements/components/MovementTable.vue](../../../../../src/modules/movements/components/MovementTable.vue) · línea 17, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/movements/components/MovementTable.vue](../../../../../src/modules/movements/components/MovementTable.vue) · línea 18, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -141,6 +142,7 @@ MovementFilters & RecordQuery
 | `previousStock` | `previousStock: string \| number \| null;` |
 | `quantity` | `quantity: string \| number \| null;` |
 | `newStock` | `newStock: string \| number \| null;` |
+| `unitCost` | `unitCost?: string \| number \| null;` |
 
 ## MovementPage.defineProps
 

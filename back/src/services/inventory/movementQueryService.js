@@ -1,4 +1,7 @@
 import { findPage } from '../../repository/paginationRepository.js';
+import {
+    findInventoryMovementCosts, findInventoryMovementDatePage, findWasteMovementCosts, findWasteMovementDatePage
+} from '../../repository/warehouse/movementRepository.js';
 import { MovementFindDatabaseError } from "../../errors/inventory/movementError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
@@ -177,7 +180,13 @@ const resolveMovementTypeName = (detail) => {
     return MOVEMENT_TYPE_NAMES[detail.movement.type] ?? detail.movement.type;
 };
 
-const mapMovementDetail = (detail) => ({
+const movementCostFields = (id, costs, linkedDocument) => {
+    if (!costs) return {};
+    const unitCost = costs.get(id) ?? null;
+    return unitCost !== null || linkedDocument ? { unitCost } : {};
+};
+
+const mapMovementDetail = (detail, costs) => ({
     id: detail.id,
 
     date: formatDateLongWithTime(detail.movement.date),
@@ -200,6 +209,8 @@ const mapMovementDetail = (detail) => ({
 
     newStock: detail.newStock,
 
+    ...movementCostFields(detail.id, costs, detail.movement.goodsReceipt || detail.movement.goodsIssue),
+
     referenceNumber:
         detail.movement.goodsIssue?.referenceNumber ||
         detail.movement.goodsReceipt?.referenceNumber ||
@@ -207,7 +218,7 @@ const mapMovementDetail = (detail) => ({
         detail.movement.referenceNumber
 });
 
-const mapWasteMovementDetail = (detail) => ({
+const mapWasteMovementDetail = (detail, costs) => ({
     id: detail.id,
     date: formatDateLongWithTime(detail.movement.date),
     createdAt: formatDateLongWithTime(detail.movement.createdAt),
@@ -225,7 +236,8 @@ const mapWasteMovementDetail = (detail) => ({
     supplierName: detail.waste.supplier.tradeName,
     previousStock: detail.previousStock,
     quantity: detail.quantity,
-    newStock: detail.newStock
+    newStock: detail.newStock,
+    ...movementCostFields(detail.id, costs, detail.movement.wasteIssue)
 });
 
 const getWasteMovementSearchFilter = (search) => !search ? {} : ({
@@ -241,6 +253,7 @@ const getWasteMovementSearchFilter = (search) => !search ? {} : ({
 
 const findInventoryMovements = async ({
     type,
+    canReadCosts = false,
     includeCounts = true,
     cursor,
     skip = 0,
@@ -263,6 +276,8 @@ const findInventoryMovements = async ({
     try {
 
         const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
+        const dateFilter = getMovementDateFilter({ startDate, endDate });
+        const onlyDate = !(search || materialId || supplierId || movementType || goodsIssueId || goodsReceiptId || stockAdjustmentId);
 
         const movementFilters = {
             ...(movementType && {
@@ -271,7 +286,7 @@ const findInventoryMovements = async ({
             ...(goodsIssueId && { goodsIssueId }),
             ...(goodsReceiptId && { goodsReceiptId }),
             ...(stockAdjustmentId && { stockAdjustmentId }),
-            ...getMovementDateFilter({ startDate, endDate })
+            ...dateFilter
         };
         const where = {
 
@@ -302,11 +317,18 @@ const findInventoryMovements = async ({
             })
         };
 
-        const page = await findPage({
+        return await findPage({
             model: db.movementDetail,
             totalWhere: materialDetailTypeWhere(type),
             hasFilters: Boolean(search || materialId || supplierId || Object.keys(movementFilters).length),
             includeCounts,
+            fetchPage: includeCounts && !cursor && take > 0 && orderBy === 'date' && onlyDate
+                ? query => findInventoryMovementDatePage({ db, query, type, dateRange: dateFilter.date, orderDir })
+                : undefined,
+            mapData: async rows => {
+                const costs = canReadCosts && await findInventoryMovementCosts({ db, ids: rows.map(detail => detail.id) });
+                return rows.map(detail => mapMovementDetail(detail, costs));
+            },
             query: {
                 skip,
                 take,
@@ -316,8 +338,6 @@ const findInventoryMovements = async ({
                 select: MOVEMENT_DETAIL_SELECT
             }
         });
-
-        return { ...page, data: page.data.map(mapMovementDetail) };
 
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'inventory.findInventoryMovements', inventoryType: type });
@@ -330,6 +350,7 @@ export const findAllMaterialMovements = (options = {}) => findInventoryMovements
 export const findAllConsumableMovements = (options = {}) => findInventoryMovements({ ...options, type: MATERIAL_TYPES.CONSUMABLE });
 
 export const findAllWasteMovements = async ({
+    canReadCosts = false,
     includeCounts = true,
     cursor,
     skip = 0,
@@ -347,6 +368,8 @@ export const findAllWasteMovements = async ({
 
     try {
         const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
+        const dateFilter = getMovementDateFilter({ startDate, endDate });
+        const onlyDate = !(search || wasteId || supplierId || movementType);
         const where = {
             ...(wasteId && { wasteId }),
             ...(supplierId && { waste: { supplierId } }),
@@ -355,13 +378,20 @@ export const findAllWasteMovements = async ({
             ...getWasteMovementSearchFilter(search),
             movement: {
                 ...(movementType && { type: isReturnMovementFilter ? 'ENTRY' : movementType }),
-                ...getMovementDateFilter({ startDate, endDate })
+                ...dateFilter
             }
         };
-        const page = await findPage({
+        return await findPage({
             model: db.wasteMovementDetail,
             hasFilters: Boolean(search || wasteId || supplierId || movementType || startDate || endDate),
             includeCounts,
+            fetchPage: includeCounts && !cursor && take > 0 && orderBy === 'date' && onlyDate
+                ? query => findWasteMovementDatePage({ db, query, dateRange: dateFilter.date, orderDir })
+                : undefined,
+            mapData: async rows => {
+                const costs = canReadCosts && await findWasteMovementCosts({ db, ids: rows.map(detail => detail.id) });
+                return rows.map(detail => mapWasteMovementDetail(detail, costs));
+            },
             query: {
                 skip,
                 take,
@@ -372,7 +402,6 @@ export const findAllWasteMovements = async ({
             }
         });
 
-        return { ...page, data: page.data.map(mapWasteMovementDetail) };
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'inventory.findAllWasteMovements' });
         throw new MovementFindDatabaseError();

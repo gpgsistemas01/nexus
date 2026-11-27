@@ -133,6 +133,7 @@ onMounted(() => {
             :rows="rows"
             :total="total"
             :is-loading="isLoading"
+            :can-read-costs="has(PERMISSIONS.INVENTORY_COSTS_READ)"
             @query="list.applyQuery"
         />
     </RecordListPanel>

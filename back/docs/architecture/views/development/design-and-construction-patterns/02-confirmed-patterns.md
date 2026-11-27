@@ -6,6 +6,7 @@
 | Entrada HTTP | Pipeline de autenticación, permisos, validación y adaptación. | `src/routes/api` y `src/middleware`. |
 | Variación por contexto | Fachadas y handlers configurables de materiales y consumibles. | `goodsReceipts` y `goodsIssues`. |
 | Datos | Cliente Prisma compartido y contexto transaccional. | `src/lib/prisma.js`, `baseRepository` y servicios. |
+| Devoluciones | Consulta en el repositorio, asignación en un servicio común y relación con clave compuesta para conservar el origen. | `issueDetailRepository.js`, `issueReturnAllocationService.js`, `MovementReturnAllocation` y `WasteMovementReturnAllocation`. |
 | Registro | Catálogos administrables mediante lista blanca. | `MANAGED_CATALOGS` y `catalogService`. |
 | Integración | Eventos autenticados de inventario posteriores a la escritura. | Socket.IO y `emitInventoryUpdated`. |
 | Auditoría | Registro transversal después de la respuesta. | `auditWrites`, `persistWriteAudit`. |

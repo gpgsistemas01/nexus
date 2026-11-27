@@ -19,8 +19,8 @@ const SOURCE_AREAS = [
 const DATABASE_AREAS = [
     ['Identidad, acceso y auditoría', ['Department', 'Role', 'User', 'Person', 'UserRoleDepartment', 'PersonRoleDepartment', 'CriticalWriteAudit']],
     ['Catálogos y relaciones comerciales', ['Status', 'FulfillmentStatus', 'Project', 'Client', 'Supplier', 'Material', 'UnitMeasure', 'Presentation', 'SupplierMaterial', 'ReferenceNumberCounter']],
-    ['Compras e inventario de materiales', ['GoodsReceipt', 'GoodsReceiptDetail', 'GoodsReceiptDetailChange', 'GoodsIssue', 'GoodsIssueDetail', 'GoodsIssueReturn', 'InventoryMovement', 'MovementDetail', 'StockAdjustment', 'StockAdjustmentDetail', 'StockAdjustmentReason']],
-    ['Mermas e inventario de merma', ['Waste', 'WasteIssue', 'WasteIssueDetail', 'WasteIssueReturn', 'WasteMovement', 'WasteMovementDetail', 'WasteStockEntry', 'WasteOperation', 'WasteStockAdjustment', 'WasteStockAdjustmentDetail']],
+    ['Compras e inventario de materiales', ['GoodsReceipt', 'GoodsReceiptDetail', 'GoodsReceiptDetailChange', 'GoodsIssue', 'GoodsIssueDetail', 'GoodsIssueReturn', 'InventoryMovement', 'MovementDetail', 'MovementDetailCost', 'MovementReturnAllocation', 'StockAdjustment', 'StockAdjustmentDetail', 'StockAdjustmentReason']],
+    ['Mermas e inventario de merma', ['Waste', 'WasteIssue', 'WasteIssueDetail', 'WasteIssueReturn', 'WasteMovement', 'WasteMovementDetail', 'WasteMovementDetailCost', 'WasteMovementReturnAllocation', 'WasteStockEntry', 'WasteOperation', 'WasteStockAdjustment', 'WasteStockAdjustmentDetail']],
     ['Importaciones y conciliación de inventario', ['InventoryImport', 'HistoricalDeliveryBatch']]
 ];
 const USE_CASE_DOCUMENTS = {

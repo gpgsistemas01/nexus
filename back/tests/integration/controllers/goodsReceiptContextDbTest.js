@@ -343,6 +343,15 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
                 const offer = await prisma.supplierMaterial.findUnique({ where });
                 const expected = Math.max(maxUnitCost ?? 0, ...saved.map(detail => Number(detail.conversionUnitCost)));
                 expect(offer.maxUnitCost === null ? null : Number(offer.maxUnitCost)).toBe(expected);
+                const movementDetails = await prisma.movementDetail.findMany({
+                    where: { movement: { goodsReceiptId: response.body.goodsReceipt.id } },
+                    include: { cost: true }
+                });
+                expect(movementDetails).toHaveLength(saved.length);
+                const costsByDetailId = new Map(saved.map(detail => [detail.id, detail.conversionUnitCost.toString()]));
+                for (const line of movementDetails) {
+                    expect(line.cost.unitCost.toString()).toBe(costsByDetailId.get(line.goodsReceiptDetailId));
+                }
             }
         } finally {
             await prisma.supplierMaterial.update({ where, data: { maxUnitCost: 10 } });
@@ -420,6 +429,12 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(canceled.costIsTotal).toBe(true);
         expect(canceled.status).toBe('CANCELED');
         expect(Number(canceled.netPurchaseAmount)).toBe(400);
+        const movements = await prisma.movementDetail.findMany({
+            where: { goodsReceiptDetailId: detail.id },
+            select: { cost: true, movement: { select: { goodsReceiptDetailChange: { select: { changeType: true } } } } }
+        });
+        expect(movements.map(line => [line.movement.goodsReceiptDetailChange?.changeType, line.cost.unitCost.toString()]))
+            .toEqual(expect.arrayContaining([[undefined, '50'], ['QUANTITY_AND_COST', '50'], ['CANCELLATION', '80']]));
     });
 
     it('emite CMA y CCO concurrentes con contadores independientes e inventario del contexto correcto', async () => {

@@ -18,7 +18,7 @@ flowchart LR
     controllers["controllers (34 módulos)"] --> errors["errors (25 módulos)"]
     controllers["controllers (34 módulos)"] --> messages["messages (1 módulos)"]
     controllers["controllers (34 módulos)"] --> middleware["middleware (6 módulos)"]
-    controllers["controllers (34 módulos)"] --> services["services (87 módulos)"]
+    controllers["controllers (34 módulos)"] --> services["services (88 módulos)"]
     controllers["controllers (34 módulos)"] --> shared["shared (25 módulos)"]
     controllers["controllers (34 módulos)"] --> utils["utils (15 módulos)"]
     dtos["dtos (12 módulos)"] --> shared["shared (25 módulos)"]
@@ -28,32 +28,32 @@ flowchart LR
     messages["messages (1 módulos)"] --> shared["shared (25 módulos)"]
     middleware["middleware (6 módulos)"] --> errors["errors (25 módulos)"]
     middleware["middleware (6 módulos)"] --> messages["messages (1 módulos)"]
-    middleware["middleware (6 módulos)"] --> services["services (87 módulos)"]
+    middleware["middleware (6 módulos)"] --> services["services (88 módulos)"]
     middleware["middleware (6 módulos)"] --> shared["shared (25 módulos)"]
     middleware["middleware (6 módulos)"] --> utils["utils (15 módulos)"]
-    repository["repository (11 módulos)"] --> constants["constants (11 módulos)"]
-    repository["repository (11 módulos)"] --> errors["errors (25 módulos)"]
-    repository["repository (11 módulos)"] --> lib["lib (3 módulos)"]
-    repository["repository (11 módulos)"] --> shared["shared (25 módulos)"]
+    repository["repository (12 módulos)"] --> constants["constants (11 módulos)"]
+    repository["repository (12 módulos)"] --> errors["errors (25 módulos)"]
+    repository["repository (12 módulos)"] --> lib["lib (3 módulos)"]
+    repository["repository (12 módulos)"] --> shared["shared (25 módulos)"]
     routes["routes (37 módulos)"] --> controllers["controllers (34 módulos)"]
     routes["routes (37 módulos)"] --> middleware["middleware (6 módulos)"]
-    routes["routes (37 módulos)"] --> services["services (87 módulos)"]
+    routes["routes (37 módulos)"] --> services["services (88 módulos)"]
     routes["routes (37 módulos)"] --> shared["shared (25 módulos)"]
     routes["routes (37 módulos)"] --> utils["utils (15 módulos)"]
     routes["routes (37 módulos)"] --> validators["validators (18 módulos)"]
-    services["services (87 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (87 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (87 módulos)"] --> errors["errors (25 módulos)"]
-    services["services (87 módulos)"] --> lib["lib (3 módulos)"]
-    services["services (87 módulos)"] --> messages["messages (1 módulos)"]
-    services["services (87 módulos)"] --> repository["repository (11 módulos)"]
-    services["services (87 módulos)"] --> shared["shared (25 módulos)"]
-    services["services (87 módulos)"] --> utils["utils (15 módulos)"]
-    services["services (87 módulos)"] --> validators["validators (18 módulos)"]
+    services["services (88 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (88 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (88 módulos)"] --> errors["errors (25 módulos)"]
+    services["services (88 módulos)"] --> lib["lib (3 módulos)"]
+    services["services (88 módulos)"] --> messages["messages (1 módulos)"]
+    services["services (88 módulos)"] --> repository["repository (12 módulos)"]
+    services["services (88 módulos)"] --> shared["shared (25 módulos)"]
+    services["services (88 módulos)"] --> utils["utils (15 módulos)"]
+    services["services (88 módulos)"] --> validators["validators (18 módulos)"]
     utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (15 módulos)"] --> errors["errors (25 módulos)"]
     utils["utils (15 módulos)"] --> messages["messages (1 módulos)"]
-    utils["utils (15 módulos)"] --> services["services (87 módulos)"]
+    utils["utils (15 módulos)"] --> services["services (88 módulos)"]
     utils["utils (15 módulos)"] --> shared["shared (25 módulos)"]
     validators["validators (18 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (18 módulos)"] --> messages["messages (1 módulos)"]
@@ -246,7 +246,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/document/referenceNumberService.js`](../../../../src/services/document/referenceNumberService.js) | `generateYearlyReferenceNumber`, `incrementNonYearlyReferenceNumberCounter`, `reserveYearlyReferenceNumbers`, `throwIfReferenceNumberAlreadyExists` |
 | [`src/services/healthService.js`](../../../../src/services/healthService.js) | `checkDatabaseReady` |
 | [`src/services/inventory/materialIdentity.js`](../../../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityWidth` |
-| [`src/services/inventory/movementHelpers.js`](../../../../src/services/inventory/movementHelpers.js) | `buildInventoryMovementDetail`, `buildStockUpdateSummary` |
+| [`src/services/inventory/movementHelpers.js`](../../../../src/services/inventory/movementHelpers.js) | `buildInventoryMovementDetail`, `buildMovementCostRelations`, `buildStockUpdateSummary` |
 | [`src/services/inventory/movementQueryService.js`](../../../../src/services/inventory/movementQueryService.js) | `findAllConsumableMovements`, `findAllMaterialMovements`, `findAllWasteMovements` |
 | [`src/services/inventory/movementService.js`](../../../../src/services/inventory/movementService.js) | `applyInventoryMovement`, `createInventoryMovement` |
 | [`src/services/inventory/reportService.js`](../../../../src/services/inventory/reportService.js) | `findMovementReportRows` |
@@ -293,6 +293,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/issues/issueAccessService.js`](../../../../src/services/warehouse/issues/issueAccessService.js) | `assertIssueDepartmentAccess`, `buildIssueDepartmentWhere`, `resolveIssueImmediateSupply` |
 | [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `assertIssueNotCanceled`, `assertIssueNotHistorical`, `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
+| [`src/services/warehouse/issues/issueReturnAllocationService.js`](../../../../src/services/warehouse/issues/issueReturnAllocationService.js) | `resolveIssueReturnAllocations` |
 | [`src/services/warehouse/issues/issueSupplyRules.js`](../../../../src/services/warehouse/issues/issueSupplyRules.js) | `buildInitialIssueSupplyDetails`, `resolveIssueSupplyChange` |
 | [`src/services/warehouse/materials/materialCatalogService.js`](../../../../src/services/warehouse/materials/materialCatalogService.js) | `createMaterialCatalogEntry`, `deleteMaterialCatalogEntry`, `findMaterialCatalog`, `findMaterialCatalogEntries`, `materialCatalogIdentityChanged`, `updateMaterialCatalogEntry` |
 | [`src/services/warehouse/materials/materialDocumentSnapshot.js`](../../../../src/services/warehouse/materials/materialDocumentSnapshot.js) | `MATERIAL_DOCUMENT_DISPLAY_SELECT`, `MATERIAL_SPECIFICATION_SELECT`, `assertMaterialDetailMatchesInventory`, `createMaterialSpecification`, `getMaterialDetailSpecification`, `materialDetailTypeWhere`, `materialDocumentDetailsWhere` |

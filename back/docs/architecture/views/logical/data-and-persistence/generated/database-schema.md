@@ -450,6 +450,26 @@ erDiagram
     InventoryMovement ||..o{ MovementDetail : "movementId = InventoryMovement.id"
 ```
 
+### MovementDetailCost · MovementReturnAllocation
+
+```mermaid
+erDiagram
+    direction LR
+    MovementDetailCost {
+        String movementDetailId PK,FK
+    }
+    MovementReturnAllocation {
+        String returnMovementDetailId PK,FK
+        String sourceMovementDetailId PK,FK
+    }
+    MovementDetail {
+        String id PK
+    }
+    MovementDetail ||--o| MovementDetailCost : "movementDetailId = MovementDetail.id"
+    MovementDetail ||--o{ MovementReturnAllocation : "returnMovementDetailId = MovementDetail.id"
+    MovementDetailCost ||--o{ MovementReturnAllocation : "sourceMovementDetailId = MovementDetailCost.movementDetailId"
+```
+
 ### StockAdjustment
 
 ```mermaid
@@ -655,7 +675,7 @@ erDiagram
     Waste ||..o{ WasteIssueReturn : "wasteId = Waste.id"
 ```
 
-### WasteMovementDetail
+### WasteMovementDetail · WasteMovementDetailCost
 
 ```mermaid
 erDiagram
@@ -666,6 +686,9 @@ erDiagram
         String wasteStockAdjustmentDetailId FK
         String movementId FK
         String wasteIssueDetailId FK
+    }
+    WasteMovementDetailCost {
+        String movementDetailId PK,FK
     }
     Waste {
         String id PK
@@ -683,13 +706,18 @@ erDiagram
     WasteStockAdjustmentDetail o|..o{ WasteMovementDetail : "wasteStockAdjustmentDetailId = WasteStockAdjustmentDetail.id"
     WasteMovement ||..o{ WasteMovementDetail : "movementId = WasteMovement.id"
     WasteIssueDetail o|..o{ WasteMovementDetail : "wasteIssueDetailId = WasteIssueDetail.id"
+    WasteMovementDetail ||--o| WasteMovementDetailCost : "movementDetailId = WasteMovementDetail.id"
 ```
 
-### WasteStockEntry · WasteOperation
+### WasteMovementReturnAllocation · WasteStockEntry · WasteOperation
 
 ```mermaid
 erDiagram
     direction LR
+    WasteMovementReturnAllocation {
+        String returnMovementDetailId PK,FK
+        String sourceMovementDetailId PK,FK
+    }
     WasteStockEntry {
         String id PK
         String referenceNumber UK
@@ -710,10 +738,18 @@ erDiagram
     WasteMovement {
         String id PK
     }
+    WasteMovementDetail {
+        String id PK
+    }
+    WasteMovementDetailCost {
+        String movementDetailId PK,FK
+    }
     User ||--o{ WasteOperation : "userId = User.id"
     Waste ||..o{ WasteStockEntry : "wasteId = Waste.id"
     User ||..o{ WasteStockEntry : "createdById = User.id"
     WasteMovement ||..o| WasteStockEntry : "wasteMovementId = WasteMovement.id"
+    WasteMovementDetail ||--o{ WasteMovementReturnAllocation : "returnMovementDetailId = WasteMovementDetail.id"
+    WasteMovementDetailCost ||--o{ WasteMovementReturnAllocation : "sourceMovementDetailId = WasteMovementDetailCost.movementDetailId"
 ```
 
 ### WasteStockAdjustment
@@ -840,6 +876,9 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `WasteMovementDetail.wasteStockAdjustmentDetailId` | `WasteStockAdjustmentDetail.id` | 0..1 | 0..N |
 | `WasteMovementDetail.movementId` | `WasteMovement.id` | 1 | 0..N |
 | `WasteMovementDetail.wasteIssueDetailId` | `WasteIssueDetail.id` | 0..1 | 0..N |
+| `WasteMovementDetailCost.movementDetailId` | `WasteMovementDetail.id` | 1 | 0..1 |
+| `WasteMovementReturnAllocation.returnMovementDetailId` | `WasteMovementDetail.id` | 1 | 0..N |
+| `WasteMovementReturnAllocation.sourceMovementDetailId` | `WasteMovementDetailCost.movementDetailId` | 1 | 0..N |
 | `WasteIssue.historicalDeliveryBatchId` | `HistoricalDeliveryBatch.id` | 0..1 | 0..N |
 | `WasteIssue.createdById` | `User.id` | 1 | 0..N |
 | `WasteIssue.departmentId` | `Department.id` | 1 | 0..N |
@@ -889,6 +928,9 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `MovementDetail.goodsIssueDetailId` | `GoodsIssueDetail.id` | 0..1 | 0..N |
 | `MovementDetail.stockAdjustmentDetailId` | `StockAdjustmentDetail.id` | 0..1 | 0..N |
 | `MovementDetail.movementId` | `InventoryMovement.id` | 1 | 0..N |
+| `MovementDetailCost.movementDetailId` | `MovementDetail.id` | 1 | 0..1 |
+| `MovementReturnAllocation.returnMovementDetailId` | `MovementDetail.id` | 1 | 0..N |
+| `MovementReturnAllocation.sourceMovementDetailId` | `MovementDetailCost.movementDetailId` | 1 | 0..N |
 | `StockAdjustment.reasonId` | `StockAdjustmentReason.id` | 0..1 | 0..N |
 | `StockAdjustment.inventoryImportId` | `InventoryImport.id` | 0..1 | 0..1 |
 | `StockAdjustment.createdById` | `User.id` | 1 | 0..N |

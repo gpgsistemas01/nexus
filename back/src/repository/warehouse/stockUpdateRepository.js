@@ -26,7 +26,7 @@ export const updateSupplierMaterialStocks = ({ tx, changes }) => {
         WHERE stock."id" = locked."id"
             AND stock."materialId" = changes.material_id AND stock."supplierId" = changes.supplier_id
             AND (changes.quantity >= 0 OR stock."currentStock" >= -changes.quantity)
-        RETURNING stock."materialId", stock."supplierId", stock."currentStock"
+        RETURNING stock."materialId", stock."supplierId", stock."currentStock", stock."maxUnitCost"
     `);
 };
 
@@ -50,6 +50,6 @@ export const updateWasteStocks = ({ tx, changes }) => {
         FROM changes, locked
         WHERE stock."id" = locked."id" AND stock."id" = changes.id
             AND (changes.quantity >= 0 OR stock."currentStock" >= -changes.quantity)
-        RETURNING stock."id", stock."currentStock"
+        RETURNING stock."id", stock."currentStock", stock."maxUnitCost"
     `);
 };

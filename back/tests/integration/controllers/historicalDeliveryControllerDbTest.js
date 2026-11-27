@@ -161,7 +161,14 @@ describe('entregas históricas HTTP: reconocimiento, concurrencia y ausencia de 
     const path = `/${resource}/${issue.id}/details/${issue.details[0].id}/returns`;
     await request(app).patch(path).set('Cookie', cookie).send({ returnQuantity: 1, observations: 'Retorno actual' }).expect(400);
     expect(await stockSnapshot()).toEqual(before);
-    await request(app).patch(path).set('Cookie', cookie).send({ returnQuantity: 1, observations: 'Retorno físico actual', physicalReturnConfirmed: true }).expect(200);
+    const returned = await request(app).patch(path).set('Cookie', cookie)
+      .send({ returnQuantity: 1, observations: 'Retorno físico actual', physicalReturnConfirmed: true }).expect(200);
+    const returnResource = resource === 'wastes' ? 'wasteIssueReturn' : 'goodsIssueReturn';
+    const costs = resource === 'wastes' ? prisma.wasteMovementDetailCost : prisma.movementDetailCost;
+    const allocations = resource === 'wastes' ? prisma.wasteMovementReturnAllocation : prisma.movementReturnAllocation;
+    const movementDetailId = returned.body[returnResource].movementDetailId;
+    expect(await costs.findUnique({ where: { movementDetailId } })).toBeNull();
+    expect(await allocations.count({ where: { returnMovementDetailId: movementDetailId } })).toBe(0);
     const offer = resource === 'wastes' ? await prisma.waste.findUnique({ where: { id: ids.waste } })
       : await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: fixture.suppliers[0].id, materialId: ids.materials } } });
     expect(Number(offer.currentStock)).toBe(1);

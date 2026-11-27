@@ -2,6 +2,8 @@ import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { applyWasteStockChanges } from './wasteInventoryService.js';
+import { WasteIssueMissingMaxUnitCost } from '../../../errors/warehouse/wasteIssueError.js';
+import { buildMovementCostRelations } from '../../inventory/movementHelpers.js';
 
 export const createWasteMovement = ({
     tx = null,
@@ -47,7 +49,11 @@ export const applyWasteMovement = async ({
         grouped.set(detail.wasteId, change);
     }
 
-    const balances = await applyWasteStockChanges({ tx, changes: [...grouped.values()] });
+    const balances = await applyWasteStockChanges({
+        tx,
+        changes: [...grouped.values()],
+        includeMaxUnitCost: isIssue && details.some(detail => detail.wasteIssueDetailId)
+    });
     const movementDetails = details.map(detail => {
         const quantity = isIssue ? -detail.quantity : detail.quantity;
         const balance = balances.get(detail.wasteId);
@@ -55,12 +61,17 @@ export const applyWasteMovement = async ({
         const newStock = normalizeDecimal(previousStock + quantity);
         balance.previousStock = newStock;
 
+        if (isIssue && detail.wasteIssueDetailId && !(Number(balance.maxUnitCost) > 0)) {
+            throw new WasteIssueMissingMaxUnitCost({ materialName: detail.materialName });
+        }
+        const cost = isIssue && detail.wasteIssueDetailId ? { unitCost: balance.maxUnitCost } : detail.cost;
         return {
             wasteId: detail.wasteId,
             ...(detail.wasteIssueDetailId && { wasteIssueDetailId: detail.wasteIssueDetailId }),
             quantity,
             previousStock,
-            newStock
+            newStock,
+            ...buildMovementCostRelations({ cost, returnAllocations: detail.returnAllocations })
         };
     });
 

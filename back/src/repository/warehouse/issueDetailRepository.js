@@ -1,4 +1,40 @@
 import { Prisma } from '../../../generated/prisma/client.ts';
+import { INVENTORY_MOVEMENT_TYPES } from '../../constants/inventory.js';
+
+// El índice por origen permite sumar sólo las asignaciones de los surtidos de esta partida.
+const findAvailableIssueSources = ({ tx, issueDetailId, detail, movement, cost, allocation, issueColumn }) => tx.$queryRaw(Prisma.sql`
+    SELECT source.id, movement.date, balance.quantity, cost."unitCost"
+    FROM ${detail} AS source
+    JOIN ${movement} AS movement ON movement.id = source."movementId"
+    JOIN ${cost} AS cost ON cost."movementDetailId" = source.id
+    CROSS JOIN LATERAL (
+        SELECT -source.quantity - COALESCE(SUM(allocation.quantity), 0) AS quantity
+        FROM ${allocation} AS allocation
+        WHERE allocation."sourceMovementDetailId" = source.id
+    ) AS balance
+    WHERE source.${issueColumn} = ${issueDetailId}::uuid AND source.quantity < 0
+        AND movement.type = ${INVENTORY_MOVEMENT_TYPES.ISSUE}::"InventoryMovementType"
+        AND balance.quantity > 0
+    ORDER BY movement.date ASC, source.id ASC
+`);
+
+export const findAvailableGoodsIssueSources = ({ tx, issueDetailId }) => findAvailableIssueSources({
+    tx, issueDetailId,
+    detail: Prisma.sql`"MovementDetail"`,
+    movement: Prisma.sql`"InventoryMovement"`,
+    cost: Prisma.sql`"MovementDetailCost"`,
+    allocation: Prisma.sql`"MovementReturnAllocation"`,
+    issueColumn: Prisma.sql`"goodsIssueDetailId"`
+});
+
+export const findAvailableWasteIssueSources = ({ tx, issueDetailId }) => findAvailableIssueSources({
+    tx, issueDetailId,
+    detail: Prisma.sql`"WasteMovementDetail"`,
+    movement: Prisma.sql`"WasteMovement"`,
+    cost: Prisma.sql`"WasteMovementDetailCost"`,
+    allocation: Prisma.sql`"WasteMovementReturnAllocation"`,
+    issueColumn: Prisma.sql`"wasteIssueDetailId"`
+});
 
 // Los nombres SQL proceden exclusivamente de los dos identificadores fijos de este módulo.
 // El servicio valida los detalles y conserva el bloqueo del documento durante la escritura.

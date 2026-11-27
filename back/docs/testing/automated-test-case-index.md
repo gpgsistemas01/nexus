@@ -389,3 +389,17 @@ operativa no puede forzarlo. Comprueba documento, saldo, cantidad entregada y
 movimientos en PostgreSQL; restaura stock y limpia sus documentos al finalizar.
 
 `CP-INT-CAT-MAT-002` (`RF-CAT-030`): `catalogControllersDbTest.js` combina nombre, tipo, presentación y unidad. Comprueba conteos y segunda página, selección de una presentación inactiva y rechazo con `CATALOG_FILTER_INVALID`.
+
+## Costo de movimientos y devolución por surtido
+
+`CA-RF-REC-007-4` relaciona cada entrada con el costo de su partida en
+`goodsReceiptContextDbTest.js`. `CA-RF-ISS-002-2` y `CA-RF-ISS-003-2` comprueban
+en `goodsIssueControllerDbTest.js` dos surtidos a precios distintos, el requisito
+de elegir origen y el rechazo de una devolución concurrente del mismo saldo.
+`wasteIssueControllerDbTest.js` cubre la consulta y devolución de merma.
+`movementUnitCostsDbTest.js` aplica la migración a tablas temporales y verifica
+el costo exacto recuperado y el rechazo de valores nulos o inválidos.
+`movementReturnAllocationsDbTest.js` comprueba la conversión del JSON a vínculos
+con cantidades exactas y el rollback en ambos inventarios cuando el costo de
+origen difiere. La integración de salidas también verifica una devolución con
+varios orígenes del mismo costo y la lectura del costo desde el surtido.

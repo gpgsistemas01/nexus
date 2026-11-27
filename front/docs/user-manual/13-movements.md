@@ -72,6 +72,10 @@ existencia** muestra el stock anterior, la cantidad del movimiento y el nuevo sa
 | Stock anterior        | Existencia antes del movimiento.                                    |
 | Movimiento            | Variación registrada; interprete su signo junto con el tipo.        |
 | Nuevo stock           | Saldo resultante de esa operación.                                  |
+| Costo unitario sin IVA | Con permiso de costos, muestra el costo de compra, el máximo vigente al surtir o el costo del surtido devuelto, en la unidad de conversión. |
+
+**Sin verificar** indica que el historial disponible no permite recuperar el
+costo del movimiento. Un guion indica que la operación no tiene valoración.
 
 Revise fecha, orden y artículo: puede haber movimientos posteriores al saldo
 mostrado. Compare movimientos del mismo artículo y proveedor.

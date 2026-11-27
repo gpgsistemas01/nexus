@@ -61,12 +61,16 @@ export const applyInventoryMovement = async ({
         const previousStock = balance.previousStock;
         const newStock = normalizeDecimal(previousStock + quantity);
         balance.previousStock = newStock;
+        const cost = isIssue && detail.goodsIssueDetailId
+            ? { unitCost: balance.maxUnitCost }
+            : detail.cost;
 
         return buildInventoryMovementDetail({
             ...detail,
             quantity,
             previousStock,
-            newStock
+            newStock,
+            cost
         });
     });
 

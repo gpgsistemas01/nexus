@@ -2,8 +2,9 @@ import { isDeepStrictEqual } from 'node:util';
 import { QUERY_BATCH_SIZES } from '../constants/pagination.js';
 
 // Recibe el modelo del cliente elegido por el servicio; no crea otro cliente ni transacción.
-export const findPage = async ({ model, query, totalWhere, hasFilters = true, includeCounts = true }) => {
-    const dataQuery = model.findMany(query);
+export const findPage = async ({ model, query, totalWhere, hasFilters = true, includeCounts = true, mapData, fetchPage = query => model.findMany(query) }) => {
+    const rowsQuery = fetchPage(query);
+    const dataQuery = mapData ? Promise.resolve(rowsQuery).then(mapData) : rowsQuery;
     if (!includeCounts) return { data: await dataQuery };
 
     // Convertir PrismaPromise en Promise permite compartir un único conteo entre ambos resultados.

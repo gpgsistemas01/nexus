@@ -1,5 +1,7 @@
 import { lockWasteIssue } from '../../../../repository/warehouse/documentLockRepository.js';
 import { assertHistoricalPhysicalReturn } from '../../issues/historicalReturnRules.js';
+import { resolveIssueReturnAllocations } from '../../issues/issueReturnAllocationService.js';
+import { findAvailableWasteIssueSources } from '../../../../repository/warehouse/issueDetailRepository.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../shared/constants/fulfillmentStatuses.js';
 import {
     WasteIssueDetailNotFound,
@@ -14,6 +16,7 @@ import { applyWasteMovement } from '../../wastes/wasteMovementService.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
 import { findWasteIssueFulfillmentStatusIds } from '../wasteIssueFulfillmentService.js';
 import { assertPieceQuantity } from '../../../inventory/stockHelpers.js';
+import { roundTo } from '../../../../shared/utils/numberUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueReturnService');
 
@@ -34,14 +37,20 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
 
     const returnedQuantity = Number(detail.returnedQuantity);
     const suppliedQuantity = Number(detail.suppliedQuantity);
-    const returnQuantity = Number(returnDto.returnQuantity);
-    const availableQuantity = suppliedQuantity - returnedQuantity;
+    const returnQuantity = roundTo(returnDto.returnQuantity);
+    const availableQuantity = roundTo(suppliedQuantity - returnedQuantity);
 
     if (returnQuantity <= 0 || returnQuantity > availableQuantity) {
         throw new WasteIssueReturnQuantityConflict();
     }
 
-    const newTotalReturnedQuantity = returnedQuantity + returnQuantity;
+    const newTotalReturnedQuantity = roundTo(returnedQuantity + returnQuantity);
+    const returnAllocations = resolveIssueReturnAllocations({
+        pricedSources: await findAvailableWasteIssueSources({ tx, issueDetailId: detail.id }),
+        availableQuantity,
+        returnQuantity,
+        sourceMovementDetailId: returnDto.sourceMovementDetailId
+    });
     const movement = await applyWasteMovement({
         tx,
         reference: { wasteIssueId: id },
@@ -50,7 +59,8 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
             wasteId: detail.wasteId,
             wasteIssueDetailId: detail.id,
             quantity: returnQuantity,
-            convertedQuantity: Number(detail.convertedQuantity) * returnQuantity / Number(detail.quantity)
+            convertedQuantity: Number(detail.convertedQuantity) * returnQuantity / Number(detail.quantity),
+            returnAllocations
         }]
     });
     const statusIds = await findWasteIssueFulfillmentStatusIds(tx);

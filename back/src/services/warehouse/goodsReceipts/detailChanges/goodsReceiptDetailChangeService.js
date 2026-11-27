@@ -46,6 +46,8 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
 
     if (normalizedQuantityDifference === 0) return null;
 
+    const unitCost = currentDetail.conversionUnitCost;
+    const numericUnitCost = Number(unitCost);
     return applyInventoryMovement({
         tx,
         movementType: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT,
@@ -55,7 +57,8 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
             supplierId: currentDetail.goodsReceipt.supplierId,
             quantity: normalizedQuantityDifference,
             goodsReceiptDetailId,
-            materialSpecification: currentDetail.materialSpecification
+            materialSpecification: currentDetail.materialSpecification,
+            ...(Number.isFinite(numericUnitCost) && numericUnitCost >= 0 && { cost: { unitCost } })
         }]
     });
 };

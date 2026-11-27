@@ -217,6 +217,10 @@
       },
       "newStock": {
         "type": "number"
+      },
+      "unitCost": {
+        "type": ["string", "null"],
+        "description": "Costo unitario sin IVA en la unidad de conversión. Sólo se incluye con inventory:costs-read en movimientos a los que aplica. El texto decimal conserva hasta seis decimales. Null identifica un costo histórico sin verificar."
       }
     },
     "additionalProperties": false,

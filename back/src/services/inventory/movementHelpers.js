@@ -8,6 +8,11 @@ const resolveValue = (item, resolver) => (
         : item[resolver]
 );
 
+export const buildMovementCostRelations = ({ cost, returnAllocations = [] }) => ({
+    ...(cost && { cost: { create: cost } }),
+    ...(returnAllocations.length > 0 && { returnAllocations: { create: returnAllocations } })
+});
+
 export const buildInventoryMovementDetail = ({
     materialId,
     supplierId,
@@ -16,7 +21,9 @@ export const buildInventoryMovementDetail = ({
     newStock,
     goodsReceiptDetailId = null,
     goodsIssueDetailId = null,
-    stockAdjustmentDetailId = null
+    stockAdjustmentDetailId = null,
+    cost,
+    returnAllocations
 }) => ({
     materialId,
     supplierId,
@@ -25,7 +32,8 @@ export const buildInventoryMovementDetail = ({
     newStock,
     ...(goodsReceiptDetailId && { goodsReceiptDetailId }),
     ...(goodsIssueDetailId && { goodsIssueDetailId }),
-    ...(stockAdjustmentDetailId && { stockAdjustmentDetailId })
+    ...(stockAdjustmentDetailId && { stockAdjustmentDetailId }),
+    ...buildMovementCostRelations({ cost, returnAllocations })
 });
 
 export const buildStockUpdateSummary = ({
