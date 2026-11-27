@@ -22,8 +22,10 @@ comprueba recibos, movimientos, versiones y rollback reales.
 La variante de conteo selecciona Ajustar existencias para todo el archivo y muestra
 stock 2→0. Cambiar de Alta a Ajustar retira el archivo previo y exige cargarlo otra
 vez. La vista previa muestra el motivo y las observaciones comunes una sola vez. Se confirma una sola solicitud y se muestra el folio común una sola vez. La
-variante con saldos iguales y celdas en blanco muestra Sin conteo para las
-filas omitidas en la vista previa y el recibo. La confirmación muestra el aviso
+variante con saldos iguales y celdas en blanco avisa por qué se omiten las filas y
+las marca como **Sin conteo** en la vista previa y el recibo. La vista previa
+permite confirmar con los conteos disponibles y explica cómo incluir las filas en
+blanco en una nueva validación. La confirmación muestra el aviso
 de importación sin cambios y omite el folio. Las plantillas conservan su operación en los
 parámetros y nombre de descarga, no envían página, y la pantalla explica las columnas
 grises, las opciones de **Catalogos** y los filtros. Un archivo incompatible muestra
