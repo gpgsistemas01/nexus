@@ -106,6 +106,42 @@ test('un archivo de otra operación muestra el rechazo y permite elegir otra pla
   expect(confirmations).toBe(0);
 });
 
+test('una plantilla de conteo vencida pide descargar otra y permite validar el reemplazo', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const batch = inventoryImportDraft();
+  batch.mode = 'adjust';
+  let uploads = 0;
+  await page.route('**/api/warehouse/inventory-imports/materials/preview?mode=adjust', (route) => {
+    uploads++;
+    return uploads === 1
+      ? route.fulfill({ status: 400, json: { code: 'INVENTORY_IMPORT_TEMPLATE_EXPIRED' } })
+      : route.fulfill({ json: { code: 'INVENTORY_IMPORT_PREVIEW', batch } });
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Importar Excel de materiales', exact: true });
+  await selectOperation(page, 'Ajustar existencias');
+  const file = dialog.locator('input[type=file]');
+  const validate = dialog.getByRole('button', { name: 'Validar archivo', exact: true });
+  const confirm = dialog.getByRole('button', { name: 'Confirmar importación', exact: true });
+  const upload = (name: string) =>
+    file.setInputFiles({
+      name,
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      buffer: Buffer.from(name),
+    });
+  await upload('conteo-vencido.xlsx');
+  await validate.click();
+  await expect(dialog.getByRole('alert').filter({ hasText: 'Descarga una nueva' })).toBeVisible();
+  await expect(confirm).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'Descargar plantilla' })).toBeEnabled();
+  await upload('conteo-actual.xlsx');
+  await validate.click();
+  await expect(confirm).toBeEnabled();
+});
+
 test('un operador de conteo sólo dispone de Ajustar existencias y conserva las referencias necesarias', async ({
   page,
 }) => {

@@ -21,7 +21,7 @@ secretos ni los guardes en Git.
 | --- | --- |
 | `NODE_ENV` | Usa `development` para la ejecución local. |
 | `DATABASE_URL` | Conexión de la aplicación a PostgreSQL. |
-| `JWT_SECRET_ACCESS` | Firma independiente para tokens de acceso. |
+| `JWT_SECRET_ACCESS` | Firma de tokens de acceso y, con un prefijo exclusivo, del sello de las plantillas Excel de ajuste. Las réplicas del mismo entorno comparten el valor. Tras rotarlo, las plantillas de ajuste descargadas antes de la rotación requieren una descarga nueva. |
 | `JWT_SECRET_REFRESH` | Firma independiente para tokens de renovación. |
 | `PORT` | Puerto HTTP; por defecto `3000`. |
 | `DIRECT_URL` | Conexión directa opcional para migraciones Prisma. |

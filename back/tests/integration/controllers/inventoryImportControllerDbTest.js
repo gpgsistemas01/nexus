@@ -10,7 +10,8 @@ import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { getImportConfig } from '../../../src/services/warehouse/imports/inventoryImportConfig.js';
 import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
-import { ARTICLE_IMPORT_RESOURCE } from '../../../src/shared/constants/inventoryImport.js';
+import { ARTICLE_IMPORT_RESOURCE, INVENTORY_IMPORT_LIMITS } from '../../../src/shared/constants/inventoryImport.js';
+import { INVENTORY_STOCK_COUNT_SEAL_CELL } from '../../../src/constants/inventoryImport.js';
 
 let prisma, app, fixture, cookie, deniedCookie, previousSecret;
 const extraUnitIds = [];
@@ -359,6 +360,32 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(headers).not.toContain('Costo unitario');
         expect(sheet.getCell(2, headers.indexOf('Stock contado') + 1).value ?? '').toBe('');
         expect(sheet.getCell(2, headers.indexOf('Stock actual') + 1).value).toBe(2);
+    });
+
+    it('rechaza conteos vencidos, sin sello o con fecha alterada antes de crear un borrador', async () => {
+        const offer = await seedOffer('Conteo fuera de vigencia');
+        const issuedAt = Date.now() - INVENTORY_IMPORT_LIMITS.stockCountTemplateHours * 60 * 60 * 1000;
+        const adjustment = await adjustmentCapture();
+        const before = await inventorySnapshot();
+        const drafts = await prisma.inventoryImport.count({ where: { userId: fixture.user.id } });
+        const setSeal = (workbook, value) => { workbook.getWorksheet('Instrucciones').getCell(INVENTORY_STOCK_COUNT_SEAL_CELL).value = value; };
+        const variants = [
+            { issuedAt, alter: workbook => { workbook.modified = new Date(); } },
+            { issuedAt, alter: workbook => {
+                const seal = workbook.getWorksheet('Instrucciones').getCell(INVENTORY_STOCK_COUNT_SEAL_CELL).value;
+                setSeal(workbook, seal.replace(/^\d+/, String(Date.now())));
+            } },
+            { alter: workbook => setSeal(workbook, null) },
+            { alter: workbook => { workbook.getWorksheet('Instrucciones').getCell('B1').value = 'NEXUS_INVENTORY_V3'; } }
+        ];
+        for (const variant of variants) {
+            const bytes = await inventoryWorkbook({ mode: 'adjust', rows: [countRow(offer, 3)], adjustment, ...variant });
+            await request(app).post('/materials/preview').query({ mode: 'adjust' }).set('Cookie', cookie)
+                .attach('file', bytes, 'conteo.xlsx').expect(400)
+                .expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_TEMPLATE_EXPIRED'));
+        }
+        expect(await prisma.inventoryImport.count({ where: { userId: fixture.user.id } })).toBe(drafts);
+        expect(await inventorySnapshot()).toEqual(before);
     });
 
     it('al perder lectura de costos, protege las ediciones sin bloquear los conteos', async () => {

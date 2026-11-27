@@ -103,7 +103,7 @@ const operationHint = computed(() => {
         return 'El sistema genera los IDs de las altas. Usa los valores completos de las listas desplegables de la hoja Catalogos.';
 
     if (props.mode === modes.ADJUST)
-        return 'Descarga la plantilla actual. En Datos, captura el Stock contado de los registros que hayas contado. Las celdas en blanco se omiten. Cero es válido. Si hay cambios, captura el motivo y las observaciones una sola vez en Instrucciones. Conserva las columnas grises y evita movimientos durante el conteo.';
+        return `Descarga la plantilla actual y súbela dentro de las ${limits.stockCountTemplateHours} horas. En Datos, captura el Stock contado de los registros que hayas contado. Las celdas en blanco se omiten. Cero es válido. Si hay cambios, captura el motivo y las observaciones una sola vez en Instrucciones. Conserva las columnas grises y evita movimientos durante el conteo.`;
 
     return props.resource === 'wastes'
         ? 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y conserva las columnas grises.'

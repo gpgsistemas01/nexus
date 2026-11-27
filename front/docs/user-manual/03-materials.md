@@ -80,6 +80,10 @@ Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->
+Suba la plantilla de ajuste dentro de las 24 horas desde que Nexus la genera.
+Conserve el sello de emisión en **Instrucciones**. Si vence, descargue otra
+plantilla y vuelva a comprobar el conteo.
+
 En **Stock contado**, escriba cero si comprobó que no hay existencias. Deje en blanco
 las celdas de las filas que aún no haya contado. La vista previa y el recibo muestran
 un aviso y marcan cada fila omitida como **Sin conteo**. Puede confirmar con las

@@ -43,6 +43,10 @@ sistema calcula las medidas. La edición de datos conserva el stock.
 <!-- manual:end -->
 
 <!-- manual:any wastes:adjust-stock -->
+Suba la plantilla de ajuste dentro de las 24 horas desde que Nexus la genera.
+Conserve el sello de emisión en **Instrucciones**. Si vence, descargue otra
+plantilla y vuelva a comprobar el conteo.
+
 En ajuste capture el saldo físico final. Escriba cero si comprobó que no hay
 existencias. Deje en blanco el **Stock contado** de las filas que aún no haya contado.
 La vista previa y el recibo muestran un aviso y marcan cada fila omitida como
